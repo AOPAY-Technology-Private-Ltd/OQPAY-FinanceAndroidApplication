@@ -1,0 +1,198 @@
+package com.bosandroidapp.oqmobilefinance.kioskmode
+
+import android.accessibilityservice.AccessibilityService
+import android.accounts.AccountManager
+import android.app.ActivityManager
+import android.app.ActivityOptions
+import android.content.Context
+import android.content.Intent
+import android.util.Log
+import android.view.accessibility.AccessibilityEvent
+import android.view.accessibility.AccessibilityNodeInfo
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.SETTINGS_PKG
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.gpsSettingsOpened
+import com.bosandroidapp.oqmobilefinance.utils.ACCESSIBILITYTAG
+import com.bosandroidapp.oqmobilefinance.utils.Logger
+import com.bosandroidapp.oqmobilefinance.utils.syncEmis
+
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
+class MyAccessibilityService : AccessibilityService() {
+
+
+    override fun onAccessibilityEvent(event: AccessibilityEvent?) {
+
+        CoroutineScope(Dispatchers.IO).launch {
+            syncEmis()
+        }
+
+        if (isMyAppInfoPage() && !isEMIsCompleted()) {
+            Logger.d(ACCESSIBILITYTAG, "On App Info Page: Global Back")
+            performGlobalAction(GLOBAL_ACTION_BACK)
+        }
+
+        if (isFactoryResetting(event?.text?.toString() ?: "") && !isEMIsCompleted()) {
+            Logger.d(ACCESSIBILITYTAG, "On Factory Reset Page: Global Back")
+            performGlobalAction(GLOBAL_ACTION_BACK)
+            this.showToast("You are not allowed to Factory reset your device when your EMIs are pending.")
+        }
+
+        val currentPkg = event?.packageName?.toString() ?: ""
+
+        if (!isGpsEnabled(this) && !isEMIsCompleted()) {
+            // Open GPS settings ONLY ONCE
+            if (!gpsSettingsOpened) {
+                gpsSettingsOpened = true
+                showToast("GPS must be enabled to use this device")
+                openGpsSettings()
+                return
+            }
+            if (!currentPkg.contains(SETTINGS_PKG)) {
+                openGpsSettings()   // FORCE BACK
+            }
+
+            return // STOP all other processing
+        }
+
+        // ✅ GPS ENABLED → RELEASE LOCK
+        if (gpsSettingsOpened) {
+            gpsSettingsOpened = false
+        }
+
+        /*if (isGoogleLogin(event) && !isEMIsCompleted()) {
+            Logger.d(ACCESSIBILITYTAG, "On Google Login Page: Global Back")
+            performGlobalAction(GLOBAL_ACTION_BACK)
+        }*/
+
+
+        if (isLocked()) {
+            Logger.d(ACCESSIBILITYTAG, "Phone Locked")
+            isMyAppMinimizedOrRemoved(event)
+        }
+
+
+    }
+
+    override fun onInterrupt() {
+        Log.d("Accessibility", "Service interrupted")
+    }
+
+    private fun isFactoryResetting(t: String): Boolean {
+        val text = t.toLowerCase()
+        return if (text.contains("reset phone", false) || text.contains(
+                "erase all data",
+                false
+            ) || text.contains(
+                "erase data",
+                false
+            ) || text.contains("factory reset", false) || text.contains("factory reset", false)
+        ) true
+        else false
+    }
+
+
+    private fun isMyAppMinimizedOrRemoved(event: AccessibilityEvent?) {
+
+        if (!((event?.packageName?.equals("com.google.android.apps.nbu.paisa.user")) ?: false)
+            && !((event?.packageName?.equals("com.phonepe.app")) ?: false)
+            && !((event?.packageName?.equals("net.one97.paytm")) ?: false)
+            && !((event?.packageName?.equals("in.org.npci.upiapp")) ?: false)
+            && !((event?.packageName?.equals("com.mobikwik_new")) ?: false)
+            && !((event?.packageName?.equals("com.freecharge.mobile")) ?: false)
+            && !((event?.packageName?.equals("com.icici.pockets")) ?: false)
+            && !((event?.packageName?.equals("com.axis.axispay")) ?: false)
+            && !((event?.packageName?.equals("com.hdfcbank.payzapp")) ?: false)
+            && !((event?.packageName?.equals("sbi.mobile.apps.in")) ?: false)
+            && !((event?.packageName?.equals("in.amazon.mShop.android.shopping")) ?: false)
+            && !((event?.packageName?.equals("com.bosandroidapp.oqmobilefinance")) ?: false)
+            && !(event?.packageName == null) && !isActivityRunning(this, KioskActivity::class.java) && !isPaymentAppRunning()
+        ) {
+            Logger.d(ACCESSIBILITYTAG, "${event.packageName}")
+            Logger.d(ACCESSIBILITYTAG, "Performing KioskActivity Intent")
+            val intent = Intent(this, KioskActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            val options = ActivityOptions.makeCustomAnimation(this, 0, 0)
+            startActivity(intent, options.toBundle())
+
+        }
+
+
+    }
+
+    private fun isActivityRunning(context: Context, activityClass: Class<*>): Boolean {
+        val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        val tasks = activityManager.appTasks
+        for (task in tasks) {
+            val base = task.taskInfo.baseActivity
+            val top = task.taskInfo.topActivity
+            if (base?.className == activityClass.name && top?.className == activityClass.name) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private fun isMyAppInfoPage(): Boolean {
+        val rootNode = rootInActiveWindow ?: return false
+        val texts = getVisibleText(rootNode)
+        var isAppInfo = false
+        var isMyApp = false
+
+        // Search for known "App info" patterns
+        for (t in texts) {
+            if (t.contains("App info", true) || t.contains(
+                    "Device admin app",
+                    true
+                ) || t.contains("Erase app data", true)
+            ) {
+                isAppInfo = true
+            }
+            // Many devices show package name directly
+            if (t.contains("OQ", true)) { // crude check for package
+                isMyApp = true
+            }
+        }
+        return (isAppInfo && isMyApp)
+    }
+
+    private fun isGoogleLogin(event: AccessibilityEvent?): Boolean {
+        Log.d("Accessibility",(event?.packageName?:"").toString())
+        if (event?.packageName?.contains("com.google.android.gms") ?: false ||
+            event?.packageName?.contains("com.google.android.gsf.login") ?: false
+        ) {
+            return true
+        }
+        return false
+    }
+
+    private fun isGpsEnabled(context: Context): Boolean {
+        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as android.location.LocationManager
+        return locationManager.isProviderEnabled(android.location.LocationManager.GPS_PROVIDER)
+    }
+
+
+    private fun openGpsSettings() {
+        val intent = Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
+    }
+
+    private fun getVisibleText(node: AccessibilityNodeInfo?): List<String> {
+        val result = mutableListOf<String>()
+        if (node == null) return result
+        node.text?.toString()?.let { result.add(it) }
+
+        for (i in 0 until node.childCount) {
+            result.addAll(getVisibleText(node.getChild(i)))
+        }
+        return result
+    }
+
+
+}
+
