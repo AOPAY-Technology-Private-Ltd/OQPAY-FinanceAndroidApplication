@@ -87,6 +87,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.CustomerLoanEmiR
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.GetCustomerLoanDetailsReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.VerifyOTPReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.SendOtpReq
+import com.bosandroidapp.oqmobilefinance.data.pg.PGOnlineRequestCall
 import com.bosandroidapp.oqmobilefinance.data.pg.PGRequestCall
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.repository.PanRepository
@@ -574,21 +575,31 @@ class EmiLoanDetailPage : AppCompatActivity() {
                         val email = preference.getStringValue(ConstantClass.CustomerEmailID, "") .ifEmpty { "bos.centerpvtltd@gmail.com" }
                         val emiNumbers=  (1..selectedNoofEmi).joinToString("")
                         PGWebViewActivity.LoanCodePG = loanCode
-                        var req = PGRequestCall(
-                            payCustomerPhoneNo = preference.getStringValue(ConstantClass.CustomerMobileNumber, ""),
-                            customerEmailID = email,
-                            registrationID = ConstantClass.PAN_VERIFICATION_REGISTRATION_ID ,
-                            payCartAmount = "1"/*emiamount.toString()*/,
-                            eMINumbers = "EMI${emiNumbers}",
-                            customerCode = preference.getStringValue(ConstantClass.CustomerCode, ""),
-                            payCustomerName = "${preference.getStringValue(ConstantClass.FirstName, "")} ${preference.getStringValue(ConstantClass.LastName, "")}",
-                            loanCode = loanCode
-                        )
+
                         if(loanmode!!.toLowerCase().equals("offline",ignoreCase = true)){
+                            var req = PGRequestCall(
+                                payCustomerPhoneNo = preference.getStringValue(ConstantClass.CustomerMobileNumber, ""),
+                                customerEmailID = email,
+                                registrationID = ConstantClass.PAN_VERIFICATION_REGISTRATION_ID ,
+                                payCartAmount = emiamount.toString(),
+                                eMINumbers = "EMI${emiNumbers}",
+                                customerCode = preference.getStringValue(ConstantClass.CustomerCode, ""),
+                                payCustomerName = "${preference.getStringValue(ConstantClass.FirstName, "")} ${preference.getStringValue(ConstantClass.LastName, "")}",
+                                loanCode = loanCode
+                            )
                             hitApiForRequestPG(req)
                         }
                         else{
-                            Toast.makeText(this@EmiLoanDetailPage,"Online EMI not allowed",Toast.LENGTH_SHORT).show()
+                            var req = PGOnlineRequestCall(
+                                amount = emiamount,
+                                registrationID =  ConstantClass.PAN_VERIFICATION_REGISTRATION_ID,
+                                eMINumbers = "EMI${emiNumbers}",
+                                customerCode = preference.getStringValue(ConstantClass.CustomerCode, ""),
+                                loanCode = loanCode
+
+                            )
+                            hitApiForRequestPGOnline(req)
+
                         }
 
                         // }
@@ -1280,12 +1291,15 @@ class EmiLoanDetailPage : AppCompatActivity() {
 
 
     fun hitApiForOTPVerify(mobileOrEmailID: String, otp: String, message: String) {
+
         var verifyotpreq = VerifyOTPReq(
             mobileormailid = mobileOrEmailID,
             otp = otp,
             logintype = message
         )
+
         Log.d("VerifyOTPReq", Gson().toJson(verifyotpreq))
+
         viewModel.verifyOTPReq(verifyotpreq).observe(this) { resources ->
             resources.let {
                 when (it.apiStatus) {
@@ -1449,5 +1463,51 @@ class EmiLoanDetailPage : AppCompatActivity() {
     }
 
 
+
+    fun hitApiForRequestPGOnline(req : PGOnlineRequestCall){
+
+        Log.d("PGRequest", Gson().toJson(req))
+
+        panViewModel.getPGRequestCallOnline(req).observe(this) { resources ->
+            resources.let {
+                when (it.apiStatus) {
+                    ApiStatus.SUCCESS -> {
+                        it.data.let { users ->
+                            users!!.body().let { response ->
+                                Log.d("PanVerificationResp", Gson().toJson(response))
+
+                                if (!response!!.intentUrl.isNullOrEmpty()) {
+                                    // Open WebView with the provided URL
+                                    ConstantClass.dialog.dismiss()
+                                    val intent = Intent(this@EmiLoanDetailPage, PGWebViewActivity::class.java)
+                                    intent.putExtra("pgurl", response!!.intentUrl)
+                                    startActivity(intent)
+                                }
+                                else {
+                                    ConstantClass.dialog.dismiss()
+                                    Toast.makeText(this@EmiLoanDetailPage, response!!.status, Toast.LENGTH_SHORT).show()
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                    ApiStatus.ERROR -> {
+                        ConstantClass.dialog.dismiss()
+                    }
+
+                    ApiStatus.LOADING -> {
+                        ConstantClass.OpenPopUpForVeryfyOTP(this)
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
 
 }

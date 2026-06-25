@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>No Objection Certificate</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 10px;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .noc-card {
+            position: relative;
+            width: 100%;
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 15px 15px 20px 15px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        /* WATERMARK */
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 75%;
+            max-width: 350px;
+            transform: translate(-50%, -50%);
+            opacity: 0.15;
+            z-index: 0;
+        }
+
+        /* CONTENT */
+        .content {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* HEADER */
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .logo-cell {
+            width: 90px;
+            vertical-align: top;
+        }
+
+        .logo {
+            width: 100%;
+            height: auto;
+        }
+
+        .company-name {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .address {
+            text-align: center;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .contact {
+            text-align: center;
+            margin-top: 5px;
+            font-size: 11px;
+        }
+
+        .divider {
+            margin-top: 10px;
+            border-top: 1px solid #666;
+        }
+
+        /* REF DATE */
+        .meta {
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .meta td {
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* TITLE */
+        .title {
+            text-align: center;
+            font-size: 22px;
+            font-style: italic;
+            text-decoration: underline;
+            margin-top: 20px;
+        }
+
+        .recipient {
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        /* BODY */
+        .body-content {
+            margin-top: 20px;
+        }
+
+        .body-content p {
+            font-size: 14px;
+            line-height: 1.8;
+            text-align: justify;
+            margin-bottom: 12px;
+        }
+
+        /* FOOTER */
+        .footer {
+            margin-top: 10px;
+        }
+
+        .footer p {
+            margin: 0;
+        }
+
+        /* SIGNATURE */
+        .sign-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .signature {
+            width: 130px;
+            height: auto;
+            object-fit: contain;
+        }
+
+
+        /* DETAILS */
+        .sign-details {
+            margin-top: 10px;
+            font-size: 14px;
+            line-height: 2;
+        }
+
+
+        /* STAMP */
+        .stamp-row {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .stamp {
+            width: 130px;
+            height: auto;
+            object-fit: contain;
+        }
+
+        /* MOBILE ADJUSTMENTS */
+        @media screen and (max-width: 600px) {
+            body {
+                padding: 0;
+                background: #fff;
+            }
+
+            .noc-card {
+                padding: 10px;
+                border: none;
+                height: 100vh;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                box-sizing: border-box;
+            }
+
+            .watermark {
+                width: 65%;
+            }
+
+            .logo-cell {
+                width: 75px;
+            }
+
+            .company-name {
+                font-size: 14px; /* Increased 1px (was 13px) */
+                margin-bottom: 1px;
+            }
+
+            .address, .contact {
+                font-size: 10px; /* Increased 1px (was 9px) */
+                line-height: 1.25;
+            }
+
+            .divider {
+                margin-top: 4px;
+            }
+
+            .meta {
+                margin-top: 4px;
+            }
+
+            .meta td {
+                font-size: 10px; /* Increased 1px (was 9px) */
+            }
+
+            .title {
+                font-size: 16px; /* Increased 1px (was 15px) */
+                margin-top: 4px;
+            }
+
+            .recipient {
+                font-size: 12px; /* Increased 1px (was 11px) */
+                margin-top: 4px;
+            }
+
+            .body-content {
+                margin-top: 4px;
+            }
+
+            .body-content p {
+                font-size: 11.5px; /* Increased 1px (was 10.5px) */
+                line-height: 1.35;
+                margin-bottom: 4px;
+                text-align: left;
+            }
+
+            .footer {
+                margin-top: 4px;
+                font-size: 11.5px; /* Increased 1px (was 10.5px) */
+            }
+
+            /* --- SIGNATURE ROW: LEFT ALIGNED & ENLARGED --- */
+            .sign-row {
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                margin-top: 4px;
+                gap: 10px;
+            }
+
+            .signature {
+                width: 145px;
+                height: 40px;
+                object-fit: contain;
+            }
+
+            .sign-details {
+                margin-top: 2px;
+                font-size: 11.5px; /* Increased 1px (was 10.5px) */
+                line-height: 1.3;
+            }
+
+            /* --- STAMP ROW: LEFT ALIGNED & CENTER CROPPED --- */
+            .stamp-row {
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                margin-top: 4px;
+                gap: 10px;
+            }
+
+            .stamp {
+                width: 120px;
+                height: 45px;
+                object-fit: fit;
+                object-position: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="noc-card">
+    <!-- Watermark -->
+    <img src="file:///android_res/drawable/aopay_logo.png" class="watermark" alt="Watermark">
+
+    <div class="content">
+        <!-- Header -->
+        <table class="header-table">
+            <tr>
+                <td class="logo-cell">
+                    <img src="file:///android_res/drawable/aopaynewlogo.png" class="logo" alt="Logo">
+                </td>
+                <td>
+                    <div class="company-name">AOPAY TECHNOLOGY PVT. LTD.</div>
+                    <div class="address">
+                        <b>Address:</b> Building No. 73, Block B-1, Sewak Park Extension, Near Netaji Subhas University Of Technology, Uttam Nagar, Delhi - 110059
+                    </div>
+                    <div class="contact">
+                        <b>Phone:</b> 08909890901 &nbsp;&nbsp; <b>Email:</b> info@aopay.in
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <div class="divider"></div>
+
+        <!-- Ref Date -->
+        <table class="meta">
+            <tr>
+                <td>Ref: {{REF_NO}}</td>
+                <td style="text-align:right;">Date: {{DATE}}</td>
+            </tr>
+        </table>
+
+        <!-- Title -->
+        <div class="title">No Objection Certificate</div>
+        <div class="recipient">To Whom It May Concern,</div>
+
+        <!-- Body -->
+        <div class="body-content">
+            <p>
+                This is to certify that <strong>{{CUSTOMER_NAME}}</strong>, holder of Mobile Number <strong>{{MOBILE_NUMBER}}</strong>, had availed a mobile phone finance facility from <strong>AOPAY Technology Pvt. Ltd.</strong> under Loan Agreement No. <strong>{{LOAN_NUMBER}}</strong> for the purchase of <strong>{{PRODUCT_NAME}}</strong>.
+            </p>
+            <p>
+                We hereby confirm that all installments and dues related to the above-mentioned finance agreement have been paid in full. There are no outstanding amounts pending against the said loan account as of <strong>{{LOAN_CLOSURE_DATE}}</strong>.
+            </p>
+            <p>
+                Therefore, AOPAY Technology Pvt. Ltd. has no objection to the closure of the loan account and confirms that the customer is released from all financial obligations related to this finance agreement.
+            </p>
+            <p>
+                This certificate is issued upon the customer's request for record purposes.
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>For AOPAY Technology Pvt. Ltd.</strong></p>
+
+            <div class="sign-row">
+                <span><strong>Authorized Signatory:</strong></span>
+                <img src="file:///android_res/drawable/signature.png" class="signature" alt="Signature">
+            </div>
+
+            <div class="sign-details">
+                <div><strong>Name:</strong> {{AUTH_NAME}}</div>
+                <div><strong>Designation:</strong> {{DESIGNATION}}</div>
+
+                <div class="stamp-row">
+                    <span><strong>Company Seal/Stamp:</strong></span>
+                    <img src="file:///android_res/drawable/stampicon.png" class="stamp" alt="Stamp">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

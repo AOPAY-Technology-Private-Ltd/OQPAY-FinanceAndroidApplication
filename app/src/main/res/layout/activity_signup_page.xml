@@ -453,9 +453,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@null"
-                        android:hint="Enter PAN Number"
+                        android:hint="Enter GST Number"
                         android:inputType="textCapCharacters"
-                        android:maxLength="10"
                         android:imeOptions="actionNext"
                         android:padding="@dimen/_8sdp"
                         android:textAllCaps="true"
@@ -475,6 +474,27 @@
                         android:layout_gravity="center"/>
 
                 </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/verifyGSTlayout"
+                    android:layout_width="@dimen/_55sdp"
+                    android:layout_height="@dimen/_20sdp"
+                    android:gravity="center"
+                    android:visibility="gone"
+                    android:layout_marginRight="@dimen/_10sdp"
+                    android:layout_marginTop="@dimen/_4sdp"
+                    android:background="@drawable/verifybg"
+                    android:layout_gravity="right">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Verify"
+                        android:gravity="center"
+                        android:layout_gravity="center"
+                        android:textColor="@color/white"/>
+
+                </LinearLayout>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -524,6 +544,7 @@
                         android:layout_height="wrap_content"
                         android:background="@null"
                         android:hint="Enter Store Legal Name"
+                        android:textColor="@color/edt_color"
                         android:padding="@dimen/_8sdp"
                         android:textSize="@dimen/_14ssp" />
 
@@ -550,6 +571,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@null"
+                        android:textColor="@color/edt_color"
                         android:hint="Enter Trade Name eg: ABC Electronics"
                         android:padding="@dimen/_8sdp"
                         android:textSize="@dimen/_14ssp" />
@@ -578,6 +600,7 @@
                         android:layout_height="wrap_content"
                         android:background="@null"
                         android:hint="Enter NOB eg: Electronics"
+                        android:textColor="@color/edt_color"
                         android:padding="@dimen/_8sdp"
                         android:textSize="@dimen/_14ssp" />
 
@@ -606,6 +629,7 @@
                         android:layout_height="wrap_content"
                         android:background="@null"
                         android:hint="Enter Store Address"
+                        android:textColor="@color/edt_color"
                         android:padding="@dimen/_8sdp"
                         android:textSize="@dimen/_14ssp" />
 
@@ -1183,7 +1207,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/_4sdp"
                 android:fontFamily="@font/inter_bold"
-                android:text="BOS Center Pvt Ltd"
+               android:text="@string/aopay_technology_ltd"
                 android:textColor="@color/black"
                 android:textSize="@dimen/_10ssp" />
 

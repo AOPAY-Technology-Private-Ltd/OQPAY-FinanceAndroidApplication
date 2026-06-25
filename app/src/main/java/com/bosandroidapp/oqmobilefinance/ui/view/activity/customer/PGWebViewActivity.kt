@@ -54,6 +54,7 @@ class PGWebViewActivity : AppCompatActivity() {
         var LoanCodePG : String = ""
     }
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         actionBar?.hide()
@@ -95,10 +96,10 @@ class PGWebViewActivity : AppCompatActivity() {
     </body>
     </html>
 """.trimIndent()
+
         binding.pgwebview.settings.javaScriptEnabled = true
         binding.pgwebview.settings.domStorageEnabled = true
         binding.pgwebview.webViewClient = object : WebViewClient() {
-
             override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
 
                 Log.d("URL", url.orEmpty())
