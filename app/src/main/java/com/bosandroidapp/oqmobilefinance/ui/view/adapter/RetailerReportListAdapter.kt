@@ -22,7 +22,9 @@ import com.bosandroidapp.oqmobilefinance.ui.view.activity.customer.EmiLoanDetail
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.customer.EmiLoanDetailPage.Companion.customerCode
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.reports.RetailerCustomerReportsPage
 
-class RetailerReportListAdapter(private val ReportsDataList: MutableList<com.bosandroidapp.oqmobilefinance.data.model.loginsignup.reports.ReportsDataItem> = mutableListOf(), var context: Context, var loginType : String
+class RetailerReportListAdapter(private val ReportsDataList: MutableList<com.bosandroidapp.oqmobilefinance.data.model.loginsignup.reports.ReportsDataItem> = mutableListOf(),
+                                var context: Context,
+                                var loginType : String
 ) : RecyclerView.Adapter<RetailerReportListAdapter.ViewHolder>() {
 
     lateinit var preference: SharedPreference
@@ -152,10 +154,17 @@ class RetailerReportListAdapter(private val ReportsDataList: MutableList<com.bos
     }
 
 
+
+
+
     fun safeFormatDate(date: String?): String {
         return date?.let { formatDateToFullMonth(it) } ?: "N/A"
     }
 
+
+    interface onClickListner{
+        fun onClick(item: com.bosandroidapp.oqmobilefinance.data.model.loginsignup.reports.ReportsDataItem )
+    }
 
 
 }

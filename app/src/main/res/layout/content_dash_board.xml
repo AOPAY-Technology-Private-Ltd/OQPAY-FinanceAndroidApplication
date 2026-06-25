@@ -389,8 +389,7 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/_4sdp"
-                android:visibility="gone">
+                android:layout_margin="@dimen/_4sdp">
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/customerreports"

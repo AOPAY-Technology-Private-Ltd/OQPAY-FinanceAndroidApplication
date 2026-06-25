@@ -373,11 +373,14 @@ class LoginPage : AppCompatActivity() {
 
         subtitle.text = "Enter four digit OTP send on your registered mobile number"
 
+
         startOtpTimer(resendtxt,timer)
+
 
         cancel.setOnClickListener {
             dialog.dismiss()
         }
+
 
         resendlayout.setOnClickListener {
                   if(isInternetAvailable(this@LoginPage)) {
@@ -391,6 +394,7 @@ class LoginPage : AppCompatActivity() {
 
         }
 
+
         verifyButton.setOnClickListener {
             val enteredOTP = pinView.getText().toString()
             if (enteredOTP.length == 4) {
@@ -399,11 +403,13 @@ class LoginPage : AppCompatActivity() {
 
                 // Toast.makeText(this, "Thanks for your input! The next flow is under development and will be available soon.", Toast.LENGTH_SHORT).show()
 
-            } else {
+            }
+            else {
                 Toast.makeText(this, "Please enter complete OTP", Toast.LENGTH_SHORT).show()
             }
 
         }
+
 
         dialog.show()
 
@@ -429,6 +435,7 @@ class LoginPage : AppCompatActivity() {
         }
         countDownTimer.start()
     }
+
 
 
     private fun setupOTPFocus(current: EditText, next: EditText?, previous: EditText? = null) {

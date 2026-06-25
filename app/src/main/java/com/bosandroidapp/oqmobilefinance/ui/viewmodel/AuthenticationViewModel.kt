@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
 import com.bosandroidapp.oqmobilefinance.data.enach.EnachDateUploadReq
+import com.bosandroidapp.oqmobilefinance.data.gst.GstRequest
 import com.bumptech.glide.load.engine.Resource
 import com.bosandroidapp.oqmobilefinance.data.model.AddBankAccountReq
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerEmiStatusReq
@@ -522,5 +523,10 @@ class AuthenticationViewModel (private val repository: AuthRepository):ViewModel
             emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
         }
     }
+
+
+
+
+
 
 }

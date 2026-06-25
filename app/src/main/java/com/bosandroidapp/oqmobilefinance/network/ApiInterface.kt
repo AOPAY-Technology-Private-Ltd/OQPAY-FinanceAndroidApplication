@@ -7,6 +7,8 @@ import com.bosandroidapp.oqmobilefinance.data.enach.ENachStatusReq
 import com.bosandroidapp.oqmobilefinance.data.enach.ENachStatusResp
 import com.bosandroidapp.oqmobilefinance.data.enach.EnachDateUploadReq
 import com.bosandroidapp.oqmobilefinance.data.enach.EnachDateUploadResp
+import com.bosandroidapp.oqmobilefinance.data.gst.GstRequest
+import com.bosandroidapp.oqmobilefinance.data.gst.GstResponse
 import com.bosandroidapp.oqmobilefinance.data.loancharge.LoanChargeReq
 import com.bosandroidapp.oqmobilefinance.data.loancharge.LoanChargeResp
 import com.bosandroidapp.oqmobilefinance.data.model.AddedBankListResp
@@ -88,6 +90,8 @@ import com.bosandroidapp.oqmobilefinance.data.pennydrop.PennyDropCheckStatusRequ
 import com.bosandroidapp.oqmobilefinance.data.pennydrop.PennyDropCheckStatusResponse
 import com.bosandroidapp.oqmobilefinance.data.pennydrop.PennyDropRequest
 import com.bosandroidapp.oqmobilefinance.data.pennydrop.PennyDropResponse
+import com.bosandroidapp.oqmobilefinance.data.pg.PGOnlineRequestCall
+import com.bosandroidapp.oqmobilefinance.data.pg.PGOnlineResponseCall
 import com.bosandroidapp.oqmobilefinance.data.pg.PGRequestCall
 import com.bosandroidapp.oqmobilefinance.data.pg.PGRequestResponse
 import okhttp3.MultipartBody
@@ -614,7 +618,15 @@ interface ApiInterface {
 
 
     @POST("api/AOPay/Finance/Offline/V1/PaymentGateway")
-    suspend fun callPG(@Body req : PGRequestCall) : Response<PGRequestResponse>?
+    suspend fun callPGOffline(@Body req : PGRequestCall) : Response<PGRequestResponse>?
+
+
+    @POST("api/AOP/V1/Validation/GstNumber")
+    suspend fun getGstNumberVerify(@Body req : GstRequest) : Response<GstResponse>?
+
+
+    @POST("api/OQPay/Finance/Online/V1/PaymentGateway")
+    suspend fun callPGOnline(@Body req : PGOnlineRequestCall) : Response<PGOnlineResponseCall>?
 
 
 }

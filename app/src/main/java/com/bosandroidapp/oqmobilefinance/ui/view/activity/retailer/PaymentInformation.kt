@@ -461,6 +461,7 @@ class PaymentInformation : AppCompatActivity() {
 
         })
 
+
         binding.verifymobilenumber.setOnClickListener {
 
             var mobnumber = binding.refmobno.text.toString()
@@ -470,11 +471,7 @@ class PaymentInformation : AppCompatActivity() {
                     hitApiForSendOTP(mobnumber, "Mobile")
                 }
                 else {
-                    Toast.makeText(
-                        this,
-                        "Please check your internet connection!!",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(this, "Please check your internet connection!!", Toast.LENGTH_SHORT).show()
                 }
             } else {
                 if (binding.refername.text.toString().isNullOrBlank()) {
@@ -499,6 +496,7 @@ class PaymentInformation : AppCompatActivity() {
             hitApiForAadharVerification()
         }
 
+
         binding.nextlayout.setOnClickListener {
 
             when{
@@ -517,7 +515,7 @@ class PaymentInformation : AppCompatActivity() {
                     }
                     else
                     {
-                         AccountNumber = binding.accountnumber.text.toString().trim()
+                        /* AccountNumber = binding.accountnumber.text.toString().trim()
                          BankIFSCCode = binding.ifsccode.text.toString().trim()
                          BankName =  binding.bankname.text.toString().trim()
                          AccountType = binding.acounttype.selectedItem.toString().trim()
@@ -526,9 +524,9 @@ class PaymentInformation : AppCompatActivity() {
                          BranchAddress= binding.branchaddress.text.toString().trim()
                          BankID = bankList.find { it.first == BankName }?.second!!
                          Log.d("BankId", "${BankID}")
-                         setselectionForSecondCard()  // for testing
+                         setselectionForSecondCard()  // for testing*/
 
-                        /* hitApiForRequestPennyDrop()*/
+                         hitApiForRequestPennyDrop()
 
                     }
 

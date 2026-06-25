@@ -633,6 +633,7 @@ CLIENT shall access your Credit Information as your authorized representative an
     <string name="please_upload_the_image_of_your_gst_document">Please upload the image of your GST Document</string>
     <string name="your_payment_was_cancelled">Your payment was cancelled and no amount has been deducted from your account.\n\nIf this was unintentional, please try again to complete your payment.</string>
     <string name="your_payment_has_been_completed">Your payment has been completed successfully.\n The transaction has been processed .</string>
+    <string name="aopay_technology_ltd">AOPay Technology Ltd.</string>
 
 
 </resources>

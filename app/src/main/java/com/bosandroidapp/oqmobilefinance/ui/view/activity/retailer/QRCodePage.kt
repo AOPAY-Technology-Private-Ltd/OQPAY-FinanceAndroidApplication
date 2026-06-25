@@ -262,7 +262,7 @@ class QRCodePage : AppCompatActivity() {
                     val startDate = LoanStartDate
                     val endDate = LoanEndDate
 
-                   // val emiAmount = EmiAmount.toDouble().roundToInt()
+                    /*val emiAmount = EmiAmount.toDouble().roundToInt()*/
                     val emiAmount = 1
 
                     val request = EMandateRequest(

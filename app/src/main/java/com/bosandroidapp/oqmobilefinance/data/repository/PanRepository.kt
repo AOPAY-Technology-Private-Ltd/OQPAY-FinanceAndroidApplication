@@ -3,12 +3,14 @@ package com.bosandroidapp.oqmobilefinance.data.repository
 import com.bos.payment.appName.network.ApiInterface
 import com.bosandroidapp.oqmobilefinance.data.enach.EMandateRequest
 import com.bosandroidapp.oqmobilefinance.data.enach.ENachStatusReq
+import com.bosandroidapp.oqmobilefinance.data.gst.GstRequest
 import com.bosandroidapp.oqmobilefinance.data.loancharge.LoanChargeReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.AadharVerificationReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.PanVerificationReq
 import com.bosandroidapp.oqmobilefinance.data.pennydrop.BankListReq
 import com.bosandroidapp.oqmobilefinance.data.pennydrop.PennyDropCheckStatusRequest
 import com.bosandroidapp.oqmobilefinance.data.pennydrop.PennyDropRequest
+import com.bosandroidapp.oqmobilefinance.data.pg.PGOnlineRequestCall
 import com.bosandroidapp.oqmobilefinance.data.pg.PGRequestCall
 
 class PanRepository(private val apiInterface: ApiInterface) {
@@ -27,6 +29,10 @@ class PanRepository(private val apiInterface: ApiInterface) {
 
     suspend fun getAadharVerificationReq(req: AadharVerificationReq) = apiInterface.getAadharVarification(req)
 
-    suspend fun getPGRequestCall(req: PGRequestCall) = apiInterface.callPG(req)
+    suspend fun getPGRequestCall(req: PGRequestCall) = apiInterface.callPGOffline(req)
+
+    suspend fun getPGRequestCallOnline(req: PGOnlineRequestCall) = apiInterface.callPGOnline(req)
+
+    suspend fun getGstNumberVerify(req: GstRequest) = apiInterface.getGstNumberVerify(req)
 
 }

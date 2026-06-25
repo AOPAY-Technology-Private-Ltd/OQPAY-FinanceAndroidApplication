@@ -99,8 +99,17 @@ import java.util.concurrent.TimeUnit
 object ConstantClass {
      //const val BASE_URL = "https://oqapi.bos.center/"
 
-     const val BASE_URL = "https://api.oqpay.in/"
-     const val BASE_URL_IMAGE = "https://api.oqpay.in"
+    /*
+     // Production
+       const val BASE_URL = "https://api.oqpay.in/"
+       const val BASE_URL_IMAGE = "https://api.oqpay.in"*/
+
+    // UAT
+     const val BASE_URL = "https://api.oqpay.co.in/"
+     const val BASE_URL_IMAGE = "https://api.oqpay.co.in"
+
+
+
      const val SMS_BASE_URL = "http://web.adcruxmedia.in/"
      const val PAN_BASE_URL = "https://api.aopay.in/"
      const val SMS_API_KEY = "KBSxc26XqjoiR7SA"
@@ -110,7 +119,7 @@ object ConstantClass {
      const val PENNYDROP_REGISTRATION_ID = "AOP-5039"
      const val FRP_MAIL_ID = "116164541526712076874" // info@aopay.in
      const val CustomerCode = "customerCode"
-    const val RetailerCode = "retailerCode"
+     const val RetailerCode = "retailerCode"
      const val ForgotPasswordType = "Retailer forgot password"
      const val OTPTYPE = "VerifyUser"
      const val EMILIST = "EmiList"
@@ -313,7 +322,7 @@ object ConstantClass {
     var eMandatepending = "pending"
     var isMandate = "Yes"
 
-    var IsGSTVerified : String ="1" // default active
+    var IsGSTVerified : String ="" // default active
     var IsPanVerified : String =""
     var IsAadhaarVerified : String =""
 

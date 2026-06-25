@@ -278,7 +278,7 @@
                     android:layout_width="@dimen/_18sdp"
                     android:layout_height="@dimen/_18sdp"
                     android:layout_marginRight="@dimen/_8sdp"
-                    android:src="@drawable/ic_description"
+                    android:src="@drawable/descriptionnoc"
                     app:tint="@color/white" />
 
                 <TextView
