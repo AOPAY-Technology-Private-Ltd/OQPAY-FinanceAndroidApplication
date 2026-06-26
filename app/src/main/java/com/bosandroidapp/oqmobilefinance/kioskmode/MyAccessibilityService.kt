@@ -12,6 +12,7 @@ import android.view.accessibility.AccessibilityNodeInfo
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.SETTINGS_PKG
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.gpsSettingsOpened
+import com.bosandroidapp.oqmobilefinance.ui.view.activity.customer.PGWebViewActivity
 import com.bosandroidapp.oqmobilefinance.utils.ACCESSIBILITYTAG
 import com.bosandroidapp.oqmobilefinance.utils.Logger
 import com.bosandroidapp.oqmobilefinance.utils.syncEmis
@@ -68,7 +69,33 @@ class MyAccessibilityService : AccessibilityService() {
         }*/
 
 
+        /* if (isLocked()) {
+             Logger.d(ACCESSIBILITYTAG, "Phone Locked")
+             isMyAppMinimizedOrRemoved(event)
+         }*/
+
+
         if (isLocked()) {
+
+            val packageName = event?.packageName?.toString()
+
+            Log.d("packageName", packageName.toString())
+
+            // Allow soft keyboard
+            if (isKeyboardPackage(packageName)) {
+                return
+            }
+
+            // Allow chooser/share sheet
+            if (isAllowedSystemPackage(packageName)) {
+                return
+            }
+
+
+            if (isActivityRunning(this, PGWebViewActivity::class.java)) {
+                return
+            }
+
             Logger.d(ACCESSIBILITYTAG, "Phone Locked")
             isMyAppMinimizedOrRemoved(event)
         }
@@ -95,7 +122,7 @@ class MyAccessibilityService : AccessibilityService() {
 
 
     private fun isMyAppMinimizedOrRemoved(event: AccessibilityEvent?) {
-
+        Log.d("Accessibility Package Name", "Package Name: ${event?.packageName}")
         if (!((event?.packageName?.equals("com.google.android.apps.nbu.paisa.user")) ?: false)
             && !((event?.packageName?.equals("com.phonepe.app")) ?: false)
             && !((event?.packageName?.equals("net.one97.paytm")) ?: false)
@@ -107,9 +134,9 @@ class MyAccessibilityService : AccessibilityService() {
             && !((event?.packageName?.equals("com.hdfcbank.payzapp")) ?: false)
             && !((event?.packageName?.equals("sbi.mobile.apps.in")) ?: false)
             && !((event?.packageName?.equals("in.amazon.mShop.android.shopping")) ?: false)
-            && !((event?.packageName?.equals("com.bosandroidapp.oqmobilefinance")) ?: false)
-            && !(event?.packageName == null) && !isActivityRunning(this, KioskActivity::class.java) && !isPaymentAppRunning()
-        ) {
+            && !((event?.packageName?.equals("com.bosandroidapp.aopayfinance")) ?: false)
+            && !(event?.packageName == null) && !isActivityRunning(this, KioskActivity::class.java) && !isPaymentAppRunning()) {
+
             Logger.d(ACCESSIBILITYTAG, "${event.packageName}")
             Logger.d(ACCESSIBILITYTAG, "Performing KioskActivity Intent")
             val intent = Intent(this, KioskActivity::class.java)
@@ -153,7 +180,7 @@ class MyAccessibilityService : AccessibilityService() {
                 isAppInfo = true
             }
             // Many devices show package name directly
-            if (t.contains("OQ", true)) { // crude check for package
+            if (t.contains("", true)) { // crude check for package
                 isMyApp = true
             }
         }
@@ -182,6 +209,7 @@ class MyAccessibilityService : AccessibilityService() {
         startActivity(intent)
     }
 
+
     private fun getVisibleText(node: AccessibilityNodeInfo?): List<String> {
         val result = mutableListOf<String>()
         if (node == null) return result
@@ -192,6 +220,85 @@ class MyAccessibilityService : AccessibilityService() {
         }
         return result
     }
+
+
+    private fun isKeyboardPackage(packageName: String?): Boolean {
+
+        return packageName.equals("com.google.android.inputmethod.latin", true) ||
+                packageName.equals("com.samsung.android.honeyboard", true) ||
+                packageName.equals("com.microsoft.swiftkey", true) ||
+                packageName.equals("com.touchtype.swiftkey", true) ||
+                packageName.equals("com.google.android.tts", true) ||
+
+                // System Chooser / Share Sheet
+                packageName.equals("android", true) ||
+                packageName.equals("com.android.systemui", true) ||
+                packageName.equals("com.android.intentresolver", true) ||
+                packageName.equals("com.android.permissioncontroller", true) ||
+                packageName.equals("com.google.android.permissioncontroller", true) ||
+                packageName.equals("com.google.android.permissioncontroller", true) ||
+                packageName.equals("com.android.permissioncontroller", true) ||
+
+                // Your App
+                packageName.equals("com.bosandroidapp.aopayfinance", true) ||
+
+                // Payment Apps
+                packageName.equals("sbi.mobile.apps.in", true) ||
+                packageName.equals("com.hdfcbank.payzapp", true) ||
+                packageName.equals("net.one97.paytm", true) ||
+                packageName.equals("com.mobikwik_new", true) ||
+                packageName.equals("com.freecharge.mobile", true) ||
+                packageName.equals("com.axis.axispay", true) ||
+                packageName.equals("in.amazon.mShop.android.shopping", true) ||
+                packageName.equals("com.phonepe.app", true) ||
+                packageName.equals("com.google.android.apps.nbu.paisa.user", true)||
+                // CRED
+                packageName.equals("com.dreamplug.androidapp", true)||
+                packageName.equals("com.flipkart.supermoney", true)||
+                packageName.equals("com.whatsapp", true)
+
+
+    }
+
+
+    private fun isAllowedSystemPackage(packageName: String?): Boolean {
+        return packageName.equals("android", true) ||
+                packageName.equals("com.android.settings", true) ||
+                packageName.equals("com.android.systemui", true) ||
+                packageName.equals("com.android.intentresolver", true) ||
+                packageName.equals("com.android.permissioncontroller", true) ||
+                packageName.equals("com.google.android.permissioncontroller", true)||
+
+                // Oppo / OnePlus / Realme
+                packageName.equals("com.oplus.safecenter", true) ||
+
+                packageName.equals("com.coloros.safecenter", true) ||
+
+                // Xiaomi / Redmi / Poco
+                packageName.equals("com.miui.securitycenter", true) ||
+
+                // Samsung
+                packageName.equals("com.samsung.android.lool", true) || // Device Care
+                packageName.equals("com.samsung.android.sm.devicesecurity", true) ||
+                packageName?.contains("biometric", true) ?: false ||
+                packageName?.contains("biometrics", true) ?: false ||
+
+                // Vivo
+                packageName.equals("com.iqoo.secure", true) ||
+                packageName.equals("com.vivo.permissionmanager", true) ||
+
+                // Huawei
+                packageName.equals("com.huawei.systemmanager", true) ||
+
+                // Motorola
+                packageName.equals("com.motorola.ccc.ota", true) ||
+
+                // Nothing
+                packageName.equals("com.nothing.smartcenter", true)
+
+    }
+
+
 
 
 }

@@ -86,7 +86,7 @@ class CustomerReportListAdapter(private val ReportsDataList: MutableList<Reports
             status = changeStatus
         }
 
-        holder.viewNOC.visibility=View.GONE
+        holder.viewNOC.visibility=View.VISIBLE
 
 
         holder.reportstatus.text = status.replaceFirstChar { it.uppercase() }

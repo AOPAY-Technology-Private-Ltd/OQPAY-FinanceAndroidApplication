@@ -216,7 +216,7 @@ class AuthRepository(private val apiInterface: ApiInterface) {
 
   suspend fun getPayoutReportReq(req: PayoutReportReq) = apiInterface.getPayoutReportReq(req)
 
-  suspend fun getAddBankAccountReq(req: com.bosandroidapp.oqmobilefinance.data.model.AddBankAccountReq) = apiInterface.addBankAccounts(req)
+  suspend fun getAddBankAccountReq(req: AddBankAccountReq) = apiInterface.addBankAccounts(req)
 
   suspend fun requestHoldAmountWithdrawRequest(req: HoldAmountWithdrawReq) = apiInterface.requestHoldAmountWithdrawRequest(req)
 

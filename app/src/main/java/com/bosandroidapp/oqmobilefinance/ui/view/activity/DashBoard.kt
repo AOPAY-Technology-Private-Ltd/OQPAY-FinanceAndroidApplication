@@ -361,9 +361,10 @@ class DashBoard : AppCompatActivity() {
                 binding.appBarDashBoard.deskdesign.customerdashboardItemlayout.visibility = View.VISIBLE
             }
 
-           /* preference.setBooleanValue(ConstantClass.CustomerAccessKey,true)
+            /*preference.setBooleanValue(ConstantClass.CustomerAccessKey,true)
             binding.appBarDashBoard.deskdesign.customerGenerateKeyLayout.visibility = View.GONE
             binding.appBarDashBoard.deskdesign.customerdashboardItemlayout.visibility = View.VISIBLE*/
+
         }
 
 

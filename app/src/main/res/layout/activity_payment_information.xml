@@ -307,6 +307,7 @@
                         android:layout_height="30dp"
                         app:tint="@color/black"
                         android:alpha=".8"
+                        android:visibility="gone"
                         android:src="@drawable/downarrow"/>
 
                 </LinearLayout>

@@ -46,6 +46,7 @@ import com.bos.payment.appName.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityCustomerReportsPageBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.formatDateToFullMonth
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.reports.GetReportsReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.reports.ReportsDataItem
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
@@ -247,22 +248,27 @@ class CustomerReportsPage : AppCompatActivity() ,CustomerReportListAdapter.onCli
 
 
     override fun onClick(item: ReportsDataItem) {
-
+        Log.d("Date Time", formatDateToFullMonth(item.endDate))
         val ref = "${ item.loanCode }${item.custerMob.takeLast(4)}${item.customerCode.takeLast(2)}"
+        var date=""
+        if(!item.endDate.isNullOrEmpty()){
+            date = formatDateToFullMonth(item.endDate)
+        }else{
+            date = item.endDate
+        }
 
         val finalHtml = htmlTemplate
             /*.replace("{{LOGO_IMAGE}}", logoBase64)
             .replace("{{WATERMARK_IMAGE}}", watermarkBase64)
             .replace("{{SIGNATURE_IMAGE}}", signatureBase64)
             .replace("{{STAMP_IMAGE}}", stampBase64)*/
-
             .replace("{{REF_NO}}", ref)
-            .replace("{{DATE}}", item.endDate)
+            .replace("{{DATE}}", date)
             .replace("{{CUSTOMER_NAME}}", item.customerName)
             .replace("{{MOBILE_NUMBER}}", item.custerMob)
             .replace("{{LOAN_NUMBER}}", item.loanCode)
             .replace("{{PRODUCT_NAME}}", item.productDetails)
-            .replace("{{LOAN_CLOSURE_DATE}}", item.endDate)
+            .replace("{{LOAN_CLOSURE_DATE}}", date)
             .replace("{{AUTH_NAME}}", "Arjun")
             .replace("{{DESIGNATION}}", "Director")
 

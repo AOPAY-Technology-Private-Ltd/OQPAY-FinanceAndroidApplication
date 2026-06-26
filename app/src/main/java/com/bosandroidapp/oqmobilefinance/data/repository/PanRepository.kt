@@ -24,7 +24,9 @@ class PanRepository(private val apiInterface: ApiInterface) {
     suspend fun getpennyDropCheckStatusReq(req: PennyDropCheckStatusRequest) = apiInterface.pennyDropStatus(req)
 
     suspend fun getEMandateRequestReq(req: EMandateRequest) = apiInterface.geteMandateRequest(req)
+    suspend fun EMandateOnlineRequest(req: EMandateRequest) = apiInterface.geteMandateOnlineRequest(req)
     suspend fun geteMandateSatusRequest(req: ENachStatusReq) = apiInterface.geteMandateSatusRequest(req)
+    suspend fun geteMandateOnlineSatusRequest(req: ENachStatusReq) = apiInterface.geteMandateOnlineSatusRequest(req)
     suspend fun loanApplyChargesReq(req: LoanChargeReq) = apiInterface.loanApplyChargesReq(req)
 
     suspend fun getAadharVerificationReq(req: AadharVerificationReq) = apiInterface.getAadharVarification(req)

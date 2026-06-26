@@ -217,7 +217,7 @@ class LoginPage : AppCompatActivity() {
 
         binding.customerloginlayout.setOnClickListener {
             var mobnumber = binding.mobilenumber.text.toString()
-            if (ConstantClass.validateLoginInput(mobnumber, this) ) {
+            if (ConstantClass.validateLoginInput(mobnumber, this)) {
                 if (isInternetAvailable(this@LoginPage)) {
                     /*if (!isSimPresent()) {
                         Toast.makeText(this, "No SIM detected. Insert SIM to continue.", Toast.LENGTH_LONG).show()
