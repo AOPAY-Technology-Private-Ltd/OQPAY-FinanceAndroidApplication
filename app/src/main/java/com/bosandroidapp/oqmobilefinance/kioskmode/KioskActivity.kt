@@ -29,6 +29,7 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isInternetAvaila
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.CustomerDataItem
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.GetCustomerLoanDetailsReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.RetailerProfileReq
+import com.bosandroidapp.oqmobilefinance.data.pg.PGOnlineRequestCall
 import com.bosandroidapp.oqmobilefinance.data.pg.PGRequestCall
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.repository.PanRepository
@@ -68,6 +69,7 @@ class KioskActivity : AppCompatActivity() {
     var WaiveOff : String = ""
     var loanCode: String = ""
     var emiAmount: String = ""
+    var loanmode : String? = ""
     var isEmandateVerified : String? = ""
     var isPannydropVerified : String? = ""
     var emiamount : Double = 0.0
@@ -119,7 +121,7 @@ class KioskActivity : AppCompatActivity() {
         }
 
         HitApiForEmiList()
-
+        setOnClickListner()
 
     }
 
@@ -180,24 +182,35 @@ class KioskActivity : AppCompatActivity() {
 
                     PGWebViewActivity.LoanCodePG = loanCode
 
-                    var req = PGRequestCall(
-                        payCustomerPhoneNo = preference.getStringValue(ConstantClass.CustomerMobileNumber, ""),
-                        customerEmailID = email,
-                        registrationID = ConstantClass.PAN_VERIFICATION_REGISTRATION_ID,
-                        payCartAmount = emiamount.toString(),
-                        eMINumbers = "EMI${emiNumbers}",
-                        customerCode = preference.getStringValue(ConstantClass.CustomerCode, ""),
-                        payCustomerName = "${preference.getStringValue(ConstantClass.FirstName, "")} ${preference.getStringValue(ConstantClass.LastName, "")}",
-                        loanCode = loanCode
-                    )
+                    if(loanmode!!.toLowerCase().equals("offline",ignoreCase = true)){
+                        var req = PGRequestCall(
+                            payCustomerPhoneNo = preference.getStringValue(ConstantClass.CustomerMobileNumber, ""),
+                            customerEmailID = email,
+                            registrationID = ConstantClass.PAN_VERIFICATION_REGISTRATION_ID ,
+                            payCartAmount = emiamount.toString(),
+                            eMINumbers = "EMI${emiNumbers}",
+                            customerCode = preference.getStringValue(ConstantClass.CustomerCode, ""),
+                            payCustomerName = "${preference.getStringValue(ConstantClass.FirstName, "")} ${preference.getStringValue(ConstantClass.LastName, "")}",
+                            loanCode = loanCode
+                        )
+                        hitApiForRequestPG(req)
+                    }
+                    else{
+                        var req = PGOnlineRequestCall(
+                            amount = emiamount,
+                            registrationID =  ConstantClass.PAN_VERIFICATION_REGISTRATION_ID,
+                            eMINumbers = "EMI${emiNumbers}",
+                            customerCode = preference.getStringValue(ConstantClass.CustomerCode, ""),
+                            loanCode = loanCode
+                        )
 
-                    hitApiForRequestPG(req)
+                        hitApiForRequestPGOnline(req)
 
+                    }
 
                 }
 
             }
-
 
         }
     }
@@ -207,11 +220,12 @@ class KioskActivity : AppCompatActivity() {
 
         if (!previousLoanData.isNullOrEmpty()) {
             setData(previousLoanData, previousCurrentDate)
-
         } else if (!isApiRunning) {
-
             HitApiForEmiList()
         }
+
+        hitapiforGetUpdateProfile()
+
     }
 
     override fun onPause() {
@@ -287,13 +301,16 @@ class KioskActivity : AppCompatActivity() {
         }
     }
 
+
     fun HitApiForEmiList(){
+
         if (isApiRunning) {
             Log.d("EMI_API", "Already running")
             return
         }
 
         isApiRunning = true
+
         var loanemireq = GetCustomerLoanDetailsReq(
             loancode = "",
             customercode = preference.getStringValue(ConstantClass.CustomerCode, "")
@@ -308,16 +325,30 @@ class KioskActivity : AppCompatActivity() {
                             users.body()?.let { response ->
                                 Log.d("customerLoanemiresp", response.toString())
 
+                                if(ConstantClass.dialog!=null && ConstantClass.dialog.isShowing){
+                                    ConstantClass.dialog.dismiss()
+                                }
+
                                 isApiRunning = false
 
-                                resources.data?.body()?.let { response ->
-                                    ConstantClass.dialog.dismiss()
-                                    LoanEmiList = response.data
-                                    previousLoanData = response.data
-                                    previousCurrentDate = response.indiaTimeIST ?: ""
+                                if(!response.status.isNullOrEmpty()){
+                                    resources.data?.body()?.let { response ->
+                                        ConstantClass.dialog.dismiss()
+                                        LoanEmiList = response.data
+                                        previousLoanData = response.data
+                                        previousCurrentDate = response.indiaTimeIST ?: ""
 
-                                    setData(response.data, response.indiaTimeIST ?: "")
+                                        setData(response.data, response.indiaTimeIST ?: "")
+                                    }
                                 }
+                                else{
+                                    if(response.status!!.toLowerCase().equals("false", ignoreCase = true)){
+                                        Toast.makeText(this@KioskActivity, response.message, Toast.LENGTH_SHORT).show()
+                                        return@observe
+                                    }
+                                    HitApiForEmiList()
+                                }
+
                             }
 
                         }
@@ -340,6 +371,7 @@ class KioskActivity : AppCompatActivity() {
         }
     }
 
+
     fun setData(LoanEmiList:List<CustomerDataItem?>? = null,  currentDate : String){
         latefine = LoanEmiList?.get(0)!!.lateFine
         AllgracePeriod = LoanEmiList!![0]!!.gracePeriod
@@ -353,6 +385,7 @@ class KioskActivity : AppCompatActivity() {
 
         loanCode = LoanEmiList!![0]!!.loanCode.toString()
         emiAmount = LoanEmiList!![0]!!.emiAmount.toString()
+        loanmode = LoanEmiList[0]!!.loanmode
 
         isEmandateVerified = LoanEmiList!![0]!!.isEmandateVerified.toString()
         isPannydropVerified = LoanEmiList!![0]!!.isPannydropVerified.toString()
@@ -366,6 +399,8 @@ class KioskActivity : AppCompatActivity() {
             setDataInspinner(LoanEmiList!![0]!!.duesEMI!!.toInt(),LoanEmiList?.get(0)?.emiAmount?.toDoubleOrNull() ?: 0.0)
         }
     }
+
+
     fun setDataInspinner(tenure:Int,emiAmount:Double?){
         val emiOptions = ConstantClass.generateEMIOptions(tenure)
         val noOfEmiAdapter = ArrayAdapter(this, R.layout.mobilenamelayout, emiOptions )
@@ -434,6 +469,52 @@ class KioskActivity : AppCompatActivity() {
                                 else {
                                     ConstantClass.dialog.dismiss()
                                     Toast.makeText(this@KioskActivity, response.message, Toast.LENGTH_SHORT).show()
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                    ApiStatus.ERROR -> {
+                        ConstantClass.dialog.dismiss()
+                    }
+
+                    ApiStatus.LOADING -> {
+                        ConstantClass.OpenPopUpForVeryfyOTP(this)
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
+    fun hitApiForRequestPGOnline(req : PGOnlineRequestCall){
+
+        Log.d("PGRequest", Gson().toJson(req))
+
+        panViewModel.getPGRequestCallOnline(req).observe(this) { resources ->
+            resources.let {
+                when (it.apiStatus) {
+                    ApiStatus.SUCCESS -> {
+                        it.data.let { users ->
+                            users!!.body().let { response ->
+                                Log.d("PanVerificationResp", Gson().toJson(response))
+
+                                if (!response!!.intentUrl.isNullOrEmpty()) {
+                                    // Open WebView with the provided URL
+                                    ConstantClass.dialog.dismiss()
+                                    val intent = Intent(this@KioskActivity, PGWebViewActivity::class.java)
+                                    intent.putExtra("pgurl", response!!.intentUrl)
+                                    startActivity(intent)
+                                }
+                                else {
+                                    ConstantClass.dialog.dismiss()
+                                    Toast.makeText(this@KioskActivity, response!!.status, Toast.LENGTH_SHORT).show()
                                 }
 
                             }

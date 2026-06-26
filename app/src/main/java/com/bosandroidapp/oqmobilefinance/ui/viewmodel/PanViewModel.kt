@@ -61,10 +61,24 @@ class PanViewModel(private val repository: PanRepository) : ViewModel() {
         }
     }
 
+
+
     fun getEMandateRequestReq(req: EMandateRequest) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
             emit(ApiResponse.success(data = repository.getEMandateRequestReq(req)))
+        }
+        catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+        }
+    }
+
+
+
+    fun getEMandateOnlineRequest(req: EMandateRequest) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            emit(ApiResponse.success(data = repository.EMandateOnlineRequest(req)))
         }
         catch (exception: Exception) {
             emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
@@ -81,6 +95,18 @@ class PanViewModel(private val repository: PanRepository) : ViewModel() {
             emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
         }
     }
+
+
+    fun geteMandateOnlineSatusRequest(req: ENachStatusReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            emit(ApiResponse.success(data = repository.geteMandateOnlineSatusRequest(req)))
+        }
+        catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+        }
+    }
+
 
 
     fun loanApplyChargesReq(req: LoanChargeReq) = liveData(Dispatchers.IO) {

@@ -204,6 +204,7 @@ interface ApiInterface {
     suspend fun getLoanCreatedByRetailer(@Body req : LoanCreatedReq): Response<LoanCreatedResp>?
 
 
+
     @Multipart
     @POST("api/V1/OQFinance/ManageCustByCredit")
     suspend fun getCustomerCibilApprovedReq(
@@ -269,6 +270,7 @@ interface ApiInterface {
         @Part aadharBack_Path: MultipartBody.Part?,
         @Part panFront_Path: MultipartBody.Part?
         ): Response<RegisterCustomerResp>
+
 
 
     @Multipart
@@ -582,12 +584,31 @@ interface ApiInterface {
     suspend fun getBankListRequest(@Body req: BankListReq): Response<BankListResponse>?
 
 
+    // for Offline eNach Api ..................................................................
     @POST("api/AOP/Enach/V1/eMandate")
     suspend fun geteMandateRequest(@Body req: EMandateRequest): Response<EMandateResponse>?
 
 
     @POST("api/AOP/Enach/V1/eMandate/getStatus")
     suspend fun geteMandateSatusRequest(@Body req: ENachStatusReq): Response<ENachStatusResp>?
+
+    //............................................................................................
+
+
+
+    //for online eNach Api .......................................................................
+
+    @POST("api/OQPay/Enach/V1/eMandate")
+    suspend fun geteMandateOnlineRequest(@Body req: EMandateRequest): Response<EMandateResponse>?
+
+
+    @POST("api/OQPay/Enach/V1/eMandate/getStatus")
+    suspend fun geteMandateOnlineSatusRequest(@Body req: ENachStatusReq): Response<ENachStatusResp>?
+
+
+    //............................................................................................
+
+
 
 
     // loan charge for each loan retailer

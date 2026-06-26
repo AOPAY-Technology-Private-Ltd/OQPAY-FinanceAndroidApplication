@@ -99,16 +99,13 @@ import java.util.concurrent.TimeUnit
 object ConstantClass {
      //const val BASE_URL = "https://oqapi.bos.center/"
 
-    /*
-     // Production
+   /*  // Production
        const val BASE_URL = "https://api.oqpay.in/"
        const val BASE_URL_IMAGE = "https://api.oqpay.in"*/
 
     // UAT
      const val BASE_URL = "https://api.oqpay.co.in/"
      const val BASE_URL_IMAGE = "https://api.oqpay.co.in"
-
-
 
      const val SMS_BASE_URL = "http://web.adcruxmedia.in/"
      const val PAN_BASE_URL = "https://api.aopay.in/"

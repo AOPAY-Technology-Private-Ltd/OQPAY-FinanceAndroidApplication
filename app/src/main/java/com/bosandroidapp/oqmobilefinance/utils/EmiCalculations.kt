@@ -193,6 +193,7 @@ private suspend fun Context.isEMIDue(sharedPref: SharedPreferences) = withContex
 }
 
 
+
 /*private suspend fun Context.defaultedLoansList(sharedPref: SharedPreferences): List<LocalLoanData> = withContext(Dispatchers.IO) {
     val defaultedEmis= arrayListOf<LocalLoanData>()
     try {
@@ -227,6 +228,7 @@ private suspend fun Context.isEMIDue(sharedPref: SharedPreferences) = withContex
 }*/
 
 
+
 fun String.toFormattedDate(): String {
     return try {
         val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -237,6 +239,7 @@ fun String.toFormattedDate(): String {
         this // return original if parsing fails
     }
 }
+
 
 
 private fun String.getJumpedDate(paidMonths: Long): String {

@@ -20,7 +20,7 @@ data class DataItem(
 	val amountType: String? = null,
 
 	@field:SerializedName("amount")
-	val amount: Any? = null,
+	val amount: Double? = null,
 
 	@field:SerializedName("transactionStatus")
 	val transactionStatus: String? = null,

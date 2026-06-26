@@ -1254,7 +1254,6 @@ class QRCodePage : AppCompatActivity() {
     }
 
 
-
     fun hitApiForRetailerCreatedLoan(requset: LoanCreatedReq) {
 
         Log.d("customerReq", Gson().toJson(requset))
@@ -1650,82 +1649,156 @@ class QRCodePage : AppCompatActivity() {
 
 
 
-
-
     fun hitApiForEnach(request: EMandateRequest,check: Boolean) {
         Log.d("eManadateReq", Gson().toJson(request))
 
-        panViewModel.getEMandateRequestReq(request).observe(this) { resources ->
-            resources.let {
-                when (it.apiStatus) {
-                    ApiStatus.SUCCESS -> {
-                        it.data.let { users ->
-                            users!!.body().let { response ->
-                                Log.d("eMandateRes", Gson().toJson(response))
+        if(LoanMode.equals(ConstantClass.offline)) {
+            panViewModel.getEMandateRequestReq(request).observe(this) { resources ->
+                resources.let {
+                    when (it.apiStatus) {
+                        ApiStatus.SUCCESS -> {
+                            it.data.let { users ->
+                                users!!.body().let { response ->
+                                    Log.d("eMandateRes", Gson().toJson(response))
 
-                                if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
-                                    ConstantClass.dialog.dismiss()
-                                }
-                                binding.LoanCreatelayout.isEnabled= true
+                                    if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
+                                        ConstantClass.dialog.dismiss()
+                                    }
+                                    binding.LoanCreatelayout.isEnabled= true
 
-                                if (response!!.data?.customer != null) {
-                                    webUrl = response!!.data!!.url
-                                    startActivity(Intent(this@QRCodePage, RetailerEMandateVerifyPage::class.java))
-                                }
-                                else {
-                                    ConstantClass.dialog.dismiss()
-                                    isEmandateVerified= "No"
-                                    isEnachCancelled = true
-                                    Toast.makeText(this, response.message, Toast.LENGTH_SHORT).show()
-                                }
+                                    if (response!!.data?.customer != null) {
+                                        webUrl = response!!.data!!.url
+                                        startActivity(Intent(this@QRCodePage, RetailerEMandateVerifyPage::class.java))
+                                    }
+                                    else {
+                                        ConstantClass.dialog.dismiss()
+                                        isEmandateVerified= "No"
+                                        isEnachCancelled = true
+                                        Toast.makeText(this, response.message, Toast.LENGTH_SHORT).show()
+                                    }
 
-                                if(!isEmandateVerified.isNullOrBlank()){
-                                    var request = EnachDateUploadReq(
-                                        isEmandateVerified = isEmandateVerified,
-                                        emAccountType = AccountType,
-                                        isPannydropVerified = isPannydropVerified,
-                                        emAccountNumber = AccountNumber,
-                                        customerCode = CustomerCodeForEnach,
-                                        retailerCode= RetailerCodeForEnach,
-                                        loanCode= loaneCode,
-                                        emBankName=BankName,
-                                        emIfscCode =BankIFSCCode
-                                    )
+                                    if(!isEmandateVerified.isNullOrBlank()){
+                                        var request = EnachDateUploadReq(
+                                            isEmandateVerified = isEmandateVerified,
+                                            emAccountType = AccountType,
+                                            isPannydropVerified = isPannydropVerified,
+                                            emAccountNumber = AccountNumber,
+                                            customerCode = CustomerCodeForEnach,
+                                            retailerCode= RetailerCodeForEnach,
+                                            loanCode= loaneCode,
+                                            emBankName=BankName,
+                                            emIfscCode =BankIFSCCode
+                                        )
 
-                                    hitApiForUploadEnachMandateDataResponse(request)
+                                        hitApiForUploadEnachMandateDataResponse(request)
+                                    }
+
                                 }
 
                             }
 
                         }
 
-                    }
+                        ApiStatus.ERROR -> {
+                            ConstantClass.dialog.dismiss()
+                            // ✅ Print the full error details
+                            Log.e("API_ERROR", "Status: ERROR")
+                            Log.e("API_ERROR_CODE", resources.data?.code().toString())
+                            Log.e("API_ERROR_MSG", resources.message ?: "Unknown Error")
 
-                    ApiStatus.ERROR -> {
-                        ConstantClass.dialog.dismiss()
-                        // ✅ Print the full error details
-                        Log.e("API_ERROR", "Status: ERROR")
-                        Log.e("API_ERROR_CODE", resources.data?.code().toString())
-                        Log.e("API_ERROR_MSG", resources.message ?: "Unknown Error")
+                            Toast.makeText(this, "Server error occurred (Code: ${resources.data?.code() ?: "Unknown"})", Toast.LENGTH_LONG).show()
 
-                        Toast.makeText(this, "Server error occurred (Code: ${resources.data?.code() ?: "Unknown"})", Toast.LENGTH_LONG).show()
-
-                        // Optional: Handle specific 500 error
-                        if (resources.data?.code() == 500) {
-                            Log.e("API_ERROR", "Internal Server Error from backend.")
+                            // Optional: Handle specific 500 error
+                            if (resources.data?.code() == 500) {
+                                Log.e("API_ERROR", "Internal Server Error from backend.")
+                            }
                         }
-                    }
 
-                    ApiStatus.LOADING -> {
-                       if(check){
-                           ConstantClass.OpenPopUpForVeryfyOTP(this)
-                       }
+                        ApiStatus.LOADING -> {
+                            if(check){
+                                ConstantClass.OpenPopUpForVeryfyOTP(this)
+                            }
+                        }
+
                     }
 
                 }
 
             }
+        }
+        else{
+            panViewModel.getEMandateOnlineRequest(request).observe(this) { resources ->
+                resources.let {
+                    when (it.apiStatus) {
+                        ApiStatus.SUCCESS -> {
+                            it.data.let { users ->
+                                users!!.body().let { response ->
+                                    Log.d("eMandateOnlineRes", Gson().toJson(response))
 
+                                    if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
+                                        ConstantClass.dialog.dismiss()
+                                    }
+                                    binding.LoanCreatelayout.isEnabled= true
+
+                                    if (response!!.data?.customer != null) {
+                                        webUrl = response!!.data!!.url
+                                        startActivity(Intent(this@QRCodePage, RetailerEMandateVerifyPage::class.java))
+                                    }
+                                    else {
+                                        ConstantClass.dialog.dismiss()
+                                        isEmandateVerified= "No"
+                                        isEnachCancelled = true
+                                        Toast.makeText(this, response.message, Toast.LENGTH_SHORT).show()
+                                    }
+
+                                    if(!isEmandateVerified.isNullOrBlank()){
+                                        var request = EnachDateUploadReq(
+                                            isEmandateVerified = isEmandateVerified,
+                                            emAccountType = AccountType,
+                                            isPannydropVerified = isPannydropVerified,
+                                            emAccountNumber = AccountNumber,
+                                            customerCode = CustomerCodeForEnach,
+                                            retailerCode= RetailerCodeForEnach,
+                                            loanCode= loaneCode,
+                                            emBankName=BankName,
+                                            emIfscCode =BankIFSCCode
+                                        )
+
+                                        hitApiForUploadEnachMandateDataResponse(request)
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+                        ApiStatus.ERROR -> {
+                            ConstantClass.dialog.dismiss()
+                            // ✅ Print the full error details
+                            Log.e("API_ERROR", "Status: ERROR")
+                            Log.e("API_ERROR_CODE", resources.data?.code().toString())
+                            Log.e("API_ERROR_MSG", resources.message ?: "Unknown Error")
+
+                            Toast.makeText(this, "Server error occurred (Code: ${resources.data?.code() ?: "Unknown"})", Toast.LENGTH_LONG).show()
+
+                            // Optional: Handle specific 500 error
+                            if (resources.data?.code() == 500) {
+                                Log.e("API_ERROR", "Internal Server Error from backend.")
+                            }
+                        }
+
+                        ApiStatus.LOADING -> {
+                            if(check){
+                                ConstantClass.OpenPopUpForVeryfyOTP(this)
+                            }
+                        }
+
+                    }
+
+                }
+
+            }
         }
 
     }

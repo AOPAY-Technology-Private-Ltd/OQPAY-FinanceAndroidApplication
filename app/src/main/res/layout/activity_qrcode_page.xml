@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
@@ -291,6 +292,7 @@
             </LinearLayout>
 
         </LinearLayout>
+
     </androidx.core.widget.NestedScrollView>
 
     <!-- Footer -->
@@ -312,7 +314,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/_4sdp"
             android:fontFamily="@font/inter_bold"
-            android:text="© BOS Center Pvt Ltd"
+            android:text="@string/aopay_technology_ltd"
             android:textColor="@color/black"
             android:textSize="@dimen/_10ssp" />
     </LinearLayout>

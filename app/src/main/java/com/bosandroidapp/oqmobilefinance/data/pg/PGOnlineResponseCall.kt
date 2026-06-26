@@ -17,7 +17,7 @@ data class PGOnlineResponseCall(
 	val orderID: String? = null,
 
 	@field:SerializedName("ErrorMessage")
-	val errorMessage: Any? = null,
+	val errorMessage: String? = null,
 
 	@field:SerializedName("MarchentOrderID")
 	val marchentOrderID: String? = null,

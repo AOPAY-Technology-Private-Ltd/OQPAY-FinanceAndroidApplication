@@ -1485,7 +1485,7 @@ class EmiLoanDetailPage : AppCompatActivity() {
                                 }
                                 else {
                                     ConstantClass.dialog.dismiss()
-                                    Toast.makeText(this@EmiLoanDetailPage, response!!.status, Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(this@EmiLoanDetailPage, response!!.errorMessage, Toast.LENGTH_SHORT).show()
                                 }
 
                             }

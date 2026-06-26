@@ -353,7 +353,7 @@ class PayoutPage : Fragment() {
      }
 
 
-   binding.verifybuttonlayout.setOnClickListener {
+    binding.verifybuttonlayout.setOnClickListener {
 
        val (isValid, errorMessage) = isValidForm(
            accountNumber = binding.accountnumber.selectedItem?.toString()?.trim() ?: "",
@@ -379,7 +379,7 @@ class PayoutPage : Fragment() {
    }
 
 
-   binding.holdamountrequest.setOnClickListener {
+    binding.holdamountrequest.setOnClickListener {
        if(holdcheckremarks){
            Toast.makeText(requireContext(),"Please enter valid remark",Toast.LENGTH_SHORT).show()
        }
@@ -394,7 +394,6 @@ class PayoutPage : Fragment() {
 
 
    }
-
 
 
 }
@@ -536,6 +535,7 @@ class PayoutPage : Fragment() {
     }
 
 
+
     @SuppressLint("SetTextI18n")
     fun OpenPopUpForHoldAmountAlert() {
         dialog = Dialog(requireContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen)
@@ -574,7 +574,6 @@ class PayoutPage : Fragment() {
         dialog.show()
 
     }
-
 
 
    fun hitApiForWalletPayout() {
