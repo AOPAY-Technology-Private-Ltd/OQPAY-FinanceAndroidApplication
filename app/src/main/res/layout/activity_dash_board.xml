@@ -64,6 +64,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:text="@string/menu_profile"
+                    android:textStyle="bold"
                     android:textColor="@android:color/black"
                     android:textSize="16sp" />
 
@@ -91,6 +92,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:text="@string/menu_wallet"
+                    android:textStyle="bold"
                     android:textColor="@android:color/black"
                     android:textSize="16sp" />
 
@@ -118,6 +120,40 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:text="@string/menu_account"
+                    android:textStyle="bold"
+                    android:textColor="@android:color/black"
+                    android:textSize="16sp" />
+
+            </LinearLayout>
+
+            <!-- App Install -->
+
+            <LinearLayout
+                android:id="@+id/installAppLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="12dp"
+                app:layout_constraintTop_toBottomOf="@+id/nav_addaccount">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:scaleType="centerCrop"
+                    android:layout_marginLeft="-5dp"
+                    android:src="@drawable/customerappinstall"/>
+
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="@string/customer_app_install"
+                    android:textStyle="bold"
                     android:textColor="@android:color/black"
                     android:textSize="16sp" />
 
@@ -133,6 +169,7 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="12dp"
+                android:visibility="gone"
                 app:layout_constraintTop_toBottomOf="@+id/nav_addaccount">
 
                 <ImageView
@@ -162,7 +199,7 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:padding="12dp"
-                app:layout_constraintTop_toBottomOf="@+id/navRecyclerViewlayout">
+                app:layout_constraintTop_toBottomOf="@+id/installAppLayout">
 
                 <ImageView
                     android:layout_width="24dp"
@@ -174,6 +211,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:text="@string/menu_sign"
+                    android:textStyle="bold"
                     android:textColor="@android:color/black"
                     android:textSize="16sp" />
             </LinearLayout>

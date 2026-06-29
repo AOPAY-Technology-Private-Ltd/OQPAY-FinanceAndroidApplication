@@ -77,6 +77,12 @@
         android:theme="@style/Base.Theme.TheEmiClub"
         android:usesCleartextTraffic="true"
         tools:targetApi="33">
+
+        <activity
+            android:name=".ui.view.activity.retailer.CustomerAppInstall"
+            android:exported="false"
+            android:screenOrientation="portrait"/>
+
         <activity
             android:name=".ui.view.activity.customer.PGWebViewActivity"
             android:exported="false"
