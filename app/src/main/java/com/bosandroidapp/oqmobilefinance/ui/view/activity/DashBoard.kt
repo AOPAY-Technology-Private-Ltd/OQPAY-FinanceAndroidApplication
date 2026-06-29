@@ -89,6 +89,7 @@ import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.customer.CustomerEMIPage
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.customer.CustomerReportsPage
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.BankDetailsPage
+import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.CustomerAppInstall
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.IDVerificationPage
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.MapActivity
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.reports.LowCibilScoreCustomerReports
@@ -161,6 +162,7 @@ class DashBoard : AppCompatActivity() {
                     Manifest.permission.ACCESS_COARSE_LOCATION), 101)
             }
             binding.navRecyclerViewlayout.visibility=View.GONE
+            binding.installAppLayout.visibility=View.GONE
             binding.logout.visibility = View.GONE
         }
 
@@ -169,7 +171,7 @@ class DashBoard : AppCompatActivity() {
                 ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_PHONE_STATE), 101)
             }
 
-            binding.navRecyclerViewlayout.visibility=View.VISIBLE
+            binding.navRecyclerViewlayout.visibility=View.GONE
             binding.navRecyclerView.layoutManager = LinearLayoutManager(this)
 
             navAdapter = NavAdapter(this, items) { clickedChild ->
@@ -181,6 +183,7 @@ class DashBoard : AppCompatActivity() {
 
             binding.navRecyclerView.adapter = navAdapter
             binding.logout.visibility = View.VISIBLE
+            binding.installAppLayout.visibility=View.VISIBLE
 
           }
 
@@ -341,6 +344,11 @@ class DashBoard : AppCompatActivity() {
                 getFirebaseToken()
                 binding.appBarDashBoard.swiperefresh.isRefreshing = true
             }
+        }
+
+
+        binding.installAppLayout.setOnClickListener {
+            startActivity(Intent(this, CustomerAppInstall::class.java))
         }
 
 

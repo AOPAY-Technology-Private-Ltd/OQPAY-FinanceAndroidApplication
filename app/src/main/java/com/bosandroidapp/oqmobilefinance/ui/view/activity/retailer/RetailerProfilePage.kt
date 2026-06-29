@@ -710,7 +710,6 @@ class RetailerProfilePage : AppCompatActivity() {
         }
 
 
-
         cancel.setOnClickListener {
             dialog.dismiss()
         }
