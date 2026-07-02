@@ -67,8 +67,7 @@ class CustomerReportsPage : AppCompatActivity() ,CustomerReportListAdapter.onCli
     lateinit var binding: ActivityCustomerReportsPageBinding
     lateinit var preference: SharedPreference
     lateinit var viewModel: AuthenticationViewModel
-    var ReportDataList: MutableList<com.bosandroidapp.oqmobilefinance.data.model.loginsignup.reports.ReportsDataItem> =
-        mutableListOf()
+    var ReportDataList: MutableList<com.bosandroidapp.oqmobilefinance.data.model.loginsignup.reports.ReportsDataItem> = mutableListOf()
     lateinit var reportAdapter: CustomerReportListAdapter
     private lateinit var htmlTemplate: String
     var webViewContentbitmap: Bitmap ?= null
@@ -124,11 +123,7 @@ class CustomerReportsPage : AppCompatActivity() ,CustomerReportListAdapter.onCli
 
 
     fun setview() {
-        val adapter = ArrayAdapter.createFromResource(
-            this,
-            R.array.customerreporttype,
-            R.layout.mobilenamelayout
-        )
+        val adapter = ArrayAdapter.createFromResource(this, R.array.customerreporttype, R.layout.mobilenamelayout)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.reporttype.adapter = adapter
 

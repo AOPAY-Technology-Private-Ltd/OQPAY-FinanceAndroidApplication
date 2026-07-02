@@ -245,6 +245,7 @@ class EmiLoanDetailPage : AppCompatActivity() {
                     ApiStatus.SUCCESS -> {
 
                         it.data?.let { users ->
+
                             users.body()?.let { response ->
 
                                 Log.d("Walletamount", response.walletBalance!!)
@@ -266,9 +267,11 @@ class EmiLoanDetailPage : AppCompatActivity() {
 
                             }
                         }
+
                     }
 
                     ApiStatus.ERROR -> {
+
                         if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
                             ConstantClass.dialog.dismiss()
                         }

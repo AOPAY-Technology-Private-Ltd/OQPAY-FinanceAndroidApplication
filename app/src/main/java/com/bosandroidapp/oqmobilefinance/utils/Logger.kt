@@ -5,6 +5,7 @@ import android.util.Log
 import java.io.File
 
 object Logger {
+
     fun d(tag: String, logMessage: String) {
         Log.d(tag, logMessage)
         printInFile("DEBUG",tag,logMessage)
@@ -24,6 +25,7 @@ object Logger {
         Log.e(tag, logMessage)
         printInFile("ERROR",tag,logMessage)
     }
+
 
     private fun printInFile(type: String, tag: String, logMessage: String) {
         try {
@@ -46,4 +48,6 @@ object Logger {
             e.printStackTrace()
         }
     }
+
+
 }
