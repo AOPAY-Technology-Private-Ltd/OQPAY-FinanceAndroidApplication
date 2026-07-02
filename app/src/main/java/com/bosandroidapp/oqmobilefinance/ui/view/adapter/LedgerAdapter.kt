@@ -54,8 +54,8 @@ class LedgerAdapter(var context: Context, var ledgerReportList: List<LedgerRepor
 
         //sum of fine,bounce,other
         val totalAmount = (ledgerReportList[position]?.lateFine?.toString()?.toDoubleOrNull() ?: 0.0) +
-                          (ledgerReportList[position]?.bouncingCharge?.toString()?.toDoubleOrNull() ?: 0.0) +
-                          (ledgerReportList[position]?.otherCharge?.toString()?.toDoubleOrNull() ?: 0.0)
+                          (ledgerReportList[position]?.bouncingCharge?.toString()?.toDoubleOrNull() ?: 0.0) /*+
+                          (ledgerReportList[position]?.otherCharge?.toString()?.toDoubleOrNull() ?: 0.0)*/
 
         holder.binding.tvTotalChargesAmount.text = formatIndianAmount(totalAmount.toString())
 
