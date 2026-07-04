@@ -163,7 +163,7 @@ class DashBoard : AppCompatActivity() {
             }
             binding.navRecyclerViewlayout.visibility=View.GONE
             binding.installAppLayout.visibility=View.GONE
-            binding.logout.visibility = View.GONE
+            binding.logout.visibility = View.VISIBLE // for testing
         }
 
         else {
@@ -218,6 +218,7 @@ class DashBoard : AppCompatActivity() {
         getFirebaseToken()
         setDataHeader()
         if (logintype.equals(Customer)) {
+            hitApiForCustomerLogin(preference.getStringValue(ConstantClass.CustomerCode, ""))
             HitApiForEmiList()
             hitApiForUploadLatLong()
             // 🔁 Setup periodic once only
@@ -241,7 +242,6 @@ class DashBoard : AppCompatActivity() {
             else {
                 getCurrentLocation()
             }
-
             setupPeriodicWork()
             initiateBlocking(CheckCompleteEmiStatus)
         }
@@ -262,7 +262,8 @@ class DashBoard : AppCompatActivity() {
             if (isInternetAvailable(this@DashBoard)) {
                 hitApiForRetailerWalletAmount()
             }
-            hitApiForLogin()
+
+            hitApiForLogin(preference.getStringValue(ConstantClass.RetailerCode, ""))
             var request = SendNotificationFeatureNameRequest(
                 clientCode = ConstantClass.ClientCode,
                 customerCode =  preference.getStringValue(ConstantClass.CustomerCode,""),
@@ -780,13 +781,54 @@ class DashBoard : AppCompatActivity() {
         WorkManager.getInstance(this).enqueueUniquePeriodicWork("EMI_ALERT_WORK", ExistingPeriodicWorkPolicy.UPDATE, workRequest)
     }
 
-    fun hitApiForLogin() {
+    fun hitApiForCustomerLogin(retailerOrCustomerCode: String) {
 
        var deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
        preference.setStringValue(ConstantClass.DEVICEID,deviceId)
 
         var sessionOutReq = SessionOutReq(
-            retailerCode = preference.getStringValue(ConstantClass.RetailerCode, ""),
+            retailerCode = retailerOrCustomerCode,
+        )
+
+        Log.d("SessionOutReq", Gson().toJson(sessionOutReq))
+
+        viewModel.getSessionReq(sessionOutReq).observe(this) { resources ->
+            resources.let {
+                when (it.apiStatus) {
+                    ApiStatus.SUCCESS -> {
+                        it.data?.let { users ->
+                            users.body()?.let { response ->
+                                Log.d("SessionOutResponse", Gson().toJson(response))
+                                if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
+                                    ConstantClass.dialog.dismiss()
+                                }
+                                ConstantClass.checkActiveStatusAndLogout(this@DashBoard, response.status, preference)
+                            }
+                        }
+                    }
+
+                    ApiStatus.ERROR -> {
+
+                    }
+
+                    ApiStatus.LOADING -> {
+
+                    }
+                }
+            }
+        }
+
+
+
+    }
+
+    fun hitApiForLogin(retailerOrCustomerCode: String) {
+
+        var deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+        preference.setStringValue(ConstantClass.DEVICEID,deviceId)
+
+        var sessionOutReq = SessionOutReq(
+            retailerCode = retailerOrCustomerCode,
         )
 
         Log.d("SessionOutReq", Gson().toJson(sessionOutReq))
@@ -832,9 +874,9 @@ class DashBoard : AppCompatActivity() {
                         it.data?.let { users ->
                             users.body()?.let { response ->
                                 Log.d("validateresp", Gson().toJson(response))
-                                 if(response.status==0){
-                                     hitApiForRetailerLogout()
-                                 }
+                                if(response.status==0){
+                                    hitApiForRetailerLogout()
+                                }
                             }
                         }
                     }
@@ -851,6 +893,8 @@ class DashBoard : AppCompatActivity() {
         }
 
     }
+
+
 
     fun hitApiForRetailerLogout() {
         var loginRequest = LogoutReq(

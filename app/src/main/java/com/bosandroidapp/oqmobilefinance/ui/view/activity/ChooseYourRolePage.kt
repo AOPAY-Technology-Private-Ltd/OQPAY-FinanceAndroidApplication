@@ -184,7 +184,7 @@ class ChooseYourRolePage : AppCompatActivity() {
                      }
                     else {
                         Toast.makeText(this,"Kindly transfer the ownership to OQ Pay.",Toast.LENGTH_SHORT).show()
-                       // intentNextPage() // for working
+                        //intentNextPage() // for working
                     }
                 }
 

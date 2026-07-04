@@ -1,6 +1,7 @@
 package com.bosandroidapp.oqmobilefinance.ui.view.activity.customer
 
 import android.os.Bundle
+import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -12,6 +13,8 @@ import com.bos.payment.appName.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityCustomerEmipageBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isInternetAvailable
+import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
+import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.CustomerDataItem
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.GetCustomerLoanDetailsReq
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
@@ -56,7 +59,48 @@ class CustomerEMIPage : AppCompatActivity() {
         super.onResume()
         if(isInternetAvailable(this@CustomerEMIPage)) {
             HitApiForEmiList()
+            hitApiForLogin(preference.getStringValue(ConstantClass.CustomerCode,""))
+
         }
+    }
+
+    fun hitApiForLogin(retailerOrCustomerCode: String) {
+
+        var deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+        preference.setStringValue(ConstantClass.DEVICEID,deviceId)
+
+        var sessionOutReq = SessionOutReq(
+            retailerCode = retailerOrCustomerCode,
+        )
+
+        Log.d("SessionOutReq", Gson().toJson(sessionOutReq))
+
+        viewModel.getSessionReq(sessionOutReq).observe(this) { resources ->
+            resources.let {
+                when (it.apiStatus) {
+                    ApiStatus.SUCCESS -> {
+                        it.data?.let { users ->
+                            users.body()?.let { response ->
+                                Log.d("SessionOutResponse", Gson().toJson(response))
+                                if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
+                                    ConstantClass.dialog.dismiss()
+                                }
+                                ConstantClass.checkActiveStatusAndLogout(this@CustomerEMIPage, response.status, preference)
+                            }
+                        }
+                    }
+
+                    ApiStatus.ERROR -> {
+
+                    }
+
+                    ApiStatus.LOADING -> {
+
+                    }
+                }
+            }
+        }
+
     }
 
 
@@ -118,10 +162,10 @@ class CustomerEMIPage : AppCompatActivity() {
 
                                 if(ConstantClass.dialog!=null && ConstantClass.dialog.isShowing){
                                     ConstantClass.dialog.dismiss()
-                                    var LoanEmiList = response.data
-                                    customerLoanEmiDetailsList = LoanEmiList as MutableList<CustomerDataItem?>?
-                                    setDataOnView(customerLoanEmiDetailsList)
                                 }
+                                var LoanEmiList = response.data
+                                customerLoanEmiDetailsList = LoanEmiList as MutableList<CustomerDataItem?>?
+                                setDataOnView(customerLoanEmiDetailsList)
 
                             }
                         }

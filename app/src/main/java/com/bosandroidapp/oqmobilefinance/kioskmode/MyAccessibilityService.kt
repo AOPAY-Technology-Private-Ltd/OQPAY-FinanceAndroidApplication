@@ -4,6 +4,8 @@ import android.accessibilityservice.AccessibilityService
 import android.accounts.AccountManager
 import android.app.ActivityManager
 import android.app.ActivityOptions
+import android.app.admin.DevicePolicyManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.util.Log
@@ -35,13 +37,16 @@ class MyAccessibilityService : AccessibilityService() {
             performGlobalAction(GLOBAL_ACTION_BACK)
         }
 
+
         if (isFactoryResetting(event?.text?.toString() ?: "") && !isEMIsCompleted()) {
             Logger.d(ACCESSIBILITYTAG, "On Factory Reset Page: Global Back")
             performGlobalAction(GLOBAL_ACTION_BACK)
             this.showToast("You are not allowed to Factory reset your device when your EMIs are pending.")
         }
 
+
         val currentPkg = event?.packageName?.toString() ?: ""
+
 
         if (!isGpsEnabled(this) && !isEMIsCompleted()) {
             // Open GPS settings ONLY ONCE
@@ -58,10 +63,12 @@ class MyAccessibilityService : AccessibilityService() {
             return // STOP all other processing
         }
 
+
         // ✅ GPS ENABLED → RELEASE LOCK
         if (gpsSettingsOpened) {
             gpsSettingsOpened = false
         }
+
 
         /*if (isGoogleLogin(event) && !isEMIsCompleted()) {
             Logger.d(ACCESSIBILITYTAG, "On Google Login Page: Global Back")
@@ -91,10 +98,10 @@ class MyAccessibilityService : AccessibilityService() {
                 return
             }
 
-
             if (isActivityRunning(this, PGWebViewActivity::class.java)) {
                 return
             }
+
 
             Logger.d(ACCESSIBILITYTAG, "Phone Locked")
             isMyAppMinimizedOrRemoved(event)
@@ -106,6 +113,7 @@ class MyAccessibilityService : AccessibilityService() {
     override fun onInterrupt() {
         Log.d("Accessibility", "Service interrupted")
     }
+
 
     private fun isFactoryResetting(t: String): Boolean {
         val text = t.toLowerCase()
@@ -123,6 +131,7 @@ class MyAccessibilityService : AccessibilityService() {
 
     private fun isMyAppMinimizedOrRemoved(event: AccessibilityEvent?) {
         Log.d("Accessibility Package Name", "Package Name: ${event?.packageName}")
+
         if (!((event?.packageName?.equals("com.google.android.apps.nbu.paisa.user")) ?: false)
             && !((event?.packageName?.equals("com.phonepe.app")) ?: false)
             && !((event?.packageName?.equals("net.one97.paytm")) ?: false)
@@ -141,7 +150,7 @@ class MyAccessibilityService : AccessibilityService() {
             Logger.d(ACCESSIBILITYTAG, "Performing KioskActivity Intent")
             val intent = Intent(this, KioskActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            /*intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)*/
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             val options = ActivityOptions.makeCustomAnimation(this, 0, 0)
             startActivity(intent, options.toBundle())
@@ -151,13 +160,26 @@ class MyAccessibilityService : AccessibilityService() {
 
     }
 
-    private fun isActivityRunning(context: Context, activityClass: Class<*>): Boolean {
+
+  /*  private fun isActivityRunning(context: Context, activityClass: Class<*>): Boolean {
         val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         val tasks = activityManager.appTasks
         for (task in tasks) {
             val base = task.taskInfo.baseActivity
             val top = task.taskInfo.topActivity
             if (base?.className == activityClass.name && top?.className == activityClass.name) {
+                return true
+            }
+        }
+        return false
+    }*/
+
+    private fun isActivityRunning(context: Context, activityClass: Class<*>): Boolean {
+        val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+
+        for (task in activityManager.appTasks) {
+            val top = task.taskInfo.topActivity
+            if (top?.className == activityClass.name) {
                 return true
             }
         }
@@ -186,6 +208,7 @@ class MyAccessibilityService : AccessibilityService() {
         }
         return (isAppInfo && isMyApp)
     }
+
 
     private fun isGoogleLogin(event: AccessibilityEvent?): Boolean {
         Log.d("Accessibility",(event?.packageName?:"").toString())
@@ -294,7 +317,9 @@ class MyAccessibilityService : AccessibilityService() {
                 packageName.equals("com.motorola.ccc.ota", true) ||
 
                 // Nothing
-                packageName.equals("com.nothing.smartcenter", true)
+                packageName.equals("com.nothing.smartcenter", true)||
+
+                packageName.equals("com.bosandroidapp.oqmobilefinance", true)
 
     }
 

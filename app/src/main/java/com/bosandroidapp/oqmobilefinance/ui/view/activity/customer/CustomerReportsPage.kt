@@ -24,6 +24,7 @@ import android.print.PrintAttributes
 import android.print.PrintDocumentAdapter
 import android.print.PrintDocumentAdapter.*
 import android.print.PrintDocumentInfo
+import android.provider.Settings
 import android.util.Base64
 import android.util.Log
 import android.view.View
@@ -47,6 +48,7 @@ import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityCustomerReportsPageBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.formatDateToFullMonth
+import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.reports.GetReportsReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.reports.ReportsDataItem
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
@@ -118,6 +120,7 @@ class CustomerReportsPage : AppCompatActivity() ,CustomerReportListAdapter.onCli
     override fun onResume() {
         super.onResume()
         hitApiForGetReports(binding.reporttype.selectedItem.toString())
+        hitApiForLogin(preference.getStringValue(ConstantClass.CustomerCode,""))
     }
 
 
@@ -162,6 +165,7 @@ class CustomerReportsPage : AppCompatActivity() ,CustomerReportListAdapter.onCli
         }
 
     }
+
 
 
     fun hitApiForGetReports(reporttype: String) {
@@ -241,7 +245,6 @@ class CustomerReportsPage : AppCompatActivity() ,CustomerReportListAdapter.onCli
         return "data:image/png;base64,$base64"
     }
 
-
     override fun onClick(item: ReportsDataItem) {
         Log.d("Date Time", formatDateToFullMonth(item.endDate))
         val ref = "${ item.loanCode }${item.custerMob.takeLast(4)}${item.customerCode.takeLast(2)}"
@@ -271,7 +274,6 @@ class CustomerReportsPage : AppCompatActivity() ,CustomerReportListAdapter.onCli
 
 
     }
-
 
     fun  showNocDialog(finalHtml: String,loanCode: String){
         val dialog = Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
@@ -345,7 +347,6 @@ class CustomerReportsPage : AppCompatActivity() ,CustomerReportListAdapter.onCli
         dialog.show()
     }
 
-
     fun captureWebView(webView: WebView): Bitmap {
 
         val width = webView.width
@@ -364,7 +365,6 @@ class CustomerReportsPage : AppCompatActivity() ,CustomerReportListAdapter.onCli
 
         return bitmap
     }
-
 
     private fun saveBitmapAsPdf(context: Context, bitmap: Bitmap,fileName: String): File? {
         // Create a new PdfDocument
@@ -410,6 +410,46 @@ class CustomerReportsPage : AppCompatActivity() ,CustomerReportListAdapter.onCli
         document.close()
 
         return pdfFile
+    }
+
+
+    fun hitApiForLogin(retailerOrCustomerCode: String) {
+
+        var deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+        preference.setStringValue(ConstantClass.DEVICEID,deviceId)
+
+        var sessionOutReq = SessionOutReq(
+            retailerCode = retailerOrCustomerCode,
+        )
+
+        Log.d("SessionOutReq", Gson().toJson(sessionOutReq))
+
+        viewModel.getSessionReq(sessionOutReq).observe(this) { resources ->
+            resources.let {
+                when (it.apiStatus) {
+                    ApiStatus.SUCCESS -> {
+                        it.data?.let { users ->
+                            users.body()?.let { response ->
+                                Log.d("SessionOutResponse", Gson().toJson(response))
+                                if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
+                                    ConstantClass.dialog.dismiss()
+                                }
+                                ConstantClass.checkActiveStatusAndLogout(this@CustomerReportsPage, response.status, preference)
+                            }
+                        }
+                    }
+
+                    ApiStatus.ERROR -> {
+
+                    }
+
+                    ApiStatus.LOADING -> {
+
+                    }
+                }
+            }
+        }
+
     }
 
 

@@ -40,7 +40,7 @@ class PayoutReportAdapter (var context: Context, var payoutReportList : List<Pay
                ContextCompat.getColor(context,R.color.green))
        }
        holder.binding.tvStatus.text = payoutReportList!![position]!!.transactionStatus
-       holder.binding.tvAmount.text = "₹ ${payoutReportList!![position]!!.transferAmt!!.twoDecimal()}"
+       holder.binding.tvAmount.text = "₹ ${payoutReportList!![position]!!.actualTransactionAmount!!.twoDecimal()}"
        holder.binding.tvDateTime.text = ConstantClass.formatRecordDateTime(payoutReportList!![position]!!.recordDate.toString(), payoutReportList!![position]!!.recordTime.toString())
        holder.binding.tvMessage.text = payoutReportList!![position]!!.transferToMsg
        holder.binding.tvServiceCharge.text = "Service Charge : ₹${payoutReportList!![position]!!.servicesChargeAmt!!.twoDecimal()}"
