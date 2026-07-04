@@ -86,7 +86,7 @@ class CustomerReportListAdapter(private val ReportsDataList: MutableList<Reports
             status = changeStatus
         }
 
-        holder.viewNOC.visibility=View.VISIBLE
+        holder.viewNOC.visibility=View.GONE
 
 
         holder.reportstatus.text = status.replaceFirstChar { it.uppercase() }
@@ -108,10 +108,12 @@ class CustomerReportListAdapter(private val ReportsDataList: MutableList<Reports
             holder.reportstatuslayout.backgroundTintList= context.resources.getColorStateList(R.color.red)
         }
 
+
         if(status.toLowerCase().equals("close",ignoreCase = true)){
             holder.reportstatuslayout.backgroundTintList= context.resources.getColorStateList(R.color.darkpurple)
             holder.viewNOC.visibility=View.VISIBLE
         }
+
 
         if(status.toLowerCase().equals("settlement",ignoreCase = true)){
             holder.reportstatuslayout.backgroundTintList= context.resources.getColorStateList(R.color.darkgrey)

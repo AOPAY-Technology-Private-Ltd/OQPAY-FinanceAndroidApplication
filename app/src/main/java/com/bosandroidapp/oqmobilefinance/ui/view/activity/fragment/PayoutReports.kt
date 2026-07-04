@@ -99,9 +99,7 @@ class PayoutReports : Fragment() {
             if(!filteredList.isNullOrEmpty()){
                 binding.notfoundimage.visibility= View.GONE
                 binding.showreports.visibility = View.VISIBLE
-                var list = filteredList.reversed()
-                Log.d("reversereportList", Gson().toJson( filteredList.reversed()))
-                var adapter = RetailerWalletAdapter(requireContext(), list)
+                var adapter = RetailerWalletAdapter(requireContext(), filteredList)
                 binding.showreports.adapter = adapter
                 adapter.notifyDataSetChanged()
             }
@@ -118,6 +116,7 @@ class PayoutReports : Fragment() {
 
     }
 
+
     fun hitApiForReports(reportType:String){
 
         var request = RetailerWalletReportReq(
@@ -128,7 +127,6 @@ class PayoutReports : Fragment() {
         )
 
         Log.d("payoutreportreq", Gson().toJson(request))
-
 
         viewModel.getRetailerWalletReport(request).observe(requireActivity()) { resources ->
             resources.let {

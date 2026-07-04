@@ -13,6 +13,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Environment
+import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -72,6 +73,7 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanNumber
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanNumberVerified
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanResponse
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanState
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.Retailer
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.WalletBalance
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.createMultipartFromUri
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.formatDateToDDMMYYYY
@@ -83,6 +85,8 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.saveImageToCache
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.validateLoginInput
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletAmountReq
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletPayoutAtMakePaymentTimeReq
+import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
+import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.CustomerDataItem
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.CustomerLoanEmiReceiveReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.GetCustomerLoanDetailsReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.VerifyOTPReq
@@ -220,12 +224,57 @@ class EmiLoanDetailPage : AppCompatActivity() {
     }
 
 
-
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onResume() {
         super.onResume()
         HitApiForEmiList()
         hitApiForRetailerWalletAmount()
+        if(logintype.equals(Retailer)){
+            hitApiForLogin(preference.getStringValue(ConstantClass.RetailerCode,""))
+        }else{
+            hitApiForLogin(preference.getStringValue(ConstantClass.CustomerCode,""))
+        }
+
+    }
+
+
+    fun hitApiForLogin(retailerOrCustomerCode: String) {
+
+        var deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+        preference.setStringValue(ConstantClass.DEVICEID,deviceId)
+
+        var sessionOutReq = SessionOutReq(
+            retailerCode = retailerOrCustomerCode,
+        )
+
+        Log.d("SessionOutReq", Gson().toJson(sessionOutReq))
+
+        viewModel.getSessionReq(sessionOutReq).observe(this) { resources ->
+            resources.let {
+                when (it.apiStatus) {
+                    ApiStatus.SUCCESS -> {
+                        it.data?.let { users ->
+                            users.body()?.let { response ->
+                                Log.d("SessionOutResponse", Gson().toJson(response))
+                                if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
+                                    ConstantClass.dialog.dismiss()
+                                }
+                                ConstantClass.checkActiveStatusAndLogout(this@EmiLoanDetailPage, response.status, preference)
+                            }
+                        }
+                    }
+
+                    ApiStatus.ERROR -> {
+
+                    }
+
+                    ApiStatus.LOADING -> {
+
+                    }
+                }
+            }
+        }
+
     }
 
 
@@ -458,7 +507,16 @@ class EmiLoanDetailPage : AppCompatActivity() {
     }
 
 
+
     fun setOnClickListner(){
+
+        binding.swiperefresh.setOnRefreshListener {
+            if (isInternetAvailable(this@EmiLoanDetailPage)) {
+                hitApiForRetailerWalletAmount()
+                HitApiForEmiList()
+                binding.swiperefresh.isRefreshing = true
+            }
+        }
 
         binding.back.setOnClickListener {
             finish()
@@ -652,11 +710,12 @@ class EmiLoanDetailPage : AppCompatActivity() {
     }
 
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    /*@RequiresApi(Build.VERSION_CODES.O)
     fun HitApiForEmiList(){
         var loanemireq = GetCustomerLoanDetailsReq(
             loancode = LoanId,
             customercode = "")
+
         Log.d("customerloanEmireq", Gson().toJson(loanemireq))
 
         viewModel.getCustomerLoanEmiDetailsReq(loanemireq).observe(this) { resources ->
@@ -669,12 +728,14 @@ class EmiLoanDetailPage : AppCompatActivity() {
                                 Log.d("customerLoanemiresp", response.toString())
                                 if(ConstantClass.dialog!=null && ConstantClass.dialog.isShowing){
                                     ConstantClass.dialog.dismiss()
+                                }
+
                                     var LoanEmiList = response.data
                                     var currentDate = response.indiaTimeIST
 
                                     val df = DecimalFormat("0.00")
 
-                                    binding.loanamount.text = "₹  ${df.format(LoanEmiList!![0]!!.loanAmount)}"
+                                    binding.loanamount.text = "₹  ${df.format(LoanEmiList!!.loanAmount)}"
 
                                     latefine = LoanEmiList[0]!!.lateFine
                                     binding.latefineamount.text = latefine
@@ -682,23 +743,23 @@ class EmiLoanDetailPage : AppCompatActivity() {
                                     CustomergracePeriod = LoanEmiList[0]!!.customerGracePeriod
                                     loanmode = LoanEmiList[0]!!.loanmode
 
-                                    var amount = calculateEMIPaymentStatus(LoanEmiList!![0]!!.paidEMI!!.toInt(),LoanEmiList!![0]!!.emiAmount!!.toDouble(), LoanEmiList!![0]!!.tenure)
+                                    var amount = calculateEMIPaymentStatus(LoanEmiList!!.paidEMI!!.toInt(),LoanEmiList!!.emiAmount!!.toDouble(), LoanEmiList!!.tenure)
 
                                     binding.paidamount.text = "₹ ${df.format(amount.first)}"
                                     binding.remainamount.text = "₹ ${df.format(amount.second)}"
 
                                     setDataForProgress(amount.first,amount.second!!)
 
-                                    binding.monthlyemi.text = "₹ ${df.format(LoanEmiList!![0]!!.emiAmount!!.toDoubleOrNull() ?: 0.0)}"
-                                    binding.modelname.text = LoanEmiList!![0]!!.modelName.toString()
+                                    binding.monthlyemi.text = "₹ ${df.format(LoanEmiList!!.emiAmount!!.toDoubleOrNull() ?: 0.0)}"
+                                    binding.modelname.text = LoanEmiList!!.modelName.toString()
 
-                                    binding.enddate.text = formatDateToDDMMYYYY(LoanEmiList!![0]!!.endDate.toString())
-                                    binding.noofpaidemi.text = LoanEmiList!![0]!!.paidEMI.toString()
-                                    binding.pendingnoofemi.text = LoanEmiList!![0]!!.duesEMI.toString()
-                                    binding.color.text = LoanEmiList!![0]!!.avlbColors.toString()
-                                    binding.bouncecharge.text = LoanEmiList!![0]!!.applicableBounceCharge.toString()
-                                    binding.othercharge.text = LoanEmiList!![0]!!.applicableOtherCharge.toString()
-                                    binding.waiveoff.text = LoanEmiList!![0]!!.applicableWaiveOff.toString()
+                                    binding.enddate.text = formatDateToDDMMYYYY(LoanEmiList!!.endDate.toString())
+                                    binding.noofpaidemi.text = LoanEmiList!!.paidEMI.toString()
+                                    binding.pendingnoofemi.text = LoanEmiList!!.duesEMI.toString()
+                                    binding.color.text = LoanEmiList!!.avlbColors.toString()
+                                    binding.bouncecharge.text = LoanEmiList!!.applicableBounceCharge.toString()
+                                    binding.othercharge.text = LoanEmiList!!.applicableOtherCharge.toString()
+                                    binding.waiveoff.text = LoanEmiList!!.applicableWaiveOff.toString()
 
 
                                     BounceCharge = String.format("%.2f", LoanEmiList?.get(0)?.applicableBounceCharge?.toDoubleOrNull() ?: 0.0)
@@ -706,23 +767,33 @@ class EmiLoanDetailPage : AppCompatActivity() {
                                     WaiveOff = String.format("%.2f", LoanEmiList?.get(0)?.applicableWaiveOff?.toDoubleOrNull() ?: 0.0)
 
 
-                                    loanCode = LoanEmiList!![0]!!.loanCode.toString()
-                                    emiAmount = LoanEmiList!![0]!!.emiAmount.toString()
-                                    paidAmount = LoanEmiList!![0]!!.emiAmount.toString()
-                                    isEmandateVerified = LoanEmiList!![0]!!.isEmandateVerified.toString()
-                                    isPannydropVerified = LoanEmiList!![0]!!.isPannydropVerified.toString()
+                                    loanCode = LoanEmiList!!.loanCode.toString()
+                                    emiAmount = LoanEmiList!!.emiAmount.toString()
+                                    paidAmount = LoanEmiList!!.emiAmount.toString()
+                                    isEmandateVerified = LoanEmiList!!.isEmandateVerified.toString()
+                                    isPannydropVerified = LoanEmiList!!.isPannydropVerified.toString()
 
                                     val gracePeriod = AllgracePeriod!!.toInt()+CustomergracePeriod!!.toInt()
 
-                                    nextDueDate =  formatDueDateGracePeriodDateToDDMMYYYY(LoanEmiList!![0]!!.startDate.toString(),gracePeriod.toInt(),LoanEmiList!![0]!!.paidEMI!!.toInt()) // start date is due date of emi and here due is showing next due date
+                                    nextDueDate =  formatDueDateGracePeriodDateToDDMMYYYY(LoanEmiList!!.startDate.toString(),gracePeriod.toInt(),LoanEmiList!!.paidEMI!!.toInt()) // start date is due date of emi and here due is showing next due date
 
                                     lifecycleScope.launch {
-                                        listOfDueWithGraceDate = formatDateToDDMMYYYY(LoanEmiList!![0]!!.startDate.toString()).getCurrentLastPaidDueDate(this@EmiLoanDetailPage,LoanEmiList!![0]!!.paidEMI!!.toLong(),LoanEmiList!![0]!!.duesEMI!!.toLong(), AllgracePeriod!!.toInt(),CustomergracePeriod!!.toInt(),currentDate!!)
+                                        listOfDueWithGraceDate = formatDateToDDMMYYYY(LoanEmiList!!.startDate.toString()).getCurrentLastPaidDueDate(this@EmiLoanDetailPage,LoanEmiList!!.paidEMI!!.toLong(),LoanEmiList!!.duesEMI!!.toLong(), AllgracePeriod!!.toInt(),CustomergracePeriod!!.toInt(),currentDate!!)
                                         Log.d("DueList", "Data". plus(listOfDueWithGraceDate))
-                                        setDataInspinner(LoanEmiList!![0]!!.duesEMI!!.toInt(),LoanEmiList?.get(0)?.emiAmount?.toDoubleOrNull() ?: 0.0)
+                                        if(LoanEmiList.get(0)!!.emiAmount!=null){
+                                            setDataInspinner(LoanEmiList!!.duesEMI!!.toInt(),LoanEmiList?.get(0)?.emiAmount?.toDoubleOrNull() ?: 0.0)
+                                        }
+                                        else{
+                                            binding.qrcodelayout.visibility=View.GONE
+                                            binding.txnNumber.visibility=View.GONE
+                                            binding.uploadphotolayout.visibility=View.GONE
+                                            binding.paymentmodelayout.visibility=View.GONE
+                                            Log.d("EMIAmount","${LoanEmiList.get(0)!!.emiAmount}")
+                                        }
+
                                     }
 
-                                    if(LoanEmiList!![0]!!.paidEMI.toString()==LoanEmiList!![0]!!.tenure.toString()){
+                                    if(LoanEmiList!!.paidEMI.toString()==LoanEmiList!!.tenure.toString()){
                                         binding.emidetailspaynowlayout.visibility=View.GONE
                                         binding.doneemitext.visibility=View.VISIBLE
                                         binding.duestatustitle.text = this.getString(R.string.status)
@@ -734,11 +805,11 @@ class EmiLoanDetailPage : AppCompatActivity() {
                                         binding.emidetailspaynowlayout.visibility=View.VISIBLE
                                         binding.doneemitext.visibility=View.GONE
                                         binding.duestatustitle.text = this.getString(R.string.due_date)
-                                        binding.startdate.text = formatDateToDDMMYYYY(LoanEmiList!![0]!!.startDate.toString())
+                                        binding.startdate.text = formatDateToDDMMYYYY(LoanEmiList!!.startDate.toString())
                                         binding.startdate.setTextColor(getColor(R.color.black))
                                     }
 
-                                }
+
                             }
 
                         }
@@ -759,7 +830,129 @@ class EmiLoanDetailPage : AppCompatActivity() {
                 }
             }
         }
+    }*/
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun HitApiForEmiList() {
+
+        val loanEmiReq = GetCustomerLoanDetailsReq(
+            loancode = LoanId,
+            customercode = ""
+        )
+
+        Log.d("customerloanEmireq", Gson().toJson(loanEmiReq))
+
+        val liveData = viewModel.getCustomerLoanEmiDetailsReq(loanEmiReq)
+
+        liveData.removeObservers(this)
+
+        liveData.observe(this) { resources ->
+
+            when (resources.apiStatus) {
+
+                ApiStatus.LOADING -> {
+                    ConstantClass.OpenPopUpForVeryfyOTP(this)
+                }
+
+                ApiStatus.ERROR -> {
+                    ConstantClass.dialog.takeIf { it.isShowing }?.dismiss()
+                }
+
+                ApiStatus.SUCCESS -> {
+                    binding.swiperefresh.isRefreshing = false
+                    ConstantClass.dialog.takeIf { it.isShowing }?.dismiss()
+
+                    if (isFinishing || isDestroyed) return@observe
+
+                    val response = resources.data?.body() ?: return@observe
+                    val LoanEmiList = response.data?.firstOrNull() ?: return@observe
+
+                   // var LoanEmiList = response.data
+                    var currentDate = response.indiaTimeIST
+
+                    val df = DecimalFormat("0.00")
+
+                    binding.loanamount.text = "₹  ${df.format(LoanEmiList!!.loanAmount)}"
+
+                    latefine = LoanEmiList!!.lateFine
+                    binding.latefineamount.text = latefine
+                    AllgracePeriod = LoanEmiList!!.gracePeriod
+                    CustomergracePeriod = LoanEmiList!!.customerGracePeriod
+                    loanmode = LoanEmiList!!.loanmode
+
+                    var amount = calculateEMIPaymentStatus(LoanEmiList!!.paidEMI!!.toInt(),LoanEmiList!!.emiAmount!!.toDouble(), LoanEmiList!!.tenure)
+
+                    binding.paidamount.text = "₹ ${df.format(amount.first)}"
+                    binding.remainamount.text = "₹ ${df.format(amount.second)}"
+
+                    setDataForProgress(amount.first,amount.second!!)
+
+                    binding.monthlyemi.text = "₹ ${df.format(LoanEmiList!!.emiAmount!!.toDoubleOrNull() ?: 0.0)}"
+                    binding.modelname.text = LoanEmiList!!.modelName.toString()
+
+                    binding.enddate.text = formatDateToDDMMYYYY(LoanEmiList!!.endDate.toString())
+                    binding.noofpaidemi.text = LoanEmiList!!.paidEMI.toString()
+                    binding.pendingnoofemi.text = LoanEmiList!!.duesEMI.toString()
+                    binding.color.text = LoanEmiList!!.avlbColors.toString()
+                    binding.bouncecharge.text = LoanEmiList!!.applicableBounceCharge.toString()
+                    binding.othercharge.text = LoanEmiList!!.applicableOtherCharge.toString()
+                    binding.waiveoff.text = LoanEmiList!!.applicableWaiveOff.toString()
+
+
+                    BounceCharge = String.format("%.2f", LoanEmiList?.applicableBounceCharge?.toDoubleOrNull() ?: 0.0)
+                    Othercharges = String.format("%.2f", LoanEmiList?.applicableOtherCharge?.toDoubleOrNull() ?: 0.0)
+                    WaiveOff = String.format("%.2f", LoanEmiList?.applicableWaiveOff?.toDoubleOrNull() ?: 0.0)
+
+
+                    loanCode = LoanEmiList!!.loanCode.toString()
+                    emiAmount = LoanEmiList!!.emiAmount.toString()
+                    paidAmount = LoanEmiList!!.emiAmount.toString()
+                    isEmandateVerified = LoanEmiList!!.isEmandateVerified.toString()
+                    isPannydropVerified = LoanEmiList!!.isPannydropVerified.toString()
+
+                    val gracePeriod = AllgracePeriod!!.toInt()+CustomergracePeriod!!.toInt()
+
+                    nextDueDate =  formatDueDateGracePeriodDateToDDMMYYYY(LoanEmiList!!.startDate.toString(),gracePeriod.toInt(),LoanEmiList!!.paidEMI!!.toInt()) // start date is due date of emi and here due is showing next due date
+
+                    lifecycleScope.launch {
+                        listOfDueWithGraceDate = formatDateToDDMMYYYY(LoanEmiList!!.startDate.toString()).getCurrentLastPaidDueDate(this@EmiLoanDetailPage,LoanEmiList!!.paidEMI!!.toLong(),LoanEmiList!!.duesEMI!!.toLong(), AllgracePeriod!!.toInt(),CustomergracePeriod!!.toInt(),currentDate!!)
+                        Log.d("DueList", "Data". plus(listOfDueWithGraceDate))
+                        if(LoanEmiList!!.emiAmount!=null){
+                            setDataInspinner(LoanEmiList!!.duesEMI!!.toInt(),LoanEmiList?.emiAmount?.toDoubleOrNull() ?: 0.0)
+                        }
+                        else{
+                            binding.qrcodelayout.visibility=View.GONE
+                            binding.txnNumber.visibility=View.GONE
+                            binding.uploadphotolayout.visibility=View.GONE
+                            binding.paymentmodelayout.visibility=View.GONE
+                            Log.d("EMIAmount","${LoanEmiList!!.emiAmount}")
+                        }
+
+                    }
+
+                    if(LoanEmiList!!.paidEMI.toString()==LoanEmiList!!.tenure.toString()){
+                        binding.emidetailspaynowlayout.visibility=View.GONE
+                        binding.doneemitext.visibility=View.VISIBLE
+                        binding.duestatustitle.text = this.getString(R.string.status)
+                        binding.startdate.text = this.getString(R.string.emistatus)
+                        binding.startdate.setTextColor(getColor(R.color.green))
+                    }
+
+                    else{
+                        binding.emidetailspaynowlayout.visibility=View.VISIBLE
+                        binding.doneemitext.visibility=View.GONE
+                        binding.duestatustitle.text = this.getString(R.string.due_date)
+                        binding.startdate.text = formatDateToDDMMYYYY(LoanEmiList!!.startDate.toString())
+                        binding.startdate.setTextColor(getColor(R.color.black))
+                    }
+
+                
+                }
+            }
+        }
     }
+
 
 
     fun HitApiForPayEmiAmount(emicount:Int,loopcount :Int,emiamount : String,fine:String?/*,imageFile:File*/){

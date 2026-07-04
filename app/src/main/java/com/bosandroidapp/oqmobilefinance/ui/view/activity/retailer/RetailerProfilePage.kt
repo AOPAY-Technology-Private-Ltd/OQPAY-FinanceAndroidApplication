@@ -8,6 +8,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -151,9 +152,14 @@ class RetailerProfilePage : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+
         if (logintype.equals(Retailer)) {
-            hitApiForLogin()
+            hitApiForLogin(preference.getStringValue(ConstantClass.RetailerCode, ""))
         }
+        else{
+            hitApiForCustomerLogin(preference.getStringValue(ConstantClass.CustomerCode, ""))
+        }
+
     }
 
 
@@ -867,6 +873,7 @@ class RetailerProfilePage : AppCompatActivity() {
     }
 
 
+
     fun hitApiForReSendOTP(mailidormobile: String, type: String) {
         var sendOtpReq = SendOtpReq(
             mobileoremailId = mailidormobile,
@@ -1013,13 +1020,7 @@ class RetailerProfilePage : AppCompatActivity() {
         return false
     }
 
-
-
-    fun isValidForm(
-        checkFirstname: Boolean,
-        checkLastname:Boolean,
-        checkaddress: Boolean,
-        checkMailId: Boolean): Pair<Boolean, String?> {
+    fun isValidForm(checkFirstname: Boolean, checkLastname:Boolean, checkaddress: Boolean, checkMailId: Boolean): Pair<Boolean, String?> {
         // Bank details
         if (!checkFirstname) return Pair(false, "Enter valid first name")
 
@@ -1033,15 +1034,13 @@ class RetailerProfilePage : AppCompatActivity() {
     }
 
 
-
-    fun hitApiForLogin() {
+    fun hitApiForLogin(retailerOrCustomerCode: String) {
 
         var sessionOutReq = SessionOutReq(
-            retailerCode = preference.getStringValue(ConstantClass.RetailerCode, ""),
+            retailerCode = retailerOrCustomerCode,
         )
 
         Log.d("SessionOutReq", Gson().toJson(sessionOutReq))
-
         viewModel.getSessionReq(sessionOutReq).observe(this) { resources ->
             resources.let {
                 when (it.apiStatus) {
@@ -1067,12 +1066,12 @@ class RetailerProfilePage : AppCompatActivity() {
                 }
             }
         }
-
         var request = ValidateSessionRequest(
             preference.getStringValue(ConstantClass.RetailerCode, ""),
             preference.getStringValue(ConstantClass.DEVICEID, ""),
             preference.getStringValue(ConstantClass.FCMTOKEN, "")
         )
+
 
         Log.d("validaterequest", Gson().toJson(request))
         viewModel.getSessionExpiredReq(request).observe(this){resources ->
@@ -1085,6 +1084,45 @@ class RetailerProfilePage : AppCompatActivity() {
                                 if(response.status==0){
                                     hitApiForRetailerLogout()
                                 }
+                            }
+                        }
+                    }
+
+                    ApiStatus.ERROR -> {
+
+                    }
+
+                    ApiStatus.LOADING -> {
+
+                    }
+                }
+            }
+        }
+
+    }
+
+    fun hitApiForCustomerLogin(retailerOrCustomerCode: String) {
+
+        var deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+        preference.setStringValue(ConstantClass.DEVICEID,deviceId)
+
+        var sessionOutReq = SessionOutReq(
+            retailerCode = retailerOrCustomerCode,
+        )
+
+        Log.d("SessionOutReq", Gson().toJson(sessionOutReq))
+
+        viewModel.getSessionReq(sessionOutReq).observe(this) { resources ->
+            resources.let {
+                when (it.apiStatus) {
+                    ApiStatus.SUCCESS -> {
+                        it.data?.let { users ->
+                            users.body()?.let { response ->
+                                Log.d("SessionOutResponse", Gson().toJson(response))
+                                if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
+                                    ConstantClass.dialog.dismiss()
+                                }
+                                ConstantClass.checkActiveStatusAndLogout(this@RetailerProfilePage, response.status, preference)
                             }
                         }
                     }
@@ -1140,7 +1178,5 @@ class RetailerProfilePage : AppCompatActivity() {
         }
 
     }
-
-
 
 }

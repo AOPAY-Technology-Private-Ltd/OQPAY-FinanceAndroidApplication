@@ -7,6 +7,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -30,6 +31,7 @@ import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.Customer
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.getCurrentUtcTimestamp
+import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.CustomerLoanEmiReceiveReq
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
@@ -84,6 +86,11 @@ class PGWebViewActivity : AppCompatActivity() {
         launchPGOnWebView()
     }
 
+    override fun onResume() {
+        super.onResume()
+        hitApiForLogin(preference.getStringValue(ConstantClass.CustomerCode,""))
+    }
+
     fun launchPGOnWebView(){
         val pgUrl = intent.getStringExtra("pgurl")
         val finalHtml = """
@@ -114,7 +121,10 @@ class PGWebViewActivity : AppCompatActivity() {
                     when {
                         // Payment Success
                         url.contains("status=success", ignoreCase = true) || url.contains("/success", ignoreCase = true) -> {
-                            showingSuccessPopUp()
+                            val uri = Uri.parse(url)
+                            val utrNumber = uri.getQueryParameter("utrNumber")
+                            Log.d("UTR", utrNumber ?: "")
+                            showingSuccessPopUp(utrNumber!!)
                             return true
                         }
                         // Payment Failed
@@ -165,24 +175,24 @@ class PGWebViewActivity : AppCompatActivity() {
 
 
 
-    fun HitApiForPayEmiAmount(emicount:Int,loopcount :Int,emiamount : String,fine:String?/*,imageFile:File*/,loanCode:String){
+    fun HitApiForPayEmiAmount(emicount:Int,loopcount :Int,emiamount : String,fine:String?/*,imageFile:File*/,loanCode:String,utrNumber: String){
 
-        var  createdBy = preference.getStringValue(ConstantClass.CustomerCode, "")
-        var customercode =  customerCode
+        var createdBy = preference.getStringValue(ConstantClass.CustomerCode, "")
+        var customercode =  preference.getStringValue(ConstantClass.CustomerCode, "")
         var retailercode =  preference.getStringValue(ConstantClass.RetailerCode, "")
 
         val request = CustomerLoanEmiReceiveReq(
             mode = "UPDATE",
             loanCode = loanCode,
             paymentDate = getCurrentUtcTimestamp(),
-            paymentMode = "",
-            utrNumber = "",
-            remarks = "",
+            paymentMode = "Online",
+            utrNumber = utrNumber,
+            remarks = "Payment",
             createdBy = createdBy,
             receiptNo = "",
             customerCode =customercode,
             retailerCode = retailercode,
-            bankName = "",
+            bankName = "PG",
             receiptImagePath = ""/*,
             imageFile = imageFile*/
         )
@@ -242,6 +252,7 @@ class PGWebViewActivity : AppCompatActivity() {
         WebStorage.getInstance().deleteAllData()
     }
 
+
     fun showingRejectionePGPopUp(){
         dialog = Dialog(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -259,8 +270,11 @@ class PGWebViewActivity : AppCompatActivity() {
         var Ok = dialog.findViewById<AppCompatButton>(R.id.btnOk)
 
         Ok.setOnClickListener {
-            finish()
             dialog.dismiss()
+            closePg()
+            window.decorView.post {
+                finish()
+            }
         }
 
         dialog.setCanceledOnTouchOutside(false)
@@ -269,7 +283,17 @@ class PGWebViewActivity : AppCompatActivity() {
 
     }
 
-    fun showingSuccessPopUp(){
+    private fun closePg() {
+        binding.pgwebview.stopLoading()
+        binding.pgwebview.loadUrl("about:blank")
+        binding.pgwebview.clearHistory()
+        binding.pgwebview.removeAllViews()
+        binding.pgwebview.destroy()
+
+        finish()
+    }
+
+    fun showingSuccessPopUp(utrNumber: String){
         dialog = Dialog(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.payment_success_alert)
@@ -293,7 +317,7 @@ class PGWebViewActivity : AppCompatActivity() {
             if(emiList.size>0){
                 dialog.dismiss()
                 for(i in 0 until emiList.size){
-                    HitApiForPayEmiAmount(emiList[i].selectedNoofEmi, emiList[i].emiNo, emiList[i].emiAmount,emiList[i].lateFine,emiList[i].loancode )
+                    HitApiForPayEmiAmount(emiList[i].selectedNoofEmi, emiList[i].emiNo, emiList[i].emiAmount,emiList[i].lateFine,emiList[i].loancode,utrNumber )
                 }
             }
         }
@@ -308,6 +332,62 @@ class PGWebViewActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         showingRejectionePGPopUp()
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("PG", "onDestroy")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d("PG", "onPause")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d("PG", "onStop")
+    }
+
+
+    fun hitApiForLogin(retailerOrCustomerCode: String) {
+
+        var deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+        preference.setStringValue(ConstantClass.DEVICEID,deviceId)
+
+        var sessionOutReq = SessionOutReq(
+            retailerCode = retailerOrCustomerCode,
+        )
+
+        Log.d("SessionOutReq", Gson().toJson(sessionOutReq))
+
+        viewModel.getSessionReq(sessionOutReq).observe(this) { resources ->
+            resources.let {
+                when (it.apiStatus) {
+                    ApiStatus.SUCCESS -> {
+                        it.data?.let { users ->
+                            users.body()?.let { response ->
+                                Log.d("SessionOutResponse", Gson().toJson(response))
+                                if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
+                                    ConstantClass.dialog.dismiss()
+                                }
+                                ConstantClass.checkActiveStatusAndLogout(this@PGWebViewActivity, response.status, preference)
+                            }
+                        }
+                    }
+
+                    ApiStatus.ERROR -> {
+
+                    }
+
+                    ApiStatus.LOADING -> {
+
+                    }
+                }
+            }
+        }
+
     }
 
 

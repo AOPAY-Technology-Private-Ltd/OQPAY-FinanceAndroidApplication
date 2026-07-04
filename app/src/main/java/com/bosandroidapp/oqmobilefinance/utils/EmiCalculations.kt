@@ -182,7 +182,8 @@ private suspend fun Context.isEMIDue(sharedPref: SharedPreferences) = withContex
             this@isEMIDue.startLockSituation()
         }
         else {
-            this@isEMIDue.stopLockSituation()
+           // this@isEMIDue.stopLockSituation()
+            this@isEMIDue.startLockSituation()
         }
 
 

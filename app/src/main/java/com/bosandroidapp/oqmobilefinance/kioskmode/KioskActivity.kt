@@ -1,5 +1,6 @@
 package com.bosandroidapp.oqmobilefinance.kioskmode
 
+import android.app.ActivityManager
 import android.app.ActivityOptions
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
@@ -26,6 +27,7 @@ import com.bosandroidapp.oqmobilefinance.databinding.ActivityKioskBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.formatDateToDDMMYYYY
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isInternetAvailable
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isLockTaskStarted
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.CustomerDataItem
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.GetCustomerLoanDetailsReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.RetailerProfileReq
@@ -83,8 +85,11 @@ class KioskActivity : AppCompatActivity() {
 
     private var isApiRunning = false
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         window.exitTransition = null
         window.returnTransition = null
         window.reenterTransition = null
@@ -114,11 +119,13 @@ class KioskActivity : AppCompatActivity() {
         }
 
         // for testing transferOwnerShip.....................................................
-        val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+        /*  val dpm = getSystemService(DEVICE_POLICY_SERVICE) as DevicePolicyManager
+        val admin = ComponentName(this, KioskDeviceAdminReceiver::class.java)
+        dpm.setLockTaskPackages(admin, arrayOf(packageName))
 
-        if (dpm.isLockTaskPermitted(packageName)) {
-            startLockTask() // 🔒 Enter kiosk mode
-        }
+        if (dpm.isDeviceOwnerApp(packageName) && dpm.isAdminActive(admin)){
+            startLockTask()
+        }*/
 
         HitApiForEmiList()
         setOnClickListner()
@@ -215,6 +222,7 @@ class KioskActivity : AppCompatActivity() {
         }
     }
 
+
     override fun onResume() {
         super.onResume()
 
@@ -224,19 +232,40 @@ class KioskActivity : AppCompatActivity() {
             HitApiForEmiList()
         }
 
+
         hitapiforGetUpdateProfile()
 
+        // for testing transferOwnerShip.....................................................
+        val dpm = getSystemService(DevicePolicyManager::class.java)
+        val admin = ComponentName(this, KioskDeviceAdminReceiver::class.java)
+        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+
+        if (dpm.isDeviceOwnerApp(packageName)) {
+
+            // Whitelist the app for Lock Task Mode (typically done once during provisioning)
+            dpm.setLockTaskPackages(admin, arrayOf(packageName))
+
+            // Start Lock Task only if not already active
+            if (!isLockTaskStarted &&activityManager.lockTaskModeState == ActivityManager.LOCK_TASK_MODE_NONE) {
+                startLockTask()
+                isLockTaskStarted = true
+            }
+        }
+
     }
+
 
     override fun onPause() {
         super.onPause()
         if(isLocked()) finish()
     }
 
+
     override fun onStop() {
         super.onStop()
         Log.d("Accessibility","onStop")
     }
+
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
@@ -462,6 +491,8 @@ class KioskActivity : AppCompatActivity() {
                                 if (response!!.status?.toLowerCase().equals("true",ignoreCase = true) && !response.preparePOSTForm.isNullOrEmpty()) {
                                     // Open WebView with the provided URL
                                     ConstantClass.dialog.dismiss()
+                                    ConstantClass.isLockTaskStarted = false
+                                    stopLockTask()
                                     val intent = Intent(this@KioskActivity, PGWebViewActivity::class.java)
                                     intent.putExtra("pgurl", response.preparePOSTForm)
                                     startActivity(intent)
@@ -508,6 +539,8 @@ class KioskActivity : AppCompatActivity() {
                                 if (!response!!.intentUrl.isNullOrEmpty()) {
                                     // Open WebView with the provided URL
                                     ConstantClass.dialog.dismiss()
+                                    isLockTaskStarted = false
+                                    stopLockTask()
                                     val intent = Intent(this@KioskActivity, PGWebViewActivity::class.java)
                                     intent.putExtra("pgurl", response!!.intentUrl)
                                     startActivity(intent)

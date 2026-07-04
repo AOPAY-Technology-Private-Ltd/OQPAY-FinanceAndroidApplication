@@ -288,7 +288,7 @@ class LoginPage : AppCompatActivity() {
                             fcmToken = FireBaseToken
                         )
 
-                       // sendDataOnServerForUploadToken(req)
+                        // sendDataOnServerForUploadToken(req)
 
                         preference.setStringValue(ConstantClass.CustomerCode, response.customerCode.toString())
                         preference.setStringValue(ConstantClass.RetailerCode, response.retailerCode.toString())

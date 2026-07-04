@@ -6,4 +6,5 @@ data class SessionOutReq(
 
 	@field:SerializedName("retailerCode")
 	val retailerCode: String? = null
+
 )

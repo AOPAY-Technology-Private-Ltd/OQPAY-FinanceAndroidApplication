@@ -426,9 +426,11 @@ interface ApiInterface {
     suspend fun getRetailerWalletAmountReq(@Body req : RetailerWalletAmountReq): Response<com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletResponse>?
 
 
+
     // retailer payout report
     @POST("api/V1/OQFinance/GetPayoutTransferDetails")
     suspend fun getPayoutReportReq(@Body req : PayoutReportReq): Response<PayoutReportResp>?
+
 
 
     @POST("api/V1/OQFinance/GetLookupReports")
@@ -648,6 +650,7 @@ interface ApiInterface {
 
     @POST("api/OQPay/Finance/Online/V1/PaymentGateway")
     suspend fun callPGOnline(@Body req : PGOnlineRequestCall) : Response<PGOnlineResponseCall>?
+
 
 
 }

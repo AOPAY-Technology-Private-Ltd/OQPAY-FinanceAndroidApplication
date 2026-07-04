@@ -106,7 +106,6 @@ object ConstantClass {
     // UAT
      const val BASE_URL = "https://api.oqpay.co.in/"
      const val BASE_URL_IMAGE = "https://api.oqpay.co.in"
-
      const val SMS_BASE_URL = "http://web.adcruxmedia.in/"
      const val PAN_BASE_URL = "https://api.aopay.in/"
      const val SMS_API_KEY = "KBSxc26XqjoiR7SA"
@@ -131,7 +130,8 @@ object ConstantClass {
      const val DefaulterEmiDebitPending ="retailer"
 
      const val LoanStatus ="Pending"
-     const val SessionOutStatus = "Inactive"
+     const val SessionOutStatus = "inactive"
+     const val SessionOutStatusRejected = "rejected"
 
      const val LoginMobileorMailid = "loginMobileorMail"
 
@@ -251,6 +251,8 @@ object ConstantClass {
      var CustFirstName : String = ""
      var CustMiddleName : String = ""
      var CustLastName : String = ""
+
+     var isLockTaskStarted = false
      var CustPrimaryMobileNumber : String = ""
      var CustPrimaryOTP : String = ""
      var CustPrimaryMobileVerified : String = "no"
@@ -808,9 +810,10 @@ object ConstantClass {
         return outputFormat.format(date!!)
     }
 
+
     fun checkActiveStatusAndLogout(context: Context, activeStatus: String?, preference: SharedPreference) {
 
-        if (ConstantClass.SessionOutStatus.equals(activeStatus)!!) {
+        if (ConstantClass.SessionOutStatus.equals(activeStatus!!.toLowerCase())!! || ConstantClass.SessionOutStatusRejected.equals(activeStatus!!.toLowerCase())) {
             try {
                 Toast.makeText(context, "Your account is inactive. Please contact support.", Toast.LENGTH_LONG).show()
 
@@ -831,6 +834,7 @@ object ConstantClass {
             }
         }
     }
+
 
     fun base64ToBitmap(base64String: String): Bitmap? {
         return try {

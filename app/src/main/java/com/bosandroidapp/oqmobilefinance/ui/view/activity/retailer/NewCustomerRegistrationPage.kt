@@ -217,6 +217,7 @@ class NewCustomerRegistrationPage : AppCompatActivity() {
 
     }
 
+
     override fun onResume() {
         super.onResume()
 
@@ -607,7 +608,10 @@ class NewCustomerRegistrationPage : AppCompatActivity() {
 
             if (validateLoginInput(mobnumber, this) && !binding.firstName.text.toString().isNullOrBlank() && !binding.lastName.text.toString().isNullOrBlank()) {
                 if (isInternetAvailable(this@NewCustomerRegistrationPage)) {
-                    hitApiForVerifyCustomer()
+
+                    //hitApiForVerifyCustomer()
+                    hitApiForSendOTP(binding.mobileNumber.text.toString().trim(), OTPTYPE) //"Mobile"
+
                 } else {
                     Toast.makeText(this, "Please check your internet connection!!", Toast.LENGTH_SHORT).show()
                 }
