@@ -83,6 +83,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LogoutReq
 import com.bosandroidapp.oqmobilefinance.data.notification.SendNotificationFeatureNameRequest
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.kioskmode.initiateBlocking
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
@@ -104,6 +105,7 @@ import com.bosandroidapp.oqmobilefinance.utils.LocationPermissionHelper
 import com.bosandroidapp.oqmobilefinance.utils.MonthsAndPayables
 import com.bosandroidapp.oqmobilefinance.utils.getCurrentLastPaidDueDate
 import com.bosandroidapp.oqmobilefinance.workmanager.EmiNotificationWorker
+import com.google.android.gms.common.wrappers.Wrappers.packageManager
 import com.google.android.gms.location.CurrentLocationRequest
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -120,7 +122,7 @@ import java.util.TimeZone
 import java.util.concurrent.TimeUnit
 
 
-class DashBoard : AppCompatActivity() {
+class DashBoard : BaseActivity() {
     private lateinit var binding: ActivityDashBoardBinding
     private lateinit var headerBinding: NavHeaderDashBoardBinding
     lateinit var preference: SharedPreference
@@ -163,7 +165,7 @@ class DashBoard : AppCompatActivity() {
             }
             binding.navRecyclerViewlayout.visibility=View.GONE
             binding.installAppLayout.visibility=View.GONE
-            binding.logout.visibility = View.VISIBLE // for testing
+            binding.logout.visibility = View.GONE // for testing
         }
 
         else {
@@ -370,7 +372,7 @@ class DashBoard : AppCompatActivity() {
                 binding.appBarDashBoard.deskdesign.customerdashboardItemlayout.visibility = View.VISIBLE
             }
 
-            /*preference.setBooleanValue(ConstantClass.CustomerAccessKey,true)
+           /* preference.setBooleanValue(ConstantClass.CustomerAccessKey,true)
             binding.appBarDashBoard.deskdesign.customerGenerateKeyLayout.visibility = View.GONE
             binding.appBarDashBoard.deskdesign.customerdashboardItemlayout.visibility = View.VISIBLE*/
 
