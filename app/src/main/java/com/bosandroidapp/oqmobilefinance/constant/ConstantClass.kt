@@ -1,6 +1,7 @@
 package com.bosandroidapp.oqmobilefinance.constant
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
@@ -50,6 +51,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import  com.bosandroidapp.oqmobilefinance.R
+import com.bosandroidapp.oqmobilefinance.internetchecker.NetworkMonitor
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
 import com.bosandroidapp.oqmobilefinance.workmanager.LocationUploadWorker
@@ -324,6 +326,25 @@ object ConstantClass {
     var IsGSTVerified : String ="" // default active
     var IsPanVerified : String =""
     var IsAadhaarVerified : String =""
+
+    var isPgClosing = false
+
+    private var noInternetDialog: AlertDialog? = null
+
+     fun showNoInternetDialog(context: Context) {
+        if (noInternetDialog?.isShowing == true) return
+
+        noInternetDialog = AlertDialog.Builder(context)
+            .setTitle("No Internet")
+            .setMessage("Please check your Wi-Fi or mobile data connection.")
+            .setCancelable(false)
+            .setPositiveButton("Retry") { _, _ ->
+                if (NetworkMonitor(context).isConnected()) noInternetDialog?.dismiss() else showNoInternetDialog(context)
+            }
+            .create()
+
+        noInternetDialog?.show()
+    }
 
 
 

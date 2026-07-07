@@ -28,6 +28,7 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.formatDateToDDMMYYYY
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isInternetAvailable
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isLockTaskStarted
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isPgClosing
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.CustomerDataItem
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.GetCustomerLoanDetailsReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.RetailerProfileReq
@@ -82,8 +83,8 @@ class KioskActivity : AppCompatActivity() {
     private var previousLoanData: List<CustomerDataItem?>? = null
     private var previousCurrentDate: String = ""
     private var LoanEmiList: List<CustomerDataItem?>? = null
-
     private var isApiRunning = false
+
 
 
 
@@ -132,6 +133,7 @@ class KioskActivity : AppCompatActivity() {
 
     }
 
+
     fun setOnClickListner(){
 
         binding.submitpayment.setOnClickListener {
@@ -139,84 +141,86 @@ class KioskActivity : AppCompatActivity() {
             emiamount = binding.amount.text.toString().replace("₹ ","").toDouble()
 
             if(isInternetAvailable(this@KioskActivity)) {
+                if(binding.noOfEmi.selectedItem.toString().isNullOrBlank()){
+                    HitApiForEmiList()
+                }else{
+                    lifecycleScope.launch {
+                        selectedNoofEmi = binding.noOfEmi.selectedItem.toString().toInt()
+                        // val file = saveImageToCache(this@EmiLoanDetailPage,receiptUri,"ReceiptPhoto")
+                        // ConstantClass.OpenPopUpForVeryfyOTP(this@EmiLoanDetailPage)
+                        var ForServerlatefine:String ?= ""
+                        PGWebViewActivity.emiList.clear()
 
-                lifecycleScope.launch {
-                    selectedNoofEmi = binding.noOfEmi.selectedItem.toString().toInt()
-                    // val file = saveImageToCache(this@EmiLoanDetailPage,receiptUri,"ReceiptPhoto")
-                    // ConstantClass.OpenPopUpForVeryfyOTP(this@EmiLoanDetailPage)
-                    var ForServerlatefine:String ?= ""
-                    PGWebViewActivity.emiList.clear()
+                        for (j in 1..selectedNoofEmi) {
 
-                    for (j in 1..selectedNoofEmi) {
+                            val emiIndex = j - 1
 
-                        val emiIndex = j - 1
+                            val emiAmountWithFine: String
 
-                        val emiAmountWithFine: String
-
-                        if (listOfDueWithGraceDate[emiIndex].lateFeesApplied) {
-                            if(isEmandateVerified!!.toLowerCase().equals("yes",ignoreCase = true)){
-                                emiAmountWithFine = (emiAmount.toDouble() + latefine!!.toDouble() + BounceCharge!!.toDouble() + Othercharges!!.toDouble() + WaiveOff!!.toDouble()).toString()
-                                BounceChargeApplicable = BounceCharge
+                            if (listOfDueWithGraceDate[emiIndex].lateFeesApplied) {
+                                if(isEmandateVerified!!.toLowerCase().equals("yes",ignoreCase = true)){
+                                    emiAmountWithFine = (emiAmount.toDouble() + latefine!!.toDouble() + BounceCharge!!.toDouble() + Othercharges!!.toDouble() + WaiveOff!!.toDouble()).toString()
+                                    BounceChargeApplicable = BounceCharge
+                                }
+                                else{
+                                    emiAmountWithFine = (emiAmount.toDouble() + latefine!!.toDouble() + Othercharges!!.toDouble()).toString()
+                                    BounceChargeApplicable = "0"
+                                }
+                                ForServerlatefine = latefine
                             }
-                            else{
-                                emiAmountWithFine = (emiAmount.toDouble() + latefine!!.toDouble() + Othercharges!!.toDouble()).toString()
+                            else {
+                                emiAmountWithFine = emiAmount
+                                ForServerlatefine = "0"
                                 BounceChargeApplicable = "0"
                             }
-                            ForServerlatefine = latefine
-                        }
-                        else {
-                            emiAmountWithFine = emiAmount
-                            ForServerlatefine = "0"
-                            BounceChargeApplicable = "0"
-                        }
 
-                        Log.d("emiAmountWithFine", emiAmountWithFine)
-                        Log.d("EMIAmount", emiAmountWithFine)
-                        emiList.add(
-                            EmiLoanDetailPage.EmiData(
-                                selectedNoofEmi,
-                                emiNo = j,
-                                emiAmount = emiAmountWithFine,
-                                lateFine = ForServerlatefine!!,
-                                BounceChargeApplicable,
-                                loanCode
+                            Log.d("emiAmountWithFine", emiAmountWithFine)
+                            Log.d("EMIAmount", emiAmountWithFine)
+                            emiList.add(
+                                EmiLoanDetailPage.EmiData(
+                                    selectedNoofEmi,
+                                    emiNo = j,
+                                    emiAmount = emiAmountWithFine,
+                                    lateFine = ForServerlatefine!!,
+                                    BounceChargeApplicable,
+                                    loanCode
+                                )
                             )
-                        )
+                        }
+
+                        val email = preference.getStringValue(ConstantClass.CustomerEmailID, "") .ifEmpty { "bos.centerpvtltd@gmail.com" }
+                        val emiNumbers=  (1..selectedNoofEmi).joinToString("")
+
+                        PGWebViewActivity.LoanCodePG = loanCode
+
+                        if(loanmode!!.toLowerCase().equals("offline",ignoreCase = true)){
+                            var req = PGRequestCall(
+                                payCustomerPhoneNo = preference.getStringValue(ConstantClass.CustomerMobileNumber, ""),
+                                customerEmailID = email,
+                                registrationID = ConstantClass.PAN_VERIFICATION_REGISTRATION_ID ,
+                                payCartAmount = emiamount.toString(),
+                                eMINumbers = "EMI${emiNumbers}",
+                                customerCode = preference.getStringValue(ConstantClass.CustomerCode, ""),
+                                payCustomerName = "${preference.getStringValue(ConstantClass.FirstName, "")} ${preference.getStringValue(ConstantClass.LastName, "")}",
+                                loanCode = loanCode
+                            )
+                            hitApiForRequestPG(req)
+                        }
+                        else{
+                            var req = PGOnlineRequestCall(
+                                amount = emiamount,
+                                registrationID =  ConstantClass.PAN_VERIFICATION_REGISTRATION_ID,
+                                eMINumbers = "EMI${emiNumbers}",
+                                customerCode = preference.getStringValue(ConstantClass.CustomerCode, ""),
+                                loanCode = loanCode
+                            )
+
+                            hitApiForRequestPGOnline(req)
+
+                        }
+
                     }
-
-                    val email = preference.getStringValue(ConstantClass.CustomerEmailID, "") .ifEmpty { "bos.centerpvtltd@gmail.com" }
-                    val emiNumbers=  (1..selectedNoofEmi).joinToString("")
-
-                    PGWebViewActivity.LoanCodePG = loanCode
-
-                    if(loanmode!!.toLowerCase().equals("offline",ignoreCase = true)){
-                        var req = PGRequestCall(
-                            payCustomerPhoneNo = preference.getStringValue(ConstantClass.CustomerMobileNumber, ""),
-                            customerEmailID = email,
-                            registrationID = ConstantClass.PAN_VERIFICATION_REGISTRATION_ID ,
-                            payCartAmount = emiamount.toString(),
-                            eMINumbers = "EMI${emiNumbers}",
-                            customerCode = preference.getStringValue(ConstantClass.CustomerCode, ""),
-                            payCustomerName = "${preference.getStringValue(ConstantClass.FirstName, "")} ${preference.getStringValue(ConstantClass.LastName, "")}",
-                            loanCode = loanCode
-                        )
-                        hitApiForRequestPG(req)
-                    }
-                    else{
-                        var req = PGOnlineRequestCall(
-                            amount = emiamount,
-                            registrationID =  ConstantClass.PAN_VERIFICATION_REGISTRATION_ID,
-                            eMINumbers = "EMI${emiNumbers}",
-                            customerCode = preference.getStringValue(ConstantClass.CustomerCode, ""),
-                            loanCode = loanCode
-                        )
-
-                        hitApiForRequestPGOnline(req)
-
-                    }
-
                 }
-
             }
 
         }
@@ -228,10 +232,10 @@ class KioskActivity : AppCompatActivity() {
 
         if (!previousLoanData.isNullOrEmpty()) {
             setData(previousLoanData, previousCurrentDate)
-        } else if (!isApiRunning) {
+        }
+        else if (!isApiRunning) {
             HitApiForEmiList()
         }
-
 
         hitapiforGetUpdateProfile()
 
@@ -251,6 +255,8 @@ class KioskActivity : AppCompatActivity() {
                 isLockTaskStarted = true
             }
         }
+
+       isPgClosing = false
 
     }
 
@@ -523,6 +529,7 @@ class KioskActivity : AppCompatActivity() {
         }
 
     }
+
 
     fun hitApiForRequestPGOnline(req : PGOnlineRequestCall){
 

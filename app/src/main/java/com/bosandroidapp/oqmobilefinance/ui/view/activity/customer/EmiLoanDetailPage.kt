@@ -954,7 +954,6 @@ class EmiLoanDetailPage : AppCompatActivity() {
     }
 
 
-
     fun HitApiForPayEmiAmount(emicount:Int,loopcount :Int,emiamount : String,fine:String?/*,imageFile:File*/){
 
         var createdBy=""

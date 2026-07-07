@@ -31,6 +31,7 @@ import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.Customer
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.getCurrentUtcTimestamp
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isPgClosing
 import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.CustomerLoanEmiReceiveReq
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
@@ -270,6 +271,7 @@ class PGWebViewActivity : AppCompatActivity() {
         var Ok = dialog.findViewById<AppCompatButton>(R.id.btnOk)
 
         Ok.setOnClickListener {
+            isPgClosing = true
             dialog.dismiss()
             closePg()
             window.decorView.post {
@@ -289,8 +291,6 @@ class PGWebViewActivity : AppCompatActivity() {
         binding.pgwebview.clearHistory()
         binding.pgwebview.removeAllViews()
         binding.pgwebview.destroy()
-
-        finish()
     }
 
     fun showingSuccessPopUp(utrNumber: String){
