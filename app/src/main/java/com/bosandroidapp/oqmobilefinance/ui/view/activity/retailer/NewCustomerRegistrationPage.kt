@@ -40,6 +40,7 @@ import com.bos.payment.appName.network.RetrofitClient
 import com.chaos.view.PinView
 import com.bosandroidapp.bosmobilefinance.ui.slideshow.data.model.loginsignup.cibilscore.CibilScoreReq
 import com.bosandroidapp.bosmobilefinance.ui.slideshow.ui.view.activity.retailer.cibilreportsfragment.BureauScore.Companion.userScore
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityNewCustomerRegistrationPageBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
@@ -136,7 +137,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 
-class NewCustomerRegistrationPage : AppCompatActivity() {
+class NewCustomerRegistrationPage : BaseActivity() {
     lateinit var binding: ActivityNewCustomerRegistrationPageBinding
 
     lateinit var dialog: Dialog

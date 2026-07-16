@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.MobilelistitemlayoutBinding
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.EMICalculationDetailsPage

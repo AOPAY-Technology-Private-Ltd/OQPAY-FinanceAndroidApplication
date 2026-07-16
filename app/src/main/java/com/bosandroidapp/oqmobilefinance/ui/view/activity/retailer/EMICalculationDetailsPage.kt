@@ -30,6 +30,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.ViewModelProvider
 import com.bos.payment.appName.network.RetrofitClient
 import com.bumptech.glide.Glide
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityEmicalculationDetailsPageBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
@@ -69,7 +70,7 @@ import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.google.gson.Gson
 
-class EMICalculationDetailsPage : AppCompatActivity() {
+class EMICalculationDetailsPage : BaseActivity() {
     lateinit var binding: ActivityEmicalculationDetailsPageBinding
     lateinit var viewModel: AuthenticationViewModel
     private var sellingPriceHandler = Handler(Looper.getMainLooper())

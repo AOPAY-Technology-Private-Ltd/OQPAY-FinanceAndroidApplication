@@ -58,6 +58,7 @@ import com.bosandroidapp.oqmobilefinance.data.notification.SendNotificationFeatu
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityLoginPageBinding
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.ForgetPasswordPage
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.SignupPage
@@ -67,7 +68,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
 
-class LoginPage : AppCompatActivity() {
+class LoginPage : BaseActivity() {
     lateinit var binding: ActivityLoginPageBinding
     private lateinit var viewModel: AuthenticationViewModel
     lateinit var preference : SharedPreference

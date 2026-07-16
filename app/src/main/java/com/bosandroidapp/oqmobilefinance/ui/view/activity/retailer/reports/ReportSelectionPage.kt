@@ -6,10 +6,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityReportSelectionPageBinding
 
-class ReportSelectionPage : AppCompatActivity() {
+class ReportSelectionPage : BaseActivity() {
 
     lateinit var binding : ActivityReportSelectionPageBinding
 

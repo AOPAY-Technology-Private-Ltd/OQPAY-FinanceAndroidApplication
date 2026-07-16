@@ -19,13 +19,14 @@ import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.CustomerDataItem
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.GetCustomerLoanDetailsReq
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.ui.slideshow.adapter.CustomerEMIDetailsAdapter
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.google.gson.Gson
 
-class CustomerEMIPage : AppCompatActivity() {
+class CustomerEMIPage : BaseActivity() {
     lateinit var binding : ActivityCustomerEmipageBinding
     lateinit var adapter : CustomerEMIDetailsAdapter
     lateinit var viewModel: AuthenticationViewModel

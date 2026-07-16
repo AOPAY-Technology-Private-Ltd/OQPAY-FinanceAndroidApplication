@@ -31,6 +31,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.ViewModelProvider
 import com.bos.payment.appName.network.RetrofitClient
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityPanCardVerificationPageBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
@@ -77,7 +78,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class PanCardVerificationPage : AppCompatActivity() {
+class PanCardVerificationPage : BaseActivity() {
     lateinit var binding: ActivityPanCardVerificationPageBinding
     lateinit var viewModel: AuthenticationViewModel
     lateinit var panViewModel: PanViewModel

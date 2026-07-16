@@ -37,6 +37,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.CustomerLoanEmiR
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityPgwebViewBinding
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.ui.slideshow.activity.DashBoard
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.customer.EmiLoanDetailPage.Companion.customerCode
@@ -45,11 +46,12 @@ import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.google.gson.Gson
 
-class PGWebViewActivity : AppCompatActivity() {
+class PGWebViewActivity : BaseActivity() {
     lateinit var binding : ActivityPgwebViewBinding
     lateinit var dialog: Dialog
     lateinit var preference : SharedPreference
     lateinit var viewModel: AuthenticationViewModel
+
 
     companion object{
         var emiList = mutableListOf<EmiData>()
@@ -284,6 +286,7 @@ class PGWebViewActivity : AppCompatActivity() {
         dialog.show()
 
     }
+
 
     private fun closePg() {
         binding.pgwebview.stopLoading()

@@ -38,6 +38,7 @@ import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.Congratulatio
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.CongratulationPage.Companion.LastName
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.CongratulationPage.Companion.MiddleName
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.CongratulationPage.Companion.loaneCode
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityQrcodePageBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
@@ -98,7 +99,6 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.LoanStatus
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ModelColor
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ModelName
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ModelVarient
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PENNYDROP_REGISTRATION_ID
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanFrontImageUri
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanNumber
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanNumberVerified
@@ -154,7 +154,7 @@ import okhttp3.Response
 import kotlin.math.roundToInt
 
 
-class QRCodePage : AppCompatActivity() {
+class QRCodePage : BaseActivity() {
     lateinit var binding: ActivityQrcodePageBinding
     lateinit var viewModel: AuthenticationViewModel
     lateinit var panViewModel: PanViewModel
@@ -255,15 +255,16 @@ class QRCodePage : AppCompatActivity() {
             if (loancreatedreq != null) {
                 if (!loaneCode.isNullOrEmpty()) {
 
-                    LoanStartDate = "2026-07-12T09:21:03.988Z"
-                    LoanEndDate = "2026-08-12T09:21:03.988Z"
-
                     // Loan already created in a previous attempt, retry E-Nach directly
+
+                   /* LoanStartDate = "2026-08-12T09:21:03.988Z"
+                    LoanEndDate = "2026-09-12T09:21:03.988Z"*/
+
                     val startDate = LoanStartDate
                     val endDate = LoanEndDate
 
-                    /*val emiAmount = EmiAmount.toDouble().roundToInt()*/
-                    val emiAmount = 1
+                     val emiAmount = EmiAmount.toDouble().roundToInt()
+                    /*val emiAmount = 1*/
 
                     val request = EMandateRequest(
                         categoryID = 7,
@@ -272,7 +273,11 @@ class QRCodePage : AppCompatActivity() {
                         seqType = "RCUR",
                         iFSCCode = BankIFSCCode,
                         frequncy = "MNTH",
-                        registrationID = ConstantClass.PAN_VERIFICATION_REGISTRATION_ID,
+                        registrationID =  if (ConstantClass.CheckOnlineOrOffline == ConstantClass.online) {
+                            ConstantClass.PAN_VERIFICATION_REGISTRATION_ID
+                        } else {
+                            ConstantClass.PAN_VERIFICATION_REGISTRATION_ID_OFFLINE
+                        },
                         accountHolderName = ConstantClass.AccountHolderName,
                         finalCollectionDate = endDate,
                         loanNo = loaneCode,
@@ -1278,10 +1283,12 @@ class QRCodePage : AppCompatActivity() {
                                     LoanStartDate = response.data.startDate!!
                                     LoanEndDate = response.data.endDate!!
 
-                                    LoanStartDate = "2026-07-12T09:21:03.988Z"
-                                    LoanEndDate = "2026-08-12T09:21:03.988Z"
-                                   /* val emiAmount = EmiAmount.toDouble().roundToInt()*/
-                                    val emiAmount = 1
+                                    /*LoanStartDate = "2026-08-12T09:21:03.988Z"
+                                    LoanEndDate = "2026-09-12T09:21:03.988Z"*/
+
+                                    val emiAmount = EmiAmount.toDouble().roundToInt()
+                                   /* val emiAmount = 1*/
+
 
                                     val request = EMandateRequest(
                                         categoryID = 7,
@@ -1290,7 +1297,11 @@ class QRCodePage : AppCompatActivity() {
                                         seqType = "RCUR",
                                         iFSCCode = BankIFSCCode,
                                         frequncy = "MNTH",
-                                        registrationID = ConstantClass.PAN_VERIFICATION_REGISTRATION_ID,
+                                        registrationID = if (ConstantClass.CheckOnlineOrOffline == ConstantClass.online) {
+                                            ConstantClass.PAN_VERIFICATION_REGISTRATION_ID
+                                        } else {
+                                            ConstantClass.PAN_VERIFICATION_REGISTRATION_ID_OFFLINE
+                                        },
                                         accountHolderName = ConstantClass.AccountHolderName,
                                         finalCollectionDate = LoanEndDate,
                                         loanNo = loaneCode,
@@ -1786,12 +1797,14 @@ class QRCodePage : AppCompatActivity() {
                             if (resources.data?.code() == 500) {
                                 Log.e("API_ERROR", "Internal Server Error from backend.")
                             }
+
                         }
 
                         ApiStatus.LOADING -> {
                             if(check){
                                 ConstantClass.OpenPopUpForVeryfyOTP(this)
                             }
+
                         }
 
                     }
@@ -1807,9 +1820,14 @@ class QRCodePage : AppCompatActivity() {
     fun hitApiForCheckLoanCharge(loancreatedreq: LoanCreatedReq){
 
         var request = LoanChargeReq(
-            registrationID = PENNYDROP_REGISTRATION_ID,
+            registrationID =   if (ConstantClass.CheckOnlineOrOffline == ConstantClass.online) {
+                ConstantClass.PENNYDROP_REGISTRATION_ID
+            } else {
+                ConstantClass.PENNYDROP_REGISTRATION_ID_OFFLINE
+            },
             retailerCode = preference.getStringValue(ConstantClass.RetailerCode, "")
         )
+
         Log.d("LoanChargeRequest", Gson().toJson(request))
 
         panViewModel.loanApplyChargesReq(request).observe(this) { resources ->
@@ -1858,7 +1876,6 @@ class QRCodePage : AppCompatActivity() {
         }
     }
 
-    
 
     fun  hitApiForUploadEnachMandateDataResponse(request:EnachDateUploadReq){
 

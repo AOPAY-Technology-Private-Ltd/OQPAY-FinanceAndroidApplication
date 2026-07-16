@@ -13,6 +13,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bos.payment.appName.network.RetrofitClient
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.clickMakePaymentPage
@@ -34,7 +35,7 @@ import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
-class DuesEMIPage : AppCompatActivity() {
+class DuesEMIPage : BaseActivity() {
     lateinit var binding : ActivityPendingEmisPageBinding
     lateinit var viewModel: AuthenticationViewModel
     lateinit var preference: SharedPreference

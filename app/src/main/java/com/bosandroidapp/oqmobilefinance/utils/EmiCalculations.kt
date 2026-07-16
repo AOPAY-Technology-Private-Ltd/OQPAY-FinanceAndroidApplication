@@ -24,7 +24,9 @@ import com.bosandroidapp.oqmobilefinance.kioskmode.isLocked
 import com.bosandroidapp.oqmobilefinance.kioskmode.removeRestrictions
 import com.bosandroidapp.oqmobilefinance.kioskmode.setEMICompleted
 import com.bosandroidapp.oqmobilefinance.kioskmode.setEMINotCompleted
+import com.bosandroidapp.oqmobilefinance.kioskmode.startInternetAlertSituation
 import com.bosandroidapp.oqmobilefinance.kioskmode.startLockSituation
+import com.bosandroidapp.oqmobilefinance.kioskmode.stopInternetAlertSituation
 import com.bosandroidapp.oqmobilefinance.kioskmode.stopLockSituation
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.google.gson.Gson
@@ -72,18 +74,19 @@ private suspend fun getCustomerLoanEmiDetailsReq(req: GetCustomerLoanDetailsReq)
     RetrofitClient.apiInterface.getCustomerLoanDetailsList(req)
 
 
+@RequiresApi(Build.VERSION_CODES.R)
 suspend fun Context.syncEmis() = withContext(Dispatchers.IO) {
     val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
 
    /* if (hasDateChanged()) {*/
-        Logger.d(ACCESSIBILITYTAG, "Date Changed")
+        // Logger.d(ACCESSIBILITYTAG, "Date Changed")
         val preference = SharedPreference(this@syncEmis)
         var loanemireq = GetCustomerLoanDetailsReq(
             loancode = "",
             customercode = preference.getStringValue(ConstantClass.CustomerCode, "")
         )
         try {
-            Logger.d(ACCESSIBILITYTAG, "Syncing EMIs")
+            // Logger.d(ACCESSIBILITYTAG, "Syncing EMIs")
             Log.d("Loanreq",Gson().toJson(loanemireq))
             val loanDetails = getCustomerLoanEmiDetailsReq(loanemireq)
             currentDate = loanDetails?.body()?.indiaTimeIST!!.convertDate()
@@ -91,13 +94,13 @@ suspend fun Context.syncEmis() = withContext(Dispatchers.IO) {
 
             list?.let { loans ->
                 val obj = loans.getLoansStringObject()
-                Logger.d(ACCESSIBILITYTAG, obj)
+                // Logger.d(ACCESSIBILITYTAG, obj)
                 sharedPref.edit().putString("LoanData", obj).apply()
             }
 
         }
         catch (e: Exception) {
-            Logger.d(ACCESSIBILITYTAG, e.localizedMessage ?: "")
+            // Logger.d(ACCESSIBILITYTAG, e.localizedMessage ?: "")
         }
 
   /*  }*/
@@ -166,7 +169,7 @@ private suspend fun Context.isEMIDue(sharedPref: SharedPreferences) = withContex
         }
 
 
-        Logger.d(ACCESSIBILITYTAG,"EMIDUES: $emiDues")
+        // Logger.d(ACCESSIBILITYTAG,"EMIDUES: $emiDues")
 
         if (emiDues != null) {
             if (emiDues!! > 0) {
@@ -176,18 +179,20 @@ private suspend fun Context.isEMIDue(sharedPref: SharedPreferences) = withContex
             }
         }
 
-        Logger.d(ACCESSIBILITYTAG, "Late EMIs Count: $lateEMIs")
+        // Logger.d(ACCESSIBILITYTAG, "Late EMIs Count: $lateEMIs")
 
         if (lateEMIs > 0) {
             this@isEMIDue.startLockSituation()
+            this@isEMIDue.startInternetAlertSituation()
         }
         else {
             this@isEMIDue.stopLockSituation()
+            this@isEMIDue.stopInternetAlertSituation()
         }
 
 
     } catch (e: Exception) {
-        Logger.d(ACCESSIBILITYTAG, e.localizedMessage ?: "")
+        // Logger.d(ACCESSIBILITYTAG, e.localizedMessage ?: "")
     }
 
 }
@@ -486,7 +491,7 @@ fun Context.hasDateChanged(): Boolean {
     val lastSync = sharedPref.getString("LoanSyncDate", "")
     if (lastSync != currentDate) {
         sharedPref.edit().putString("LoanSyncDate", currentDate).apply()
-        Logger.d(ACCESSIBILITYTAG, currentDate.toString())
+        // Logger.d(ACCESSIBILITYTAG, currentDate.toString())
         return true
     }
     return false

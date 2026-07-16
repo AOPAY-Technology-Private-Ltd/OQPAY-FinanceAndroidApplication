@@ -37,6 +37,7 @@ import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bos.payment.appName.network.RetrofitClient
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivitySignupPageBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
@@ -97,7 +98,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class SignupPage : AppCompatActivity() {
+class SignupPage : BaseActivity() {
     lateinit var binding : ActivitySignupPageBinding
     lateinit var viewModel: AuthenticationViewModel
     lateinit var preference : SharedPreference
@@ -1222,7 +1223,8 @@ class SignupPage : AppCompatActivity() {
             binding.firstName.error = null
         }
 
-        if (gstNumber.isBlank() || !ConstantClass.isValidGST(gstNumber)) {
+
+        /*if (gstNumber.isBlank() || !ConstantClass.isValidGST(gstNumber)) {
             binding.gstEditText.error= "Enter a valid GST number (e.g., 07ABCDE1234F1Z5)"
             scrollToView(binding.detaillayout,  binding.gstEditText)
             Toast.makeText(context, "Enter a valid GST number (e.g., 07ABCDE1234F1Z5)", Toast.LENGTH_SHORT).show()
@@ -1240,7 +1242,7 @@ class SignupPage : AppCompatActivity() {
         }
         else{
             binding.gstEditText.error = null
-        }
+        }*/
 
 
         if (storeName.isNullOrBlank() ) {
@@ -1432,6 +1434,7 @@ class SignupPage : AppCompatActivity() {
 
 
 
+
     fun isSameMaskedAadhaar(customerMasked: String, referenceMasked: String): Boolean {
         val customerLast4 = customerMasked.takeLast(4)
         val referenceLast4 = referenceMasked.takeLast(4)
@@ -1439,6 +1442,7 @@ class SignupPage : AppCompatActivity() {
         Log.d("validateAadhaarnumber" , "${isAadhaarMatched}")
         return isAadhaarMatched
     }
+
 
 
     fun emptyAboveField(){
@@ -1507,7 +1511,6 @@ class SignupPage : AppCompatActivity() {
         }
         return false
     }
-
 
     fun scrollToView(scrollView: NestedScrollView, targetView: View) {
         scrollView.post {

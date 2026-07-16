@@ -24,6 +24,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LogoutReq
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityCibilReportsDetailsPageBinding
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
 import com.bosandroidapp.oqmobilefinance.ui.view.adapter.CibilViewPagerAdapter
@@ -33,7 +34,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.gson.Gson
 
-class CibilReportsDetailsPage : AppCompatActivity() {
+class CibilReportsDetailsPage : BaseActivity() {
     lateinit var binding : ActivityCibilReportsDetailsPageBinding
     val statusArray = listOf("Personal", "CAIS", "Account","Bureau","CAPS")
     lateinit var  viewPager: ViewPager2

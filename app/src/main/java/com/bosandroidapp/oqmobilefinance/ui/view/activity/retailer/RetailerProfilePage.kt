@@ -35,6 +35,7 @@ import androidx.transition.Visibility
 import com.bos.payment.appName.network.ApiInterface
 import com.bos.payment.appName.network.RetrofitClient
 import com.chaos.view.PinView
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityRetailerProfilePageBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
@@ -71,7 +72,7 @@ import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
 
-class RetailerProfilePage : AppCompatActivity() {
+class RetailerProfilePage : BaseActivity() {
     lateinit var binding: ActivityRetailerProfilePageBinding
     lateinit var viewModel: AuthenticationViewModel
     lateinit var api: ApiInterface

@@ -53,6 +53,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.reports.GetRepor
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.reports.ReportsDataItem
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.ui.slideshow.adapter.CustomerReportListAdapter
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.IMEIDetailsPage
@@ -65,7 +66,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 
 
-class CustomerReportsPage : AppCompatActivity() ,CustomerReportListAdapter.onClickListner{
+class CustomerReportsPage : BaseActivity() ,CustomerReportListAdapter.onClickListner{
     lateinit var binding: ActivityCustomerReportsPageBinding
     lateinit var preference: SharedPreference
     lateinit var viewModel: AuthenticationViewModel

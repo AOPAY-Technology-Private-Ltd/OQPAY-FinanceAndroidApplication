@@ -27,6 +27,7 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.dialog
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityCustomerAppInstallBinding
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.ui.slideshow.activity.DashBoard
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
@@ -34,7 +35,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class CustomerAppInstall : AppCompatActivity() {
+class CustomerAppInstall : BaseActivity() {
     lateinit var binding: ActivityCustomerAppInstallBinding
     lateinit var viewModel: AuthenticationViewModel
     lateinit var preference: SharedPreference

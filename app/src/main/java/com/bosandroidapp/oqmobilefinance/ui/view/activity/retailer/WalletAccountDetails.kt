@@ -29,6 +29,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.bos.payment.appName.network.RetrofitClient
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityWalletAccountDetailsBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
@@ -65,7 +66,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.google.gson.Gson
 import java.util.Locale
 
-class WalletAccountDetails : AppCompatActivity() {
+class WalletAccountDetails : BaseActivity() {
     lateinit var binding : ActivityWalletAccountDetailsBinding
     lateinit var viewModel: AuthenticationViewModel
     lateinit var preference : SharedPreference
