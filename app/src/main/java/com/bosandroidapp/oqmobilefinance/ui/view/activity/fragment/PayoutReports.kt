@@ -10,6 +10,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.lifecycle.ViewModelProvider
 import com.bos.payment.appName.network.RetrofitClient
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.FragmentPayoutReportsBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass

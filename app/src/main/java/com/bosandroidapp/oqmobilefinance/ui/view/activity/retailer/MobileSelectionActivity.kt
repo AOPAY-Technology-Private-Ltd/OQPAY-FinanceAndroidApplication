@@ -28,6 +28,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import com.bos.payment.appName.network.RetrofitClient
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityMobileselectionBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
@@ -51,7 +52,7 @@ import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.bosandroidapp.oqmobilefinance.utils.GridSpacingItemDecoration
 import com.google.gson.Gson
 
-class MobileSelectionActivity : AppCompatActivity() {
+class MobileSelectionActivity : BaseActivity() {
 
     lateinit var binding : ActivityMobileselectionBinding
     lateinit var adapter : MobileListAdapter

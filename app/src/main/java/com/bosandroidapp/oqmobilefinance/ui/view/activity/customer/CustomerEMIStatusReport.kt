@@ -21,6 +21,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.GetCustomerLoanD
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityCustomerEmistatusReportBinding
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.ui.slideshow.adapter.CustomerEMIDetailsAdapter
 import com.bosandroidapp.oqmobilefinance.ui.view.adapter.CustomerEmiStatusAdapter
@@ -28,7 +29,7 @@ import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.google.gson.Gson
 
-class CustomerEMIStatusReport : AppCompatActivity() {
+class CustomerEMIStatusReport : BaseActivity() {
 
     lateinit var binding: ActivityCustomerEmistatusReportBinding
     lateinit var viewModel: AuthenticationViewModel

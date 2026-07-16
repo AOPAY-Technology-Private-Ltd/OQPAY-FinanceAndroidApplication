@@ -36,6 +36,7 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.loginType
 import com.bosandroidapp.oqmobilefinance.data.model.UploadDeviceInfoReq
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.ui.slideshow.activity.DashBoard
 import com.bosandroidapp.oqmobilefinance.ui.slideshow.activity.LoginPage
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.NewCustomerRegistrationPage
@@ -43,10 +44,9 @@ import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.google.gson.Gson
 
-class ChooseYourRolePage : AppCompatActivity() {
+class ChooseYourRolePage : BaseActivity() {
    lateinit var binding : ActivityChooseYourRolePageBinding
     lateinit var viewModel: AuthenticationViewModel
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -32,6 +32,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.ViewModelProvider
 import com.bos.payment.appName.network.RetrofitClient
 import com.chaos.view.PinView
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityForgetPasswordPageBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
@@ -48,7 +49,7 @@ import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.google.gson.Gson
 
-class ForgetPasswordPage : AppCompatActivity() {
+class ForgetPasswordPage : BaseActivity() {
     lateinit var binding : ActivityForgetPasswordPageBinding
     lateinit var viewModel: AuthenticationViewModel
     lateinit var preference : SharedPreference

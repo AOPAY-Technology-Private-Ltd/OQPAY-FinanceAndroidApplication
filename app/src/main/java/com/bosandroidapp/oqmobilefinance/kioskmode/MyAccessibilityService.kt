@@ -5,6 +5,8 @@ import android.app.ActivityManager
 import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -13,6 +15,7 @@ import android.view.accessibility.AccessibilityNodeInfo
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.SETTINGS_PKG
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.gpsSettingsOpened
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.internetSettingsOpened
 import com.bosandroidapp.oqmobilefinance.utils.ACCESSIBILITYTAG
 import com.bosandroidapp.oqmobilefinance.utils.Logger
 import com.bosandroidapp.oqmobilefinance.utils.syncEmis
@@ -31,20 +34,17 @@ class MyAccessibilityService : AccessibilityService() {
         }
 
         if (isMyAppInfoPage() && !isEMIsCompleted()) {
-            Logger.d(ACCESSIBILITYTAG, "On App Info Page: Global Back")
+            // Logger.d(ACCESSIBILITYTAG, "On App Info Page: Global Back")
             performGlobalAction(GLOBAL_ACTION_BACK)
         }
 
-
         if (isFactoryResetting(event?.text?.toString() ?: "") && !isEMIsCompleted()) {
-            Logger.d(ACCESSIBILITYTAG, "On Factory Reset Page: Global Back")
+            // Logger.d(ACCESSIBILITYTAG, "On Factory Reset Page: Global Back")
             performGlobalAction(GLOBAL_ACTION_BACK)
             this.showToast("You are not allowed to Factory reset your device when your EMIs are pending.")
         }
 
-
         val currentPkg = event?.packageName?.toString() ?: ""
-
 
         if (!isGpsEnabled(this) && !isEMIsCompleted()) {
             // Open GPS settings ONLY ONCE
@@ -61,26 +61,39 @@ class MyAccessibilityService : AccessibilityService() {
             return // STOP all other processing
         }
 
-
         // ✅ GPS ENABLED → RELEASE LOCK
         if (gpsSettingsOpened) {
             gpsSettingsOpened = false
         }
 
-
         /*if (isGoogleLogin(event) && !isEMIsCompleted()) {
-            Logger.d(ACCESSIBILITYTAG, "On Google Login Page: Global Back")
+            // Logger.d(ACCESSIBILITYTAG, "On Google Login Page: Global Back")
             performGlobalAction(GLOBAL_ACTION_BACK)
         }*/
 
 
         /* if (isLocked()) {
-             Logger.d(ACCESSIBILITYTAG, "Phone Locked")
+             // Logger.d(ACCESSIBILITYTAG, "Phone Locked")
              isMyAppMinimizedOrRemoved(event)
          }*/
 
 
         if (isLocked()) {
+
+            if (!isInternetAvailable(this) && isInternetAlertSituationCompleted()) {
+                // Open Internet settings ONLY ONCE
+                if (!internetSettingsOpened) {
+                    internetSettingsOpened = true
+                    showToast("Please connect with internet")
+                    openInternetSettings()
+                    return
+                }
+                if (!currentPkg.contains(SETTINGS_PKG)) {
+                    openInternetSettings()   // FORCE BACK
+                }
+
+                return // STOP all other processing
+            }
 
             val packageName = event?.packageName?.toString()
 
@@ -100,11 +113,9 @@ class MyAccessibilityService : AccessibilityService() {
                 return
             }
 
-
            /* if (isActivityRunning(this, PGWebViewActivity::class.java)) {
                 return
             }*/
-
 
             if (ConstantClass.isPgClosing) {
                 Handler(Looper.getMainLooper()).postDelayed({
@@ -113,12 +124,10 @@ class MyAccessibilityService : AccessibilityService() {
                 return
             }
 
-
-            Logger.d(ACCESSIBILITYTAG, "Phone Locked")
+            // Logger.d(ACCESSIBILITYTAG, "Phone Locked")
             isMyAppMinimizedOrRemoved(event)
 
         }
-
 
     }
 
@@ -188,8 +197,8 @@ class MyAccessibilityService : AccessibilityService() {
             && !((event?.packageName?.equals("com.bosandroidapp.aopayfinance")) ?: false)
             && !(event?.packageName == null) && !isMyAppOnTop()/*!isActivityRunning(this, KioskActivity::class.java)*/  && event?.packageName != null && !isPaymentAppRunning()) {
 
-            Logger.d(ACCESSIBILITYTAG, "${event.packageName}")
-            Logger.d(ACCESSIBILITYTAG, "Performing KioskActivity Intent")
+            // Logger.d(ACCESSIBILITYTAG, "${event.packageName}")
+            // Logger.d(ACCESSIBILITYTAG, "Performing KioskActivity Intent")
 
             val intent = Intent(this, KioskActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -283,8 +292,27 @@ class MyAccessibilityService : AccessibilityService() {
     }
 
 
+    fun isInternetAvailable(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        val network = connectivityManager.activeNetwork ?: return false
+        val capabilities =
+            connectivityManager.getNetworkCapabilities(network) ?: return false
+
+        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+                capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+    }
+
+
     private fun openGpsSettings() {
         val intent = Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
+    }
+
+    fun openInternetSettings() {
+        val intent = Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
     }
@@ -362,6 +390,7 @@ class MyAccessibilityService : AccessibilityService() {
                 packageName.equals("com.samsung.android.sm.devicesecurity", true) ||
                 packageName?.contains("biometric", true) ?: false ||
                 packageName?.contains("biometrics", true) ?: false ||
+                packageName?.contains("settings", true) ?: false ||
 
                 // Vivo
                 packageName.equals("com.iqoo.secure", true) ||

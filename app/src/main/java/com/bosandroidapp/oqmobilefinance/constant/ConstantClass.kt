@@ -101,20 +101,41 @@ import java.util.concurrent.TimeUnit
 object ConstantClass {
      //const val BASE_URL = "https://oqapi.bos.center/"
 
-   /*  // Production
-       const val BASE_URL = "https://api.oqpay.in/"
-       const val BASE_URL_IMAGE = "https://api.oqpay.in"*/
+      // Production
+ /*     const val BASE_URL = "https://api.oqpay.in/"
+        const val BASE_URL_IMAGE = "https://api.oqpay.in"*/
 
     // UAT
      const val BASE_URL = "https://api.oqpay.co.in/"
      const val BASE_URL_IMAGE = "https://api.oqpay.co.in"
+
      const val SMS_BASE_URL = "http://web.adcruxmedia.in/"
      const val PAN_BASE_URL = "https://api.aopay.in/"
+
      const val SMS_API_KEY = "KBSxc26XqjoiR7SA"
      const val SMS_SENDER_ID = "BOSCNT"
      const val SMS_TEMPLATE_ID = "1207175396979758678"
-     const val PAN_VERIFICATION_REGISTRATION_ID = "AOP-5039"
-     const val PENNYDROP_REGISTRATION_ID = "AOP-5039"
+
+
+    // production merchant id online
+    /* const val PAN_VERIFICATION_REGISTRATION_ID = "AOP-5039"
+     const val PENNYDROP_REGISTRATION_ID = "AOP-5039"*/
+
+
+     const val PAN_VERIFICATION_REGISTRATION_ID = "AOP-554"
+     const val PENNYDROP_REGISTRATION_ID = "AOP-554"
+
+
+     // production merchant id offline
+/*     const val PAN_VERIFICATION_REGISTRATION_ID_OFFLINE = "AOP-5050"
+       const val PENNYDROP_REGISTRATION_ID_OFFLINE = "AOP-5050"*/
+
+
+    // UAT merchant id
+     const val PAN_VERIFICATION_REGISTRATION_ID_OFFLINE = "AOP-554"
+     const val PENNYDROP_REGISTRATION_ID_OFFLINE = "AOP-554"
+
+
      const val FRP_MAIL_ID = "116164541526712076874" // info@aopay.in
      const val CustomerCode = "customerCode"
      const val RetailerCode = "retailerCode"
@@ -139,6 +160,7 @@ object ConstantClass {
 
      const val Loginpassword = "loginPassword"
      var gpsSettingsOpened = false
+     var internetSettingsOpened = false
      var CheckCompleteEmiStatus = false
      const val SETTINGS_PKG = "com.android.settings"
      const val CustomerMobileNumber = "mobileNumber"
@@ -228,6 +250,7 @@ object ConstantClass {
      var ToBePaidAmount : String = ""
 
      var CountryName : String ? = ""
+
      var ClickOnCardDashboard : String ? = ""
      var ClickOnCardLowCibilScore : String ? = ""
 
@@ -338,8 +361,13 @@ object ConstantClass {
             .setTitle("No Internet")
             .setMessage("Please check your Wi-Fi or mobile data connection.")
             .setCancelable(false)
-            .setPositiveButton("Retry") { _, _ ->
-                if (NetworkMonitor(context).isConnected()) noInternetDialog?.dismiss() else showNoInternetDialog(context)
+            .setPositiveButton("Open Settings") { _, _ ->
+                if (NetworkMonitor(context).isConnected()) noInternetDialog?.dismiss() else {
+                    val intent = Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    context.startActivity(intent)
+                }
+
             }
             .create()
 
@@ -867,12 +895,25 @@ object ConstantClass {
         }
     }
 
-    fun convertToDDMMYYYY(isoDate: String ?): String {
+  /*  fun convertToDDMMYYYY(isoDate: String ?): String {
         val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SS", Locale.getDefault())
         val outputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
         val date = inputFormat.parse(isoDate)
         return outputFormat.format(date!!)
+    }*/
+
+    fun convertToDDMMYYYY(dateValue: String?): String {
+        if (dateValue.isNullOrBlank()) return "-"
+        return try {
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()).apply {
+                isLenient = false
+            }
+            val outputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            inputFormat.parse(dateValue)?.let(outputFormat::format) ?: "-"
+        } catch (e: Exception) {
+            "-"
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

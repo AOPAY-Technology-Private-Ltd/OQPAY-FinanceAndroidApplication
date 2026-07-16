@@ -11,6 +11,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import com.bos.payment.appName.network.RetrofitClient
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.data.model.OverdueDataItem
@@ -31,7 +32,7 @@ import java.util.Calendar
 import java.util.Locale
 import java.util.TimeZone
 
-class AllTransactionHistory : AppCompatActivity() {
+class AllTransactionHistory : BaseActivity() {
     lateinit var binding: ActivityAllTransactionHistoryBinding
     lateinit var viewModel: AuthenticationViewModel
     lateinit var preference: SharedPreference

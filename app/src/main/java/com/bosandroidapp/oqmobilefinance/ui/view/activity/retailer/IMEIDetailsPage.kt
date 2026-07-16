@@ -31,6 +31,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.ViewModelProvider
 import com.bos.payment.appName.network.RetrofitClient
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityImeidetailsPageBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
@@ -70,7 +71,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class IMEIDetailsPage : AppCompatActivity() {
+class IMEIDetailsPage : BaseActivity() {
     lateinit var binding : ActivityImeidetailsPageBinding
     private val CAMERA_REQUEST_CODE_FRONT = 1001
     private  var imei1photoUri: Uri? = null

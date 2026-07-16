@@ -52,6 +52,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LogoutReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.AadharVerificationReq
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.AadharCardWebViewDIGILockerPage.Companion.digilockerLink
@@ -62,7 +63,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-class IDVerificationPage : AppCompatActivity() {
+class IDVerificationPage : BaseActivity() {
     lateinit var binding: ActivityIdverificationPageBinding
     lateinit var viewModel: AuthenticationViewModel
     lateinit var preference: SharedPreference
@@ -99,7 +100,8 @@ class IDVerificationPage : AppCompatActivity() {
             else {
                 if (ConstantClass.CheckOnlineOrOffline.equals(ConstantClass.online)) {
                     hitApiForAadharVerification()
-                } else {
+                }
+                else {
                     startActivity(Intent(this@IDVerificationPage, AadharCardVerificationPage::class.java))
                 }
             }

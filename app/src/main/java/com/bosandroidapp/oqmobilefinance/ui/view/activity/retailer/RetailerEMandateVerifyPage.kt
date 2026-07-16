@@ -26,6 +26,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import com.bos.payment.appName.network.RetrofitClient
 import com.bosandroidapp.bosmobilefinance.ui.slideshow.ui.view.activity.retailer.cibilreportsfragment.BureauScore.Companion.userScore
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AadharNumber
@@ -91,7 +92,7 @@ import com.bosandroidapp.oqmobilefinance.ui.viewmodel.PanViewModel
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.google.gson.Gson
 
-class RetailerEMandateVerifyPage : AppCompatActivity() {
+class RetailerEMandateVerifyPage : BaseActivity() {
 
     lateinit var binding : ActivityRetailerEmandateVerifyPageBinding
     var isEmandateVerified : String= ""
@@ -124,6 +125,7 @@ class RetailerEMandateVerifyPage : AppCompatActivity() {
         )[PanViewModel::class.java]
 
         setDataInWebView()
+
     }
 
 
@@ -222,8 +224,13 @@ class RetailerEMandateVerifyPage : AppCompatActivity() {
     fun doUpdateEMandateStatus(eMandateID : String){
 
         (this@RetailerEMandateVerifyPage).runOnUiThread {
+
             var request = ENachStatusReq(
-                registrationID = ConstantClass.PAN_VERIFICATION_REGISTRATION_ID,
+                registrationID = if (ConstantClass.CheckOnlineOrOffline == ConstantClass.online) {
+                    ConstantClass.PAN_VERIFICATION_REGISTRATION_ID
+                } else {
+                    ConstantClass.PAN_VERIFICATION_REGISTRATION_ID_OFFLINE
+                },
                 eMandateID = eMandateID
             )
 

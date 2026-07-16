@@ -26,6 +26,7 @@ import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.repository.CibilRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CibilViewModelFactory
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
@@ -36,7 +37,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class AadharCardWebViewDIGILockerPage : AppCompatActivity() {
+class AadharCardWebViewDIGILockerPage : BaseActivity() {
     lateinit var binding: ActivityAadharCardWebViewDigilockerPageBinding
     lateinit var viewModel: AuthenticationViewModel
     private lateinit var viewCibilModel: CibilViewModel
@@ -228,8 +229,6 @@ class AadharCardWebViewDIGILockerPage : AppCompatActivity() {
             }
         }
 
-
-
     }
 
     fun hitApiForRetailerLogout() {
@@ -275,7 +274,11 @@ class AadharCardWebViewDIGILockerPage : AppCompatActivity() {
 
         var aadharverificationreq = AAdhaarDetailesReq(
             transactionID = transactionId,
-            registrationID = ConstantClass.PAN_VERIFICATION_REGISTRATION_ID,
+            registrationID =  if (ConstantClass.CheckOnlineOrOffline == ConstantClass.online) {
+                ConstantClass.PAN_VERIFICATION_REGISTRATION_ID
+            } else {
+                ConstantClass.PAN_VERIFICATION_REGISTRATION_ID_OFFLINE
+            }
         )
 
         Log.d("AadharDetailsreq", Gson().toJson(aadharverificationreq))

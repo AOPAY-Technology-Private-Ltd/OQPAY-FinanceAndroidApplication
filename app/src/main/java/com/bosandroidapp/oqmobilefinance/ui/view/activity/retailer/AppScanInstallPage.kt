@@ -77,7 +77,6 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.LoanStatus
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ModelColor
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ModelName
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ModelVarient
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PENNYDROP_REGISTRATION_ID
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanNumber
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanNumberVerified
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanResponse
@@ -103,6 +102,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LogoutReq
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityAppScanInstallPageBinding
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.ui.slideshow.activity.DashBoard
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
@@ -119,7 +119,7 @@ import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 import kotlin.toString
 
-class AppScanInstallPage : AppCompatActivity() {
+class AppScanInstallPage : BaseActivity() {
     lateinit var viewModel: AuthenticationViewModel
     lateinit var binding : ActivityAppScanInstallPageBinding
     lateinit var api: ApiInterface

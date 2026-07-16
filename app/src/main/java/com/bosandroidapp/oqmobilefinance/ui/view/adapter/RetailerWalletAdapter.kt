@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bosandroidapp.oqmobilefinance.R
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.databinding.LoandetailesItemlayoutBinding
 import com.bosandroidapp.oqmobilefinance.databinding.RetailerWalletReportsBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass

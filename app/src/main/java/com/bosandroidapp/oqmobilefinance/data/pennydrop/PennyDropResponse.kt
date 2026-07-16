@@ -53,5 +53,5 @@ data class PennyDropModel(
 	val rrn: String? = null,
 
 	@field:SerializedName("desc")
-	val desc: Any? = null
+	val desc: String? = null
 )

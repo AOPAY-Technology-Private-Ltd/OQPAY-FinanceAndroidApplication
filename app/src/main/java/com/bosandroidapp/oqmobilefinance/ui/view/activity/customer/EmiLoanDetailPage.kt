@@ -45,6 +45,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bos.payment.appName.network.ApiInterface
 import com.bos.payment.appName.network.RetrofitClient
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityEmiLoanDetailPageBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
@@ -125,7 +126,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
-class EmiLoanDetailPage : AppCompatActivity() {
+class EmiLoanDetailPage : BaseActivity() {
     lateinit var binding : ActivityEmiLoanDetailPageBinding
     lateinit var dialog : Dialog
     lateinit var viewModel: AuthenticationViewModel
@@ -641,7 +642,7 @@ class EmiLoanDetailPage : AppCompatActivity() {
                             var req = PGRequestCall(
                                 payCustomerPhoneNo = preference.getStringValue(ConstantClass.CustomerMobileNumber, ""),
                                 customerEmailID = email,
-                                registrationID = ConstantClass.PAN_VERIFICATION_REGISTRATION_ID ,
+                                registrationID = ConstantClass.PAN_VERIFICATION_REGISTRATION_ID_OFFLINE ,
                                 payCartAmount = emiamount.toString(),
                                 eMINumbers = "EMI${emiNumbers}",
                                 customerCode = preference.getStringValue(ConstantClass.CustomerCode, ""),
@@ -1137,7 +1138,11 @@ class EmiLoanDetailPage : AppCompatActivity() {
             customerCommissionGST = 0,
             commissionWithoutGST = 0,
             transferFromMsg = "Your Account is debited by ${amount}Rs.Due to Paid EMI on customer code :${customerCode}",
-            registrationId = retailercode,
+            registrationId =if(loanmode!!.toLowerCase().equals("online",ignoreCase = true)) {
+                ConstantClass.PAN_VERIFICATION_REGISTRATION_ID
+            } else {
+                ConstantClass.PAN_VERIFICATION_REGISTRATION_ID_OFFLINE
+            },
             tdsAmount = 0,
             serviceschargeGSTAmount = 0,
             transactionStatus = "Approved",
