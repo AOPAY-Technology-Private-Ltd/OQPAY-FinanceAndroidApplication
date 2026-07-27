@@ -99,15 +99,33 @@ import java.util.TimeZone
 import java.util.concurrent.TimeUnit
 
 object ConstantClass {
-     //const val BASE_URL = "https://oqapi.bos.center/"
 
-      // Production
- /*     const val BASE_URL = "https://api.oqpay.in/"
-        const val BASE_URL_IMAGE = "https://api.oqpay.in"*/
+        // Production
+       /*  const val BASE_URL = "https://api.oqpay.in/"
+         const val BASE_URL_IMAGE = "https://api.oqpay.in"
+
+        // production merchant id online
+        const val PAN_VERIFICATION_REGISTRATION_ID = "AOP-5039"
+        const val PENNYDROP_REGISTRATION_ID = "AOP-5039"
+
+         // production merchant id offline
+         const val PAN_VERIFICATION_REGISTRATION_ID_OFFLINE = "AOP-5050"
+         const val PENNYDROP_REGISTRATION_ID_OFFLINE = "AOP-5050"*/
+
 
     // UAT
-     const val BASE_URL = "https://api.oqpay.co.in/"
-     const val BASE_URL_IMAGE = "https://api.oqpay.co.in"
+
+    const val BASE_URL = "https://api.oqpay.co.in/"
+    const val BASE_URL_IMAGE = "https://api.oqpay.co.in"
+
+    // UAT merchant id online
+    const val PAN_VERIFICATION_REGISTRATION_ID = "AOP-554"
+    const val PENNYDROP_REGISTRATION_ID = "AOP-554"
+
+    //  UAT merchant id offline
+    const val PAN_VERIFICATION_REGISTRATION_ID_OFFLINE = "AOP-554"
+    const val PENNYDROP_REGISTRATION_ID_OFFLINE = "AOP-554"
+
 
      const val SMS_BASE_URL = "http://web.adcruxmedia.in/"
      const val PAN_BASE_URL = "https://api.aopay.in/"
@@ -115,27 +133,6 @@ object ConstantClass {
      const val SMS_API_KEY = "KBSxc26XqjoiR7SA"
      const val SMS_SENDER_ID = "BOSCNT"
      const val SMS_TEMPLATE_ID = "1207175396979758678"
-
-
-    // production merchant id online
-    /* const val PAN_VERIFICATION_REGISTRATION_ID = "AOP-5039"
-     const val PENNYDROP_REGISTRATION_ID = "AOP-5039"*/
-
-
-     const val PAN_VERIFICATION_REGISTRATION_ID = "AOP-554"
-     const val PENNYDROP_REGISTRATION_ID = "AOP-554"
-
-
-     // production merchant id offline
-/*     const val PAN_VERIFICATION_REGISTRATION_ID_OFFLINE = "AOP-5050"
-       const val PENNYDROP_REGISTRATION_ID_OFFLINE = "AOP-5050"*/
-
-
-    // UAT merchant id
-     const val PAN_VERIFICATION_REGISTRATION_ID_OFFLINE = "AOP-554"
-     const val PENNYDROP_REGISTRATION_ID_OFFLINE = "AOP-554"
-
-
      const val FRP_MAIL_ID = "116164541526712076874" // info@aopay.in
      const val CustomerCode = "customerCode"
      const val RetailerCode = "retailerCode"
@@ -195,6 +192,7 @@ object ConstantClass {
      const val ModeOfPayment = "IMPS"
 
      const val SUCCESS = "SUCCESS"
+     const val GENERATEKEY = "GenerateKey"
 
      var PanFirstName : String= ""
      var PanMiddleName : String= ""
@@ -349,6 +347,7 @@ object ConstantClass {
     var IsGSTVerified : String ="" // default active
     var IsPanVerified : String =""
     var IsAadhaarVerified : String =""
+
 
     var isPgClosing = false
 

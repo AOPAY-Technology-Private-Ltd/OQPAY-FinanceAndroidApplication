@@ -322,14 +322,21 @@ class DashBoard : BaseActivity() {
             binding.appBarDashBoard.deskdesign.subtitle.text = "Track Your Loan. Pay with Ease"
 
             var accessKey = preference.getBoolanValue(ConstantClass.CustomerAccessKey,false)
+            var generateKey = preference.getStringValue(ConstantClass.GENERATEKEY,"")
 
             if(accessKey){
                 binding.appBarDashBoard.deskdesign.customerGenerateKeyLayout.visibility = View.GONE
                 binding.appBarDashBoard.deskdesign.customerdashboardItemlayout.visibility = View.VISIBLE
             }
             else{
-                binding.appBarDashBoard.deskdesign.customerGenerateKeyLayout.visibility = View.VISIBLE
-                binding.appBarDashBoard.deskdesign.customerdashboardItemlayout.visibility = View.GONE
+                if(generateKey.isNotEmpty()){
+                    binding.appBarDashBoard.deskdesign.customerGenerateKeyLayout.visibility = View.GONE
+                    binding.appBarDashBoard.deskdesign.customerdashboardItemlayout.visibility = View.VISIBLE
+                }else{
+                    binding.appBarDashBoard.deskdesign.customerGenerateKeyLayout.visibility = View.VISIBLE
+                    binding.appBarDashBoard.deskdesign.customerdashboardItemlayout.visibility = View.GONE
+                }
+
             }
 
 
@@ -356,7 +363,16 @@ class DashBoard : BaseActivity() {
 
 
         binding.appBarDashBoard.deskdesign.customerGenerateKeyLayout.setOnClickListener{
-            hitApiForGetAndCheckAccessToken()
+            var generateKey = preference.getStringValue(ConstantClass.GENERATEKEY,"")
+            if(generateKey.isNullOrBlank()){
+                hitApiForGetAndCheckAccessToken()
+            }
+            else{
+                 preference.setBooleanValue(ConstantClass.CustomerAccessKey,true)
+                 binding.appBarDashBoard.deskdesign.customerGenerateKeyLayout.visibility = View.GONE
+                 binding.appBarDashBoard.deskdesign.customerdashboardItemlayout.visibility = View.VISIBLE
+            }
+
         }
 
 
@@ -499,6 +515,10 @@ class DashBoard : BaseActivity() {
                             binding.appBarDashBoard.deskdesign.generatedkey.visibility = View.VISIBLE
                             binding.appBarDashBoard.deskdesign.clicktologin.visibility = View.VISIBLE
                             binding.appBarDashBoard.deskdesign.generatedkey.text = response.data?.apiacessKey ?: ""
+                            preference.setStringValue(ConstantClass.GENERATEKEY,response.data?.apiacessKey ?: "")
+                        }
+                        else{
+
                         }
                     }
                 }

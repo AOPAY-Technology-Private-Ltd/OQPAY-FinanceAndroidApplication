@@ -74,6 +74,7 @@ private suspend fun getCustomerLoanEmiDetailsReq(req: GetCustomerLoanDetailsReq)
     RetrofitClient.apiInterface.getCustomerLoanDetailsList(req)
 
 
+
 @RequiresApi(Build.VERSION_CODES.R)
 suspend fun Context.syncEmis() = withContext(Dispatchers.IO) {
     val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
@@ -167,7 +168,6 @@ private suspend fun Context.isEMIDue(sharedPref: SharedPreferences) = withContex
                 }
             }
         }
-
 
         // Logger.d(ACCESSIBILITYTAG,"EMIDUES: $emiDues")
 

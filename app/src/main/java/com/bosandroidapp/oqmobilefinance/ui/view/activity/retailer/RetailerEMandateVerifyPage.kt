@@ -236,6 +236,7 @@ class RetailerEMandateVerifyPage : BaseActivity() {
 
             hitApiForEMandateStatus(request)
         }
+
     }
 
 
