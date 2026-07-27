@@ -257,14 +257,14 @@ class QRCodePage : BaseActivity() {
 
                     // Loan already created in a previous attempt, retry E-Nach directly
 
-                   /* LoanStartDate = "2026-08-12T09:21:03.988Z"
-                    LoanEndDate = "2026-09-12T09:21:03.988Z"*/
+                    LoanStartDate = "2026-08-25T09:21:03.988Z"
+                    LoanEndDate = "2026-09-25T09:21:03.988Z"
 
                     val startDate = LoanStartDate
                     val endDate = LoanEndDate
 
-                     val emiAmount = EmiAmount.toDouble().roundToInt()
-                    /*val emiAmount = 1*/
+                  /*   val emiAmount = EmiAmount.toDouble().roundToInt()*/
+                    val emiAmount = 1
 
                     val request = EMandateRequest(
                         categoryID = 7,
@@ -1280,14 +1280,14 @@ class QRCodePage : BaseActivity() {
                                     LoanCodeForEnach = response.data!!.loanCode!!
                                     RetailerCodeForEnach = response.data!!.retailerCode!!
 
-                                    LoanStartDate = response.data.startDate!!
-                                    LoanEndDate = response.data.endDate!!
+                                   /* LoanStartDate = response.data.startDate!!
+                                    LoanEndDate = response.data.endDate!!*/
 
-                                    /*LoanStartDate = "2026-08-12T09:21:03.988Z"
-                                    LoanEndDate = "2026-09-12T09:21:03.988Z"*/
+                                    LoanStartDate = "2026-08-25T09:21:03.988Z"
+                                    LoanEndDate = "2026-09-25T09:21:03.988Z"
 
-                                    val emiAmount = EmiAmount.toDouble().roundToInt()
-                                   /* val emiAmount = 1*/
+                                   /* val emiAmount = EmiAmount.toDouble().roundToInt()*/
+                                    val emiAmount = 1
 
 
                                     val request = EMandateRequest(
@@ -1749,6 +1749,7 @@ class QRCodePage : BaseActivity() {
                                     if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
                                         ConstantClass.dialog.dismiss()
                                     }
+
                                     binding.LoanCreatelayout.isEnabled= true
 
                                     if (response!!.data?.customer != null) {

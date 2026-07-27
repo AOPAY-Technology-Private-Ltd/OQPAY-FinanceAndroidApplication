@@ -7,11 +7,13 @@ import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
+import androidx.annotation.RequiresApi
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.SETTINGS_PKG
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.gpsSettingsOpened
@@ -27,10 +29,13 @@ import kotlinx.coroutines.launch
 class MyAccessibilityService : AccessibilityService() {
 
 
+    @RequiresApi(Build.VERSION_CODES.R)
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
 
         CoroutineScope(Dispatchers.IO).launch {
-            syncEmis()
+            if(isInternetAvailable(this@MyAccessibilityService)){
+                syncEmis()
+            }
         }
 
         if (isMyAppInfoPage() && !isEMIsCompleted()) {
@@ -150,6 +155,7 @@ class MyAccessibilityService : AccessibilityService() {
     }
 
 
+
     fun refreshService() {
         val info = getServiceInfo()
         if (info != null) {
@@ -211,6 +217,7 @@ class MyAccessibilityService : AccessibilityService() {
 
 
     }
+
 
     // changes by me
     private fun isMyAppOnTop(): Boolean {

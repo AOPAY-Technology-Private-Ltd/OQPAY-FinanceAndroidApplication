@@ -850,7 +850,6 @@ class SignupPage : BaseActivity() {
     }
 
 
-
     fun clickCameraForUploadDocument(mode: String) {
         val photoFile = createImageFile()
         val providerAuthority = "${packageName}.fileprovider"
@@ -1162,13 +1161,14 @@ class SignupPage : BaseActivity() {
             binding.address.error = null
         }
 
+        // .............................................................for testing purpose............................................
 
         val aadhaarRegex = Regex("^[2-9][0-9]{11}$")
         val maskedAadhaarRegex = Regex("^[xX]{8}[0-9]{4}$")
 
 
         // Aadhaar validation
-        val isValid = aadharNumber.matches(Regex("\\d{12}")) || aadharNumber.matches(maskedAadhaarRegex)
+     /*   val isValid = aadharNumber.matches(Regex("\\d{12}")) || aadharNumber.matches(maskedAadhaarRegex)
 
         if (aadharNumber.isBlank() || aadharNumber.length != 12 ||  !isValid) {
             binding.aadharnumber.error= "Enter a valid 12-digit Aadhaar number"
@@ -1177,10 +1177,10 @@ class SignupPage : BaseActivity() {
             return false
         }else{
             binding.aadharnumber.error = null
-        }
+        }*/
 
 
-        if(IsAadhaarVerified.isNullOrBlank()){
+      /*  if(IsAadhaarVerified.isNullOrBlank()){
             binding.aadharnumber.error= "Please verify aadhaar number first"
             scrollToView(binding.detaillayout,  binding.aadharnumber)
             Toast.makeText(context, "Please verify aadhaar number first", Toast.LENGTH_SHORT).show()
@@ -1188,10 +1188,10 @@ class SignupPage : BaseActivity() {
         }
         else{
             binding.aadharnumber.error = null
-        }
+        }*/
 
 
-        // PAN validation (Regex: 5 letters, 4 digits, 1 letter)
+      /*  // PAN validation (Regex: 5 letters, 4 digits, 1 letter)
         val panRegex = Regex("[A-Z]{5}[0-9]{4}[A-Z]{1}")
         if (panNumber.isBlank() || !panRegex.matches(panNumber.uppercase())) {
             binding.panEditText.error= "Enter a valid PAN number (e.g., ABCDE1234F)"
@@ -1211,9 +1211,9 @@ class SignupPage : BaseActivity() {
         }
         else{
             binding.panEditText.error = null
-        }
+        }*/
 
-        if(!PanFirstName!!.toLowerCase().contains(ConstantClass.ReferenceAadhaarName.toLowerCase()) && !isSameMaskedAadhaar(ReferenceAadharNumber, PanAadhaarNumber!!) ){
+      /*  if(!PanFirstName!!.toLowerCase().contains(ConstantClass.ReferenceAadhaarName.toLowerCase()) && !isSameMaskedAadhaar(ReferenceAadharNumber, PanAadhaarNumber!!) ){
             binding.firstName.error= "Data mismatch. Please enter the valid data as per your PAN and Aadhaar records."
             scrollToView(binding.detaillayout,  binding.firstName)
             Toast.makeText(context, "Data mismatch. Please enter the name as per your PAN and Aadhaar records.", Toast.LENGTH_SHORT).show()
@@ -1221,7 +1221,9 @@ class SignupPage : BaseActivity() {
         }
         else {
             binding.firstName.error = null
-        }
+        }*/
+
+        ///................................as per Guru teting flow....................................................................................
 
 
         /*if (gstNumber.isBlank() || !ConstantClass.isValidGST(gstNumber)) {

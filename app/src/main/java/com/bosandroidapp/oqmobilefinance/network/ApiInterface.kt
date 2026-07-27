@@ -611,8 +611,6 @@ interface ApiInterface {
     //............................................................................................
 
 
-
-
     // loan charge for each loan retailer
     @POST("api/Customer/LoanApplyCharges")
     suspend fun loanApplyChargesReq(@Body req: LoanChargeReq): Response<LoanChargeResp>?

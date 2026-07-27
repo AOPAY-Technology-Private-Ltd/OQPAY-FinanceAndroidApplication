@@ -522,7 +522,7 @@ class PaymentInformation : BaseActivity() {
                     }
                     else
                     {
-                       /* AccountNumber = binding.accountnumber.text.toString().trim()
+                        AccountNumber = binding.accountnumber.text.toString().trim()
                          BankIFSCCode = binding.ifsccode.text.toString().trim()
                          BankName =  binding.bankname.text.toString().trim()
                          AccountType = binding.acounttype.selectedItem.toString().trim()
@@ -531,9 +531,9 @@ class PaymentInformation : BaseActivity() {
                          BranchAddress= binding.branchaddress.text.toString().trim()
                          BankID = bankList.find { it.first == BankName }?.second!!
                          Log.d("BankId", "${BankID}")
-                         setselectionForSecondCard()  // for testing*/
+                         setselectionForSecondCard()  // for testing
 
-                         hitApiForRequestPennyDrop()
+                       /*  hitApiForRequestPennyDrop()*/
 
                     }
 
