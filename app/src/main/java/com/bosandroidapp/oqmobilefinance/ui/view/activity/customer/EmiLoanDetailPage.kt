@@ -95,8 +95,10 @@ import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.Sen
 import com.bosandroidapp.oqmobilefinance.data.pg.PGOnlineRequestCall
 import com.bosandroidapp.oqmobilefinance.data.pg.PGRequestCall
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
+import com.bosandroidapp.oqmobilefinance.data.repository.DikshifinsureRepository
 import com.bosandroidapp.oqmobilefinance.data.repository.PanRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
+import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.DikshifinsureOnlinePGModelFactory
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.PanViewModelFactory
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.ui.slideshow.activity.DashBoard
@@ -105,6 +107,7 @@ import com.bosandroidapp.oqmobilefinance.ui.view.activity.customer.PGWebViewActi
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.customer.PGWebViewActivity.Companion.emiList
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.NewCustomerRegistrationPage
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
+import com.bosandroidapp.oqmobilefinance.ui.viewmodel.DikshifinsureViewModel
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.PanViewModel
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.bosandroidapp.oqmobilefinance.utils.MonthsAndPayables
@@ -155,21 +158,26 @@ class EmiLoanDetailPage : BaseActivity() {
     var WaiveOff : String = ""
     var nextDueDate : String = ""
     var checkpaynow : Boolean = false
+
     lateinit var preference : SharedPreference
     var listOfDueWithGraceDate : ArrayList<MonthsAndPayables> = arrayListOf()
+
     lateinit var logintype: String
     private val CAMERA_REQUEST_CODE_FRONT = 1001
     private var photoUri: Uri? = null
     lateinit var receiptUri : Uri
     var imagepath: String? = ""
     var checktxnNumber : Boolean = false
-    lateinit var api : ApiInterface
 
+    lateinit var api : ApiInterface
     var BounceChargeApplicable : String = ""
 
     lateinit var countDownTimer: CountDownTimer
 
     lateinit var panViewModel: PanViewModel
+
+    lateinit var dikshifinsureOnlinePGModel: DikshifinsureViewModel
+
 
     var selectedNoofEmi: Int = 0
 
@@ -214,6 +222,7 @@ class EmiLoanDetailPage : BaseActivity() {
 
         viewModel = ViewModelProvider(this, CommonViewModelFactory(AuthRepository(RetrofitClient.apiInterface)))[AuthenticationViewModel::class.java]
         panViewModel = ViewModelProvider(this, PanViewModelFactory(PanRepository(RetrofitClient.apiInterfacePAN)))[PanViewModel::class.java]
+        dikshifinsureOnlinePGModel = ViewModelProvider(this, DikshifinsureOnlinePGModelFactory(DikshifinsureRepository(RetrofitClient.apiInterfaceOnlinePG)))[DikshifinsureViewModel::class.java]
 
         api = RetrofitClient.apiInterfaceSMS
         preference = SharedPreference(this)
@@ -638,7 +647,7 @@ class EmiLoanDetailPage : BaseActivity() {
                         val emiNumbers=  (1..selectedNoofEmi).joinToString("")
                         PGWebViewActivity.LoanCodePG = loanCode
 
-                        if(!loanmode!!.toLowerCase().equals("offline",ignoreCase = true)){
+                        if(loanmode!!.toLowerCase().equals("offline",ignoreCase = true)){
                             var req = PGRequestCall(
                                 payCustomerPhoneNo = preference.getStringValue(ConstantClass.CustomerMobileNumber, ""),
                                 customerEmailID = email,
@@ -655,10 +664,9 @@ class EmiLoanDetailPage : BaseActivity() {
                             var req = PGOnlineRequestCall(
                                 amount = emiamount,
                                 registrationID =  ConstantClass.PAN_VERIFICATION_REGISTRATION_ID,
-                                eMINumbers = "EMI${emiNumbers}",
+                                eMINumbers = "${emiNumbers}", //EMI
                                 customerCode = preference.getStringValue(ConstantClass.CustomerCode, ""),
                                 loanCode = loanCode
-
                             )
                             hitApiForRequestPGOnline(req)
 
@@ -1496,7 +1504,6 @@ class EmiLoanDetailPage : BaseActivity() {
 
     }
 
-
     fun hitApiForRequestPG(req : PGRequestCall){
 
         Log.d("PGRequest", Gson().toJson(req))
@@ -1542,21 +1549,17 @@ class EmiLoanDetailPage : BaseActivity() {
         }
 
     }
-
-
-
     fun hitApiForRequestPGOnline(req : PGOnlineRequestCall){
 
         Log.d("PGRequest", Gson().toJson(req))
 
-        panViewModel.getPGRequestCallOnline(req).observe(this) { resources ->
+        dikshifinsureOnlinePGModel.getPGRequestCallOnline(req).observe(this) { resources ->
             resources.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
                         it.data.let { users ->
                             users!!.body().let { response ->
                                 Log.d("PanVerificationResp", Gson().toJson(response))
-
                                 if (!response!!.intentUrl.isNullOrEmpty()) {
                                     // Open WebView with the provided URL
                                     ConstantClass.dialog.dismiss()

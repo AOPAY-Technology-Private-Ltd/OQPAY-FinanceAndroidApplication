@@ -8,7 +8,6 @@ android {
     namespace = "com.bosandroidapp.oqmobilefinance"
     compileSdk = 34
 
-
     defaultConfig {
         applicationId = "com.bosandroidapp.oqmobilefinance"
         minSdk = 28
@@ -17,7 +16,6 @@ android {
         versionName = "1.0.5"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-
 
     buildFeatures {
         viewBinding = true

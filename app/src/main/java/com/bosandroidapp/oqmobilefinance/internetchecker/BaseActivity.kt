@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 open class BaseActivity : AppCompatActivity() {
     private var dialog: AlertDialog? = null
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -28,6 +29,7 @@ open class BaseActivity : AppCompatActivity() {
                 }
             }
         }
+
     }
 
 

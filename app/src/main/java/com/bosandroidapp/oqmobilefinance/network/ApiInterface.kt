@@ -490,6 +490,7 @@ interface ApiInterface {
     suspend fun RetailerWalletPayoutReq(@Body req : RetailerWalletPayoutAtMakePaymentTimeReq): Response<RetailerWalletPayoutAtMakePaymentTimeResp>?
 
 
+
     @Multipart
     @POST("api/V1/OQFinance/MakePayment")
     suspend fun getCustomerReceiptUpload(
@@ -532,9 +533,11 @@ interface ApiInterface {
 
 
 
+
     // revalidate user eligible for loan or not
     @POST("api/V1/OQFinance/GetMembershipFee")
     suspend fun getMemberShipReq(@Body req : GetIsEligibleLoanReq): Response<MembershipFeeResp>?
+
 
 
 
@@ -544,15 +547,18 @@ interface ApiInterface {
 
 
 
+
     // link for download apk file
     @GET("api/V1/OQFinance/generate-qr")
     suspend fun getApkUrlLink(): Response<ResponseBody>?
 
 
 
+
     // for customer generate token key
     @POST("api/V1/OQFinance/generatekey")
     suspend fun getAccessKeyForValidateAPKReq(@Body req : GenerateAccessTokenRequest): Response<GenerateAccessTokenResponse>?
+
 
 
     //  key validate retailer end
@@ -595,7 +601,6 @@ interface ApiInterface {
     suspend fun geteMandateSatusRequest(@Body req: ENachStatusReq): Response<ENachStatusResp>?
 
     //............................................................................................
-
 
 
     //for online eNach Api .......................................................................

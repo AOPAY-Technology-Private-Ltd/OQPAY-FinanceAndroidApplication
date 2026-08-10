@@ -143,15 +143,7 @@ class PanViewModel(private val repository: PanRepository) : ViewModel() {
     }
 
 
-    fun getPGRequestCallOnline(req: PGOnlineRequestCall) = liveData(Dispatchers.IO) {
-        emit(ApiResponse.loading(data = null))
-        try {
-            emit(ApiResponse.success(data = repository.getPGRequestCallOnline(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
-        }
-    }
+
 
     fun getGstNumberVerify(req: GstRequest) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
