@@ -700,25 +700,12 @@ class NewCustomerRegistrationPage : BaseActivity() {
                 CustCityName = binding.cityname.text.toString()
                 ConstantClass.ClickOnCardDashboard = "Customer"
 
-                if(CheckOnlineOrOffline.equals(ConstantClass.offline)){
-                    if(!CustAlternateMobileNumber.isNullOrBlank()){
-                     startActivity(Intent(this@NewCustomerRegistrationPage, MobileSelectionActivity::class.java))
-                 }
-                 else {
-                        binding.alternatemobileNumber.error= "Please enter alternate mobile number ."
-                        scrollToView(binding.detaillayout,  binding.alternatemobileNumber)
-                 }
-
-                }
-
-                else{
+                if(CheckOnlineOrOffline.equals(ConstantClass.online)){
                     if (CustPrimaryMobileNumber.isNullOrBlank()) {
                         Toast.makeText(this@NewCustomerRegistrationPage, "Primary mobile number is mandatory.", Toast.LENGTH_SHORT).show()
 
                     } else if (CustPrimaryMobileNumber.length != 10) {
-
                         Toast.makeText(this@NewCustomerRegistrationPage, "Please enter a valid 10-digit primary mobile number.", Toast.LENGTH_SHORT).show()
-
                     }
                     else if (CustAlternateMobileNumber.isNullOrBlank()) {
                         Toast.makeText(this@NewCustomerRegistrationPage, "Alternate mobile number is mandatory.", Toast.LENGTH_SHORT).show()
@@ -734,6 +721,18 @@ class NewCustomerRegistrationPage : BaseActivity() {
                     }
                     else {
                         hitApiForCibilReport()
+                    }
+
+                }
+
+                else{
+
+                    if(!CustAlternateMobileNumber.isNullOrBlank()){
+                        startActivity(Intent(this@NewCustomerRegistrationPage, MobileSelectionActivity::class.java))
+                    }
+                    else {
+                        binding.alternatemobileNumber.error= "Please enter alternate mobile number ."
+                        scrollToView(binding.detaillayout,  binding.alternatemobileNumber)
                     }
 
                 }

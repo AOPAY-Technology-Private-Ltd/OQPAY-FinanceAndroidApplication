@@ -36,8 +36,10 @@ import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.RetailerProfileR
 import com.bosandroidapp.oqmobilefinance.data.pg.PGOnlineRequestCall
 import com.bosandroidapp.oqmobilefinance.data.pg.PGRequestCall
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
+import com.bosandroidapp.oqmobilefinance.data.repository.DikshifinsureRepository
 import com.bosandroidapp.oqmobilefinance.data.repository.PanRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
+import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.DikshifinsureOnlinePGModelFactory
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.PanViewModelFactory
 import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
@@ -45,6 +47,7 @@ import com.bosandroidapp.oqmobilefinance.ui.view.activity.customer.EmiLoanDetail
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.customer.PGWebViewActivity
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.customer.PGWebViewActivity.Companion.emiList
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
+import com.bosandroidapp.oqmobilefinance.ui.viewmodel.DikshifinsureViewModel
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.PanViewModel
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.bosandroidapp.oqmobilefinance.utils.MonthsAndPayables
@@ -87,7 +90,7 @@ class KioskActivity : BaseActivity() {
     private var LoanEmiList: List<CustomerDataItem?>? = null
     private var isApiRunning = false
 
-
+    lateinit var dikshifinsureOnlinePGModel: DikshifinsureViewModel
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -101,8 +104,10 @@ class KioskActivity : BaseActivity() {
 
         preference= SharedPreference(this)
         retailerCode = preference.getStringValue(ConstantClass.RetailerCode,"")
+
         viewModel = ViewModelProvider(this, CommonViewModelFactory(AuthRepository(RetrofitClient.apiInterface)))[AuthenticationViewModel::class.java]
         panViewModel = ViewModelProvider(this, PanViewModelFactory(PanRepository(RetrofitClient.apiInterfacePAN)))[PanViewModel::class.java]
+        dikshifinsureOnlinePGModel = ViewModelProvider(this, DikshifinsureOnlinePGModelFactory(DikshifinsureRepository(RetrofitClient.apiInterfaceOnlinePG)))[DikshifinsureViewModel::class.java]
 
 
         hitapiforGetUpdateProfile()
@@ -212,7 +217,7 @@ class KioskActivity : BaseActivity() {
                                     var req = PGOnlineRequestCall(
                                         amount = emiamount,
                                         registrationID =  ConstantClass.PAN_VERIFICATION_REGISTRATION_ID,
-                                        eMINumbers = "EMI${emiNumbers}",
+                                        eMINumbers = "${emiNumbers}", //EMI
                                         customerCode = preference.getStringValue(ConstantClass.CustomerCode, ""),
                                         loanCode = loanCode
                                     )
@@ -255,20 +260,24 @@ class KioskActivity : BaseActivity() {
         hitapiforGetUpdateProfile()
 
         // for testing transferOwnerShip.....................................................
-        val dpm = getSystemService(DevicePolicyManager::class.java)
-        val admin = ComponentName(this, KioskDeviceAdminReceiver::class.java)
-        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        try {
+            val dpm = getSystemService(DevicePolicyManager::class.java)
+            val admin = ComponentName(this, KioskDeviceAdminReceiver::class.java)
+            val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
 
-        if (dpm.isDeviceOwnerApp(packageName)) {
+            if (dpm.isDeviceOwnerApp(packageName)) {
 
-            // Whitelist the app for Lock Task Mode (typically done once during provisioning)
-            dpm.setLockTaskPackages(admin, arrayOf(packageName))
+                // Whitelist the app for Lock Task Mode (typically done once during provisioning)
+                dpm.setLockTaskPackages(admin, arrayOf(packageName))
 
-            // Start Lock Task only if not already active
-            if (!isLockTaskStarted &&activityManager.lockTaskModeState == ActivityManager.LOCK_TASK_MODE_NONE) {
-                startLockTask()
-                isLockTaskStarted = true
+                // Start Lock Task only if not already active
+                if (!isLockTaskStarted &&activityManager.lockTaskModeState == ActivityManager.LOCK_TASK_MODE_NONE) {
+                    startLockTask()
+                    isLockTaskStarted = true
+                }
             }
+        } catch (e: Exception) {
+            Log.e("KioskActivity", "Error in onResume DPM check: ${e.message}")
         }
 
         isPgClosing = false
@@ -547,7 +556,7 @@ class KioskActivity : BaseActivity() {
 
         Log.d("PGRequest", Gson().toJson(req))
 
-        panViewModel.getPGRequestCallOnline(req).observe(this) { resources ->
+        dikshifinsureOnlinePGModel.getPGRequestCallOnline(req).observe(this) { resources ->
             resources.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {

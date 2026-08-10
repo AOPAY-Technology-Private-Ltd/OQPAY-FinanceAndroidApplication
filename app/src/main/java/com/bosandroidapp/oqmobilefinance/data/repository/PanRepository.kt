@@ -33,7 +33,6 @@ class PanRepository(private val apiInterface: ApiInterface) {
 
     suspend fun getPGRequestCall(req: PGRequestCall) = apiInterface.callPGOffline(req)
 
-    suspend fun getPGRequestCallOnline(req: PGOnlineRequestCall) = apiInterface.callPGOnline(req)
 
     suspend fun getGstNumberVerify(req: GstRequest) = apiInterface.getGstNumberVerify(req)
 

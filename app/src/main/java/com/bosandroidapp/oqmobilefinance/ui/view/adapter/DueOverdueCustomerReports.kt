@@ -69,6 +69,8 @@ class DueOverdueCustomerReports(var context:Context, var dueoverDueList : Mutabl
     }
 
 
+
+
     override fun getItemCount(): Int = dueoverDueList!!.size
 
 

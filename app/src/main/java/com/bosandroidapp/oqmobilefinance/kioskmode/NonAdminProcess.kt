@@ -119,7 +119,7 @@ fun Activity.optimizeBatterry() {
 
 
 
-fun Activity.isStatsPermissionGranted():Boolean{
+fun Context.isStatsPermissionGranted():Boolean{
     val appOps = getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
     val mode = appOps.checkOpNoThrow(
         AppOpsManager.OPSTR_GET_USAGE_STATS,

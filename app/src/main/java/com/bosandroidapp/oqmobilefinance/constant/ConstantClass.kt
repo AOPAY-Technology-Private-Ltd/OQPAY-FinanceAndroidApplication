@@ -98,15 +98,17 @@ import java.util.Locale
 import java.util.TimeZone
 import java.util.concurrent.TimeUnit
 
+
 object ConstantClass {
 
-        // Production
+         // Production
+
        /*  const val BASE_URL = "https://api.oqpay.in/"
          const val BASE_URL_IMAGE = "https://api.oqpay.in"
 
-        // production merchant id online
-        const val PAN_VERIFICATION_REGISTRATION_ID = "AOP-5039"
-        const val PENNYDROP_REGISTRATION_ID = "AOP-5039"
+         // production merchant id online
+         const val PAN_VERIFICATION_REGISTRATION_ID = "AOP-5039"
+         const val PENNYDROP_REGISTRATION_ID = "AOP-5039"
 
          // production merchant id offline
          const val PAN_VERIFICATION_REGISTRATION_ID_OFFLINE = "AOP-5050"
@@ -117,6 +119,7 @@ object ConstantClass {
 
     const val BASE_URL = "https://api.oqpay.co.in/"
     const val BASE_URL_IMAGE = "https://api.oqpay.co.in"
+
 
     // UAT merchant id online
     const val PAN_VERIFICATION_REGISTRATION_ID = "AOP-554"
@@ -129,6 +132,7 @@ object ConstantClass {
 
      const val SMS_BASE_URL = "http://web.adcruxmedia.in/"
      const val PAN_BASE_URL = "https://api.aopay.in/"
+     const val ONLINE_PG = "https://api.dikshifinsure.com/"
 
      const val SMS_API_KEY = "KBSxc26XqjoiR7SA"
      const val SMS_SENDER_ID = "BOSCNT"
@@ -143,12 +147,12 @@ object ConstantClass {
      const val FCMTOKEN = "fcmtoken"
 
      const val DEVICEID = "deviceid"
+     const val CHECKACCESSIBILITY = "checkAccessibility"
      const val LoanSuccessStatus = "success"
      const val DeviceType = "Android"
      const val ClientCode = "CMP0005"
      const val DefaulterEmiDebitAutoApproved ="admin"
      const val DefaulterEmiDebitPending ="retailer"
-
      const val LoanStatus ="Pending"
      const val SessionOutStatus = "inactive"
      const val SessionOutStatusRejected = "rejected"
@@ -1208,7 +1212,7 @@ object ConstantClass {
     }
 
 
-    // DPCAPPJSON
+// DPCAPPJSON
 
    /* {
         "android.app.extra.PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME":
