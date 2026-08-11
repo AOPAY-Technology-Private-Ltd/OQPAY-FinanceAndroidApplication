@@ -40,7 +40,6 @@ class KioskDeviceAdminReceiver : DeviceAdminReceiver(){
                     .build()
             )
 
-
             dpm.addUserRestriction(admin, UserManager.DISALLOW_FACTORY_RESET)
             dpm.setPermittedAccessibilityServices(admin, Arrays.asList(context.packageName))
             dpm.setPermissionGrantState(admin, context.packageName, "android.permission.ACCESS_FINE_LOCATION", DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED)

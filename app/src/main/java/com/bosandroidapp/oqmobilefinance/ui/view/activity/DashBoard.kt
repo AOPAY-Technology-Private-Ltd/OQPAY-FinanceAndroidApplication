@@ -165,7 +165,7 @@ class DashBoard : BaseActivity() {
             }
             binding.navRecyclerViewlayout.visibility=View.GONE
             binding.installAppLayout.visibility=View.GONE
-            binding.logout.visibility = View.VISIBLE // for testing
+            binding.logout.visibility = View.GONE // for testing
         }
 
         else {
