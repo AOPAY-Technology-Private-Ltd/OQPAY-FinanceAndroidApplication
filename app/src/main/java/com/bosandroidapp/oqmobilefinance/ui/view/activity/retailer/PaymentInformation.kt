@@ -180,7 +180,6 @@ class PaymentInformation : BaseActivity() {
     }
 
 
-
     companion object{
         var checkKYC : Boolean = false
     }
@@ -190,6 +189,7 @@ class PaymentInformation : BaseActivity() {
         super.onResume()
 
         hitApiForLogin()
+
         if(ConstantClass.CheckOnlineOrOffline.equals(ConstantClass.online)){
 
             if (checkKYC) {
@@ -228,7 +228,7 @@ class PaymentInformation : BaseActivity() {
 
            }
 
-        }
+       }
 
 
 
@@ -522,7 +522,7 @@ class PaymentInformation : BaseActivity() {
                     }
                     else
                     {
-                        AccountNumber = binding.accountnumber.text.toString().trim()
+                        /* AccountNumber = binding.accountnumber.text.toString().trim()
                          BankIFSCCode = binding.ifsccode.text.toString().trim()
                          BankName =  binding.bankname.text.toString().trim()
                          AccountType = binding.acounttype.selectedItem.toString().trim()
@@ -531,9 +531,9 @@ class PaymentInformation : BaseActivity() {
                          BranchAddress= binding.branchaddress.text.toString().trim()
                          BankID = bankList.find { it.first == BankName }?.second!!
                          Log.d("BankId", "${BankID}")
-                         setselectionForSecondCard()  // for testing
+                         setselectionForSecondCard()  // for testing*/
 
-                       /*  hitApiForRequestPennyDrop()*/
+                         hitApiForRequestPennyDrop()
 
                     }
 
@@ -560,23 +560,16 @@ class PaymentInformation : BaseActivity() {
                                 refAddress = binding.refaddress.text.toString().trim())
 
                             if (!isValid) {
-                                binding.referenceKycChecked.isChecked = false
                                 Toast.makeText(this@PaymentInformation, errorMessage, Toast.LENGTH_SHORT).show()
                             }
                             else
                             {
-                                if(checkKYC) {
-                                    RefName = binding.refername.text.toString().trim()
-                                    RefRelationShip = binding.referrelatinonship.text.toString().trim()
-                                    RefmobileNo = binding.refmobno.text.toString().trim()
-                                    RefAddress = binding.refaddress.text.toString().trim()
-                                    startActivity(Intent(this@PaymentInformation, IMEIDetailsPage::class.java))
-                                }
-                                else {
-                                    binding.referenceKycChecked.isChecked = false
-                                    Toast.makeText(this@PaymentInformation, getString(R.string.please_accept_kyc_agreement), Toast.LENGTH_SHORT).show()
-                                }
-
+                                // Reference KYC is now optional
+                                RefName = binding.refername.text.toString().trim()
+                                RefRelationShip = binding.referrelatinonship.text.toString().trim()
+                                RefmobileNo = binding.refmobno.text.toString().trim()
+                                RefAddress = binding.refaddress.text.toString().trim()
+                                startActivity(Intent(this@PaymentInformation, IMEIDetailsPage::class.java))
                             }
 
                     }

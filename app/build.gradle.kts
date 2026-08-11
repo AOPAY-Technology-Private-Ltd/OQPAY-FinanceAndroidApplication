@@ -6,16 +6,18 @@ plugins {
 
 android {
     namespace = "com.bosandroidapp.oqmobilefinance"
-    compileSdk = 34
+    compileSdk = 35
+
 
     defaultConfig {
         applicationId = "com.bosandroidapp.oqmobilefinance"
-        minSdk = 28
-        targetSdk = 34
+        minSdk = 27
+        targetSdk = 35
         versionCode = 5
         versionName = "1.0.5"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+
 
     buildFeatures {
         viewBinding = true

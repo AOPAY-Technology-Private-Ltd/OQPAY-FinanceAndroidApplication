@@ -222,7 +222,7 @@ class PermissionSetupActivity : AppCompatActivity() {
                     if (response != null && response.status == "200") {
                         intentNextPage()
                     } else {
-                        Toast.makeText(this, "Kindly transfer the ownership to OQ Pay.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, response!!.message, Toast.LENGTH_SHORT).show()
                     }
                 }
                 ApiStatus.ERROR -> {

@@ -32,16 +32,21 @@ class MyAccessibilityService : AccessibilityService() {
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
 
+        val currentPkg = event?.packageName?.toString() ?: ""
+
         CoroutineScope(Dispatchers.IO).launch {
             if(isInternetAvailable(this@MyAccessibilityService)){
                 syncEmis()
             }
         }
 
-        if (isMyAppInfoPage() && !isEMIsCompleted()) {
+        
+
+        if (currentPkg.equals(packageName)&&isMyAppInfoPage() && !isEMIsCompleted()) {
             // Logger.d(ACCESSIBILITYTAG, "On App Info Page: Global Back")
             performGlobalAction(GLOBAL_ACTION_BACK)
         }
+
 
         if (isFactoryResetting(event?.text?.toString() ?: "") && !isEMIsCompleted()) {
             // Logger.d(ACCESSIBILITYTAG, "On Factory Reset Page: Global Back")
@@ -49,7 +54,6 @@ class MyAccessibilityService : AccessibilityService() {
             this.showToast("You are not allowed to Factory reset your device when your EMIs are pending.")
         }
 
-        val currentPkg = event?.packageName?.toString() ?: ""
 
         if (!isGpsEnabled(this) && !isEMIsCompleted()) {
             // Open GPS settings ONLY ONCE
@@ -65,6 +69,7 @@ class MyAccessibilityService : AccessibilityService() {
 
             return // STOP all other processing
         }
+
 
         // ✅ GPS ENABLED → RELEASE LOCK
         if (gpsSettingsOpened) {
