@@ -48,6 +48,7 @@ import com.bosandroidapp.oqmobilefinance.data.notification.NotificationSendToken
 import com.bosandroidapp.oqmobilefinance.data.notification.SendNotificationFeatureNameRequest
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.utils.ApiResponse
+import okhttp3.MultipartBody
 import kotlinx.coroutines.Dispatchers
 import retrofit2.HttpException
 import java.io.IOException
@@ -518,6 +519,16 @@ class AuthenticationViewModel (private val repository: AuthRepository):ViewModel
         emit(ApiResponse.loading(data = null))
         try {
             emit(ApiResponse.success(data = repository.LoanEmIScheduleWithStatusReq(req)))
+        }
+        catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+        }
+    }
+
+    fun uploadInVoiceRequest(customerCode: String, columnName: String, newValue: String, imagePart: MultipartBody.Part) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            emit(ApiResponse.success(data = repository.uploadInVoiceRequest(customerCode, columnName, newValue, imagePart)))
         }
         catch (exception: Exception) {
             emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))

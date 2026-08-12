@@ -204,7 +204,6 @@ interface ApiInterface {
     suspend fun getLoanCreatedByRetailer(@Body req : LoanCreatedReq): Response<LoanCreatedResp>?
 
 
-
     @Multipart
     @POST("api/V1/OQFinance/ManageCustByCredit")
     suspend fun getCustomerCibilApprovedReq(
@@ -322,6 +321,7 @@ interface ApiInterface {
         @Part("CreatedBy") createdBy: RequestBody,
         @Part("MemberShipFees") membershipfees: RequestBody,
         @Part("RetailerCode") retailercode: RequestBody,
+        @Part("CustomerCodes") customerCode: RequestBody,
         @Part("CibilScore") cibilScore: RequestBody,
         @Part("IsAggrementVerified") isAggrementVerified: RequestBody,
         @Part("IsRetailerAggrementVerified") IsRetailerAggrementVerified: RequestBody,
@@ -386,6 +386,7 @@ interface ApiInterface {
         @Part("CreatedBy") createdBy: RequestBody,
         @Part("MemberShipFees") membershipfees: RequestBody,
         @Part("RetailerCode") retailercode: RequestBody,
+        @Part("CustomerCodes") customerCode: RequestBody,
         @Part("PanApiResponse") PanApiResponse: RequestBody,
         @Part("AadhaarApiResponse") AadhaarApiResponse: RequestBody,
         @Part("CibilApiResponse") CibilApiResponse: RequestBody,
@@ -653,6 +654,18 @@ interface ApiInterface {
 
     @POST("api/OQPay/Finance/Online/V1/PaymentGateway")
     suspend fun callPGOnline(@Body req : PGOnlineRequestCall) : Response<PGOnlineResponseCall>?
+
+
+
+    // upload invoice file...............
+    @Multipart
+    @POST("api/V1/OQFinance/UpdateCustomerPhotoPath")
+    suspend fun uploadInVoiceRequest(
+        @Query("CustomerCode") customerCode: String,
+        @Query("ColumnName") columnName: String,
+        @Query("NewValue") newValue: String,
+        @Part invoiceImage: MultipartBody.Part
+    ): Response<CustomerMakePaymentResp>?
 
 
 

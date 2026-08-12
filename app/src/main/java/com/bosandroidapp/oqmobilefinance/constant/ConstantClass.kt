@@ -130,6 +130,7 @@ object ConstantClass {
     const val PENNYDROP_REGISTRATION_ID_OFFLINE = "AOP-554"
 
 
+
      const val SMS_BASE_URL = "http://web.adcruxmedia.in/"
      const val PAN_BASE_URL = "https://api.aopay.in/"
      const val ONLINE_PG = "https://api.dikshifinsure.com/"

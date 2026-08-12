@@ -161,6 +161,7 @@ class QRCodePage : BaseActivity() {
     lateinit var api: ApiInterface
     lateinit var preference: SharedPreference
 
+
     var downPayment: String = ""
     var membershipAmt: String = ""
     var isEmandateVerified : String= ""
@@ -351,12 +352,14 @@ class QRCodePage : BaseActivity() {
             "CustAadharPhoto_File",
             "AadharFrontImage"
         )
+
         val aadharBackPart = createMultipartFromUri(
             this,
             AadharBackImageUri,
             "CustAadharBackPhoto_File",
             "AadharBackImage"
         )
+
         val PanFrontPart = createMultipartFromUri(
             this,
             PanFrontImageUri,
@@ -501,7 +504,7 @@ class QRCodePage : BaseActivity() {
                         imei1SealPart,
                         imei2SealPart,
                         imeiPhotoPart,
-                        invoicePart,
+                        null,
                         aadharFrontPart,
                         aadharBackPart,
                         PanFrontPart
@@ -510,7 +513,6 @@ class QRCodePage : BaseActivity() {
                     withContext(Dispatchers.Main) {
                         ConstantClass.dialog?.takeIf { it.isShowing }?.dismiss()
                         Log.e("API_RESPONSE_CODE", response.code().toString())
-
 
                         if (response.isSuccessful) {
                             val body = response.body()
@@ -719,6 +721,7 @@ class QRCodePage : BaseActivity() {
                 "UPIMandate" to "yes".toRequestBody(),
                 "CreatedBy" to createdBy.toRequestBody(),
                 "RetailerCode" to retailercode.toRequestBody(),
+                "CustomerCodes" to "".toRequestBody(),
                 "PanApiResponse" to (PanResponse ?: "").toRequestBody(),
                 "AadhaarApiResponse" to (AadhaarResponse ?: "").toRequestBody(),
                 "CibilApiResponse" to (CibilResponse ?: "").toRequestBody(),
@@ -783,6 +786,7 @@ class QRCodePage : BaseActivity() {
                             requestMap["CreatedBy"]!!,
                             requestMap["MemberShipFees"]!!,
                             requestMap["RetailerCode"]!!,
+                            requestMap["CustomerCodes"]!!,
                             requestMap["CibilScore"]!!,
                             requestMap["IsAggrementVerified"]!!,
                             requestMap["IsRetailerAggrementVerified"]!!,
@@ -790,7 +794,7 @@ class QRCodePage : BaseActivity() {
                             imei1SealPart!!,
                             imei2SealPart!!,
                             imeiPhotoPart!!,
-                            invoicePart!!,
+                            null,
                             aadharFrontPart!!,
                             aadharBackPart!!,
                             PanFrontPart!!
@@ -939,7 +943,8 @@ class QRCodePage : BaseActivity() {
                             val errorMsg = response.errorBody()?.string()
                             handleApiError(response.code(), errorMsg)
                         }
-                    } catch (e: Exception) {
+                    }
+                    catch (e: Exception) {
                         if (ConstantClass.dialog?.isShowing == true) {
                             ConstantClass.dialog.dismiss()
                         }
@@ -1015,6 +1020,7 @@ class QRCodePage : BaseActivity() {
                             requestMap["CreatedBy"]!!,
                             requestMap["MemberShipFees"]!!,
                             requestMap["RetailerCode"]!!,
+                            requestMap["CustomerCodes"]!!,
                             requestMap["PanApiResponse"]!!,
                             requestMap["AadhaarApiResponse"]!!,
                             requestMap["CibilApiResponse"]!!,
@@ -1027,7 +1033,7 @@ class QRCodePage : BaseActivity() {
                             imei1SealPart!!,
                             imei2SealPart!!,
                             imeiPhotoPart!!,
-                            invoicePart!!
+                            null
                         )
 
                         if (response.isSuccessful) {
@@ -1144,10 +1150,12 @@ class QRCodePage : BaseActivity() {
                             }
 
                         }
+
                         else {
                             val errorMsg = response.errorBody()?.string()
                             handleApiError(response.code(), errorMsg)
                         }
+
                     }
                     catch (e: Exception) {
 
