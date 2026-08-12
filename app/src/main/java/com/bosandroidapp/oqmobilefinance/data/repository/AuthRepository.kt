@@ -243,6 +243,14 @@ class AuthRepository(private val apiInterface: ApiInterface) {
 
   suspend fun LoanEmIScheduleWithStatusReq(req: CustomerEmiStatusReq) = apiInterface.LoanEmIScheduleWithStatusReq(req)
 
+  suspend fun uploadInVoiceRequest(customerCode: String, columnName: String, newValue: String, imagePart: MultipartBody.Part) = 
+      apiInterface.uploadInVoiceRequest(
+          customerCode,
+          columnName,
+          newValue,
+          imagePart
+      )
+
 
 
 

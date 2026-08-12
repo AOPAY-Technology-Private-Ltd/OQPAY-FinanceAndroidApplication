@@ -165,8 +165,6 @@ class IMEIDetailsPage : BaseActivity() {
                 invoicePhotoUri=null
             }
         }
-
-
     }
 
     fun resetFlag(){

@@ -6,8 +6,10 @@ import android.content.Intent
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.text.InputFilter
 import android.text.InputType
 import android.util.Log
@@ -26,6 +28,11 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.FileProvider
+import okhttp3.RequestBody.Companion.toRequestBody
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.createMultipartFromUri
 import com.bos.payment.appName.network.ApiInterface
 import com.bos.payment.appName.network.RetrofitClient
 import com.bosandroidapp.bosmobilefinance.ui.slideshow.ui.view.activity.retailer.cibilreportsfragment.BureauScore.Companion.userScore
@@ -70,6 +77,7 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ImeiNumber1
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ImeiNumber2
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.InterestAmt
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.InterestRate
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.Invoive_Path
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.LoanCodeForEnach
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.LoanEndDate
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.LoanStartDate
@@ -87,6 +95,10 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.RefRelationShip
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.RefmobileNo
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.RetailerCodeForEnach
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.Tenure
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CardType
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.DebitOrCreditCard
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.SellingPrice
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.UpiMandate
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.calculateEmiEndDateFromNow
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.dialog
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.getCurrentStartDate
@@ -112,10 +124,12 @@ import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.Congratulatio
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.CongratulationPage.Companion.loaneCode
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
+import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 import kotlin.math.roundToInt
 import kotlin.toString
 
@@ -124,10 +138,33 @@ class AppScanInstallPage : BaseActivity() {
     lateinit var binding : ActivityAppScanInstallPageBinding
     lateinit var api: ApiInterface
     lateinit var preference: SharedPreference
+    private  var invoicePhotoUri: Uri? = null
+
 
     companion object{
         var LoanMode=""
     }
+
+    private val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
+        if (success) {
+                // Handle the photoUri, e.g., show image in ImageView
+                binding.invoiceImage.visibility= View.VISIBLE
+                Glide.with(this)
+                    .load(invoicePhotoUri)
+                    .centerCrop()
+                    .into(binding.invoiceImage)
+                binding.tvUploadText.text= "Re- Upload"
+                Invoive_Path = invoicePhotoUri
+                binding.btnUploadToServer.visibility = View.VISIBLE
+        }
+        else{
+            invoicePhotoUri = null
+            binding.invoiceImage.visibility= View.GONE
+            binding.btnUploadToServer.visibility = View.GONE
+        }
+
+    }
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -148,6 +185,9 @@ class AppScanInstallPage : BaseActivity() {
 
         binding.accesstoken.filters = arrayOf(InputFilter.AllCaps())
         binding.accesstoken.inputType = InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS
+
+        binding.validatekeylayout.visibility = View.GONE
+
 
         setOnClickListner()
         setDataOnUi()
@@ -174,9 +214,12 @@ class AppScanInstallPage : BaseActivity() {
         binding.back.setOnClickListener {
            // OpenPopUpForVAlert()
         }
-
+        
+        
         binding.validatekeylayout.setOnClickListener {
-            if (!binding.accesstoken.text.toString().isNullOrBlank()) {
+            if (Invoive_Path == null) {
+                Toast.makeText(this@AppScanInstallPage, "Upload invoice first!!", Toast.LENGTH_SHORT).show()
+            } else if (!binding.accesstoken.text.toString().isNullOrBlank()) {
                 hitApiForValidateKey()
             } else {
                 Toast.makeText(this@AppScanInstallPage, "Enter access key first!!", Toast.LENGTH_SHORT)
@@ -190,6 +233,96 @@ class AppScanInstallPage : BaseActivity() {
         }
 
 
+        binding.btnUploadInvoice.setOnClickListener {
+            val photoFile = createImageFile()
+            invoicePhotoUri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", photoFile)
+            cameraLauncher.launch(invoicePhotoUri!!)
+        }
+
+
+        binding.btnUploadToServer.setOnClickListener {
+            if (Invoive_Path != null) {
+                hitApiForUploadInvoice()
+            } else {
+                Toast.makeText(this@AppScanInstallPage, "Select invoice first!!", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+
+    }
+
+
+    fun hitApiForUploadInvoice() {
+
+        if (CustomerCodeForEnach.isNullOrBlank()) {
+            Toast.makeText(this, "Customer Code is missing!", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        ConstantClass.OpenPopUpForVeryfyOTP(this)
+
+        val invoicePart = createMultipartFromUri(this, Invoive_Path, "Image_FileName", "InvoivePath")
+
+        if (invoicePart == null) {
+            ConstantClass.dialog.dismiss()
+            Toast.makeText(this, "Failed to process image", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        viewModel.uploadInVoiceRequest(
+            customerCode = CustomerCodeForEnach,
+            columnName = "Invoive_Path",
+            newValue = "Invoice",
+            imagePart = invoicePart
+        ).observe(this) { resources ->
+            when (resources.apiStatus) {
+                ApiStatus.SUCCESS -> {
+                    ConstantClass.dialog.dismiss()
+                    val response = resources.data?.body()
+                    Log.d("UPLOAD_SUCCESS", response.toString())
+
+                    if (response != null && response.statuss == "200") {
+                        Toast.makeText(this@AppScanInstallPage, "Invoice uploaded successfully!", Toast.LENGTH_SHORT).show()
+                        binding.btnUploadToServer.visibility = View.GONE
+                        binding.tvUploadText.text = "Uploaded"
+                        binding.validatekeylayout.visibility = View.VISIBLE
+                        binding.doneicon.visibility = View.VISIBLE
+                        binding.btnUploadInvoice.isEnabled = false
+                    } else {
+                        val serverMsg = response?.message ?: "Unknown server error"
+                        Toast.makeText(this@AppScanInstallPage, "Server Error: $serverMsg", Toast.LENGTH_LONG).show()
+                    }
+                }
+                ApiStatus.ERROR -> {
+                    ConstantClass.dialog.dismiss()
+                    Toast.makeText(this@AppScanInstallPage, "Upload failed: ${resources.message}", Toast.LENGTH_SHORT).show()
+                }
+                ApiStatus.LOADING -> {
+                    // Loader already shown via OpenPopUpForVeryfyOTP
+                }
+            }
+        }
+    }
+
+
+    private fun handleApiError(responseCode: Int, errorBody: String?) {
+        if (ConstantClass.dialog?.isShowing == true) {
+            ConstantClass.dialog.dismiss()
+        }
+
+
+        val message = when (responseCode) {
+            400 -> "Bad request. Please check entered data with code 400."
+            401 -> "Session expired. Please login again with code 401."
+            403 -> "You are not authorized to perform this action with code 403."
+            404 -> "Service not found. Please try again later with code 404."
+            500 -> "Server error. Please try after some time with code 500."
+            else -> "Something went wrong. Please try again."
+        }
+
+        Log.e("API_ERROR", "Code: $responseCode Body: $errorBody")
+
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
 
@@ -547,7 +680,6 @@ class AppScanInstallPage : BaseActivity() {
 
     }
 
-
     fun clearData() {
         CustFirstName = ""
         CustMiddleName = ""
@@ -584,6 +716,7 @@ class AppScanInstallPage : BaseActivity() {
 
         ImeiNumber1 = ""
         ImeiNumber2 = ""
+        ConstantClass.Invoive_Path = null
 
         AccountNumber = ""
         BankIFSCCode = ""
@@ -611,6 +744,13 @@ class AppScanInstallPage : BaseActivity() {
 
 
     }
+
+    private fun createImageFile(): File {
+        val fileName = "IMG_${System.currentTimeMillis()}"
+        val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile(fileName, ".jpg", storageDir)
+    }
+
 
 
 }
