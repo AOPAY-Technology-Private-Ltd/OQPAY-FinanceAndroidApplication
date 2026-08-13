@@ -198,6 +198,8 @@ object ConstantClass {
 
      const val SUCCESS = "SUCCESS"
      const val GENERATEKEY = "GenerateKey"
+     const val GENERATE_KEY_COUNT = "generate_key_count"
+     const val LAST_GENERATE_TIME = "last_generate_time"
 
      var PanFirstName : String= ""
      var PanMiddleName : String= ""
