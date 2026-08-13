@@ -135,6 +135,7 @@ class DashBoard : BaseActivity() {
     private val notificationPermission = 1001
     var listOfDueWithGraceDate : ArrayList<MonthsAndPayables> = arrayListOf()
     private lateinit var fusedClient: FusedLocationProviderClient
+    private var countDownTimer: android.os.CountDownTimer? = null
 
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -196,8 +197,6 @@ class DashBoard : BaseActivity() {
 
 
 
-
-
     private fun checkPermissions(): Boolean {
         val phoneStatePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
         val notificationPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
@@ -219,6 +218,7 @@ class DashBoard : BaseActivity() {
         super.onResume()
         getFirebaseToken()
         setDataHeader()
+        checkAndStartKeyTimer()
         if (logintype.equals(Customer)) {
             hitApiForCustomerLogin(preference.getStringValue(ConstantClass.CustomerCode, ""))
             HitApiForEmiList()
@@ -280,6 +280,11 @@ class DashBoard : BaseActivity() {
 
     }
 
+    override fun onPause() {
+        super.onPause()
+        countDownTimer?.cancel()
+    }
+
     fun getFirebaseToken(){
         FirebaseMessaging.getInstance().token
             .addOnCompleteListener { task ->
@@ -329,12 +334,15 @@ class DashBoard : BaseActivity() {
                 binding.appBarDashBoard.deskdesign.customerdashboardItemlayout.visibility = View.VISIBLE
             }
             else{
+                binding.appBarDashBoard.deskdesign.customerGenerateKeyLayout.visibility = View.VISIBLE
+                binding.appBarDashBoard.deskdesign.customerdashboardItemlayout.visibility = View.GONE
                 if(generateKey.isNotEmpty()){
-                    binding.appBarDashBoard.deskdesign.customerGenerateKeyLayout.visibility = View.GONE
-                    binding.appBarDashBoard.deskdesign.customerdashboardItemlayout.visibility = View.VISIBLE
+                    binding.appBarDashBoard.deskdesign.generatedkey.visibility = View.VISIBLE
+                    binding.appBarDashBoard.deskdesign.clicktologin.visibility = View.VISIBLE
+                    binding.appBarDashBoard.deskdesign.generatedkey.text = generateKey
                 }else{
-                    binding.appBarDashBoard.deskdesign.customerGenerateKeyLayout.visibility = View.VISIBLE
-                    binding.appBarDashBoard.deskdesign.customerdashboardItemlayout.visibility = View.GONE
+                    binding.appBarDashBoard.deskdesign.generatedkey.visibility = View.GONE
+                    binding.appBarDashBoard.deskdesign.clicktologin.visibility = View.GONE
                 }
 
             }
@@ -363,15 +371,36 @@ class DashBoard : BaseActivity() {
 
 
         binding.appBarDashBoard.deskdesign.customerGenerateKeyLayout.setOnClickListener{
-            var generateKey = preference.getStringValue(ConstantClass.GENERATEKEY,"")
-            if(generateKey.isNullOrBlank()){
-                hitApiForGetAndCheckAccessToken()
+
+            val currentCount = preference.getIntValue(ConstantClass.GENERATE_KEY_COUNT, 0)
+
+            if (currentCount >3) {
+                binding.appBarDashBoard.deskdesign.tvTimer.visibility = View.VISIBLE
+                binding.appBarDashBoard.deskdesign.tvTimer.text = "Maximum attempts reached"
+                binding.appBarDashBoard.deskdesign.generatedkey.visibility = View.GONE
+                binding.appBarDashBoard.deskdesign.clicktologin.visibility = View.VISIBLE
+                return@setOnClickListener
             }
-            else{
-                 preference.setBooleanValue(ConstantClass.CustomerAccessKey,true)
-                 binding.appBarDashBoard.deskdesign.customerGenerateKeyLayout.visibility = View.GONE
-                 binding.appBarDashBoard.deskdesign.customerdashboardItemlayout.visibility = View.VISIBLE
+
+            var generateKey = preference.getStringValue(ConstantClass.GENERATEKEY, "")
+
+            if (generateKey.isNotEmpty() && binding.appBarDashBoard.deskdesign.generatedkey.text != "Key Expired") {
+                val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
+                val loanDetails = sharedPref.getString("LoanData", "")
+                if(loanDetails.isNullOrBlank()){
+                    Toast.makeText(this,resources.getString(R.string.customerdashboard), Toast.LENGTH_LONG).show()
+                }
+                else {
+                   // showContinueDialog()
+                }
             }
+
+            else {
+                if (canGenerateKey()) {
+                    hitApiForGetAndCheckAccessToken()
+                }
+            }
+
 
         }
 
@@ -383,15 +412,8 @@ class DashBoard : BaseActivity() {
                 Toast.makeText(this,resources.getString(R.string.customerdashboard), Toast.LENGTH_LONG).show()
             }
             else{
-                preference.setBooleanValue(ConstantClass.CustomerAccessKey,true)
-                binding.appBarDashBoard.deskdesign.customerGenerateKeyLayout.visibility = View.GONE
-                binding.appBarDashBoard.deskdesign.customerdashboardItemlayout.visibility = View.VISIBLE
+                showContinueDialog()
             }
-
-           /* preference.setBooleanValue(ConstantClass.CustomerAccessKey,true)
-            binding.appBarDashBoard.deskdesign.customerGenerateKeyLayout.visibility = View.GONE
-            binding.appBarDashBoard.deskdesign.customerdashboardItemlayout.visibility = View.VISIBLE*/
-
         }
 
 
@@ -483,6 +505,111 @@ class DashBoard : BaseActivity() {
 
     }
 
+    private fun canGenerateKey(): Boolean {
+        val currentCount = preference.getIntValue(ConstantClass.GENERATE_KEY_COUNT, 0)
+        val lastTime = preference.getLongValue(ConstantClass.LAST_GENERATE_TIME, 0L)
+        val currentTime = System.currentTimeMillis()
+
+        if (currentCount > 3) {
+            binding.appBarDashBoard.deskdesign.tvTimer.visibility = View.VISIBLE
+            binding.appBarDashBoard.deskdesign.tvTimer.text = "Maximum attempts reached"
+            binding.appBarDashBoard.deskdesign.generatedkey.visibility = View.GONE
+            binding.appBarDashBoard.deskdesign.clicktologin.visibility = View.GONE
+            return false
+        }
+
+        val diff = currentTime - lastTime
+        val waitTime = 2 * 60 * 1000 // 2 minutes
+
+        if (diff < waitTime) {
+            val remainingMillis = waitTime - diff
+            startTimer(remainingMillis)
+            return false
+        }
+
+        return true
+    }
+
+    private fun checkAndStartKeyTimer() {
+        val currentCount = preference.getIntValue(ConstantClass.GENERATE_KEY_COUNT, 0)
+        val lastTime = preference.getLongValue(ConstantClass.LAST_GENERATE_TIME, 0L)
+        val currentTime = System.currentTimeMillis()
+        val waitTime = 2 * 60 * 1000 // 2 minutes
+        val diff = currentTime - lastTime
+
+        if (currentCount > 3) {
+            binding.appBarDashBoard.deskdesign.tvTimer.visibility = View.VISIBLE
+            binding.appBarDashBoard.deskdesign.tvTimer.text = "Maximum attempts reached"
+            binding.appBarDashBoard.deskdesign.generatekeyButton.isEnabled = false
+            binding.appBarDashBoard.deskdesign.generatekeyButton.alpha = 0.5f
+            binding.appBarDashBoard.deskdesign.generatedkey.visibility = View.GONE
+            binding.appBarDashBoard.deskdesign.clicktologin.visibility = View.GONE
+            return
+        }
+
+        if (diff < waitTime) {
+            startTimer(waitTime - diff)
+        } else {
+            binding.appBarDashBoard.deskdesign.tvTimer.visibility = View.GONE
+            binding.appBarDashBoard.deskdesign.generatekeyButton.isEnabled = true
+            binding.appBarDashBoard.deskdesign.generatekeyButton.alpha = 1.0f
+            if (currentCount > 0) {
+                binding.appBarDashBoard.deskdesign.tvGenerateKey.text = "Regenerate Key"
+                binding.appBarDashBoard.deskdesign.generatedkey.text = "Key Expired"
+                binding.appBarDashBoard.deskdesign.generatedkey.visibility = View.VISIBLE
+                binding.appBarDashBoard.deskdesign.clicktologin.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun startTimer(duration: Long) {
+        countDownTimer?.cancel()
+        binding.appBarDashBoard.deskdesign.tvTimer.visibility = View.VISIBLE
+        binding.appBarDashBoard.deskdesign.generatekeyButton.isEnabled = false
+        binding.appBarDashBoard.deskdesign.generatekeyButton.alpha = 0.5f
+
+        countDownTimer = object : android.os.CountDownTimer(duration, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val minutes = (millisUntilFinished / 1000) / 60
+                val seconds = (millisUntilFinished / 1000) % 60
+                binding.appBarDashBoard.deskdesign.tvTimer.text = 
+                    String.format("Next attempt in %02d:%02d", minutes, seconds)
+            }
+
+            override fun onFinish() {
+                val currentCount = preference.getIntValue(ConstantClass.GENERATE_KEY_COUNT, 0)
+                binding.appBarDashBoard.deskdesign.tvTimer.visibility = View.GONE
+                binding.appBarDashBoard.deskdesign.generatekeyButton.isEnabled = true
+                binding.appBarDashBoard.deskdesign.generatekeyButton.alpha = 1.0f
+                if (currentCount > 0) {
+                    binding.appBarDashBoard.deskdesign.tvGenerateKey.text = "Regenerate Key"
+                    binding.appBarDashBoard.deskdesign.generatedkey.text = "Key Expired"
+                    binding.appBarDashBoard.deskdesign.generatedkey.visibility = View.VISIBLE
+                    binding.appBarDashBoard.deskdesign.clicktologin.visibility = View.GONE
+                }
+            }
+        }.start()
+    }
+    
+
+    private fun showContinueDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Confirmation")
+            .setMessage("Are you sure you want to proceed to the dashboard?")
+            .setPositiveButton("Ok") { dialog, _ ->
+                preference.setBooleanValue(ConstantClass.CustomerAccessKey, true)
+                binding.appBarDashBoard.deskdesign.customerGenerateKeyLayout.visibility = View.GONE
+                binding.appBarDashBoard.deskdesign.customerdashboardItemlayout.visibility = View.VISIBLE
+                dialog.dismiss()
+            }
+            .setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+
     fun hitApiForGetAndCheckAccessToken(){
 
         val token = if (preference.getStringValue(ConstantClass.FCMTOKEN, "").isNullOrBlank()) {
@@ -512,13 +639,22 @@ class DashBoard : BaseActivity() {
                         )
 
                         if (response.success == true) {
+                            val currentCount = preference.getIntValue(ConstantClass.GENERATE_KEY_COUNT, 0)
+                            preference.setIntValue(ConstantClass.GENERATE_KEY_COUNT, currentCount + 1)
+                            preference.setLongValue(ConstantClass.LAST_GENERATE_TIME, System.currentTimeMillis())
+                            checkAndStartKeyTimer()
+
                             binding.appBarDashBoard.deskdesign.generatedkey.visibility = View.VISIBLE
                             binding.appBarDashBoard.deskdesign.clicktologin.visibility = View.VISIBLE
                             binding.appBarDashBoard.deskdesign.generatedkey.text = response.data?.apiacessKey ?: ""
                             preference.setStringValue(ConstantClass.GENERATEKEY,response.data?.apiacessKey ?: "")
                         }
                         else{
-
+                            // If response is false, maybe it's because of server side limit
+                            // You can also force count to 3 here if you want to block forever based on server response
+                            preference.setIntValue(ConstantClass.GENERATE_KEY_COUNT, 3)
+                           // preference.setBooleanValue(ConstantClass.CustomerAccessKey, true)
+                            checkAndStartKeyTimer()
                         }
                     }
                 }

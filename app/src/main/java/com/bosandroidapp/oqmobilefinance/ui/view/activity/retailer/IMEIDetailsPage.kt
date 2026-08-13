@@ -76,11 +76,12 @@ class IMEIDetailsPage : BaseActivity() {
     private val CAMERA_REQUEST_CODE_FRONT = 1001
     private  var imei1photoUri: Uri? = null
     private  var imei2photoUri: Uri?=null
-    private  var invoicePhotoUri: Uri? = null
+
+    /*private  var invoicePhotoUri: Uri? = null*/
     private  var ImeiPhotoUri: Uri?=null
     var imei1photo: Boolean = false
     var imei2photo: Boolean = false
-    var invoicePhoto: Boolean = false
+    /*var invoicePhoto: Boolean = false*/
     var ImeiPhoto: Boolean = false
     var back: Boolean = false
     lateinit var viewModel: AuthenticationViewModel
@@ -132,7 +133,7 @@ class IMEIDetailsPage : BaseActivity() {
                 resetFlag()
             }
 
-           else if(invoicePhoto){
+          /* else if(invoicePhoto){
                 // Handle the photoUri, e.g., show image in ImageView
                 binding.invoicePhoto.visibility= View.VISIBLE
                 binding.invoiceicon.visibility= View.GONE
@@ -143,10 +144,7 @@ class IMEIDetailsPage : BaseActivity() {
                     .into(binding.invoicePhoto)
                 binding.clicktoinvoice.text= "Re- Upload"
                 resetFlag()
-            }
-
-
-
+            }*/
         }
         else{
             if(imei1photo){
@@ -161,9 +159,9 @@ class IMEIDetailsPage : BaseActivity() {
                 ImeiPhotoUri= null
             }
 
-            else if(invoicePhoto){
+            /*else if(invoicePhoto){
                 invoicePhotoUri=null
-            }
+            }*/
         }
     }
 
@@ -171,7 +169,7 @@ class IMEIDetailsPage : BaseActivity() {
         imei1photo = false
         imei2photo = false
         ImeiPhoto = false
-        invoicePhoto = false
+      /*  invoicePhoto = false*/
     }
 
 
@@ -222,7 +220,7 @@ class IMEIDetailsPage : BaseActivity() {
                 IMEINumber2 = binding.IMEInumber2.text.toString().trim(),
                 imei1photoUri = imei1photoUri,
                 imei2photoUri = imei2photoUri,
-                invoicePhotoUri = invoicePhotoUri,
+                /*invoicePhotoUri = invoicePhotoUri,*/
                 ImeiPhotoUri = ImeiPhotoUri
             )
             if (!isValid) {
@@ -233,7 +231,7 @@ class IMEIDetailsPage : BaseActivity() {
                 ImeiNumber2 = binding.IMEInumber2.text.toString().trim()
                 ImeiNumber1SealPhotoPath = imei1photoUri
                 ImeiNumber2SealPhotoPath = imei2photoUri
-                Invoive_Path = invoicePhotoUri
+                /*Invoive_Path = invoicePhotoUri*/
                 ImeiNumberPhotoPath = ImeiPhotoUri
                 OpenPopUpForTermCondition()
                 //startActivity(Intent(this@IMEIDetailsPage, QRCodePage::class.java))
@@ -264,12 +262,13 @@ class IMEIDetailsPage : BaseActivity() {
 
         }
 
-        binding.clicktoinvoice.setOnClickListener {
+
+      /*  binding.clicktoinvoice.setOnClickListener {
             resetFlag()
             invoicePhoto=true
             checkCameraPermissionAndOpenCamera()
 
-        }
+        }*/
 
 
 
@@ -300,10 +299,10 @@ class IMEIDetailsPage : BaseActivity() {
             cameraLauncher.launch(ImeiPhotoUri!!)
         }
 
-        if(invoicePhoto){
+        /*if(invoicePhoto){
             invoicePhotoUri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", photoFile)
             cameraLauncher.launch(invoicePhotoUri!!)
-        }
+        }*/
 
     }
 
@@ -322,7 +321,7 @@ class IMEIDetailsPage : BaseActivity() {
         IMEINumber2: String,
         imei1photoUri: Uri?,
         imei2photoUri: Uri?,
-        invoicePhotoUri: Uri?,
+        /*invoicePhotoUri: Uri?,*/
         ImeiPhotoUri: Uri?
     ): Pair<Boolean, String?> {
 
@@ -342,9 +341,9 @@ class IMEIDetailsPage : BaseActivity() {
             return Pair(false, "Upload IMEI 2 seal photo")
         }
 
-        if (invoicePhotoUri == null) {
+       /* if (invoicePhotoUri == null) {
             return Pair(false, "Upload invoice photo")
-        }
+        }*/
 
         if (ImeiPhotoUri == null) {
             return Pair(false, "Upload combined IMEI photo")
