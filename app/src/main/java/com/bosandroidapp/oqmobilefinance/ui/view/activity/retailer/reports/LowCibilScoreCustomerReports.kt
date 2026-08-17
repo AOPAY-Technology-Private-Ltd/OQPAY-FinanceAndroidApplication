@@ -102,7 +102,6 @@ class LowCibilScoreCustomerReports : BaseActivity() {
             finish()
         }
 
-
         binding.fromDate.setOnClickListener {
 
             DatePickerDialog(this, { _, year, monthOfYear, dayOfMonth ->
@@ -132,7 +131,6 @@ class LowCibilScoreCustomerReports : BaseActivity() {
                 myCalender.get(Calendar.DAY_OF_MONTH)).show()
 
         }
-
 
         binding.toDate.setOnClickListener {
 

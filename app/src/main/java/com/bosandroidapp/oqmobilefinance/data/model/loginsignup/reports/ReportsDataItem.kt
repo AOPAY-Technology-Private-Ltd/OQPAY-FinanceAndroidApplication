@@ -59,5 +59,7 @@ data class ReportsDataItem(
     @SerializedName("bankName")
     val bankName: String = "",
     @SerializedName("accountType")
-    val accountType: String = ""
+    val accountType: String = "",
+    @SerializedName("activeStatus")
+    val activeStatus: String = ""
 )

@@ -107,11 +107,6 @@ suspend fun Context.syncEmis() = withContext(Dispatchers.IO) {
   /*  }*/
 
     isEMIDue(sharedPref)
-
-   /* if(latitude > 0.0 && longitude > 0.0){
-        scheduleLocationWorker(latitude, longitude)
-    }*/
-
 }
 
 

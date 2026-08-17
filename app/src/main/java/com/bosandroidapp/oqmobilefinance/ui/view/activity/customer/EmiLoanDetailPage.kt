@@ -582,6 +582,7 @@ class EmiLoanDetailPage : BaseActivity() {
                 }
 
             }
+
             else
             {
                 if(isInternetAvailable(this@EmiLoanDetailPage)) {
@@ -685,6 +686,7 @@ class EmiLoanDetailPage : BaseActivity() {
     }
 
 
+
     data class EmiData(
         val selectedNoofEmi:Int,
         val emiNo: Int,
@@ -693,6 +695,7 @@ class EmiLoanDetailPage : BaseActivity() {
         val bounceCharge: String,
         val loancode : String
     )
+
 
 
     private fun checkCameraPermissionAndOpenCamera() {
@@ -706,11 +709,13 @@ class EmiLoanDetailPage : BaseActivity() {
 
 
 
+
     fun clickCameraForUploadDocument() {
         val photoFile = createImageFile()
         photoUri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", photoFile)
         cameraLauncher.launch(photoUri!!)
     }
+
 
 
     private fun createImageFile(): File {
@@ -844,6 +849,7 @@ class EmiLoanDetailPage : BaseActivity() {
     }
 
 
+
     fun HitApiForPayEmiAmount(emicount:Int,loopcount :Int,emiamount : String,fine:String?/*,imageFile:File*/){
 
         var createdBy=""
@@ -926,6 +932,7 @@ class EmiLoanDetailPage : BaseActivity() {
     }
 
 
+
     fun OpenPopUpForVeryfyOTP(){
         dialog = Dialog(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -1002,6 +1009,7 @@ class EmiLoanDetailPage : BaseActivity() {
         }
 
         context.startActivity(Intent.createChooser(shareIntent, "Share Image"))
+
     }
 
 
@@ -1120,7 +1128,6 @@ class EmiLoanDetailPage : BaseActivity() {
         }
 
     }
-
 
 
     fun OpenAlertForEmiRequest(customerCode : String){
@@ -1246,6 +1253,7 @@ class EmiLoanDetailPage : BaseActivity() {
             }
         }
     }
+
 
 
     fun OpenPopUpForVeryfyOTP(EmailID: String, otp: String) {
@@ -1504,6 +1512,7 @@ class EmiLoanDetailPage : BaseActivity() {
 
     }
 
+
     fun hitApiForRequestPG(req : PGRequestCall){
 
         Log.d("PGRequest", Gson().toJson(req))
@@ -1549,6 +1558,8 @@ class EmiLoanDetailPage : BaseActivity() {
         }
 
     }
+
+
     fun hitApiForRequestPGOnline(req : PGOnlineRequestCall){
 
         Log.d("PGRequest", Gson().toJson(req))
