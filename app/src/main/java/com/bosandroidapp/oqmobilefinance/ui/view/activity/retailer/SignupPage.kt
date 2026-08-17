@@ -809,6 +809,7 @@ class SignupPage : BaseActivity() {
                                 if (response!!.code.equals("200")) {
                                     AadharCardReferenceWebViewDIGILockerPage.digilockerLink = response!!.model.kycUrl
                                     RefAadharTransactionIdNo = response.model.transactionId
+                                    preference.setStringValue(ConstantClass.RetailerCode, "")
                                     Log.d("Referencedigilockeurl",  AadharCardReferenceWebViewDIGILockerPage.digilockerLink)
                                     startActivity(Intent(this@SignupPage, AadharCardReferenceWebViewDIGILockerPage::class.java))
                                 }

@@ -225,6 +225,7 @@ class AadharCardReferenceWebViewDIGILockerPage : BaseActivity() {
         )
 
         Log.d("validaterequest", Gson().toJson(request))
+
         viewModel.getSessionExpiredReq(request).observe(this){resources ->
             resources.let {
                 when (it.apiStatus) {
@@ -251,6 +252,7 @@ class AadharCardReferenceWebViewDIGILockerPage : BaseActivity() {
         }
 
     }
+
 
 
     fun hitApiForRetailerLogout() {
@@ -355,5 +357,7 @@ class AadharCardReferenceWebViewDIGILockerPage : BaseActivity() {
         }
 
     }
+
+
 
 }

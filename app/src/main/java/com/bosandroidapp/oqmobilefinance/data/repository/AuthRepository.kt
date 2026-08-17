@@ -12,6 +12,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.GenerateAccessTokenRequest
 import com.bosandroidapp.oqmobilefinance.data.model.GetRetailerLedgerReq
 import com.bosandroidapp.oqmobilefinance.data.model.HoldAmountWithdrawReq
 import com.bosandroidapp.oqmobilefinance.data.model.LowCibilCustomerReportReq
+import com.bosandroidapp.oqmobilefinance.data.model.RetailerPerCustomerListShortCutForLoanReq
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletAmountReq
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletPayoutAtMakePaymentTimeReq
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletReportReq
@@ -237,11 +238,16 @@ class AuthRepository(private val apiInterface: ApiInterface) {
   suspend fun uploadDeviceInfo(req: UploadDeviceInfoReq) = apiInterface.uploadDeviceInfo(req)
 
   suspend fun UpdateEmandateDetails(req: EnachDateUploadReq) = apiInterface.UpdateEmandateDetails(req)
+
+
   suspend fun sendTokenViaNotificationReq(req: NotificationSendTokenRequest) = apiInterface.sendTokenViaNotificationReq(req)
+
 
   suspend fun sendNotificationFeatureNameReq(req: SendNotificationFeatureNameRequest) = apiInterface.sendNotificationFeatureNameReq(req)
 
+
   suspend fun LoanEmIScheduleWithStatusReq(req: CustomerEmiStatusReq) = apiInterface.LoanEmIScheduleWithStatusReq(req)
+
 
   suspend fun uploadInVoiceRequest(customerCode: String, columnName: String, newValue: String, imagePart: MultipartBody.Part) = 
       apiInterface.uploadInVoiceRequest(
@@ -252,6 +258,7 @@ class AuthRepository(private val apiInterface: ApiInterface) {
       )
 
 
+  suspend fun getCustomerListForShortCutLoanCreateProcess(req: RetailerPerCustomerListShortCutForLoanReq) = apiInterface.getCustomerListForShortCutLoanCreateProcess(req)
 
 
 }

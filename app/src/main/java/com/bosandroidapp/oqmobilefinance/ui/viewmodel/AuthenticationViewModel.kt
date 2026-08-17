@@ -16,6 +16,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.GenerateAccessTokenRequest
 import com.bosandroidapp.oqmobilefinance.data.model.GetRetailerLedgerReq
 import com.bosandroidapp.oqmobilefinance.data.model.HoldAmountWithdrawReq
 import com.bosandroidapp.oqmobilefinance.data.model.LowCibilCustomerReportReq
+import com.bosandroidapp.oqmobilefinance.data.model.RetailerPerCustomerListShortCutForLoanReq
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletAmountReq
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletPayoutAtMakePaymentTimeReq
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletReportReq
@@ -536,6 +537,15 @@ class AuthenticationViewModel (private val repository: AuthRepository):ViewModel
     }
 
 
+    fun getCustomerListForShortCutLoanCreateProcess(req: RetailerPerCustomerListShortCutForLoanReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            emit(ApiResponse.success(data = repository.getCustomerListForShortCutLoanCreateProcess(req)))
+        }
+        catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+        }
+    }
 
 
 

@@ -199,12 +199,11 @@ class QRCodePage : BaseActivity() {
         panViewModel = ViewModelProvider(this, com.bosandroidapp.oqmobilefinance.data.viewModelFactory.PanViewModelFactory(PanRepository(RetrofitClient.apiInterfacePAN)))[PanViewModel::class.java]
 
 
-
         setOnClickListner()
         hitApiForMemberShipFee()
 
-
     }
+
 
 
     override fun onResume() {
@@ -219,7 +218,6 @@ class QRCodePage : BaseActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     fun setOnClickListner() {
 
-
         binding.home.setOnClickListener {
             val intent = Intent(this, DashBoard::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -227,11 +225,9 @@ class QRCodePage : BaseActivity() {
             onBackPressed()
         }
 
-
         binding.back.setOnClickListener {
             OpenPopUpForVAlert()
         }
-
 
         binding.nextlayout.setOnClickListener {
             if (isInternetAvailable(this@QRCodePage)) {
@@ -250,7 +246,6 @@ class QRCodePage : BaseActivity() {
             }
 
         }
-
 
         binding.LoanCreatelayout.setOnClickListener {
             if (loancreatedreq != null) {
@@ -297,12 +292,15 @@ class QRCodePage : BaseActivity() {
                     )
 
                     hitApiForEnach(request,true)
-
+                    //startActivity(Intent(this@QRCodePage, AppScanInstallPage::class.java))
                 }
                 else {
                     // No loan created yet, proceed with the normal flow
                     binding.LoanCreatelayout.isEnabled= false
+                   // startActivity(Intent(this@QRCodePage, AppScanInstallPage::class.java))
                     hitApiForCheckLoanCharge(loancreatedreq!!)
+
+                  // for testing purpose.
                 }
             }
             else{
@@ -1669,6 +1667,7 @@ class QRCodePage : BaseActivity() {
         Log.d("eManadateReq", Gson().toJson(request))
 
         if(LoanMode.equals(ConstantClass.offline)) {
+
             panViewModel.getEMandateRequestReq(request).observe(this) { resources ->
                 resources.let {
                     when (it.apiStatus) {
@@ -1854,7 +1853,8 @@ class QRCodePage : BaseActivity() {
                                     binding.LoanCreatelayout.isEnabled= true
                                     if(response.message.isNullOrBlank()){
                                         Toast.makeText(this,"Loan charge failed", Toast.LENGTH_SHORT).show()
-                                    }else{
+                                    }
+                                    else{
                                         Toast.makeText(this,response!!.message.toString(), Toast.LENGTH_SHORT).show()
                                     }
 

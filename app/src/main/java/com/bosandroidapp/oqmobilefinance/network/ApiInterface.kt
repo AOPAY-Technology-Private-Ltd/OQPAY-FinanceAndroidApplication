@@ -26,6 +26,8 @@ import com.bosandroidapp.oqmobilefinance.data.model.HoldAmountWithdrawReq
 import com.bosandroidapp.oqmobilefinance.data.model.HoldAmountWithdrawResp
 import com.bosandroidapp.oqmobilefinance.data.model.LowCibilCustomerReportReq
 import com.bosandroidapp.oqmobilefinance.data.model.LowCibilCustomerReportResp
+import com.bosandroidapp.oqmobilefinance.data.model.RetailerPerCustomerListShortCutForLoanReq
+import com.bosandroidapp.oqmobilefinance.data.model.RetailerPerCustomerListShortCutForLoanResponse
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletAmountReq
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletPayoutAtMakePaymentTimeReq
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletPayoutAtMakePaymentTimeResp
@@ -555,7 +557,6 @@ interface ApiInterface {
 
 
 
-
     // for customer generate token key
     @POST("api/V1/OQFinance/generatekey")
     suspend fun getAccessKeyForValidateAPKReq(@Body req : GenerateAccessTokenRequest): Response<GenerateAccessTokenResponse>?
@@ -608,6 +609,7 @@ interface ApiInterface {
 
     @POST("api/OQPay/Enach/V1/eMandate")
     suspend fun geteMandateOnlineRequest(@Body req: EMandateRequest): Response<EMandateResponse>?
+
 
 
     @POST("api/OQPay/Enach/V1/eMandate/getStatus")
@@ -667,6 +669,12 @@ interface ApiInterface {
         @Part invoiceImage: MultipartBody.Part
     ): Response<CustomerMakePaymentResp>?
 
+
+
+    // api for customer list short cut option for loan generate
+
+    @POST("api/V1/OQFinance/GetCustomerByRetailer")
+    suspend fun getCustomerListForShortCutLoanCreateProcess(@Body req : RetailerPerCustomerListShortCutForLoanReq) : Response<RetailerPerCustomerListShortCutForLoanResponse>?
 
 
 }

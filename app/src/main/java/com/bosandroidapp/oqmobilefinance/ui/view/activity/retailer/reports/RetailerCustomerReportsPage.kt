@@ -27,9 +27,12 @@ import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.reports.GetRepor
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
+import com.bosandroidapp.oqmobilefinance.data.repository.PanRepository
+import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.PanViewModelFactory
 import com.bosandroidapp.oqmobilefinance.ui.slideshow.adapter.RetailerReportListAdapter
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
+import com.bosandroidapp.oqmobilefinance.ui.viewmodel.PanViewModel
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.google.gson.Gson
 import java.text.SimpleDateFormat
@@ -41,6 +44,7 @@ class RetailerCustomerReportsPage : BaseActivity() {
     lateinit var binding : ActivityRetailerCustomerReportsPageBinding
     lateinit var preference : SharedPreference
     lateinit var viewModel: AuthenticationViewModel
+    lateinit var panViewModel: PanViewModel
     var ReportDataList : MutableList<com.bosandroidapp.oqmobilefinance.data.model.loginsignup.reports.ReportsDataItem> = mutableListOf()
     var FilterReportDataList : MutableList<com.bosandroidapp.oqmobilefinance.data.model.loginsignup.reports.ReportsDataItem> = mutableListOf()
     lateinit var reportAdapter : RetailerReportListAdapter
@@ -64,6 +68,7 @@ class RetailerCustomerReportsPage : BaseActivity() {
         }
 
         viewModel = ViewModelProvider(this, CommonViewModelFactory(AuthRepository(RetrofitClient.apiInterface)))[AuthenticationViewModel::class.java]
+        panViewModel = ViewModelProvider(this, PanViewModelFactory(PanRepository(RetrofitClient.apiInterfacePAN)))[PanViewModel::class.java]
         preference = SharedPreference(this)
 
 
@@ -267,7 +272,7 @@ class RetailerCustomerReportsPage : BaseActivity() {
                             if(ReportDataList.size>0){
                                 binding.showreports.visibility= View.VISIBLE
                                 binding.notfoundimage.visibility=View.GONE
-                                reportAdapter = RetailerReportListAdapter(ReportDataList,this,ConstantClass.Retailer)
+                                reportAdapter = RetailerReportListAdapter(ReportDataList,this,ConstantClass.Retailer, panViewModel, viewModel, this)
                                 binding.showreports.adapter = reportAdapter
                                 reportAdapter.notifyDataSetChanged()
                             }
@@ -300,7 +305,7 @@ class RetailerCustomerReportsPage : BaseActivity() {
         if(ReportDataList.size>0){
             binding.showreports.visibility= View.VISIBLE
             binding.notfoundimage.visibility=View.GONE
-            reportAdapter = RetailerReportListAdapter(ReportDataList,this,ConstantClass.Retailer)
+            reportAdapter = RetailerReportListAdapter(ReportDataList,this,ConstantClass.Retailer, panViewModel, viewModel, this)
             binding.showreports.adapter = reportAdapter
             reportAdapter.notifyDataSetChanged()
 

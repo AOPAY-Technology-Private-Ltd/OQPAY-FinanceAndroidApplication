@@ -1793,7 +1793,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
             otp = otp,
             consentmessage = "I agree to share my data for verification purposes",
             consentacceptence = "yes",
-            registrationID = "AOP-5039"
+            registrationID = ConstantClass.PAN_VERIFICATION_REGISTRATION_ID
         )
 
         Log.d("CibilReq", Gson().toJson(cibilReq))

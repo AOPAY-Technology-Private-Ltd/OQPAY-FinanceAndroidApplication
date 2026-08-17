@@ -100,6 +100,14 @@
         <item>Rejected</item>
     </string-array>
 
+
+    <string-array name="customershortcutlist">
+        <item>Pending</item>
+        <item>Approved</item>
+        <item>Rejected</item>
+    </string-array>
+
+
     <string-array name="duesreporttype">
         <item>Over Dues</item>
         <item>Today Dues</item>

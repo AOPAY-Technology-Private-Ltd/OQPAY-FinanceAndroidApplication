@@ -522,7 +522,7 @@ class PaymentInformation : BaseActivity() {
                     }
                     else
                     {
-                         /*AccountNumber = binding.accountnumber.text.toString().trim()
+                        /* AccountNumber = binding.accountnumber.text.toString().trim()
                          BankIFSCCode = binding.ifsccode.text.toString().trim()
                          BankName =  binding.bankname.text.toString().trim()
                          AccountType = binding.acounttype.selectedItem.toString().trim()

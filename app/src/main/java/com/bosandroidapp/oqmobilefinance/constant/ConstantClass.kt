@@ -98,7 +98,6 @@ import java.util.Locale
 import java.util.TimeZone
 import java.util.concurrent.TimeUnit
 
-
 object ConstantClass {
 
          // Production
@@ -106,29 +105,31 @@ object ConstantClass {
 /*       const val BASE_URL = "https://api.oqpay.in/"
          const val BASE_URL_IMAGE = "https://api.oqpay.in"
 
+
          // production merchant id online
          const val PAN_VERIFICATION_REGISTRATION_ID = "AOP-5039"
          const val PENNYDROP_REGISTRATION_ID = "AOP-5039"
+
 
          // production merchant id offline
          const val PAN_VERIFICATION_REGISTRATION_ID_OFFLINE = "AOP-5050"
          const val PENNYDROP_REGISTRATION_ID_OFFLINE = "AOP-5050"*/
 
 
-    // UAT
 
-    const val BASE_URL = "https://api.oqpay.co.in/"
-    const val BASE_URL_IMAGE = "https://api.oqpay.co.in"
+       // UAT
+       const val BASE_URL = "https://api.oqpay.co.in/"
+       const val BASE_URL_IMAGE = "https://api.oqpay.co.in"
 
 
-    // UAT merchant id online
-    const val PAN_VERIFICATION_REGISTRATION_ID = "AOP-554"
-    const val PENNYDROP_REGISTRATION_ID = "AOP-554"
+     // UAT merchant id online
+      const val PAN_VERIFICATION_REGISTRATION_ID = "AOP-554"
+      const val PENNYDROP_REGISTRATION_ID = "AOP-554"
 
-    //  UAT merchant id offline
-    const val PAN_VERIFICATION_REGISTRATION_ID_OFFLINE = "AOP-554"
-    const val PENNYDROP_REGISTRATION_ID_OFFLINE = "AOP-554"
 
+      //  UAT merchant id offline
+      const val PAN_VERIFICATION_REGISTRATION_ID_OFFLINE = "AOP-554"
+      const val PENNYDROP_REGISTRATION_ID_OFFLINE = "AOP-554"
 
 
      const val SMS_BASE_URL = "http://web.adcruxmedia.in/"
