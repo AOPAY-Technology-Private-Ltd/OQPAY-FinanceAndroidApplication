@@ -10,6 +10,20 @@
 
     <!-- Quote Section (centered vertically) -->
 
+
+    <TextView
+        android:id="@+id/uattext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="UAT"
+        android:visibility="gone"
+        android:textColor="@color/black"
+        android:elevation="@dimen/_10sdp"
+        android:gravity="center"
+        android:textSize="@dimen/_20sdp"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+
     <ImageView
         android:id="@+id/logo"
         android:layout_width="@dimen/_150sdp"

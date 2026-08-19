@@ -111,13 +111,14 @@ object ConstantClass {
          const val PENNYDROP_REGISTRATION_ID = "AOP-5039"
 
 
+
          // production merchant id offline
          const val PAN_VERIFICATION_REGISTRATION_ID_OFFLINE = "AOP-5050"
          const val PENNYDROP_REGISTRATION_ID_OFFLINE = "AOP-5050"*/
 
 
 
-       // UAT
+    // UAT
        const val BASE_URL = "https://api.oqpay.co.in/"
        const val BASE_URL_IMAGE = "https://api.oqpay.co.in"
 
