@@ -669,6 +669,7 @@ class SignupPage : BaseActivity() {
                         binding.gstEditText.isEnabled=true
                         binding.verifyGSTlayout.visibility=View.VISIBLE
                         binding.verifygst.visibility=View.GONE
+                        Toast.makeText(this@SignupPage, resources.message ?: "GST verification failed", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -763,6 +764,7 @@ class SignupPage : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        Toast.makeText(this@SignupPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -822,7 +824,7 @@ class SignupPage : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
-                        hitApiForAadharVerification()
+                        Toast.makeText(this@SignupPage, resources.message ?: "Aadhar verification failed", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {

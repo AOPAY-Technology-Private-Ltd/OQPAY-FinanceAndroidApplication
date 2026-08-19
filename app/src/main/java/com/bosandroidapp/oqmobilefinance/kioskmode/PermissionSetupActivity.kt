@@ -46,7 +46,8 @@ class PermissionSetupActivity : AppCompatActivity() {
     var preference: SharedPreference? = null
     var count = 0 // Tracks accessibility redirection state
     lateinit var viewModel: AuthenticationViewModel
-
+    
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPermissionSetupBinding.inflate(layoutInflater)
@@ -137,12 +138,13 @@ class PermissionSetupActivity : AppCompatActivity() {
         }
 
     }
+    
 
     override fun onResume() {
         super.onResume()
         updatePermissionsStatus()
     }
-
+    
     private fun updatePermissionsStatus() {
         val allPermissionsGranted = checkAndSetStatus(binding.itemStandardPermissions, checkBasicPermissions()) and
                 checkAndSetStatus(binding.itemNotification, checkNotificationPermission()) and
@@ -170,9 +172,7 @@ class PermissionSetupActivity : AppCompatActivity() {
             true
         }
     }
-
-
-
+    
     private fun checkAndSetStatus(itemBinding: LayoutPermissionItemBinding, isGranted: Boolean): Boolean {
         if (isGranted) {
             itemBinding.ivStatus.visibility = View.VISIBLE
@@ -187,7 +187,7 @@ class PermissionSetupActivity : AppCompatActivity() {
         }
         return isGranted
     }
-
+    
     fun hitApiForUploadCustomerDeviceInfo() {
         val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
         try {
@@ -236,7 +236,9 @@ class PermissionSetupActivity : AppCompatActivity() {
                 }
                 ApiStatus.ERROR -> {
                     ConstantClass.dialog.dismiss()
-                    Log.e("LoginError", it.message ?: "Something went wrong")
+                    val errorMessage = it.message ?: "Something went wrong"
+                    Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+                    Log.e("LoginError", errorMessage)
                 }
             }
         }
@@ -248,4 +250,5 @@ class PermissionSetupActivity : AppCompatActivity() {
         startActivity(mainIntent)
         finish()
     }
+    
 }

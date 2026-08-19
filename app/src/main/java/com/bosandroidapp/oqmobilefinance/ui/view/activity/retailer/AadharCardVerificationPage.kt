@@ -229,6 +229,7 @@ class AadharCardVerificationPage : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        Toast.makeText(this@AadharCardVerificationPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {

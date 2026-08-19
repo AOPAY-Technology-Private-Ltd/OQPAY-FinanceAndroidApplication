@@ -2,6 +2,7 @@ package com.bosandroidapp.oqmobilefinance.ui.view.activity.fragment
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -158,6 +159,7 @@ class PayoutReports : Fragment() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        Toast.makeText(requireContext(), resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {

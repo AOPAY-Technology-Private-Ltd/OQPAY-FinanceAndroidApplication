@@ -258,34 +258,79 @@ class RetailerCustomerReportsPage : BaseActivity() {
         Log.d("RetailerCustomerLoanReq", Gson().toJson(reportreq))
 
         viewModel.getReportsReq(reportreq).observe(this){
+
         resources->resources.let {
             when(it.apiStatus){
                 ApiStatus.SUCCESS -> {
                     it.data?.let { users ->
-                        users.body()?.let { response ->
-                            ConstantClass.dialog.dismiss()
-                            Log.d("MobileRes",Gson().toJson(response) )
-                            ReportDataList = response.data!!.toMutableList()
-                            //ReportDataList =  allReportList.filter { !it.recordStatus.equals("Disbursed", ignoreCase = true) }.toMutableList()
-                            binding.reportcount.text = "Total records : ${ReportDataList.size}"
+                        if(users.isSuccessful){
+                            users.body()?.let { response ->
+                                ConstantClass.dialog.dismiss()
+                                Log.d("RetailerCustomerLoanResponse",Gson().toJson(response) )
+                                ReportDataList = response.data!!.toMutableList()
+                                //ReportDataList =  allReportList.filter { !it.recordStatus.equals("Disbursed", ignoreCase = true) }.toMutableList()
+                                binding.reportcount.text = "Total records : ${ReportDataList.size}"
 
-                            if(ReportDataList.size>0){
-                                binding.showreports.visibility= View.VISIBLE
-                                binding.notfoundimage.visibility=View.GONE
-                                reportAdapter = RetailerReportListAdapter(ReportDataList,this,ConstantClass.Retailer, panViewModel, viewModel, this)
-                                binding.showreports.adapter = reportAdapter
-                                reportAdapter.notifyDataSetChanged()
-                            }
-                            else{
-                                binding.showreports.visibility= View.GONE
-                                binding.notfoundimage.visibility=View.VISIBLE
+                                if(ReportDataList.size>0){
+                                    binding.showreports.visibility= View.VISIBLE
+                                    binding.notfoundimage.visibility=View.GONE
+                                    reportAdapter = RetailerReportListAdapter(ReportDataList,this,ConstantClass.Retailer, panViewModel, viewModel, this)
+                                    binding.showreports.adapter = reportAdapter
+                                    reportAdapter.notifyDataSetChanged()
+                                }
+                                else{
+                                    binding.showreports.visibility= View.GONE
+                                    binding.notfoundimage.visibility=View.VISIBLE
+                                }
                             }
                         }
+
+                        else{
+
+                            val errorBody = users.errorBody()?.string()
+
+                            Log.e("API_RESPONSE_ERROR", errorBody ?: "Unknown error")
+
+                            val errorMessage = when (users.code()) {
+
+                                400 -> "Bad request"
+
+                                401 -> "Unauthorized access"
+
+                                403 -> "Access forbidden"
+
+                                404 -> "Data not found"
+
+                                405 -> "Method not allowed"
+
+                                408 -> "Request timeout"
+
+                                409 -> "Conflict occurred"
+
+                                422 -> "Validation failed"
+
+                                429 -> "Too many requests"
+
+                                500 -> "Internal server error"
+
+                                502 -> "Bad gateway"
+
+                                503 -> "Service unavailable"
+
+                                504 -> "Gateway timeout"
+
+                                else -> "Something went wrong"
+                            }
+                            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+
+                        }
+
                     }
                 }
 
                 ApiStatus.ERROR -> {
                     ConstantClass.dialog.dismiss()
+                    Toast.makeText(this@RetailerCustomerReportsPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                 }
 
                 ApiStatus.LOADING -> {
@@ -295,6 +340,7 @@ class RetailerCustomerReportsPage : BaseActivity() {
             }
 
           }
+
         }
 
     }

@@ -63,34 +63,41 @@ import kotlin.math.min
 
 class PayoutPage : Fragment() {
 
-     lateinit var binding : FragmentPayoutPageBinding
-     lateinit var preference : SharedPreference
-     lateinit var viewModel: AuthenticationViewModel
-     var currentDate : String = ""
-     lateinit var dialog : Dialog
-     var checkHoldername : Boolean = false
-     var checkIFSCcode : Boolean = false
-     var checkbranchName : Boolean = false
-     var checkremarks : Boolean = false
-     var holdcheckremarks : Boolean = false
-     private val bankAccountNumber: MutableList<String?> = mutableListOf()
+    lateinit var binding: FragmentPayoutPageBinding
+    lateinit var preference: SharedPreference
+    lateinit var viewModel: AuthenticationViewModel
+    var currentDate: String = ""
+    lateinit var dialog: Dialog
+    var checkHoldername: Boolean = false
+    var checkIFSCcode: Boolean = false
+    var checkbranchName: Boolean = false
+    var checkremarks: Boolean = false
+    var holdcheckremarks: Boolean = false
+    private val bankAccountNumber: MutableList<String?> = mutableListOf()
 
-     companion object{
-         var CheckActiveStatus : Boolean = false
-     }
+    companion object {
+        var CheckActiveStatus: Boolean = false
+    }
 
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         // Inflate the layout for this fragment
         binding = FragmentPayoutPageBinding.inflate(layoutInflater, container, false)
         preference = SharedPreference(requireContext())
-        viewModel = ViewModelProvider(this, CommonViewModelFactory(AuthRepository(RetrofitClient.apiInterface)))[AuthenticationViewModel::class.java]
+        viewModel = ViewModelProvider(
+            this,
+            CommonViewModelFactory(AuthRepository(RetrofitClient.apiInterface))
+        )[AuthenticationViewModel::class.java]
 
         lifecycleScope.launch {
             val date = withContext(Dispatchers.IO) {
                 getNetworkTime(context)
             }
-            currentDate =formatToMMDDYYYY(date.first?.formatDate().orEmpty())
+            currentDate = formatToMMDDYYYY(date.first?.formatDate().orEmpty())
             Log.d("currentdate", Gson().toJson(currentDate))
         }
 
@@ -107,18 +114,16 @@ class PayoutPage : Fragment() {
     }
 
 
-    fun setview(){
+    fun setview() {
         binding.walletamount.text = "₹ ".plus(WalletBalance)
         binding.holdamount.text = "₹ ".plus(HoldAmount)
 
-        if(CheckActiveStatus){
-            binding.walletpayoutlayout.visibility= View.GONE
-            binding.holdammountlayout.visibility= View.VISIBLE
-        }
-        else
-        {
-            binding.walletpayoutlayout.visibility= View.VISIBLE
-            binding.holdammountlayout.visibility= View.GONE
+        if (CheckActiveStatus) {
+            binding.walletpayoutlayout.visibility = View.GONE
+            binding.holdammountlayout.visibility = View.VISIBLE
+        } else {
+            binding.walletpayoutlayout.visibility = View.VISIBLE
+            binding.holdammountlayout.visibility = View.GONE
         }
 
 
@@ -167,32 +172,31 @@ class PayoutPage : Fragment() {
 
             override fun afterTextChanged(s: Editable?) {
                 val enteredText = s.toString().trim()
-               // var maxHoldAmount = MaxHoldingAmount.toDoubleOrNull() ?: 0.0
+                // var maxHoldAmount = MaxHoldingAmount.toDoubleOrNull() ?: 0.0
                 var minHoldAmount = MinHoldingAmount.toDoubleOrNull() ?: 0.0
                 var HoldAmount = HoldAmount.toDoubleOrNull() ?: 0.0
-                if(HoldAmount > minHoldAmount){
+                if (HoldAmount > minHoldAmount) {
 
                     if (enteredText.isNotEmpty()) {
 
                         //val remainingBalance =  HoldAmount - maxHoldAmount
-                        val remainingBalance =  HoldAmount - minHoldAmount
+                        val remainingBalance = HoldAmount - minHoldAmount
 
                         val enteredValue = enteredText.toDoubleOrNull()
 
                         if (enteredValue!! > remainingBalance) {
                             binding.holdamountetx.error = "Max allowed is $remainingBalance"
-                            binding.holdamountrequest.isEnabled= false
-                        }
-                        else{
-                            binding.holdamountrequest.isEnabled= true
+                            binding.holdamountrequest.isEnabled = false
+                        } else {
+                            binding.holdamountrequest.isEnabled = true
                         }
                     }
 
-                  }
-                else {
-                    binding.holdamountrequest.isEnabled= false
-                   // binding.holdamountetx.error = "You cannot withdraw hold amount because hold amount is less than max hold amount $maxHoldAmount"
-                    binding.holdamountetx.error = "You cannot withdraw hold amount because hold amount is less than min hold amount $minHoldAmount"
+                } else {
+                    binding.holdamountrequest.isEnabled = false
+                    // binding.holdamountetx.error = "You cannot withdraw hold amount because hold amount is less than max hold amount $maxHoldAmount"
+                    binding.holdamountetx.error =
+                        "You cannot withdraw hold amount because hold amount is less than min hold amount $minHoldAmount"
                 }
 
             }
@@ -206,9 +210,9 @@ class PayoutPage : Fragment() {
                 s?.let {
                     if (containsEmoji(it.toString())) {
                         binding.accountholdername.error = "Emoji not allowed"
-                        checkHoldername= false
-                    }else{
-                        checkHoldername= true
+                        checkHoldername = false
+                    } else {
+                        checkHoldername = true
                     }
                 }
             }
@@ -218,7 +222,7 @@ class PayoutPage : Fragment() {
         })
 
 
-        binding.ifsccode.addTextChangedListener(object : TextWatcher{
+        binding.ifsccode.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
 
             }
@@ -231,10 +235,9 @@ class PayoutPage : Fragment() {
                 s?.let {
                     if (containsEmoji(it.toString())) {
                         binding.ifsccode.error = "Emoji not allowed"
-                        checkIFSCcode= false
-                    }
-                    else{
-                        checkIFSCcode= true
+                        checkIFSCcode = false
+                    } else {
+                        checkIFSCcode = true
                     }
                 }
             }
@@ -242,7 +245,7 @@ class PayoutPage : Fragment() {
         })
 
 
-        binding.branchname.addTextChangedListener(object : TextWatcher{
+        binding.branchname.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
 
             }
@@ -255,10 +258,9 @@ class PayoutPage : Fragment() {
                 s?.let {
                     if (containsEmoji(it.toString())) {
                         binding.branchname.error = "Emoji not allowed"
-                        checkbranchName= false
-                    }
-                    else{
-                        checkbranchName= true
+                        checkbranchName = false
+                    } else {
+                        checkbranchName = true
                     }
                 }
             }
@@ -266,7 +268,7 @@ class PayoutPage : Fragment() {
         })
 
 
-        binding.remarks.addTextChangedListener(object : TextWatcher{
+        binding.remarks.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
 
             }
@@ -279,10 +281,9 @@ class PayoutPage : Fragment() {
                 s?.let {
                     if (containsEmoji(it.toString())) {
                         binding.remarks.error = "Emoji not allowed"
-                        checkremarks= false
-                    }
-                    else{
-                        checkremarks= true
+                        checkremarks = false
+                    } else {
+                        checkremarks = true
                     }
                 }
             }
@@ -290,7 +291,7 @@ class PayoutPage : Fragment() {
         })
 
 
-        binding.holdamountremarks.addTextChangedListener(object : TextWatcher{
+        binding.holdamountremarks.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
 
             }
@@ -303,10 +304,9 @@ class PayoutPage : Fragment() {
                 s?.let {
                     if (containsEmoji(it.toString())) {
                         binding.holdamountremarks.error = "Emoji not allowed"
-                        holdcheckremarks= true
-                    }
-                    else{
-                        holdcheckremarks= false
+                        holdcheckremarks = true
+                    } else {
+                        holdcheckremarks = false
                     }
                 }
             }
@@ -316,21 +316,30 @@ class PayoutPage : Fragment() {
     }
 
 
-    fun setDataInSpinner(){
-        val adapter = ArrayAdapter.createFromResource(requireContext(),  R.array.walletpaymentmode, R.layout.mobilenamelayout)
+    fun setDataInSpinner() {
+        val adapter = ArrayAdapter.createFromResource(
+            requireContext(),
+            R.array.walletpaymentmode,
+            R.layout.mobilenamelayout
+        )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.paymentmode.adapter = adapter
 
 
-        binding.accountnumber.onItemSelectedListener= object : AdapterView.OnItemSelectedListener{
+        binding.accountnumber.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
 
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
                 var accountnumber = binding.accountnumber.selectedItem.toString().trim()
                 val selectedBank = bankDataList!!.find { it!!.accountNumber == accountnumber }
-                selectedBank.let { it->
-                    binding.accountholdername.text =(it!!.accountName)
-                    binding.ifsccode.text=(it.ifscCode)
-                    binding.branchname.text=(it.branchName)
+                selectedBank.let { it ->
+                    binding.accountholdername.text = (it!!.accountName)
+                    binding.ifsccode.text = (it.ifscCode)
+                    binding.branchname.text = (it.branchName)
                 }
 
             }
@@ -340,70 +349,67 @@ class PayoutPage : Fragment() {
             }
 
         }
-        
+
     }
 
 
+    fun setclickListner() {
+
+        binding.addBankdetails.setOnClickListener {
+            startActivity(Intent(requireContext(), BankDetailsPage::class.java))
+        }
 
 
+        binding.verifybuttonlayout.setOnClickListener {
 
- fun setclickListner(){
-
-     binding.addBankdetails.setOnClickListener {
-         startActivity(Intent(requireContext(), BankDetailsPage::class.java))
-     }
-
-
-    binding.verifybuttonlayout.setOnClickListener {
-
-       val (isValid, errorMessage) = isValidForm(
-           accountNumber = binding.accountnumber.selectedItem?.toString()?.trim() ?: "",
-           holdername = binding.accountholdername.text?.toString()?.trim()?:"",
-           ifscCode = binding.ifsccode.text?.toString()?.trim()?:"",
-           branchname = binding.branchname.text?.toString()?.trim()?:"",
-           mode = binding.paymentmode.selectedItem?.toString()?.trim()?:"",
-           amount = binding.amountEdittxt.text?.toString()?.trim()?:"",
-       )
+            val (isValid, errorMessage) = isValidForm(
+                accountNumber = binding.accountnumber.selectedItem?.toString()?.trim() ?: "",
+                holdername = binding.accountholdername.text?.toString()?.trim() ?: "",
+                ifscCode = binding.ifsccode.text?.toString()?.trim() ?: "",
+                branchname = binding.branchname.text?.toString()?.trim() ?: "",
+                mode = binding.paymentmode.selectedItem?.toString()?.trim() ?: "",
+                amount = binding.amountEdittxt.text?.toString()?.trim() ?: "",
+            )
 
 
-       if (isInternetAvailable(requireContext())){
-           if (!isValid) {
-               Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
-           }
-           else{
-               OpenPopUpForVAlert()
-           }
+            if (isInternetAvailable(requireContext())) {
+                if (!isValid) {
+                    Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
+                } else {
+                    OpenPopUpForVAlert()
+                }
 
-       }
-
-
-   }
+            }
 
 
-    binding.holdamountrequest.setOnClickListener {
-       if(holdcheckremarks){
-           Toast.makeText(requireContext(),"Please enter valid remark",Toast.LENGTH_SHORT).show()
-       }
-       else{
-           if(!binding.holdamountetx.text.toString().trim().isNullOrBlank()){
-               OpenPopUpForHoldAmountAlert()
-           }else{
-               Toast.makeText(requireContext(),"Please enter amount!!",Toast.LENGTH_SHORT).show()
-           }
-
-       }
+        }
 
 
-   }
+        binding.holdamountrequest.setOnClickListener {
+            if (holdcheckremarks) {
+                Toast.makeText(requireContext(), "Please enter valid remark", Toast.LENGTH_SHORT)
+                    .show()
+            } else {
+                if (!binding.holdamountetx.text.toString().trim().isNullOrBlank()) {
+                    OpenPopUpForHoldAmountAlert()
+                } else {
+                    Toast.makeText(requireContext(), "Please enter amount!!", Toast.LENGTH_SHORT)
+                        .show()
+                }
+
+            }
 
 
-}
+        }
 
 
-    fun hitApiForHoldAmountRequest(){
+    }
+
+
+    fun hitApiForHoldAmountRequest() {
 
         var req = HoldAmountWithdrawReq(
-            retailerID = preference.getStringValue(ConstantClass.RetailerCode,""),
+            retailerID = preference.getStringValue(ConstantClass.RetailerCode, ""),
             amount = binding.holdamountetx.text.toString().trim(),
             remarks = binding.holdamountremarks.text.toString()
         )
@@ -417,7 +423,7 @@ class PayoutPage : Fragment() {
                         it.data.let { users ->
                             users!!.body().let { response ->
 
-                                if(dialog!=null && dialog.isShowing){
+                                if (dialog != null && dialog.isShowing) {
                                     dialog.dismiss()
                                 }
 
@@ -425,17 +431,24 @@ class PayoutPage : Fragment() {
                                     Log.d("HoldAmountResp", Gson().toJson(response))
                                     ConstantClass.dialog.dismiss()
 
-                                    if(dialog!=null && dialog.isShowing){
+                                    if (dialog != null && dialog.isShowing) {
                                         dialog.dismiss()
                                     }
                                     clearHoldEditPage()
                                     hitApiForRetailerWalletAmount()
-                                    Toast.makeText(requireContext(),"The request has been successfully raised with the admin",Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        requireContext(),
+                                        "The request has been successfully raised with the admin",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
 
-                                }
-                                else {
+                                } else {
                                     ConstantClass.dialog.dismiss()
-                                    Toast.makeText(requireContext(),response.message,Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(
+                                        requireContext(),
+                                        response.message,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
                                 }
 
                             }
@@ -446,6 +459,11 @@ class PayoutPage : Fragment() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        Toast.makeText(
+                            requireContext(),
+                            resources.message ?: "Error occurred",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -459,7 +477,7 @@ class PayoutPage : Fragment() {
 
     fun isValidForm(
         accountNumber: String,
-        holdername:String,
+        holdername: String,
         ifscCode: String,
         branchname: String,
         mode: String,
@@ -472,7 +490,10 @@ class PayoutPage : Fragment() {
 
         if (!checkHoldername) return Pair(false, "Enter valid holder name")
 
-        if (!ifscCode.matches(Regex("^[A-Z]{4}0[A-Z0-9]{6}$"))) return Pair(false, "Enter valid IFSC code")
+        if (!ifscCode.matches(Regex("^[A-Z]{4}0[A-Z0-9]{6}$"))) return Pair(
+            false,
+            "Enter valid IFSC code"
+        )
 
         if (!checkIFSCcode) return Pair(false, "Enter valid IFSC code")
 
@@ -483,7 +504,7 @@ class PayoutPage : Fragment() {
         if (!checkbranchName) return Pair(false, "Enter valid branch name")
 
 
-        if(mode.equals(ConstantClass.paymentMode)) return Pair (false, "Select payment mode")
+        if (mode.equals(ConstantClass.paymentMode)) return Pair(false, "Select payment mode")
 
 
         if (amount.isBlank()) return Pair(false, "Enter payout amount")
@@ -493,7 +514,6 @@ class PayoutPage : Fragment() {
 
         return Pair(true, null)
     }
-
 
 
     @SuppressLint("SetTextI18n")
@@ -520,7 +540,8 @@ class PayoutPage : Fragment() {
 
         done.text = "Yes"
 
-        txt.text = "Do you want to request a payout of ₹${binding.amountEdittxt.text.toString()} from your wallet?"
+        txt.text =
+            "Do you want to request a payout of ₹${binding.amountEdittxt.text.toString()} from your wallet?"
 
         done.setOnClickListener {
             hitApiForWalletPayout()
@@ -534,7 +555,6 @@ class PayoutPage : Fragment() {
         dialog.show()
 
     }
-
 
 
     @SuppressLint("SetTextI18n")
@@ -562,7 +582,8 @@ class PayoutPage : Fragment() {
 
         done.text = "Yes"
 
-        txt.text = "Do you want to withdraw ₹${binding.holdamountetx.text.toString()} from your hold amount, which will be added to your wallet?"
+        txt.text =
+            "Do you want to withdraw ₹${binding.holdamountetx.text.toString()} from your hold amount, which will be added to your wallet?"
 
         done.setOnClickListener {
             hitApiForHoldAmountRequest()
@@ -577,91 +598,102 @@ class PayoutPage : Fragment() {
     }
 
 
-   fun hitApiForWalletPayout() {
-        var totalamnt =  binding.amountEdittxt.text.toString().toDouble()
+    fun hitApiForWalletPayout() {
+        var totalamnt = binding.amountEdittxt.text.toString().toDouble()
         val deviceIp = getDeviceIpAddress()
         Log.d("IP_CHECK", "Device IP: $deviceIp")
 
+        var req = RetailerWalletPayoutReq(
+            registrationId = preference.getStringValue(ConstantClass.RetailerCode, ""),
+            paymentMode = binding.paymentmode.selectedItem.toString().trim(),
+            paymentDate = currentDate!!,
+            transferAmount = totalamnt,
+            beneId = binding.accountnumber.selectedItem.toString().trim(),
+            accountHolder = binding.accountholdername.text.toString(),
+            ifscCode = binding.ifsccode.text.toString().trim(),
+            branchName = binding.branchname.text.toString(),
+            remarks = binding.remarks.text.toString()
+        )
 
-   var req = RetailerWalletPayoutReq(
-       registrationId = preference.getStringValue(ConstantClass.RetailerCode,""),
-       paymentMode = binding.paymentmode.selectedItem.toString().trim(),
-       paymentDate = currentDate!!,
-       transferAmount = totalamnt,
-       beneId = binding.accountnumber.selectedItem.toString().trim(),
-       accountHolder = binding.accountholdername.text.toString(),
-       ifscCode = binding.ifsccode.text.toString().trim(),
-       branchName = binding.branchname.text.toString(),
-       remarks = binding.remarks.text.toString()
-   )
+        Log.d("WalletpayoutReq", Gson().toJson(req))
 
-   Log.d("WalletpayoutReq", Gson().toJson(req))
+        viewModel.getRetailerWalletPayoutReq(req).observe(requireActivity()) { resources ->
+            resources.let {
+                when (it.apiStatus) {
+                    ApiStatus.SUCCESS -> {
+                        it.data.let { users ->
+                            users!!.body().let { response ->
 
-   viewModel.getRetailerWalletPayoutReq(req).observe(requireActivity()) { resources ->
-       resources.let {
-           when (it.apiStatus) {
-               ApiStatus.SUCCESS -> {
-                   it.data.let { users ->
-                       users!!.body().let { response ->
+                                if (dialog != null && dialog.isShowing) {
+                                    dialog.dismiss()
+                                }
 
-                           if(dialog!=null && dialog.isShowing){
-                               dialog.dismiss()
-                           }
+                                if (response!!.statuss.equals("True")) {
+                                    Log.d("WalletpayoutResp", Gson().toJson(response))
+                                    ConstantClass.dialog.dismiss()
 
-                           if (response!!.statuss.equals("True")) {
-                               Log.d("WalletpayoutResp", Gson().toJson(response))
-                               ConstantClass.dialog.dismiss()
+                                    if (dialog != null && dialog.isShowing) {
+                                        dialog.dismiss()
+                                    }
+                                    hitApiForRetailerWalletAmount()
+                                    clearEditPage()
+                                    Toast.makeText(
+                                        requireContext(),
+                                        "The request has been successfully raised with the admin",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
 
-                               if(dialog!=null && dialog.isShowing){
-                                   dialog.dismiss()
-                               }
-                               hitApiForRetailerWalletAmount()
-                               clearEditPage()
-                               Toast.makeText(requireContext(),"The request has been successfully raised with the admin",Toast.LENGTH_SHORT).show()
+                                } else {
+                                    ConstantClass.dialog.dismiss()
+                                    Toast.makeText(
+                                        requireContext(),
+                                        response.message,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
 
-                           }
-                           else {
-                               ConstantClass.dialog.dismiss()
-                               Toast.makeText(requireContext(),response.message,Toast.LENGTH_SHORT).show()
-                           }
+                            }
 
-                       }
+                        }
 
-                   }
+                    }
 
-               }
+                    ApiStatus.ERROR -> {
+                        ConstantClass.dialog.dismiss()
+                        Toast.makeText(
+                            requireContext(),
+                            resources.message ?: "Error occurred",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
 
-               ApiStatus.ERROR -> {
-                   ConstantClass.dialog.dismiss()
-               }
+                    ApiStatus.LOADING -> {
+                        ConstantClass.OpenPopUpForVeryfyOTP(requireContext())
+                    }
+                }
+            }
+        }
 
-               ApiStatus.LOADING -> {
-                   ConstantClass.OpenPopUpForVeryfyOTP(requireContext())
-               }
-           }
-       }
-   }
-
-}
+    }
 
 
-    fun clearEditPage(){
+    fun clearEditPage() {
         binding.accountnumber.setSelection(0)
         binding.paymentmode.setSelection(0)
         binding.amountEdittxt.text.clear()
         binding.remarks.text.clear()
     }
 
-    fun clearHoldEditPage(){
+    fun clearHoldEditPage() {
         binding.holdamountetx.text.clear()
         binding.holdamountremarks.text.clear()
     }
 
 
-    fun hitApiForRetailerWalletAmount(){
+    fun hitApiForRetailerWalletAmount() {
         var registrationID = preference.getStringValue(ConstantClass.RetailerCode, "")
         var request = RetailerWalletAmountReq(
-            retailerID = registrationID ,
+            retailerID = registrationID,
             amountType = "CreditBalance"
         )
 
@@ -680,7 +712,8 @@ class PayoutPage : Fragment() {
                                 val walletAmount = response.walletBalance!!.toDoubleOrNull() ?: 0.0
                                 val holdAmount = response.holdAmount!!.toDoubleOrNull() ?: 0.0
                                 val maxholdAmount = response.maxholdAmount!!.toDoubleOrNull() ?: 0.0
-                                val minholdAmount = response.miniholdamountrequest!!.toDoubleOrNull() ?: 0.0
+                                val minholdAmount =
+                                    response.miniholdamountrequest!!.toDoubleOrNull() ?: 0.0
 
                                 val myWalletAmount = walletAmount/* - holdAmount*/
                                 val myWalletAmountStr = String.format("%.2f", myWalletAmount)
@@ -706,7 +739,11 @@ class PayoutPage : Fragment() {
                         Log.e("API_ERROR_CODE", resources.data?.code().toString())
                         Log.e("API_ERROR_MSG", resources.message ?: "Unknown Error")
 
-                        Toast.makeText(requireContext(), "Server error occurred (Code: ${resources.data?.code() ?: "Unknown"})", Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            requireContext(),
+                            "Server error occurred (Code: ${resources.data?.code() ?: "Unknown"})",
+                            Toast.LENGTH_LONG
+                        ).show()
 
                         // Optional: Handle specific 500 error
                         if (resources.data?.code() == 500) {
@@ -738,7 +775,7 @@ class PayoutPage : Fragment() {
     }
 
 
-    fun hitApiForGetBankList(){
+    fun hitApiForGetBankList() {
 
         var req = com.bosandroidapp.oqmobilefinance.data.model.AddBankAccountReq(
             action = "GET",
@@ -760,30 +797,32 @@ class PayoutPage : Fragment() {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
                         it.data.let { users ->
-                            users!!.body().let {
-                                    response ->
-                                    ConstantClass.dialog.dismiss()
-                                if(response!!.statuss.equals("True")){
-                                    Log.d("BankListRes",Gson().toJson(response))
+                            users!!.body().let { response ->
+                                ConstantClass.dialog.dismiss()
+                                if (response!!.statuss.equals("True")) {
+                                    Log.d("BankListRes", Gson().toJson(response))
                                     bankDataList = response?.data!!
-                                    if(bankDataList.isNullOrEmpty()){
-                                        binding.addBankdetails.visibility=View.VISIBLE
-                                        binding.bankdetailslayout.visibility= View.GONE
-                                    }else{
-                                        bankDataList!!.forEach { it->
+                                    if (bankDataList.isNullOrEmpty()) {
+                                        binding.addBankdetails.visibility = View.VISIBLE
+                                        binding.bankdetailslayout.visibility = View.GONE
+                                    } else {
+                                        bankDataList!!.forEach { it ->
                                             bankAccountNumber.add(it!!.accountNumber)
                                         }
-                                        val adapter = ArrayAdapter(requireContext(), R.layout.mobilenamelayout,bankAccountNumber)
+                                        val adapter = ArrayAdapter(
+                                            requireContext(),
+                                            R.layout.mobilenamelayout,
+                                            bankAccountNumber
+                                        )
                                         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                                         binding.accountnumber.adapter = adapter
-                                        binding.addBankdetails.visibility=View.GONE
-                                        binding.bankdetailslayout.visibility= View.VISIBLE
+                                        binding.addBankdetails.visibility = View.GONE
+                                        binding.bankdetailslayout.visibility = View.VISIBLE
                                     }
 
-                                }
-                                else{
-                                binding.addBankdetails.visibility=View.VISIBLE
-                                binding.bankdetailslayout.visibility= View.GONE
+                                } else {
+                                    binding.addBankdetails.visibility = View.VISIBLE
+                                    binding.bankdetailslayout.visibility = View.GONE
                                 }
 
                             }
@@ -794,6 +833,11 @@ class PayoutPage : Fragment() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        Toast.makeText(
+                            requireContext(),
+                            resources.message ?: "Error occurred",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
 
                     ApiStatus.LOADING -> {

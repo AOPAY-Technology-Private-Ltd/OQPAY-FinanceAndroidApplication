@@ -29,7 +29,7 @@ class MobileListAdapter(private val  MobileDataList : MutableList<DataItem> = mu
       var mobileprice = binding.mobileprice
       var selectborder = binding.selectcard
       var colorlayout = binding.colorlayout
-     // var colorcard = binding.colorcard
+
     }
 
 

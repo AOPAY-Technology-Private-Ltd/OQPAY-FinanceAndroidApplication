@@ -207,6 +207,7 @@ class CustomerReportsPage : BaseActivity() ,CustomerReportListAdapter.onClickLis
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        Toast.makeText(this@CustomerReportsPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {

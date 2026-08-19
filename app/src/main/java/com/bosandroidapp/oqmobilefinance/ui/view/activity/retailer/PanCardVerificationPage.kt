@@ -331,6 +331,7 @@ class PanCardVerificationPage : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        Toast.makeText(this@PanCardVerificationPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -388,6 +389,7 @@ class PanCardVerificationPage : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        Toast.makeText(this@PanCardVerificationPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {

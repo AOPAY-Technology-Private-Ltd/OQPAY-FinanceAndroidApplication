@@ -132,6 +132,7 @@ class AddBank : Fragment() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        Toast.makeText(requireContext(), resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -424,6 +425,7 @@ class AddBank : Fragment() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        Toast.makeText(requireContext(), resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -468,6 +470,7 @@ class AddBank : Fragment() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        Toast.makeText(requireContext(), resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -535,6 +538,7 @@ class AddBank : Fragment() {
 
                ApiStatus.ERROR -> {
                    ConstantClass.dialog.dismiss()
+                   Toast.makeText(requireContext(), it.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                }
 
                ApiStatus.LOADING -> {

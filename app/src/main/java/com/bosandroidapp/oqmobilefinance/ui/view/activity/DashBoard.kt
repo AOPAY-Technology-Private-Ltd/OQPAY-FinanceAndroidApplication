@@ -374,11 +374,11 @@ class DashBoard : BaseActivity() {
 
             val currentCount = preference.getIntValue(ConstantClass.GENERATE_KEY_COUNT, 0)
 
-            if (currentCount >3) {
+            if (currentCount >= 3) {
                 binding.appBarDashBoard.deskdesign.tvTimer.visibility = View.VISIBLE
                 binding.appBarDashBoard.deskdesign.tvTimer.text = "Maximum attempts reached"
                 binding.appBarDashBoard.deskdesign.generatedkey.visibility = View.GONE
-                binding.appBarDashBoard.deskdesign.clicktologin.visibility = View.VISIBLE
+                binding.appBarDashBoard.deskdesign.clicktologin.visibility = View.GONE
                 return@setOnClickListener
             }
 
@@ -391,7 +391,7 @@ class DashBoard : BaseActivity() {
                     Toast.makeText(this,resources.getString(R.string.customerdashboard), Toast.LENGTH_LONG).show()
                 }
                 else {
-                   // showContinueDialog()
+                    showContinueDialog()
                 }
             }
 
@@ -537,7 +537,7 @@ class DashBoard : BaseActivity() {
         val waitTime = 2 * 60 * 1000 // 2 minutes
         val diff = currentTime - lastTime
 
-        if (currentCount > 3) {
+        if (currentCount >= 3) {
             binding.appBarDashBoard.deskdesign.tvTimer.visibility = View.VISIBLE
             binding.appBarDashBoard.deskdesign.tvTimer.text = "Maximum attempts reached"
             binding.appBarDashBoard.deskdesign.generatekeyButton.isEnabled = false
@@ -661,6 +661,7 @@ class DashBoard : BaseActivity() {
 
                 ApiStatus.ERROR -> {
                     ConstantClass.dialog.dismiss()
+                    Toast.makeText(this@DashBoard, resources.message ?: "Error checking access token", Toast.LENGTH_SHORT).show()
                 }
 
                 ApiStatus.LOADING -> {
@@ -785,25 +786,8 @@ class DashBoard : BaseActivity() {
                             if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
                                 ConstantClass.dialog.dismiss()
                             }
-                            hitApiForRetailerWalletAmount()
-
-                            // ✅ Print the full error details
-                            Log.e("API_ERROR", "Status: ERROR")
-                            Log.e("API_ERROR_CODE", resources.data?.code().toString())
-                            Log.e("API_ERROR_MSG", resources.message ?: "Unknown Error")
-
-                            /*Toast.makeText(
-                                this,
-                                "Server error occurred (Code: ${resources.data?.code() ?: "Unknown"})",
-                                Toast.LENGTH_LONG
-                            ).show()*/
-
-                            // Optional: Handle specific 500 error
-                            if (resources.data?.code() == 500) {
-                                Log.e("API_ERROR", "Internal Server Error from backend.")
-                            }
+                            Toast.makeText(this@DashBoard, resources.message ?: "Error getting wallet amount", Toast.LENGTH_SHORT).show()
                             binding.appBarDashBoard.swiperefresh.isRefreshing = false
-
                         }
 
                         ApiStatus.LOADING -> {
@@ -904,8 +888,7 @@ class DashBoard : BaseActivity() {
                     }
 
                     ApiStatus.ERROR -> {
-
-
+                        Toast.makeText(this@DashBoard, resources.message ?: "Error getting EMI list", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -966,7 +949,7 @@ class DashBoard : BaseActivity() {
                     }
 
                     ApiStatus.ERROR -> {
-
+                        Toast.makeText(this@DashBoard, resources.message ?: "Session error", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -1007,7 +990,7 @@ class DashBoard : BaseActivity() {
                     }
 
                     ApiStatus.ERROR -> {
-
+                        Toast.makeText(this@DashBoard, resources.message ?: "Session error", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -1040,7 +1023,7 @@ class DashBoard : BaseActivity() {
                     }
 
                     ApiStatus.ERROR -> {
-
+                        Toast.makeText(this@DashBoard, resources.message ?: "Session error", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -1080,7 +1063,7 @@ class DashBoard : BaseActivity() {
                     }
 
                     ApiStatus.ERROR -> {
-
+                        Toast.makeText(this@DashBoard, resources.message ?: "Session error", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -1124,7 +1107,7 @@ class DashBoard : BaseActivity() {
                     }
 
                     ApiStatus.ERROR -> {
-
+                        Toast.makeText(this@DashBoard, resources.message ?: "Session error", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -1212,9 +1195,8 @@ class DashBoard : BaseActivity() {
 
                 ApiStatus.ERROR -> {
                     ConstantClass.dialog.dismiss()
-                    // 👇 Show proper error from ViewModel (404, 500 etc.)
                     val errorMessage = it.message ?: "Something went wrong"
-
+                    Toast.makeText(this@DashBoard, errorMessage, Toast.LENGTH_SHORT).show()
                     Log.e("LoginError", errorMessage)
                 }
             }

@@ -50,12 +50,14 @@ import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.google.gson.Gson
 
 class ChooseYourRolePage : BaseActivity() {
-   lateinit var binding : ActivityChooseYourRolePageBinding
+    lateinit var binding : ActivityChooseYourRolePageBinding
     lateinit var viewModel: AuthenticationViewModel
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
 
         binding = ActivityChooseYourRolePageBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -221,8 +223,8 @@ class ChooseYourRolePage : BaseActivity() {
 
                 ApiStatus.ERROR -> {
                     ConstantClass.dialog.dismiss()
-                    // 👇 Show proper error from ViewModel (404, 500 etc.)
                     val errorMessage = it.message ?: "Something went wrong"
+                    Toast.makeText(this@ChooseYourRolePage, errorMessage, Toast.LENGTH_SHORT).show()
                     Log.e("LoginError", errorMessage)
                 }
 

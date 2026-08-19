@@ -314,8 +314,8 @@ class LoginPage : BaseActivity() {
 
                 ApiStatus.ERROR -> {
                     ConstantClass.dialog.dismiss()
-                    // 👇 Show proper error from ViewModel (404, 500 etc.)
                     val errorMessage = it.message ?: "Something went wrong"
+                    Toast.makeText(this@LoginPage, errorMessage, Toast.LENGTH_SHORT).show()
                     OpenPopUpForVAlert(errorMessage)
 
                     Log.e("LoginError", errorMessage)
@@ -497,6 +497,7 @@ class LoginPage : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        Toast.makeText(this@LoginPage, resources.message ?: "Error verifying OTP", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -579,6 +580,7 @@ class LoginPage : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        Toast.makeText(this@LoginPage, resources.message ?: "Error verifying OTP", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -617,6 +619,7 @@ class LoginPage : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        Toast.makeText(this@LoginPage, resources.message ?: "Error resending OTP", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -758,8 +761,8 @@ class LoginPage : BaseActivity() {
 
                 ApiStatus.ERROR -> {
                     ConstantClass.dialog.dismiss()
-                    // 👇 Show proper error from ViewModel (404, 500 etc.)
                     val errorMessage = it.message ?: "Something went wrong"
+                    Toast.makeText(this@LoginPage, errorMessage, Toast.LENGTH_SHORT).show()
                     OpenPopUpForVAlert(errorMessage)
 
                     Log.e("LoginError", errorMessage)

@@ -29,13 +29,33 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.ViewModelProvider
 import com.bos.payment.appName.network.RetrofitClient
+import com.bosandroidapp.bosmobilefinance.ui.slideshow.ui.view.activity.retailer.cibilreportsfragment.BureauScore.Companion.userScore
 import com.bumptech.glide.Glide
 import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityEmicalculationDetailsPageBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AadhaarResponse
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AadharNumber
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.BrandName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CibilResponse
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ClickOnCardDashboard
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CreatedByCustomerShortCut
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustAlternateMobileNumber
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustAreaSector
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustCityName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustCountry
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustCurrentAddress
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustFirstName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustFlatNo
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustLastName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustMiddleName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustPinCode
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustPrimaryMobileNumber
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustPrimaryMobileVerified
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustPrimaryOTP
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustStateName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CusteMailID
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.DownPayment
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.EmiAmount
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.InterestAmt
@@ -48,10 +68,14 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.MaxHoldingAmount
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ModelColor
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ModelName
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ModelVarient
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanNumber
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanNumberVerified
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanResponse
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ProcessingFees
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.SellingPrice
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.Tenure
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ToBePaidAmount
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isAggrementVerified
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.loginType
 import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
@@ -60,6 +84,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.DataItems
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.GetEMISplitDetlailsReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LoginReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LogoutReq
+import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.ManageCustomerStepWiseReq
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
@@ -92,6 +117,7 @@ class EMICalculationDetailsPage : BaseActivity() {
         var MobileData: DataItem? = null
 
     }
+
 
     override fun onStart() {
         super.onStart()
@@ -148,78 +174,6 @@ class EMICalculationDetailsPage : BaseActivity() {
         super.onResume()
         hitApiForLogin()
     }
-
-
-   /* fun hitApiForGetEmiPercent(brandName: String, modelName: String) {
-        var emisplitReq = GetEMISplitDetlailsReq(
-            brandName = brandName,
-            modelName = modelName
-        )
-        Log.d("EmiPercentReq", Gson().toJson(emisplitReq))
-
-        BrandName = brandName
-        ModelName = modelName
-
-        viewModel.getSplitEmiDetails(emisplitReq).observe(this) { resources ->
-
-            resources.let {
-                when (it.apiStatus) {
-                    ApiStatus.SUCCESS -> {
-                        it.data?.let { users ->
-                            users.body()?.let { response ->
-                                val response = users?.body()
-                                if (response != null) {
-                                    Log.d("EmiPercentRes", Gson().toJson(response.data))
-                                    if (response.status.equals("True", true) && !response.data.isNullOrEmpty()){
-
-                                        if (ConstantClass.dialog.isShowing) {
-                                            ConstantClass.dialog.dismiss()
-                                        }
-                                        EmiSplitDataModel = response.data
-
-                                        variantList = EmiSplitDataModel
-                                            .map { it.variantName.trim() }
-                                            .distinct()
-
-                                        val variantAdapter = ArrayAdapter(this, R.layout.mobilenamelayout, variantList)
-                                        variantAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                                        binding.stroage.adapter = variantAdapter
-
-                                    }
-                                }
-                                else {
-                                    if (ConstantClass.dialog.isShowing) {
-                                        ConstantClass.dialog.dismiss()
-                                    }
-                                    hitApiForGetEmiPercent(MobileData!!.brandName, MobileData!!.modelName)
-                                }
-
-                            }
-                        }
-                    }
-
-                    ApiStatus.ERROR -> {
-                        if (ConstantClass.dialog.isShowing) {
-                            ConstantClass.dialog.dismiss()
-                        }
-                        Handler(Looper.getMainLooper()).postDelayed({
-                            hitApiForGetEmiPercent(brandName, modelName)
-
-                        }, 2000)
-
-                    }
-
-                    ApiStatus.LOADING -> {
-                        ConstantClass.OpenPopUpForVeryfyOTP(this)
-                    }
-
-                }
-
-            }
-
-        }
-
-    }*/
 
 
     fun hitApiForGetEmiPercent(brandName: String, modelName: String) {
@@ -389,7 +343,6 @@ class EMICalculationDetailsPage : BaseActivity() {
 
         }
 
-
         binding.home.setOnClickListener {
             val intent = Intent(this, DashBoard::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -467,18 +420,91 @@ class EMICalculationDetailsPage : BaseActivity() {
 
         })
 
-        binding.nextbuttonlayout.setOnClickListener {
-                val loanAmount = ConstantClass.LoanAmount ?: 0.0
-                val maxHoldAmount = LoanSecurityHoldAmount.toDoubleOrNull() ?: 0.0
 
-                if (loanAmount < maxHoldAmount) {
+        binding.nextbuttonlayout.setOnClickListener {
+
+            val loanAmount = ConstantClass.LoanAmount ?: 0.0
+            val maxHoldAmount = LoanSecurityHoldAmount.toDoubleOrNull() ?: 0.0
+
+            if (loanAmount < maxHoldAmount) {
                     Toast.makeText(this@EMICalculationDetailsPage, "Your loan amount is below to the hold amount. Please contact Admin.", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
 
             if (!ToBePaidAmount.isNullOrBlank() && sellingPriceValidate) {
                 checkKYC = false
-                startActivity(Intent(this@EMICalculationDetailsPage, PaymentInformation::class.java))
+               // startActivity(Intent(this@EMICalculationDetailsPage, PaymentInformation::class.java))
+
+                var req = ManageCustomerStepWiseReq(
+                    mode = "UPDATE" ,
+                    step = "2",
+                    rid = "",
+                    firstName = CustFirstName,
+                    middleName= CustMiddleName,
+                    lastName=CustLastName,
+                    primaryMobileNumber = CustPrimaryMobileNumber,
+                    primaryOTP = CustPrimaryOTP,
+                    primaryMobileVerified = CustPrimaryMobileVerified,
+                    alternateMobileNumber = CustAlternateMobileNumber,
+                    alternateMobileOTP = "",
+                    pAlternateMobileVerified = "no",
+                    eMailID = CusteMailID,
+                    flatNo = CustFlatNo,
+                    aearSector = CustAreaSector,
+                    pinCode = CustPinCode,
+                    currentAddress = CustCurrentAddress,
+                    stateName= CustStateName,
+                    cityName= CustCityName,
+                    country= CustCountry!!,
+                    aadharNumber = AadharNumber,
+                    aadharNumberVerified = ConstantClass.AadharVerified,
+                    panNumber = PanNumber,
+                    panNumberVerified = PanNumberVerified,
+                    brandName=BrandName,
+                    modelName=ConstantClass.ModelName,
+                    modelVariant=ConstantClass.ModelVarient,
+                    color=ConstantClass.ModelColor,
+                    sellingPrice= ConstantClass.SellingPrice,
+                    downPayment= DownPayment,
+                    tenure=Tenure,
+                    emiAmount=EmiAmount,
+                    imeiNumber1="",
+                    imeiNumber2="",
+                    accountNumber="",
+                    bankIFSCCode="",
+                    bankName="",
+                    accountType="",
+                    branchName="",
+                    refName="",
+                    refRelationShip="",
+                    refmobileNo="",
+                    refAddress="",
+                    debitOrCreditCard="",
+                    upiMandate="yes",
+                    createdBy= CreatedByCustomerShortCut,
+                    membershipfees="",
+                    retailercode=preference.getStringValue(ConstantClass.RetailerCode,""),
+                    customerCode=preference.getStringValue(ConstantClass.CustomerCode,""),
+                    cibilScore= userScore.toString(),
+                    activeStatus = ConstantClass.CustomerActiveStatus,
+                    cibilApiResponse = CibilResponse,
+                    aadhaarApiResponse = AadhaarResponse,
+                    panApiResponse = PanResponse,
+                    isAggrementVerified= isAggrementVerified,
+                    isRetailerAggrementVerified="",
+                    custPhoto_File=null,
+                    imeiNumber1_SealPhotoPath = null,
+                    imeiNumber2_SealPhotoPath = null,
+                    imeiNumber_PhotoPath = null,
+                    invoive_Path = null,
+                    aadharFront_Path = null,
+                    aadharBack_Path = null,
+                    panFront_Path = null
+                )
+
+                Log.d("EMICalculationreq", Gson().toJson(req))
+                binding. nextbuttonlayout.isEnabled= false
+                hitApiForUploadCustomerData(req)
             }
 
         }
@@ -753,12 +779,8 @@ class EMICalculationDetailsPage : BaseActivity() {
                                 preference.setBooleanValue(ConstantClass.LoggedIn, false)
                                 preference.setStringValue(ConstantClass.LoginType, "")
                                 ConstantClass.ClickOnCardDashboard = ""
-                                val intent = Intent(
-                                    this@EMICalculationDetailsPage,
-                                    ChooseYourRolePage::class.java
-                                )
-                                intent.flags =
-                                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                val intent = Intent(this@EMICalculationDetailsPage, ChooseYourRolePage::class.java)
+                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                 startActivity(intent)
                                 finish()
                             }
@@ -777,6 +799,55 @@ class EMICalculationDetailsPage : BaseActivity() {
         }
 
     }
+
+
+    fun hitApiForUploadCustomerData(request : ManageCustomerStepWiseReq){
+
+        viewModel.uploadCustomerListForShortCutLoanCreateProcess(request).observe(this) { resources ->
+            when (resources.apiStatus) {
+                ApiStatus.SUCCESS ->{
+                    resources.data.let { user->
+                        ConstantClass.dialog.dismiss()
+                        if(user!!.isSuccessful){
+                            var getData = user.body()
+                            Log.d("EMICalculationresponse", Gson().toJson(getData))
+                            Toast.makeText(this, getData!!.message, Toast.LENGTH_SHORT).show()
+
+                            if(getData!!.statuss.toLowerCase().equals("false",ignoreCase = true)){
+                                binding.nextbuttonlayout.isEnabled = true
+                            }
+                            else{
+                                startActivity(Intent(this@EMICalculationDetailsPage, PaymentInformation::class.java))
+                            }
+
+                        }
+                        else {
+                            var errorbody = user.errorBody()
+                            Log.e("API_ERROR", errorbody?.string() ?: "Unknown error")
+                            Toast.makeText(this@EMICalculationDetailsPage, errorbody?.string(), Toast.LENGTH_SHORT).show()
+                            binding.nextbuttonlayout.isEnabled = true
+                        }
+                    }
+
+                }
+
+                ApiStatus.ERROR -> {
+                    ConstantClass.dialog.dismiss()
+                    binding.nextbuttonlayout.isEnabled = true
+                    Toast.makeText(this@EMICalculationDetailsPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
+                }
+
+
+                ApiStatus.LOADING -> {
+
+                }
+
+            }
+        }
+
+
+    }
+
 
 
 }

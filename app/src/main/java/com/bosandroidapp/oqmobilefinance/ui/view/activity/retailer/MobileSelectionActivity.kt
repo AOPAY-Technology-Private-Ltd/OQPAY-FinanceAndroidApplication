@@ -197,7 +197,7 @@ class MobileSelectionActivity : BaseActivity() {
 
                 ApiStatus.ERROR -> {
                     ConstantClass.dialog.dismiss()
-                    hitApiForGetMobileDataList()
+                    Toast.makeText(this@MobileSelectionActivity, resources.message ?: "Error getting mobile data", Toast.LENGTH_SHORT).show()
                 }
 
                 ApiStatus.LOADING -> {
@@ -211,73 +211,6 @@ class MobileSelectionActivity : BaseActivity() {
         }
     }
 
-
-    fun addMobileList() {
-        MobileList.clear()
-
-        val colorList1 = arrayListOf(
-            ContextCompat.getColor(this, R.color.black),
-            ContextCompat.getColor(this, R.color.lightblue),
-            ContextCompat.getColor(this, R.color.lightpink)
-        )
-        MobileList.add(
-            com.bosandroidapp.oqmobilefinance.ui.view.model.MobileListModel(
-                R.drawable.iphone,
-                "Apple iPhone 16",
-                "₹ 79,000 (128GB)",
-                colorList1
-            )
-        )
-
-        val colorList2 = arrayListOf(
-            ContextCompat.getColor(this, R.color.black),
-            ContextCompat.getColor(this, R.color.skyblue),
-            ContextCompat.getColor(this, R.color.darkred)
-        )
-
-        MobileList.add(
-            com.bosandroidapp.oqmobilefinance.ui.view.model.MobileListModel(
-                R.drawable.samsung,
-                "Samsung",
-                "₹ 30,000 (64GB)",
-                colorList2
-            )
-        )
-
-
-        val colorList3 = arrayListOf(
-            ContextCompat.getColor(this, R.color.black),
-            ContextCompat.getColor(this, R.color.lightgrey),
-            ContextCompat.getColor(this, R.color.lightgreen)
-        )
-
-        MobileList.add(
-            com.bosandroidapp.oqmobilefinance.ui.view.model.MobileListModel(
-                R.drawable.oneplus,
-                "OnePlus",
-                "₹ 59,000 (64GB)",
-                colorList3
-            )
-        )
-
-
-        val colorList4 = arrayListOf(
-            ContextCompat.getColor(this, R.color.black),
-            ContextCompat.getColor(this, R.color.blue),
-            ContextCompat.getColor(this, R.color.teal700)
-        )
-
-        
-        MobileList.add(
-                com.bosandroidapp.oqmobilefinance.ui.view.model.MobileListModel(
-                R.drawable.realme,
-                "Realme",
-                "₹ 20,000 (64GB)",
-                colorList4
-            )
-        )
-
-    }
 
 
     @SuppressLint("SetTextI18n")
@@ -389,6 +322,7 @@ class MobileSelectionActivity : BaseActivity() {
         }
 
     }
+
 
     fun hitApiForRetailerLogout() {
         var loginRequest = LogoutReq(

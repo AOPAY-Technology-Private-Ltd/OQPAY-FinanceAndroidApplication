@@ -226,6 +226,7 @@ class LowCibilScoreCustomerReports : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                       ConstantClass.dialog.dismiss()
+                      Toast.makeText(this@LowCibilScoreCustomerReports, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {

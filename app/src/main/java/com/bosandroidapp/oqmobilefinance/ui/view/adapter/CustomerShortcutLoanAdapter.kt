@@ -7,9 +7,15 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bosandroidapp.oqmobilefinance.R
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.BankID
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.BranchAddress
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CusteMailID
+import com.bosandroidapp.oqmobilefinance.data.enach.EMandateRequest
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerListDataItem
 import com.bosandroidapp.oqmobilefinance.databinding.ItemCustomerShortcutLoanBinding
 import com.bumptech.glide.Glide
+import kotlin.math.roundToInt
 
 class CustomerShortcutLoanAdapter(
     private var customerList: List<CustomerListDataItem>,
@@ -79,6 +85,7 @@ class CustomerShortcutLoanAdapter(
 
         holder.binding.tvStatus.text = statusText
         holder.binding.tvStatus.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, statusColor))
+
     }
 
 
@@ -89,5 +96,7 @@ class CustomerShortcutLoanAdapter(
         customerList = newList
         notifyDataSetChanged()
     }
+
+
 
 }

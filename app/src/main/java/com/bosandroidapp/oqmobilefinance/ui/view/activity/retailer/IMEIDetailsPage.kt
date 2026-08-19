@@ -31,15 +31,38 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.ViewModelProvider
 import com.bos.payment.appName.network.RetrofitClient
+import com.bosandroidapp.bosmobilefinance.ui.slideshow.ui.view.activity.retailer.cibilreportsfragment.BureauScore.Companion.userScore
 import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityImeidetailsPageBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AadhaarResponse
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AadharNumber
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AccountNumber
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AccountType
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.BankIFSCCode
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.BankName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.BranchName
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.BrandName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CibilResponse
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CreatedByCustomerShortCut
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustAlternateMobileNumber
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustAreaSector
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustCityName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustCountry
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustCurrentAddress
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustFirstName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustFlatNo
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustLastName
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustMiddleName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustPinCode
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustPrimaryMobileNumber
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustPrimaryMobileVerified
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustPrimaryOTP
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustStateName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CusteMailID
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.DownPayment
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.EmiAmount
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ImeiNumber1
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ImeiNumber1SealPhotoPath
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ImeiNumber2
@@ -51,12 +74,25 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.LastName
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.LoginMobileorMailid
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.Loginpassword
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ModelName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanNumber
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanNumberVerified
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanResponse
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.RefAddress
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.RefName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.RefRelationShip
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.RefmobileNo
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.Tenure
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.UPIMandate
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.createMultipartFromUri
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.iisAggrementVerified
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isAggrementVerified
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.loginType
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.saveImageToCache
 import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LoginReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LogoutReq
+import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.ManageCustomerStepWiseReq
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
@@ -184,10 +220,7 @@ class IMEIDetailsPage : BaseActivity() {
             WindowInsetsCompat.CONSUMED
         }
       
-        viewModel = ViewModelProvider(
-            this,
-            CommonViewModelFactory(AuthRepository(RetrofitClient.apiInterfacePAN))
-        )[AuthenticationViewModel::class.java]
+        viewModel = ViewModelProvider(this, CommonViewModelFactory(AuthRepository(RetrofitClient.apiInterface)))[AuthenticationViewModel::class.java]
         preference = SharedPreference(this)
         seonClickListner()
 
@@ -220,7 +253,6 @@ class IMEIDetailsPage : BaseActivity() {
                 IMEINumber2 = binding.IMEInumber2.text.toString().trim(),
                 imei1photoUri = imei1photoUri,
                 imei2photoUri = imei2photoUri,
-                /*invoicePhotoUri = invoicePhotoUri,*/
                 ImeiPhotoUri = ImeiPhotoUri
             )
             if (!isValid) {
@@ -231,8 +263,9 @@ class IMEIDetailsPage : BaseActivity() {
                 ImeiNumber2 = binding.IMEInumber2.text.toString().trim()
                 ImeiNumber1SealPhotoPath = imei1photoUri
                 ImeiNumber2SealPhotoPath = imei2photoUri
-                /*Invoive_Path = invoicePhotoUri*/
                 ImeiNumberPhotoPath = ImeiPhotoUri
+                iisAggrementVerified = true
+                IsRetailerAggrementVerified = "yes"
                 OpenPopUpForTermCondition()
                 //startActivity(Intent(this@IMEIDetailsPage, QRCodePage::class.java))
 
@@ -400,9 +433,83 @@ class IMEIDetailsPage : BaseActivity() {
         termconditiontxt.text = Html.fromHtml(getString(R.string.delivery_terms_condition), Html.FROM_HTML_MODE_LEGACY)
 
         verifyButton.setOnClickListener {
-            iisAggrementVerified = true
-            IsRetailerAggrementVerified = "yes"
-            startActivity(Intent(this@IMEIDetailsPage, QRCodePage::class.java))
+
+            val imei1SealPart = saveImageToCache(this, ImeiNumber1SealPhotoPath!!,  "IMEINumber1Image")
+
+            val imei2SealPart = saveImageToCache(this, ImeiNumber2SealPhotoPath!!,  "IMEINumber2Image")
+
+            val imeiPhotoPart = saveImageToCache(this, ImeiNumberPhotoPath!!,  "IMEINumberImage")
+
+
+            var req = ManageCustomerStepWiseReq(
+                mode = "UPDATE" ,
+                step = "6",
+                rid = "",
+                firstName = CustFirstName,
+                middleName= CustMiddleName,
+                lastName=CustLastName,
+                primaryMobileNumber = CustPrimaryMobileNumber,
+                primaryOTP = CustPrimaryOTP,
+                primaryMobileVerified = CustPrimaryMobileVerified,
+                alternateMobileNumber = CustAlternateMobileNumber,
+                alternateMobileOTP = "",
+                pAlternateMobileVerified = "no",
+                eMailID = CusteMailID,
+                flatNo = CustFlatNo,
+                aearSector = CustAreaSector,
+                pinCode = CustPinCode,
+                currentAddress = CustCurrentAddress,
+                stateName= CustStateName,
+                cityName= CustCityName,
+                country= CustCountry!!,
+                aadharNumber = AadharNumber,
+                aadharNumberVerified = ConstantClass.AadharVerified,
+                panNumber = PanNumber,
+                panNumberVerified = PanNumberVerified,
+                brandName=BrandName,
+                modelName=ConstantClass.ModelName,
+                modelVariant=ConstantClass.ModelVarient,
+                color=ConstantClass.ModelColor,
+                sellingPrice= ConstantClass.SellingPrice,
+                downPayment= DownPayment,
+                tenure=Tenure,
+                emiAmount=EmiAmount,
+                imeiNumber1=ImeiNumber1,
+                imeiNumber2=ImeiNumber2,
+                accountNumber=AccountNumber,
+                bankIFSCCode= BankIFSCCode,
+                bankName= BankName,
+                accountType= AccountType,
+                branchName= BranchName,
+                refName=RefName,
+                refRelationShip=RefRelationShip,
+                refmobileNo=RefmobileNo,
+                refAddress=RefAddress,
+                debitOrCreditCard="",
+                upiMandate=UPIMandate,
+                createdBy= CreatedByCustomerShortCut,
+                membershipfees="",
+                retailercode=preference.getStringValue(ConstantClass.RetailerCode,""),
+                customerCode=preference.getStringValue(ConstantClass.CustomerCode,""),
+                cibilScore= userScore.toString(),
+                activeStatus = ConstantClass.CustomerActiveStatus,
+                cibilApiResponse = CibilResponse,
+                aadhaarApiResponse = AadhaarResponse,
+                panApiResponse = PanResponse,
+                isAggrementVerified= isAggrementVerified,
+                isRetailerAggrementVerified=IsRetailerAggrementVerified,
+                custPhoto_File=null,
+                imeiNumber1_SealPhotoPath = imei1SealPart,
+                imeiNumber2_SealPhotoPath = imei2SealPart,
+                imeiNumber_PhotoPath = imeiPhotoPart,
+                invoive_Path = null,
+                aadharFront_Path = null,
+                aadharBack_Path = null,
+                panFront_Path = null
+            )
+            Log.d("IMEIDetailsreq", Gson().toJson(req))
+            ConstantClass.OpenPopUpForVeryfyOTP(this)
+            hitApiForUploadCustomerIMEIData(req)
         }
 
         dialog.setOnDismissListener {
@@ -421,7 +528,6 @@ class IMEIDetailsPage : BaseActivity() {
 
 
     }
-
 
 
     @SuppressLint("SetTextI18n")
@@ -464,7 +570,6 @@ class IMEIDetailsPage : BaseActivity() {
         dialog.show()
 
     }
-
 
     fun hitApiForLogin() {
 
@@ -569,6 +674,52 @@ class IMEIDetailsPage : BaseActivity() {
                 }
             }
         }
+
+    }
+
+
+    fun hitApiForUploadCustomerIMEIData(request : ManageCustomerStepWiseReq){
+
+        viewModel.uploadCustomerListForShortCutLoanCreateProcess(request).observe(this) { resources ->
+            when (resources.apiStatus) {
+                ApiStatus.SUCCESS ->{
+                    resources.data.let { user->
+                        ConstantClass.dialog.dismiss()
+                        if(user!!.isSuccessful){
+                            var getData = user.body()
+                            Log.d("IMEIDetailsresponse", Gson().toJson(getData))
+                            Toast.makeText(this, getData!!.message, Toast.LENGTH_SHORT).show()
+
+                            if(getData!!.statuss.toLowerCase().equals("false",ignoreCase = true)){
+
+                            }
+                            else{
+                                startActivity(Intent(this@IMEIDetailsPage, QRCodePage::class.java))
+                            }
+
+                        }
+                        else {
+                            var errorbody = user.errorBody()
+                            Log.e("API_ERROR", errorbody?.string() ?: "Unknown error")
+                            Toast.makeText(this@IMEIDetailsPage, errorbody?.string(), Toast.LENGTH_SHORT).show()
+
+                        }
+                    }
+
+                }
+
+                ApiStatus.ERROR -> {
+                    ConstantClass.dialog.dismiss()
+                    Toast.makeText(this@IMEIDetailsPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
+                }
+
+                ApiStatus.LOADING -> {
+
+                }
+
+            }
+        }
+
 
     }
 

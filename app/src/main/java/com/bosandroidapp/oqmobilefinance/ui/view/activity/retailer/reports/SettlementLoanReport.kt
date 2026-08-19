@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.activity.enableEdgeToEdge
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -91,6 +92,7 @@ class SettlementLoanReport : BaseActivity() {
 
                 ApiStatus.ERROR -> {
                     ConstantClass.dialog.dismiss()
+                    Toast.makeText(this@SettlementLoanReport, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                 }
 
                 ApiStatus.LOADING -> {

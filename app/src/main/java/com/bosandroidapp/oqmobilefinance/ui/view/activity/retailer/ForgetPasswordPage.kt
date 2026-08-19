@@ -153,6 +153,7 @@ class ForgetPasswordPage : BaseActivity() {
 
                 ApiStatus.ERROR -> {
                     ConstantClass.dialog.dismiss()
+                    Toast.makeText(this@ForgetPasswordPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                 }
 
                 ApiStatus.LOADING -> {
@@ -188,6 +189,7 @@ class ForgetPasswordPage : BaseActivity() {
 
                 ApiStatus.ERROR -> {
                     ConstantClass.dialog.dismiss()
+                    Toast.makeText(this@ForgetPasswordPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                 }
 
                 ApiStatus.LOADING -> {
@@ -292,6 +294,7 @@ class ForgetPasswordPage : BaseActivity() {
 
                 ApiStatus.ERROR -> {
                     ConstantClass.dialog.dismiss()
+                    Toast.makeText(this@ForgetPasswordPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                 }
 
                 ApiStatus.LOADING -> {
@@ -337,6 +340,7 @@ class ForgetPasswordPage : BaseActivity() {
 
                 ApiStatus.ERROR -> {
                     ConstantClass.dialog.dismiss()
+                    Toast.makeText(this@ForgetPasswordPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                 }
 
                 ApiStatus.LOADING -> {

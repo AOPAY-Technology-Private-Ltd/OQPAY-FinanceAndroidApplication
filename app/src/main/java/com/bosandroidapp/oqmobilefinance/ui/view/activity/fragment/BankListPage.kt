@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import com.bos.payment.appName.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
@@ -117,6 +118,7 @@ class BankListPage : Fragment() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        Toast.makeText(requireContext(), resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {

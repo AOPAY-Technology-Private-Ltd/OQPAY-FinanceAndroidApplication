@@ -708,8 +708,6 @@ class EmiLoanDetailPage : BaseActivity() {
     }
 
 
-
-
     fun clickCameraForUploadDocument() {
         val photoFile = createImageFile()
         photoUri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", photoFile)
@@ -717,13 +715,11 @@ class EmiLoanDetailPage : BaseActivity() {
     }
 
 
-
     private fun createImageFile(): File {
         val fileName = "IMG_${System.currentTimeMillis()}"
         val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(fileName, ".jpg", storageDir)
     }
-
 
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -849,7 +845,6 @@ class EmiLoanDetailPage : BaseActivity() {
     }
 
 
-
     fun HitApiForPayEmiAmount(emicount:Int,loopcount :Int,emiamount : String,fine:String?/*,imageFile:File*/){
 
         var createdBy=""
@@ -869,7 +864,7 @@ class EmiLoanDetailPage : BaseActivity() {
             mode = "UPDATE",
             loanCode = loanCode,
             paymentDate = getCurrentUtcTimestamp(),
-            paymentMode =  binding.paymentmode.selectedItem.toString(),
+            paymentMode =  "Wallet",
             utrNumber = "",
             remarks = binding.remarkEdt.text.toString(),
             createdBy = createdBy,
@@ -918,6 +913,11 @@ class EmiLoanDetailPage : BaseActivity() {
                         if(ConstantClass.dialog!=null && ConstantClass.dialog.isShowing){
                             ConstantClass.dialog.dismiss()
                         }
+                        Toast.makeText(this@EmiLoanDetailPage,resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
+                        Log.d("API_ERROR", "Status: ERROR")
+                        Log.d("API_ERROR_CODE", resources.data?.code().toString())
+                        Log.d("API_ERROR_MSG", resources.message ?: "Unknown Error")
+
 
                     }
 
@@ -1209,6 +1209,7 @@ class EmiLoanDetailPage : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        Toast.makeText(this@EmiLoanDetailPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -1375,6 +1376,7 @@ class EmiLoanDetailPage : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        Toast.makeText(this@EmiLoanDetailPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -1466,6 +1468,7 @@ class EmiLoanDetailPage : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        Toast.makeText(this@EmiLoanDetailPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -1545,6 +1548,7 @@ class EmiLoanDetailPage : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        Toast.makeText(this@EmiLoanDetailPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -1591,6 +1595,7 @@ class EmiLoanDetailPage : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        Toast.makeText(this@EmiLoanDetailPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -1604,5 +1609,6 @@ class EmiLoanDetailPage : BaseActivity() {
         }
 
     }
+
 
 }

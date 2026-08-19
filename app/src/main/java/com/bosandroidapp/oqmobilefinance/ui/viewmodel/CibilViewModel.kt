@@ -16,34 +16,25 @@ import java.net.UnknownHostException
 class CibilViewModel (private val repository: CibilRepository): ViewModel(){
 
     fun getCibilReq(req: CibilScoreReq) = liveData(Dispatchers.IO) {
-
         emit(ApiResponse.loading(data = null))
-
         try {
-            emit(ApiResponse.success(data = repository.getReportsReq(req)))
-        }
-        catch (exception: HttpException) {
-
-            when (exception.code()) {
-
-                404 -> {
-                    emit(ApiResponse.error(data = null, message = "Page not found"))
+            val response = repository.getReportsReq(req)
+            if (response!!.isSuccessful) {
+                emit(ApiResponse.success(data = response))
+            } else {
+                val code = response.code()
+                val message = when (code) {
+                    500 -> "Internal Server Error (500)"
+                    404 -> "CIBIL Report Not Found (404)"
+                    401 -> "Unauthorized Access (401)"
+                    else -> "Unexpected error: $code"
                 }
-
-                500 -> {
-                    emit(ApiResponse.error(data = null, message = "Server error"))
-                }
-
-                else -> {
-                    emit(ApiResponse.error(data = null, message = "Something went wrong"))
-                }
+                emit(ApiResponse.error(data = null, message = message))
             }
-
         }
         catch (exception: Exception) {
             emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
-
     }
 
 

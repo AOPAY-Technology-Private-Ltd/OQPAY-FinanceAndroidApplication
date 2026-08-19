@@ -33,4 +33,21 @@ open class BaseActivity : AppCompatActivity() {
     }
 
 
+    override fun onPause() {
+        super.onPause()
+        try {
+            if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
+                ConstantClass.dialog.dismiss()
+            }
+
+            if (dialog != null && dialog!!.isShowing) {
+                dialog!!.dismiss()
+            }
+        } catch (e: Exception) {
+        }
+    }
+
+
+
+
 }

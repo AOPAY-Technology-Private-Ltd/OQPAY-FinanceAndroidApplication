@@ -224,7 +224,7 @@ data class CustomerListDataItem(
 	val createdBy: String? = null,
 
 	@field:SerializedName("memberShip")
-	val memberShip: Any? = null,
+	val memberShip: String? = null,
 
 	@field:SerializedName("middleName")
 	val middleName: String? = null,
@@ -234,6 +234,12 @@ data class CustomerListDataItem(
 
 	@field:SerializedName("isrefKycVerified")
 	val isrefKycVerified: String? = null,
+
+	@field:SerializedName("startDate")
+	val startDate: String? = null,
+
+	@field:SerializedName("endDate")
+	val endDate: String? = null,
 
 	@field:SerializedName("loanCode")
 	val loanCode: String? = null,

@@ -102,7 +102,7 @@ object ConstantClass {
 
          // Production
 
-/*       const val BASE_URL = "https://api.oqpay.in/"
+      /* const val BASE_URL = "https://api.oqpay.in/"
          const val BASE_URL_IMAGE = "https://api.oqpay.in"
 
 
@@ -130,7 +130,6 @@ object ConstantClass {
       //  UAT merchant id offline
       const val PAN_VERIFICATION_REGISTRATION_ID_OFFLINE = "AOP-554"
       const val PENNYDROP_REGISTRATION_ID_OFFLINE = "AOP-554"
-
 
      const val SMS_BASE_URL = "http://web.adcruxmedia.in/"
      const val PAN_BASE_URL = "https://api.aopay.in/"
@@ -228,6 +227,9 @@ object ConstantClass {
     var PanResponse : String = ""
     var AadhaarResponse : String = ""
     var CibilResponse : String = ""
+    var CreatedByCustomerShortCut : String = ""
+    var UPIMandate : String = ""
+     var CustomerActiveStatus : String = "" // for shortcut loan process
      var ENTEREDCUSTOMERDOB : String = ""
      var WalletBalance : String = ""
      var HoldAmount : String = ""
@@ -312,12 +314,16 @@ object ConstantClass {
      var BankName : String = ""
      var AccountType : String = ""
      var CustomerCodeForEnach : String = ""
+     var DefaultEmidebit : String = "" // loan related
 
      var LoanRID : Int = 0
      var RetailerCodeForEnach : String = ""
      var LoanCodeForEnach : String = ""
      var AccountHolderName = ""
      var BranchAddress = ""
+     var isPannydropVerified : String= ""
+     var isEmandateVerified : String= ""
+     var isAccessKeyVerified : String= ""
      var LoanStartDate = ""
      var LoanEndDate = ""
      var BankID : Int =0

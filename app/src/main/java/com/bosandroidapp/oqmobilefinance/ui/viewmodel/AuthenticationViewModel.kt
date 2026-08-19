@@ -1,16 +1,11 @@
 package com.bosandroidapp.oqmobilefinance.ui.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
-import androidx.lifecycle.viewModelScope
 import com.bosandroidapp.oqmobilefinance.data.enach.EnachDateUploadReq
-import com.bosandroidapp.oqmobilefinance.data.gst.GstRequest
-import com.bumptech.glide.load.engine.Resource
 import com.bosandroidapp.oqmobilefinance.data.model.AddBankAccountReq
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerEmiStatusReq
-import com.bosandroidapp.oqmobilefinance.data.model.CustomerlocationUploadReq
 import com.bosandroidapp.oqmobilefinance.data.model.DueOverdueRequest
 import com.bosandroidapp.oqmobilefinance.data.model.GenerateAccessTokenRequest
 import com.bosandroidapp.oqmobilefinance.data.model.GetRetailerLedgerReq
@@ -26,7 +21,6 @@ import com.bosandroidapp.oqmobilefinance.data.model.ValidateAccessKeyReq
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
 import com.bosandroidapp.oqmobilefinance.data.model.VerifyCustomerReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.CustomerLoanEmiReceiveReq
-import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.CustomerMakePaymentResp
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.ForgotPasswordReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.GetCustomerLoanDetailsReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.GetEMISplitDetlailsReq
@@ -34,6 +28,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.GetIsEligibleLoa
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LoanCreatedReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LoginReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LogoutReq
+import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.ManageCustomerStepWiseReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.RegistrationReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.RetailerProfileReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.RetailerWalletPayoutReq
@@ -43,7 +38,6 @@ import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.reports.GetRepor
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.reports.LoanSettlementReportReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.reports.PayoutReportReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.reports.TransactionHistoryReq
-import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.AAdhaarDetailesReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.AadharVerificationReq
 import com.bosandroidapp.oqmobilefinance.data.notification.NotificationSendTokenRequest
 import com.bosandroidapp.oqmobilefinance.data.notification.SendNotificationFeatureNameRequest
@@ -52,129 +46,112 @@ import com.bosandroidapp.oqmobilefinance.utils.ApiResponse
 import okhttp3.MultipartBody
 import kotlinx.coroutines.Dispatchers
 import retrofit2.HttpException
+import retrofit2.Response
 import java.io.IOException
 
 class AuthenticationViewModel (private val repository: AuthRepository):ViewModel(){
 
-    fun getRegistration(req: RegistrationReq) = liveData(Dispatchers.IO) {
-        emit(ApiResponse.loading(data = null))
-        try {
-            emit(ApiResponse.success(data = repository.getregistration(req)))
-        }catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+    private fun <T> handleApiResponse(response: Response<T>?, feature: String) = when {
+        response == null -> ApiResponse.error(data = null, message = "No response from server")
+        response.isSuccessful -> ApiResponse.success(data = response)
+        else -> {
+            val code = response.code()
+            val message = when (code) {
+                400 -> "Bad Request (400)"
+                401 -> "Session Expired / Unauthorized (401)"
+                403 -> "Forbidden Access (403)"
+                404 -> "$feature Not Found (404)"
+                500 -> "Internal Server Error (500)"
+                502 -> "Bad Gateway (502)"
+                503 -> "Service Unavailable (503)"
+                else -> "Unexpected error occurred: $code"
+            }
+            Log.e("API_ERROR", "$feature - Code: $code | Body: ${response.errorBody()?.string()}")
+            ApiResponse.error(data = null, message = message)
         }
     }
 
+    fun getRegistration(req: RegistrationReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            emit(handleApiResponse(repository.getregistration(req), "Registration"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
+        }
+    }
 
     fun getLogin(req: LoginReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = repository.getlogin(req)
-            emit(ApiResponse.success(data = response))
-
+            emit(handleApiResponse(repository.getlogin(req), "Login"))
         } catch (e: HttpException) {
-            val errorCode = e.code()
-            val errorMessage = when (errorCode) {
-                400 -> "Bad Request"
-                401 -> "Unauthorized"
-                403 -> "Forbidden"
-                404 -> "Resource not found"
-                500 -> "Internal Server Error"
-                else -> "Something went wrong! Error Code: $errorCode"
-            }
-            emit(ApiResponse.error(data = null, message = errorMessage))
-
+            emit(ApiResponse.error(data = null, message = "Server Error: ${e.code()}"))
         } catch (e: IOException) {
-            emit(ApiResponse.error(data = null, message = "Network error! Please check your internet connection."))
-
+            emit(ApiResponse.error(data = null, message = "Network error! Please check your connection."))
         } catch (e: Exception) {
             emit(ApiResponse.error(data = null, message = e.message ?: "Unknown error occurred"))
         }
     }
 
-
     fun getLogout(req: LogoutReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.getlogout(req)))
-        }catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.getlogout(req), "Logout"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
 
     fun sendOTPReq(req: SendOtpReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.sendOTP(req)))
-        }catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.sendOTP(req), "Send OTP"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
 
     fun verifyOTPReq(req: VerifyOTPReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.verifyOTPReq(req)))
-        }catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.verifyOTPReq(req), "Verify OTP"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
 
     fun forgotPasswordReq(req: ForgotPasswordReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.forgotPassword(req)))
-        }catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.forgotPassword(req), "Forgot Password"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
 
     fun getMobileList() = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.getMobileList()))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.getMobileList(), "Mobile List"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
 
     fun getSplitEmiDetails(req: GetEMISplitDetlailsReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.getEmiSplitData(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.getEmiSplitData(req), "EMI Split Details"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
 
     fun getRetailerLoanCreatedReq(req: LoanCreatedReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = repository.getRetailerLoanCreatedReq(req)
-
-            if (response!!.isSuccessful) {
-                emit(ApiResponse.success(data = response))
-            }
-            else {
-                // ❌ Handle API error (like 500)
-                val errorBody = response.errorBody()?.string()
-                val code = response.code()
-                val message = when (code) {
-                    500 -> "Internal Server Error (500)"
-                    404 -> "Resource Not Found (404)"
-                    401 -> "Unauthorized Access (401)"
-                    else -> "Unexpected error: $code"
-                }
-
-                Log.e("API_ERROR", "Code: $code | Body: $errorBody")
-
-                emit(ApiResponse.error(data = null, message = message))
-            }
-
+            emit(handleApiResponse(repository.getRetailerLoanCreatedReq(req), "Loan Creation"))
         } catch (exception: Exception) {
-            Log.e("API_EXCEPTION", "Exception: ${exception.localizedMessage}")
             emit(ApiResponse.error(data = null, message = exception.message ?: "Network Error Occurred!"))
         }
     }
@@ -182,187 +159,125 @@ class AuthenticationViewModel (private val repository: AuthRepository):ViewModel
     fun getCustomerLoanEmiDetailsReq(req: GetCustomerLoanDetailsReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.getCustomerLoanEmiDetailsReq(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.getCustomerLoanEmiDetailsReq(req), "Loan EMI Details"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
 
     fun getTransactionHistoryList(req: TransactionHistoryReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.getTransactionHistoryList(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.getTransactionHistoryList(req), "Transaction History"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
 
     fun getCustomerLoanEmiDetailsReq(req: DueOverdueRequest) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.dueoverdueCustomerRequest(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.dueoverdueCustomerRequest(req), "Due Overdue Details"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
-
 
     fun getCustomerLoanDetailsReq(req: CustomerLoanEmiReceiveReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.getCustomerLoanEmiReceiveReq(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.getCustomerLoanEmiReceiveReq(req), "Loan Receiving"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
-
 
     fun getRetailerWalletPayoutReqForMakePayment(req: RetailerWalletPayoutAtMakePaymentTimeReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            val response = repository.RetailerWalletPayoutReqForMakePayment(req)
-            if (response!!.isSuccessful) {
-                emit(ApiResponse.success(data = response))
-            }
-            else{
-                // ❌ Handle API error (like 500)
-                val errorBody = response.errorBody()?.string()
-                val code = response.code()
-                val message = when (code) {
-                    500 -> "Internal Server Error (500)"
-                    404 -> "Resource Not Found (404)"
-                    401 -> "Unauthorized Access (401)"
-                    else -> "Unexpected error: $code"
-                }
-
-                Log.e("API_ERROR", "Code: $code | Body: $errorBody")
-
-                emit(ApiResponse.error(data = null, message = message))
-            }
-        }
-        catch (exception: Exception) {
-            Log.e("API_EXCEPTION", "Exception: ${exception.localizedMessage}")
+            emit(handleApiResponse(repository.RetailerWalletPayoutReqForMakePayment(req), "Wallet Payout"))
+        } catch (exception: Exception) {
             emit(ApiResponse.error(data = null, message = exception.message ?: "Network Error Occurred!"))
         }
     }
 
-
-
     fun getAadharVerificationReq(req: AadharVerificationReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.getAadharVerificationReq(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.getAadharVerificationReq(req), "Aadhar Verification"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
 
     fun getReportsReq(req: GetReportsReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.getReportsReq(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.getReportsReq(req), "Reports"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Network Error Occurred!"))
         }
     }
 
     fun getLoanEligibleReq(req: GetIsEligibleLoanReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.getLoanEligibleReq(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.getLoanEligibleReq(req), "Loan Eligibility"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
 
     fun getgetMemberShipReqeReq(req: GetIsEligibleLoanReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.getMemberShipReq(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.getMemberShipReq(req), "Membership Details"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
 
     fun getRetailerProfileReq(req: RetailerProfileReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.getRetailerProfileReq(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.getRetailerProfileReq(req), "Retailer Profile"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
-
-
 
     fun getRetailerLedgerReq(req: GetRetailerLedgerReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.getRetailerLedgerReq(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.getRetailerLedgerReq(req), "Retailer Ledger"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
-
-
 
     fun getRetailerWalletPayoutReq(req: RetailerWalletPayoutReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.getRetailerWalletPayoutReq(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.getRetailerWalletPayoutReq(req), "Wallet Payout"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
 
     fun loanSettlementReportReq(req: LoanSettlementReportReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.loanSettlementReportReq(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.loanSettlementReportReq(req), "Loan Settlement Report"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
 
-
     fun getRetailerWalletAmountReq(req: RetailerWalletAmountReq) = liveData(Dispatchers.IO) {
-
         emit(ApiResponse.loading(data = null))
         try {
-            val response = repository.getRetailerWalletAmountReq(req)
-
-            if (response!!.isSuccessful) {
-                emit(ApiResponse.success(data = response))
-            } else {
-                // ❌ Handle API error (like 500)
-                val errorBody = response.errorBody()?.string()
-                val code = response.code()
-                val message = when (code) {
-                    500 -> "Internal Server Error (500)"
-                    404 -> "Resource Not Found (404)"
-                    401 -> "Unauthorized Access (401)"
-                    else -> "Unexpected error: $code"
-                }
-
-                Log.e("API_ERROR", "Code: $code | Body: $errorBody")
-
-                emit(ApiResponse.error(data = null, message = message))
-            }
-
+            emit(handleApiResponse(repository.getRetailerWalletAmountReq(req), "Wallet Amount"))
         } catch (exception: Exception) {
-            Log.e("API_EXCEPTION", "Exception: ${exception.localizedMessage}")
             emit(ApiResponse.error(data = null, message = exception.message ?: "Network Error Occurred!"))
         }
     }
@@ -370,169 +285,144 @@ class AuthenticationViewModel (private val repository: AuthRepository):ViewModel
     fun getRetailerWalletReport(req: RetailerWalletReportReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.getRetailerWalletReportReq(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.getRetailerWalletReportReq(req), "Wallet Report"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
 
     fun getPayoutReportReq(req: PayoutReportReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.getPayoutReportReq(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.getPayoutReportReq(req), "Payout Report"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
 
-    fun getAddBankAccountReq(req: com.bosandroidapp.oqmobilefinance.data.model.AddBankAccountReq) = liveData(Dispatchers.IO) {
+    fun getAddBankAccountReq(req: AddBankAccountReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.getAddBankAccountReq(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.getAddBankAccountReq(req), "Add Bank Account"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
-
 
     fun getHoldAmountWithdrawRequest(req: HoldAmountWithdrawReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.requestHoldAmountWithdrawRequest(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.requestHoldAmountWithdrawRequest(req), "Hold Amount Withdraw"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
 
     fun getLowCibilReports(req: LowCibilCustomerReportReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.getLowCibilReports(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.getLowCibilReports(req), "Low CIBIL Report"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
 
     fun getAccessKeyForValidateAPKReq(req: GenerateAccessTokenRequest) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.getAccessKeyForValidateAPKReq(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.getAccessKeyForValidateAPKReq(req), "Generate Access Key"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
 
     fun getAccessKeyForValidateAPKReq(req: ValidateAccessKeyReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.validateTokenFromRetailerReq(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.validateTokenFromRetailerReq(req), "Token Validation"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
-
 
     fun getSessionReq(req: SessionOutReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.sessionOutReq(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.sessionOutReq(req), "Session Request"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
-
 
     fun getverifycustomerReq(req: VerifyCustomerReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.verifycustomerReq(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.verifycustomerReq(req), "Verify Customer"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
-
 
     fun getSessionExpiredReq(req: ValidateSessionRequest) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.sessionExpired(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.sessionExpired(req), "Session Status"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
 
     fun uploadDeviceInfo(req: UploadDeviceInfoReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.uploadDeviceInfo(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.uploadDeviceInfo(req), "Device Info Upload"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
 
     fun UpdateEmandateDetails(req: EnachDateUploadReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.UpdateEmandateDetails(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.UpdateEmandateDetails(req), "E-Mandate Update"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
-
 
     fun NotificationSendTokenRequest(req: NotificationSendTokenRequest) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.sendTokenViaNotificationReq(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.sendTokenViaNotificationReq(req), "Notification Token"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
-
-
 
     fun sendNotificationFeatureNameReq(req: SendNotificationFeatureNameRequest) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.sendNotificationFeatureNameReq(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.sendNotificationFeatureNameReq(req), "Notification Feature"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
-
-
 
     fun LoanEmIScheduleWithStatusReq(req: CustomerEmiStatusReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.LoanEmIScheduleWithStatusReq(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.LoanEmIScheduleWithStatusReq(req), "Loan Schedule"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
 
     fun uploadInVoiceRequest(customerCode: String, columnName: String, newValue: String, imagePart: MultipartBody.Part) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.uploadInVoiceRequest(customerCode, columnName, newValue, imagePart)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.uploadInVoiceRequest(customerCode, columnName, newValue, imagePart), "Invoice Upload"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
 
@@ -540,14 +430,21 @@ class AuthenticationViewModel (private val repository: AuthRepository):ViewModel
     fun getCustomerListForShortCutLoanCreateProcess(req: RetailerPerCustomerListShortCutForLoanReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.getCustomerListForShortCutLoanCreateProcess(req)))
-        }
-        catch (exception: Exception) {
-            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+            emit(handleApiResponse(repository.getCustomerListForShortCutLoanCreateProcess(req), "Customer List"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
 
 
+    fun uploadCustomerListForShortCutLoanCreateProcess(req: ManageCustomerStepWiseReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            emit(handleApiResponse(repository.getCustomShortCutDataRequest(req), "Customer List"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
+        }
+    }
 
 
 }

@@ -36,11 +36,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bos.payment.appName.network.ApiInterface
 import com.bos.payment.appName.network.RetrofitClient
+import com.bosandroidapp.bosmobilefinance.ui.slideshow.ui.view.activity.retailer.cibilreportsfragment.BureauScore.Companion.userScore
 import com.chaos.view.PinView
 import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityPaymentInformationBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AadhaarResponse
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AadharNumber
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AadharTransactionIdNo
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AccountHolderName
@@ -51,12 +53,29 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.BankIFSCCode
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.BankName
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.BranchAddress
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.BranchName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.BrandName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CibilResponse
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CreatedByCustomerShortCut
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustAlternateMobileNumber
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustAlternateMobileOTP
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustAlternateMobileVerified
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustAreaSector
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustCityName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustCountry
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustCurrentAddress
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustFirstName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustFlatNo
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustLastName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustMiddleName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustPinCode
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustPrimaryMobileNumber
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustPrimaryMobileVerified
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustPrimaryOTP
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustStateName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CusteMailID
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.DownPayment
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ENTEREDCUSTOMERDOB
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.EmiAmount
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.IsRetailerAggrementVerified
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.LoginMobileorMailid
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.Loginpassword
@@ -81,6 +100,9 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.RefName
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.RefRelationShip
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ReferenceAadharNumber
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.RefmobileNo
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.Tenure
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.UPIMandate
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isAggrementVerified
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isInternetAvailable
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.loginType
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.validateLoginInput
@@ -88,6 +110,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LoginReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LogoutReq
+import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.ManageCustomerStepWiseReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.VerifyOTPReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.AadharVerificationReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.SendOtpReq
@@ -171,7 +194,12 @@ class PaymentInformation : BaseActivity() {
         preference = SharedPreference(this)
 
 
-        setselectionForFirstCard()
+        when (initialStep) {
+            1 -> setselectionForFirstCard()
+            2 -> setselectionForSecondCard()
+            3 -> setselectionForThirdCard()
+            else -> setselectionForFirstCard()
+        }
         setView()
         hitApiForBankList()
         setDataInSpinner()
@@ -182,6 +210,7 @@ class PaymentInformation : BaseActivity() {
 
     companion object{
         var checkKYC : Boolean = false
+        var initialStep : Int = 1
     }
 
 
@@ -288,6 +317,7 @@ class PaymentInformation : BaseActivity() {
 
                   ApiStatus.ERROR -> {
                       ConstantClass.dialog.dismiss()
+                      Toast.makeText(this@PaymentInformation, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                   }
 
                   ApiStatus.LOADING -> {
@@ -542,7 +572,79 @@ class PaymentInformation : BaseActivity() {
                 selectSecond -> {
                     var check = binding.aggrementchecked.isChecked
                     if(check){
-                        setselectionForThirdCard()
+                        UPIMandate = "yes"
+                        var req = ManageCustomerStepWiseReq(
+                            mode = "UPDATE" ,
+                            step = "4",
+                            rid = "",
+                            firstName = CustFirstName,
+                            middleName= CustMiddleName,
+                            lastName=CustLastName,
+                            primaryMobileNumber = CustPrimaryMobileNumber,
+                            primaryOTP = CustPrimaryOTP,
+                            primaryMobileVerified = CustPrimaryMobileVerified,
+                            alternateMobileNumber = CustAlternateMobileNumber,
+                            alternateMobileOTP = "",
+                            pAlternateMobileVerified = "no",
+                            eMailID = CusteMailID,
+                            flatNo = CustFlatNo,
+                            aearSector = CustAreaSector,
+                            pinCode = CustPinCode,
+                            currentAddress = CustCurrentAddress,
+                            stateName= CustStateName,
+                            cityName= CustCityName,
+                            country= CustCountry!!,
+                            aadharNumber = AadharNumber,
+                            aadharNumberVerified = ConstantClass.AadharVerified,
+                            panNumber = PanNumber,
+                            panNumberVerified = PanNumberVerified,
+                            brandName=BrandName,
+                            modelName=ConstantClass.ModelName,
+                            modelVariant=ConstantClass.ModelVarient,
+                            color=ConstantClass.ModelColor,
+                            sellingPrice= ConstantClass.SellingPrice,
+                            downPayment= DownPayment,
+                            tenure=Tenure,
+                            emiAmount=EmiAmount,
+                            imeiNumber1="",
+                            imeiNumber2="",
+                            accountNumber=AccountNumber,
+                            bankIFSCCode= BankIFSCCode,
+                            bankName= BankName,
+                            accountType= AccountType,
+                            branchName= BranchName,
+                            refName="",
+                            refRelationShip="",
+                            refmobileNo="",
+                            refAddress="",
+                            debitOrCreditCard="",
+                            upiMandate=UPIMandate,
+                            createdBy=CreatedByCustomerShortCut,
+                            membershipfees="",
+                            retailercode=preference.getStringValue(ConstantClass.RetailerCode,""),
+                            customerCode=preference.getStringValue(ConstantClass.CustomerCode,""),
+                            cibilScore= userScore.toString(),
+                            activeStatus = ConstantClass.CustomerActiveStatus,
+                            cibilApiResponse = CibilResponse,
+                            aadhaarApiResponse = AadhaarResponse,
+                            panApiResponse = PanResponse,
+                            isAggrementVerified= isAggrementVerified,
+                            isRetailerAggrementVerified="",
+                            custPhoto_File=null,
+                            imeiNumber1_SealPhotoPath = null,
+                            imeiNumber2_SealPhotoPath = null,
+                            imeiNumber_PhotoPath = null,
+                            invoive_Path = null,
+                            aadharFront_Path = null,
+                            aadharBack_Path = null,
+                            panFront_Path = null
+                        )
+
+                        Log.d("PaymentInformationreq", Gson().toJson(req))
+
+                        ConstantClass.OpenPopUpForVeryfyOTP(this)
+                        hitApiForUploadCustomerEMandateData(req)
+
                     }
                     else {
                         Toast.makeText(this@PaymentInformation, getString(R.string.please_accept_the_agreement), Toast.LENGTH_SHORT).show()
@@ -551,7 +653,9 @@ class PaymentInformation : BaseActivity() {
                 }
 
                 selectThird -> {
+
                     if(ConstantClass.CheckOnlineOrOffline.equals(ConstantClass.online)){
+
                             val (isValid, errorMessage) = isReferenceValidOnlineForm(
                                 referName = binding.refername.text.toString().trim(),
                                 referLast = binding.referlast.text.toString().trim(),
@@ -569,7 +673,78 @@ class PaymentInformation : BaseActivity() {
                                 RefRelationShip = binding.referrelatinonship.text.toString().trim()
                                 RefmobileNo = binding.refmobno.text.toString().trim()
                                 RefAddress = binding.refaddress.text.toString().trim()
-                                startActivity(Intent(this@PaymentInformation, IMEIDetailsPage::class.java))
+
+                                var req = ManageCustomerStepWiseReq(
+                                    mode = "UPDATE" ,
+                                    step = "5",
+                                    rid = "",
+                                    firstName = CustFirstName,
+                                    middleName= CustMiddleName,
+                                    lastName=CustLastName,
+                                    primaryMobileNumber = CustPrimaryMobileNumber,
+                                    primaryOTP = CustPrimaryOTP,
+                                    primaryMobileVerified = CustPrimaryMobileVerified,
+                                    alternateMobileNumber = CustAlternateMobileNumber,
+                                    alternateMobileOTP = "",
+                                    pAlternateMobileVerified = "no",
+                                    eMailID = CusteMailID,
+                                    flatNo = CustFlatNo,
+                                    aearSector = CustAreaSector,
+                                    pinCode = CustPinCode,
+                                    currentAddress = CustCurrentAddress,
+                                    stateName= CustStateName,
+                                    cityName= CustCityName,
+                                    country= CustCountry!!,
+                                    aadharNumber = AadharNumber,
+                                    aadharNumberVerified = ConstantClass.AadharVerified,
+                                    panNumber = PanNumber,
+                                    panNumberVerified = PanNumberVerified,
+                                    brandName=BrandName,
+                                    modelName=ConstantClass.ModelName,
+                                    modelVariant=ConstantClass.ModelVarient,
+                                    color=ConstantClass.ModelColor,
+                                    sellingPrice= ConstantClass.SellingPrice,
+                                    downPayment= DownPayment,
+                                    tenure=Tenure,
+                                    emiAmount=EmiAmount,
+                                    imeiNumber1="",
+                                    imeiNumber2="",
+                                    accountNumber=AccountNumber,
+                                    bankIFSCCode= BankIFSCCode,
+                                    bankName= BankName,
+                                    accountType= AccountType,
+                                    branchName= BranchName,
+                                    refName=RefName,
+                                    refRelationShip=RefRelationShip,
+                                    refmobileNo=RefmobileNo,
+                                    refAddress=RefAddress,
+                                    debitOrCreditCard="",
+                                    upiMandate=UPIMandate,
+                                    createdBy=CreatedByCustomerShortCut,
+                                    membershipfees="",
+                                    retailercode=preference.getStringValue(ConstantClass.RetailerCode,""),
+                                    customerCode=preference.getStringValue(ConstantClass.CustomerCode,""),
+                                    cibilScore= userScore.toString(),
+                                    activeStatus = ConstantClass.CustomerActiveStatus,
+                                    cibilApiResponse = CibilResponse,
+                                    aadhaarApiResponse = AadhaarResponse,
+                                    panApiResponse = PanResponse,
+                                    isAggrementVerified= isAggrementVerified,
+                                    isRetailerAggrementVerified="",
+                                    custPhoto_File=null,
+                                    imeiNumber1_SealPhotoPath = null,
+                                    imeiNumber2_SealPhotoPath = null,
+                                    imeiNumber_PhotoPath = null,
+                                    invoive_Path = null,
+                                    aadharFront_Path = null,
+                                    aadharBack_Path = null,
+                                    panFront_Path = null
+                                )
+
+                                Log.d("PaymentInformationreq", Gson().toJson(req))
+                                ConstantClass.OpenPopUpForVeryfyOTP(this)
+                                hitApiForUploadCustomerReferenceData(req)
+
                             }
 
                     }
@@ -590,7 +765,80 @@ class PaymentInformation : BaseActivity() {
                             RefRelationShip = binding.referrelatinonship.text.toString().trim()
                             RefmobileNo = binding.refmobno.text.toString().trim()
                             RefAddress =  binding.refaddress.text.toString().trim()
-                            startActivity(Intent(this@PaymentInformation, com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.IMEIDetailsPage::class.java))
+
+                            var req = ManageCustomerStepWiseReq(
+                                mode = "UPDATE" ,
+                                step = "5",
+                                rid = "",
+                                firstName = CustFirstName,
+                                middleName= CustMiddleName,
+                                lastName=CustLastName,
+                                primaryMobileNumber = CustPrimaryMobileNumber,
+                                primaryOTP = CustPrimaryOTP,
+                                primaryMobileVerified = CustPrimaryMobileVerified,
+                                alternateMobileNumber = CustAlternateMobileNumber,
+                                alternateMobileOTP = "",
+                                pAlternateMobileVerified = "no",
+                                eMailID = CusteMailID,
+                                flatNo = CustFlatNo,
+                                aearSector = CustAreaSector,
+                                pinCode = CustPinCode,
+                                currentAddress = CustCurrentAddress,
+                                stateName= CustStateName,
+                                cityName= CustCityName,
+                                country= CustCountry!!,
+                                aadharNumber = AadharNumber,
+                                aadharNumberVerified = ConstantClass.AadharVerified,
+                                panNumber = PanNumber,
+                                panNumberVerified = PanNumberVerified,
+                                brandName=BrandName,
+                                modelName=ConstantClass.ModelName,
+                                modelVariant=ConstantClass.ModelVarient,
+                                color=ConstantClass.ModelColor,
+                                sellingPrice= ConstantClass.SellingPrice,
+                                downPayment= DownPayment,
+                                tenure=Tenure,
+                                emiAmount=EmiAmount,
+                                imeiNumber1="",
+                                imeiNumber2="",
+                                accountNumber=AccountNumber,
+                                bankIFSCCode= BankIFSCCode,
+                                bankName= BankName,
+                                accountType= AccountType,
+                                branchName= BranchName,
+                                refName=RefName,
+                                refRelationShip=RefRelationShip,
+                                refmobileNo=RefmobileNo,
+                                refAddress=RefAddress,
+                                debitOrCreditCard="",
+                                upiMandate=UPIMandate,
+                                createdBy=CreatedByCustomerShortCut,
+                                membershipfees="",
+                                retailercode=preference.getStringValue(ConstantClass.RetailerCode,""),
+                                customerCode=preference.getStringValue(ConstantClass.CustomerCode,""),
+                                cibilScore= userScore.toString(),
+                                activeStatus = ConstantClass.CustomerActiveStatus,
+                                cibilApiResponse = CibilResponse,
+                                aadhaarApiResponse = AadhaarResponse,
+                                panApiResponse = PanResponse,
+                                isAggrementVerified= isAggrementVerified,
+                                isRetailerAggrementVerified="",
+                                custPhoto_File=null,
+                                imeiNumber1_SealPhotoPath = null,
+                                imeiNumber2_SealPhotoPath = null,
+                                imeiNumber_PhotoPath = null,
+                                invoive_Path = null,
+                                aadharFront_Path = null,
+                                aadharBack_Path = null,
+                                panFront_Path = null
+                            )
+
+                            Log.d("PaymentInformationreq", Gson().toJson(req))
+
+                            ConstantClass.OpenPopUpForVeryfyOTP(this)
+                            hitApiForUploadCustomerReferenceData(req)
+
+                           // startActivity(Intent(this@PaymentInformation, com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.IMEIDetailsPage::class.java))
                         }
                     }
 
@@ -629,6 +877,7 @@ class PaymentInformation : BaseActivity() {
                             users!!.body().let { response ->
                                 Log.d("PennyDropRes",Gson().toJson(response))
                                 ConstantClass.dialog.dismiss()
+
                                 if(response!!.model?.status.equals(ConstantClass.SUCCESS)){
 
                                     var beneficiaryName =  response.model!!.beneficiaryName
@@ -663,6 +912,7 @@ class PaymentInformation : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        Toast.makeText(this@PaymentInformation, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -696,7 +946,7 @@ class PaymentInformation : BaseActivity() {
                         it.data.let { users ->
                             users!!.body().let { response ->
                                 Log.d("PennyDropCheckStatusRes",Gson().toJson(response))
-                                ConstantClass.dialog.dismiss()
+
                                 if(response!!.model?.status.equals(ConstantClass.SUCCESS)){
                                     AccountNumber = binding.accountnumber.text.toString().trim()
                                     BankIFSCCode = binding.ifsccode.text.toString().trim()
@@ -706,10 +956,80 @@ class PaymentInformation : BaseActivity() {
                                     AccountHolderName= binding.banificeryName.text.toString().trim()
                                     BranchAddress= binding.branchaddress.text.toString().trim()
                                     BankID = bankList.find { it.first == BankName }?.second!!
+                                    ConstantClass.isPannydropVerified="yes"
                                     Log.d("BankID", "${BankID}")
-                                    setselectionForSecondCard()
+                                    var req = ManageCustomerStepWiseReq(
+                                        mode = "UPDATE" ,
+                                        step = "3",
+                                        rid = "",
+                                        firstName = CustFirstName,
+                                        middleName= CustMiddleName,
+                                        lastName=CustLastName,
+                                        primaryMobileNumber = CustPrimaryMobileNumber,
+                                        primaryOTP = CustPrimaryOTP,
+                                        primaryMobileVerified = CustPrimaryMobileVerified,
+                                        alternateMobileNumber = CustAlternateMobileNumber,
+                                        alternateMobileOTP = "",
+                                        pAlternateMobileVerified = "no",
+                                        eMailID = CusteMailID,
+                                        flatNo = CustFlatNo,
+                                        aearSector = CustAreaSector,
+                                        pinCode = CustPinCode,
+                                        currentAddress = CustCurrentAddress,
+                                        stateName= CustStateName,
+                                        cityName= CustCityName,
+                                        country= CustCountry!!,
+                                        aadharNumber = AadharNumber,
+                                        aadharNumberVerified = ConstantClass.AadharVerified,
+                                        panNumber = PanNumber,
+                                        panNumberVerified = PanNumberVerified,
+                                        brandName=BrandName,
+                                        modelName=ConstantClass.ModelName,
+                                        modelVariant=ConstantClass.ModelVarient,
+                                        color=ConstantClass.ModelColor,
+                                        sellingPrice= ConstantClass.SellingPrice,
+                                        downPayment= DownPayment,
+                                        tenure=Tenure,
+                                        emiAmount=EmiAmount,
+                                        imeiNumber1="",
+                                        imeiNumber2="",
+                                        accountNumber=AccountNumber,
+                                        bankIFSCCode= BankIFSCCode,
+                                        bankName= BankName,
+                                        accountType= AccountType,
+                                        branchName= BranchName,
+                                        refName="",
+                                        refRelationShip="",
+                                        refmobileNo="",
+                                        refAddress="",
+                                        debitOrCreditCard="",
+                                        upiMandate=UPIMandate,
+                                        createdBy= CreatedByCustomerShortCut,
+                                        membershipfees="",
+                                        retailercode=preference.getStringValue(ConstantClass.RetailerCode,""),
+                                        customerCode=preference.getStringValue(ConstantClass.CustomerCode,""),
+                                        cibilScore= userScore.toString(),
+                                        activeStatus = ConstantClass.CustomerActiveStatus,
+                                        cibilApiResponse = CibilResponse,
+                                        aadhaarApiResponse = AadhaarResponse,
+                                        panApiResponse = PanResponse,
+                                        isAggrementVerified= isAggrementVerified,
+                                        isRetailerAggrementVerified="",
+                                        custPhoto_File=null,
+                                        imeiNumber1_SealPhotoPath = null,
+                                        imeiNumber2_SealPhotoPath = null,
+                                        imeiNumber_PhotoPath = null,
+                                        invoive_Path = null,
+                                        aadharFront_Path = null,
+                                        aadharBack_Path = null,
+                                        panFront_Path = null
+                                    )
+
+                                    Log.d("PaymentInformationreq", Gson().toJson(req))
+                                    hitApiForUploadCustomerBankDataData(req)
                                 }
                                 else{
+                                    ConstantClass.dialog.dismiss()
                                     Toast.makeText(this@PaymentInformation,response.message,Toast.LENGTH_SHORT).show()
                                 }
                             }
@@ -720,6 +1040,7 @@ class PaymentInformation : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        Toast.makeText(this@PaymentInformation, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -766,6 +1087,7 @@ class PaymentInformation : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        Toast.makeText(this@PaymentInformation, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -923,6 +1245,7 @@ class PaymentInformation : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        Toast.makeText(this@PaymentInformation, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -969,6 +1292,7 @@ class PaymentInformation : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        Toast.makeText(this@PaymentInformation, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -1476,6 +1800,7 @@ class PaymentInformation : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        Toast.makeText(this@PaymentInformation, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -1488,5 +1813,141 @@ class PaymentInformation : BaseActivity() {
     }
 
 
+    fun hitApiForUploadCustomerBankDataData(request : ManageCustomerStepWiseReq){
+
+        viewModel.uploadCustomerListForShortCutLoanCreateProcess(request).observe(this) { resources ->
+            when (resources.apiStatus) {
+                ApiStatus.SUCCESS ->{
+                    resources.data.let { user->
+                        ConstantClass.dialog.dismiss()
+                        if(user!!.isSuccessful){
+                            var getData = user.body()
+                            Log.d("PaymentInformationresponse", Gson().toJson(getData))
+                            Toast.makeText(this, getData!!.message, Toast.LENGTH_SHORT).show()
+
+                            if(getData!!.statuss.toLowerCase().equals("false",ignoreCase = true)){
+
+                            }
+                            else{
+                                setselectionForSecondCard()
+                                //startActivity(Intent(this@PaymentInformation, PaymentInformation::class.java))
+                            }
+
+                        }
+                        else {
+                            var errorbody = user.errorBody()
+                            Log.e("API_ERROR", errorbody?.string() ?: "Unknown error")
+                            Toast.makeText(this@PaymentInformation, errorbody?.string(), Toast.LENGTH_SHORT).show()
+
+                        }
+                    }
+
+                }
+
+                ApiStatus.ERROR -> {
+                    ConstantClass.dialog.dismiss()
+                    Toast.makeText(this@PaymentInformation, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
+                }
+
+                ApiStatus.LOADING -> {
+
+                }
+
+            }
+        }
+
+
+    }
+
+
+    fun hitApiForUploadCustomerEMandateData(request : ManageCustomerStepWiseReq){
+
+        viewModel.uploadCustomerListForShortCutLoanCreateProcess(request).observe(this) { resources ->
+            when (resources.apiStatus) {
+                ApiStatus.SUCCESS ->{
+                    resources.data.let { user->
+                        ConstantClass.dialog.dismiss()
+                        if(user!!.isSuccessful){
+                            var getData = user.body()
+                            Log.d("PaymentInformationresponse", Gson().toJson(getData))
+                            Toast.makeText(this, getData!!.message, Toast.LENGTH_SHORT).show()
+
+                            if(getData!!.statuss.toLowerCase().equals("false",ignoreCase = true)){
+
+                            }
+                            else{
+                                setselectionForThirdCard()
+                            }
+
+                        }
+                        else {
+                            var errorbody = user.errorBody()
+                            Log.e("API_ERROR", errorbody?.string() ?: "Unknown error")
+                            Toast.makeText(this@PaymentInformation, errorbody?.string(), Toast.LENGTH_SHORT).show()
+
+                        }
+                    }
+
+                }
+
+                ApiStatus.ERROR -> {
+                    ConstantClass.dialog.dismiss()
+                    Toast.makeText(this@PaymentInformation, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
+                }
+
+                ApiStatus.LOADING -> {
+
+                }
+
+            }
+        }
+
+
+    }
+
+    fun hitApiForUploadCustomerReferenceData(request : ManageCustomerStepWiseReq){
+
+        viewModel.uploadCustomerListForShortCutLoanCreateProcess(request).observe(this) { resources ->
+            when (resources.apiStatus) {
+                ApiStatus.SUCCESS ->{
+                    resources.data.let { user->
+                        ConstantClass.dialog.dismiss()
+                        if(user!!.isSuccessful){
+                            var getData = user.body()
+                            Log.d("PaymentInformationresponse", Gson().toJson(getData))
+                            Toast.makeText(this, getData!!.message, Toast.LENGTH_SHORT).show()
+
+                            if(getData!!.statuss.toLowerCase().equals("false",ignoreCase = true)){
+
+                            }
+                            else{
+                                 startActivity(Intent(this@PaymentInformation, IMEIDetailsPage::class.java))
+                            }
+
+                        }
+                        else {
+                            var errorbody = user.errorBody()
+                            Log.e("API_ERROR", errorbody?.string() ?: "Unknown error")
+                            Toast.makeText(this@PaymentInformation, errorbody?.string(), Toast.LENGTH_SHORT).show()
+
+                        }
+                    }
+
+                }
+
+                ApiStatus.ERROR -> {
+                    ConstantClass.dialog.dismiss()
+                    Toast.makeText(this@PaymentInformation, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
+                }
+
+                ApiStatus.LOADING -> {
+
+                }
+
+            }
+        }
+
+
+    }
 
 }

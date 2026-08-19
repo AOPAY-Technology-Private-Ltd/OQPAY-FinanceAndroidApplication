@@ -30,6 +30,8 @@ import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.GetIsEligibleLoa
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LoanCreatedReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LoginReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LogoutReq
+import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.ManageCustomerStepWiseReq
+import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.RegisterCustomerResp
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.RegistrationReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.RegistrationRes
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.RetailerProfileReq
@@ -259,6 +261,117 @@ class AuthRepository(private val apiInterface: ApiInterface) {
 
 
   suspend fun getCustomerListForShortCutLoanCreateProcess(req: RetailerPerCustomerListShortCutForLoanReq) = apiInterface.getCustomerListForShortCutLoanCreateProcess(req)
+
+
+
+
+  suspend fun getCustomShortCutDataRequest(req: ManageCustomerStepWiseReq): Response<RegisterCustomerResp> {
+    val mode = req.mode.toRequestBody("text/plain".toMediaTypeOrNull())
+    val step = req.step.toRequestBody("text/plain".toMediaTypeOrNull())
+    val rid = req.rid.toRequestBody("text/plain".toMediaTypeOrNull())
+    val firstName = req.firstName.toRequestBody("text/plain".toMediaTypeOrNull())
+    val middleName = req.middleName.toRequestBody("text/plain".toMediaTypeOrNull())
+    val lastName = req.lastName.toRequestBody("text/plain".toMediaTypeOrNull())
+    val primaryMobileNumber = req.primaryMobileNumber.toRequestBody("text/plain".toMediaTypeOrNull())
+    val primaryOTP = req.primaryOTP.toRequestBody("text/plain".toMediaTypeOrNull())
+    val primaryMobileVerified = req.primaryMobileVerified.toRequestBody("text/plain".toMediaTypeOrNull())
+    val alternateMobileNumber = req.alternateMobileNumber.toRequestBody("text/plain".toMediaTypeOrNull())
+    val alternateMobileOTP = req.alternateMobileOTP.toRequestBody("text/plain".toMediaTypeOrNull())
+    val pAlternateMobileVerified = req.pAlternateMobileVerified.toRequestBody("text/plain".toMediaTypeOrNull())
+    val eMailID = req.eMailID.toRequestBody("text/plain".toMediaTypeOrNull())
+    val flatNo = req.flatNo.toRequestBody("text/plain".toMediaTypeOrNull())
+    val aearSector = req.aearSector.toRequestBody("text/plain".toMediaTypeOrNull())
+    val pinCode = req.pinCode.toRequestBody("text/plain".toMediaTypeOrNull())
+    val currentAddress = req.currentAddress.toRequestBody("text/plain".toMediaTypeOrNull())
+    val stateName = req.stateName.toRequestBody("text/plain".toMediaTypeOrNull())
+    val cityName = req.cityName.toRequestBody("text/plain".toMediaTypeOrNull())
+    val country = req.country.toRequestBody("text/plain".toMediaTypeOrNull())
+    val aadharNumber = req.aadharNumber.toRequestBody("text/plain".toMediaTypeOrNull())
+    val aadharNumberVerified = req.aadharNumberVerified.toRequestBody("text/plain".toMediaTypeOrNull())
+    val panNumber = req.panNumber.toRequestBody("text/plain".toMediaTypeOrNull())
+    val panNumberVerified = req.panNumberVerified.toRequestBody("text/plain".toMediaTypeOrNull())
+    val brandName = req.brandName.toRequestBody("text/plain".toMediaTypeOrNull())
+    val modelName = req.modelName.toRequestBody("text/plain".toMediaTypeOrNull())
+    val modelVariant = req.modelVariant.toRequestBody("text/plain".toMediaTypeOrNull())
+    val color = req.color.toRequestBody("text/plain".toMediaTypeOrNull())
+    val sellingPrice = req.sellingPrice.toRequestBody("text/plain".toMediaTypeOrNull())
+    val downPayment = req.downPayment.toRequestBody("text/plain".toMediaTypeOrNull())
+    val tenure = req.tenure.toRequestBody("text/plain".toMediaTypeOrNull())
+    val emiAmount = req.emiAmount.toRequestBody("text/plain".toMediaTypeOrNull())
+    val imeiNumber1 = req.imeiNumber1.toRequestBody("text/plain".toMediaTypeOrNull())
+    val imeiNumber2 = req.imeiNumber2.toRequestBody("text/plain".toMediaTypeOrNull())
+    val accountNumber = req.accountNumber.toRequestBody("text/plain".toMediaTypeOrNull())
+    val bankIFSCCode = req.bankIFSCCode.toRequestBody("text/plain".toMediaTypeOrNull())
+    val bankName = req.bankName.toRequestBody("text/plain".toMediaTypeOrNull())
+    val accountType = req.accountType.toRequestBody("text/plain".toMediaTypeOrNull())
+    val branchName = req.branchName.toRequestBody("text/plain".toMediaTypeOrNull())
+    val refName = req.refName.toRequestBody("text/plain".toMediaTypeOrNull())
+    val refRelationShip = req.refRelationShip.toRequestBody("text/plain".toMediaTypeOrNull())
+    val refmobileNo = req.refmobileNo.toRequestBody("text/plain".toMediaTypeOrNull())
+    val refAddress = req.refAddress.toRequestBody("text/plain".toMediaTypeOrNull())
+    val debitOrCreditCard = req.debitOrCreditCard.toRequestBody("text/plain".toMediaTypeOrNull())
+    val upiMandate = req.upiMandate.toRequestBody("text/plain".toMediaTypeOrNull())
+    val createdBy = req.createdBy.toRequestBody("text/plain".toMediaTypeOrNull())
+    val membershipfees = req.membershipfees.toRequestBody("text/plain".toMediaTypeOrNull())
+    val retailercode = req.retailercode.toRequestBody("text/plain".toMediaTypeOrNull())
+    val customerCode = req.customerCode.toRequestBody("text/plain".toMediaTypeOrNull())
+    val cibilScore = req.cibilScore.toRequestBody("text/plain".toMediaTypeOrNull())
+    val activeStatus = req.activeStatus.toRequestBody("text/plain".toMediaTypeOrNull())
+    val cibilApiResponse = req.cibilApiResponse.toRequestBody("text/plain".toMediaTypeOrNull())
+    val aadhaarApiresponse = req.aadhaarApiResponse.toRequestBody("text/plain".toMediaTypeOrNull())
+    val panApiResponse = req.panApiResponse.toRequestBody("text/plain".toMediaTypeOrNull())
+    val isAggrementVerified = req.isAggrementVerified.toRequestBody("text/plain".toMediaTypeOrNull())
+    val isRetailerAggrementVerified = req.isRetailerAggrementVerified.toRequestBody("text/plain".toMediaTypeOrNull())
+
+    val custPhoto_File = req.custPhoto_File?.let {
+      val requestFile = it.asRequestBody("image/*".toMediaTypeOrNull())
+      MultipartBody.Part.createFormData("CustPhoto_File", it.name, requestFile)
+    }
+    val imeiNumber1_SealPhotoPath = req.imeiNumber1_SealPhotoPath?.let {
+      val requestFile = it.asRequestBody("image/*".toMediaTypeOrNull())
+      MultipartBody.Part.createFormData("IMEINumber1_SealPhotoFile", it.name, requestFile)
+    }
+    val imeiNumber2_SealPhotoPath = req.imeiNumber2_SealPhotoPath?.let {
+      val requestFile = it.asRequestBody("image/*".toMediaTypeOrNull())
+      MultipartBody.Part.createFormData("IMEINumber2_SealPhotoFile", it.name, requestFile)
+    }
+    val imeiNumber_PhotoPath = req.imeiNumber_PhotoPath?.let {
+      val requestFile = it.asRequestBody("image/*".toMediaTypeOrNull())
+      MultipartBody.Part.createFormData("IMEINumberPhotoFile", it.name, requestFile)
+    }
+    val invoive_Path = req.invoive_Path?.let {
+      val requestFile = it.asRequestBody("image/*".toMediaTypeOrNull())
+      MultipartBody.Part.createFormData("InvoiceFile", it.name, requestFile)
+    }
+    val aadharFront_Path = req.aadharFront_Path?.let {
+      val requestFile = it.asRequestBody("image/*".toMediaTypeOrNull())
+      MultipartBody.Part.createFormData("CustAadharPhoto_File", it.name, requestFile)
+    }
+    val aadharBack_Path = req.aadharBack_Path?.let {
+      val requestFile = it.asRequestBody("image/*".toMediaTypeOrNull())
+      MultipartBody.Part.createFormData("CustAadharBackPhoto_File", it.name, requestFile)
+    }
+    val panFront_Path = req.panFront_Path?.let {
+      val requestFile = it.asRequestBody("image/*".toMediaTypeOrNull())
+      MultipartBody.Part.createFormData("CustPanNumberPhoto_File", it.name, requestFile)
+    }
+
+
+    return apiInterface.getManageCustomerStepWiseReq(
+      mode, step,rid,firstName, middleName, lastName, primaryMobileNumber, primaryOTP, primaryMobileVerified,
+      alternateMobileNumber, alternateMobileOTP, pAlternateMobileVerified, eMailID, flatNo, aearSector,
+      pinCode, currentAddress, stateName, cityName, country, aadharNumber, aadharNumberVerified,
+      panNumber, panNumberVerified, brandName, modelName, modelVariant, color, sellingPrice, downPayment,
+      tenure, emiAmount, imeiNumber1, imeiNumber2, accountNumber, bankIFSCCode, bankName, accountType,
+      branchName, refName, refRelationShip, refmobileNo, refAddress, debitOrCreditCard, upiMandate,
+      createdBy, membershipfees, retailercode, customerCode, cibilScore, activeStatus,cibilApiResponse, aadhaarApiresponse , panApiResponse,isAggrementVerified,
+      isRetailerAggrementVerified, custPhoto_File, imeiNumber1_SealPhotoPath, imeiNumber2_SealPhotoPath,
+      imeiNumber_PhotoPath, invoive_Path, aadharFront_Path, aadharBack_Path, panFront_Path
+    )
+
+
+  }
+
 
 
 }

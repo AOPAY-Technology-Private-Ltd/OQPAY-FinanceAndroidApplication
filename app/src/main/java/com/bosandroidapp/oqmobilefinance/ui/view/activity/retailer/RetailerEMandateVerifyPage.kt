@@ -306,7 +306,7 @@ class RetailerEMandateVerifyPage : BaseActivity() {
                             Log.e("API_ERROR_CODE", resources.data?.code().toString())
                             Log.e("API_ERROR_MSG", resources.message ?: "Unknown Error")
 
-                            Toast.makeText(this, "Server error occurred (Code: ${resources.data?.code() ?: "Unknown"})", Toast.LENGTH_LONG).show()
+                            Toast.makeText(this@RetailerEMandateVerifyPage, resources.message ?: "Server error occurred", Toast.LENGTH_LONG).show()
 
                             // Optional: Handle specific 500 error
                             if (resources.data?.code() == 500) {
@@ -387,7 +387,7 @@ class RetailerEMandateVerifyPage : BaseActivity() {
                             Log.e("API_ERROR_CODE", resources.data?.code().toString())
                             Log.e("API_ERROR_MSG", resources.message ?: "Unknown Error")
 
-                            Toast.makeText(this, "Server error occurred (Code: ${resources.data?.code() ?: "Unknown"})", Toast.LENGTH_LONG).show()
+                            Toast.makeText(this@RetailerEMandateVerifyPage, resources.message ?: "Server error occurred", Toast.LENGTH_LONG).show()
 
                             // Optional: Handle specific 500 error
                             if (resources.data?.code() == 500) {

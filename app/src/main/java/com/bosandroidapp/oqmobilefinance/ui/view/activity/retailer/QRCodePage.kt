@@ -119,8 +119,10 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.dialog
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.getCurrentStartDate
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.iisAggrementVerified
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isAggrementVerified
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isEmandateVerified
 
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isInternetAvailable
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isPannydropVerified
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.uploadDataOnFirebaseConsole
 import com.bosandroidapp.oqmobilefinance.data.enach.EMandateRequest
 import com.bosandroidapp.oqmobilefinance.data.enach.ENachStatusReq
@@ -161,17 +163,16 @@ class QRCodePage : BaseActivity() {
     lateinit var api: ApiInterface
     lateinit var preference: SharedPreference
 
-
     var downPayment: String = ""
     var membershipAmt: String = ""
-    var isEmandateVerified : String= ""
-    var isPannydropVerified : String= "Yes"
+
     var loancreatedreq: LoanCreatedReq? = null
 
 
     companion object{
         var isEnachCancelled : Boolean = false
     }
+
 
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -198,6 +199,96 @@ class QRCodePage : BaseActivity() {
         viewModel = ViewModelProvider(this, CommonViewModelFactory(AuthRepository(RetrofitClient.apiInterface)))[AuthenticationViewModel::class.java]
         panViewModel = ViewModelProvider(this, com.bosandroidapp.oqmobilefinance.data.viewModelFactory.PanViewModelFactory(PanRepository(RetrofitClient.apiInterfacePAN)))[PanViewModel::class.java]
 
+
+        if(preference.getStringValue(ConstantClass.CustomerCode,"").isNotEmpty()&& ! ConstantClass.ClickOnCardLowCibilScore.equals(CardType)){
+            val startDate = getCurrentStartDate()
+            val endDate = calculateEmiEndDateFromNow(Tenure.toInt())
+            val firstName = preference.getStringValue(ConstantClass.FirstName, "").orEmpty()
+            val lastName = preference.getStringValue(ConstantClass.LastName, "").orEmpty()
+            val safeLastName = if (!lastName.isNullOrBlank() && lastName != "null") lastName else ""
+            var createdBy = firstName.plus(" ").plus(safeLastName)
+
+            if (ConstantClass.CheckOnlineOrOffline.equals(ConstantClass.offline)){
+                loancreatedreq = LoanCreatedReq(
+                    modetype = "INSERT",
+                    rid = 0,
+                    customerCode = preference.getStringValue(ConstantClass.CustomerCode,""),
+                    loanAmount = ConstantClass.LoanAmount.toDouble(),
+                    downPayment = downPayment.toDouble(),
+                    emiAmount = EmiAmount.toDouble(),
+                    tenure = Tenure.toInt(),
+                    interestRate = InterestRate.toDouble(),
+                    startDate = startDate,
+                    endDate = endDate,
+                    imeiNumber = ImeiNumber1,
+                    createdBy = createdBy,
+                    brandname = BrandName,
+                    modelname = ModelName,
+                    variantname = ModelVarient,
+                    avlcolor = ModelColor,
+                    retailerCode = preference.getStringValue(ConstantClass.RetailerCode,""),
+                    processingFees = ProcessingFees,
+                    interestAmt = InterestAmt,
+                    remarks = "",
+                    recordStatus = LoanStatus,
+                    creditScore = userScore.toString(),
+                    validateKey = "",
+                    defaultEmidebit = DefaulterEmiDebitPending,
+                    sellingPrice = ConstantClass.SellingPrice.toDouble(),
+                    loanMode = ConstantClass.offline
+                )
+
+                LoanMode = ConstantClass.offline
+
+                Log.d("LoanCreateReq", Gson().toJson(loancreatedreq))
+
+            }
+            else{
+
+                loancreatedreq = LoanCreatedReq(
+                    modetype = "INSERT",
+                    rid = 0,
+                    customerCode = preference.getStringValue(ConstantClass.CustomerCode,""),
+                    loanAmount = ConstantClass.LoanAmount.toDouble(),
+                    downPayment = downPayment.toDouble(),
+                    emiAmount = EmiAmount.toDouble(),
+                    tenure = Tenure.toInt(),
+                    interestRate = InterestRate.toDouble(),
+                    startDate = startDate,
+                    endDate = endDate,
+                    imeiNumber = ImeiNumber1,
+                    createdBy = createdBy,
+                    brandname = BrandName,
+                    modelname = ModelName,
+                    variantname = ModelVarient,
+                    avlcolor = ModelColor,
+                    retailerCode = preference.getStringValue(ConstantClass.RetailerCode,""),
+                    processingFees = ProcessingFees,
+                    interestAmt = InterestAmt,
+                    remarks = "",
+                    recordStatus = LoanStatus,
+                    creditScore = userScore.toString(),
+                    validateKey = "",
+                    defaultEmidebit = DefaulterEmiDebitPending,
+                    sellingPrice = ConstantClass.SellingPrice.toDouble(),
+                    loanMode = ConstantClass.online
+                )
+                LoanMode = ConstantClass.online
+
+                Log.d("LoanCreateReq", Gson().toJson(loancreatedreq))
+            }
+
+            updateUI(true)
+
+            binding.LoanCreatelayout.visibility = View.VISIBLE
+            binding.nextlayout.visibility = View.GONE
+        }
+
+        else{
+            binding.LoanCreatelayout.visibility = View.GONE
+            binding.nextlayout.visibility = View.VISIBLE
+            updateUI(false)
+        }
 
         setOnClickListner()
         hitApiForMemberShipFee()
@@ -260,7 +351,7 @@ class QRCodePage : BaseActivity() {
                     val endDate = LoanEndDate
 
                      val emiAmount = EmiAmount.toDouble().roundToInt()
-                   /* val emiAmount = 1*/
+                     /* val emiAmount = 1*/
 
                     val request = EMandateRequest(
                         categoryID = 7,
@@ -311,9 +402,6 @@ class QRCodePage : BaseActivity() {
 
 
     }
-
-
-
 
 
 
@@ -1262,12 +1350,14 @@ class QRCodePage : BaseActivity() {
         Log.e("API_ERROR", "Code: $responseCode Body: $errorBody")
 
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+
     }
 
 
     fun hitApiForRetailerCreatedLoan(requset: LoanCreatedReq) {
 
         Log.d("customerReq", Gson().toJson(requset))
+
         viewModel.getRetailerLoanCreatedReq(requset).observe(this) { resources ->
             resources.let {
                 when (it.apiStatus) {
@@ -1494,7 +1584,7 @@ class QRCodePage : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
-                        hitApiForMemberShipFee()
+                        Toast.makeText(this@QRCodePage, resources.message ?: "Error getting membership fee", Toast.LENGTH_SHORT).show()
                         Log.d("API_TIME", "Failed after: ${System.currentTimeMillis() - startTime} ms")
                     }
 
@@ -1721,7 +1811,7 @@ class QRCodePage : BaseActivity() {
                             Log.e("API_ERROR_CODE", resources.data?.code().toString())
                             Log.e("API_ERROR_MSG", resources.message ?: "Unknown Error")
 
-                            Toast.makeText(this, "Server error occurred (Code: ${resources.data?.code() ?: "Unknown"})", Toast.LENGTH_LONG).show()
+                            Toast.makeText(this@QRCodePage, resources.message ?: "Server error occurred", Toast.LENGTH_LONG).show()
 
                             // Optional: Handle specific 500 error
                             if (resources.data?.code() == 500) {
@@ -1850,6 +1940,7 @@ class QRCodePage : BaseActivity() {
                                     if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
                                         ConstantClass.dialog.dismiss()
                                     }
+
                                     binding.LoanCreatelayout.isEnabled= true
                                     if(response.message.isNullOrBlank()){
                                         Toast.makeText(this,"Loan charge failed", Toast.LENGTH_SHORT).show()
@@ -1871,6 +1962,7 @@ class QRCodePage : BaseActivity() {
                         if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
                             ConstantClass.dialog.dismiss()
                         }
+                        Toast.makeText(this@QRCodePage, resources.message ?: "Loan charge failed", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -1906,7 +1998,7 @@ class QRCodePage : BaseActivity() {
                         Log.e("API_ERROR_CODE", resources.data?.code().toString())
                         Log.e("API_ERROR_MSG", resources.message ?: "Unknown Error")
 
-                        Toast.makeText(this, "Server error occurred (Code: ${resources.data?.code() ?: "Unknown"})", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this@QRCodePage, resources.message ?: "Server error occurred", Toast.LENGTH_LONG).show()
 
                         // Optional: Handle specific 500 error
                         if (resources.data?.code() == 500) {
@@ -1981,5 +2073,6 @@ class QRCodePage : BaseActivity() {
 
       }
   }*/
+
 
 }

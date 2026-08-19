@@ -473,7 +473,7 @@ class AppScanInstallPage : BaseActivity() {
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
                         binding.accesstoken.isEnabled = true
-
+                        Toast.makeText(this@AppScanInstallPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {

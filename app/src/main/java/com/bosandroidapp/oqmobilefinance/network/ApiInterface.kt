@@ -340,6 +340,77 @@ interface ApiInterface {
 
 
     @Multipart
+    @POST("api/V1/OQFinance/ManageCustomerStepWise")
+    suspend fun getManageCustomerStepWiseReq(
+        @Part("Mode") mode: RequestBody,
+        @Part("Step") step: RequestBody,
+        @Part("RID") rid: RequestBody,
+        @Part("FirstName") firstName: RequestBody,
+        @Part("MiddleName") middleName: RequestBody,
+        @Part("LastName") lastName: RequestBody,
+        @Part("PrimaryMobileNumber") primaryMobileNumber: RequestBody,
+        @Part("PrimaryOTP") primaryOTP: RequestBody,
+        @Part("PrimaryMobileVerified") primaryMobileVerified: RequestBody,
+        @Part("AlternateMobileNumber") alternateMobileNumber: RequestBody,
+        @Part("AlternateMobileOTP") alternateMobileOTP: RequestBody,
+        @Part("PAlternateMobileVerified") pAlternateMobileVerified: RequestBody,
+        @Part("EMailID") eMailID: RequestBody,
+        @Part("FlatNo") flatNo: RequestBody,
+        @Part("AearSector") aearSector: RequestBody,
+        @Part("PinCode") pinCode: RequestBody,
+        @Part("CurrentAddress") currentAddress: RequestBody,
+        @Part("StateName") stateName: RequestBody,
+        @Part("CityName") cityName: RequestBody,
+        @Part("Country") country: RequestBody,
+        @Part("AadharNumber") aadharNumber: RequestBody,
+        @Part("AadharNumberVerified") aadharNumberVerified: RequestBody,
+        @Part("PANNumber") panNumber: RequestBody,
+        @Part("PANNumberVerified") panNumberVerified: RequestBody,
+        @Part("BrandName") brandName: RequestBody,
+        @Part("ModelName") modelName: RequestBody,
+        @Part("ModelVariant") modelVariant: RequestBody,
+        @Part("Color") color: RequestBody,
+        @Part("SellingPrice") sellingPrice: RequestBody,
+        @Part("DownPayment") downPayment: RequestBody,
+        @Part("Tenure") tenure: RequestBody,
+        @Part("EMIAmount") emiAmount: RequestBody,
+        @Part("IMEINumber1") imeiNumber1: RequestBody,
+        @Part("IMEINumber2") imeiNumber2: RequestBody,
+        @Part("AccountNumber") accountNumber: RequestBody,
+        @Part("BankIFSCCode") bankIFSCCode: RequestBody,
+        @Part("BankName") bankName: RequestBody,
+        @Part("AccountType") accountType: RequestBody,
+        @Part("BranchName") branchName: RequestBody,
+        @Part("RefName") refName: RequestBody,
+        @Part("RefRelationShip") refRelationShip: RequestBody,
+        @Part("RefmobileNo") refmobileNo: RequestBody,
+        @Part("RefAddress") refAddress: RequestBody,
+        @Part("DebitOrCreditCard") debitOrCreditCard: RequestBody,
+        @Part("UPIMandate") upiMandate: RequestBody,
+        @Part("CreatedBy") createdBy: RequestBody,
+        @Part("MemberShipFees") membershipfees: RequestBody,
+        @Part("RetailerCode") retailercode: RequestBody,
+        @Part("CustomerCodes") customerCode: RequestBody,
+        @Part("CibilScore") cibilScore: RequestBody,
+        @Part("ActiveStatus") activeStatus: RequestBody,
+        @Part("CibilApiResponse") cibilApiResponse: RequestBody,
+        @Part("AadhaarApiResponse") aadhaarApiResponse: RequestBody,
+        @Part("PanApiResponse") panApiResponse: RequestBody,
+        @Part("IsAggrementVerified") isAggrementVerified: RequestBody,
+        @Part("IsRetailerAggrementVerified") IsRetailerAggrementVerified: RequestBody,
+        @Part custPhoto_File: MultipartBody.Part?,
+        @Part imeiNumber1_SealPhotoPath: MultipartBody.Part?,
+        @Part imeiNumber2_SealPhotoPath: MultipartBody.Part?,
+        @Part imeiNumber_PhotoPath: MultipartBody.Part?,
+        @Part invoive_Path: MultipartBody.Part?,
+        @Part aadharFront_Path: MultipartBody.Part?,
+        @Part aadharBack_Path: MultipartBody.Part?,
+        @Part panFront_Path: MultipartBody.Part?
+    ): Response<RegisterCustomerResp>
+
+
+
+    @Multipart
     @POST("api/V1/OQFinance/ManageCustomer")
     suspend fun getRegisterOnlineCustomerReq(
         @Part("Mode") mode: RequestBody,
@@ -465,7 +536,7 @@ interface ApiInterface {
 
 
 
-    // retailer trasaction history...................................................
+    // retailer transaction history...................................................
     @POST("api/V1/OQFinance/GetWalletCreditDebitHistory")
     suspend fun getTransactionHistoryList(@Body req : TransactionHistoryReq): Response<TransactionHistoryResp>?
 
@@ -533,7 +604,6 @@ interface ApiInterface {
     // revalidate user eligible for loan or not
     @POST("api/V1/OQFinance/IsLoanReapplyEligible")
     suspend fun getEligiblereq(@Body req : GetIsEligibleLoanReq): Response<EligibleLoanResp>?
-
 
 
 
@@ -671,7 +741,7 @@ interface ApiInterface {
 
 
 
-    // api for customer list short cut option for loan generate
+    // api for customer list shortcut option for loan generate
 
     @POST("api/V1/OQFinance/GetCustomerByRetailer")
     suspend fun getCustomerListForShortCutLoanCreateProcess(@Body req : RetailerPerCustomerListShortCutForLoanReq) : Response<RetailerPerCustomerListShortCutForLoanResponse>?

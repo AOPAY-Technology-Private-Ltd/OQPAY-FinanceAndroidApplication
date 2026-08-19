@@ -58,6 +58,7 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AadharStreet
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AadharTransactionIdNo
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CheckOnlineOrOffline
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CibilResponse
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CreatedByCustomerShortCut
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustAlternateMobileNumber
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustAlternateMobileOTP
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustAlternateMobileVerified
@@ -104,6 +105,7 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.iisAggrementVeri
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isAggrementVerified
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isInternetAvailable
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isValidPinCode
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.saveImageToCache
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.scrollToView
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.uriToFile
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.validateLoginInput
@@ -111,6 +113,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
 import com.bosandroidapp.oqmobilefinance.data.model.VerifyCustomerReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LogoutReq
+import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.ManageCustomerStepWiseReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.SendOtpReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.VerifyOTPReq
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
@@ -684,6 +687,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
             }
             else
                {
+                binding.createaccount.isEnabled = false
                 CustPhotoPath = photoUri
                 CustFirstName = binding.firstName.text.toString().trim()
                 CustMiddleName = binding.middleName.text.toString().trim()
@@ -726,9 +730,96 @@ class NewCustomerRegistrationPage : BaseActivity() {
                 }
 
                 else{
-
+                    ConstantClass.OpenPopUpForVeryfyOTP(this)
+                    
                     if(!CustAlternateMobileNumber.isNullOrBlank()){
-                        startActivity(Intent(this@NewCustomerRegistrationPage, MobileSelectionActivity::class.java))
+                        userScore=0f
+                        
+                        if(CustCountry.isNullOrBlank()){
+                            CustCountry ="India"
+                        }
+                        val firstName = preference.getStringValue(ConstantClass.FirstName, "").orEmpty()
+                        val lastName = preference.getStringValue(ConstantClass.LastName, "").orEmpty()
+                        val safeLastName = if (!lastName.isNullOrBlank() && lastName != "null") lastName else ""
+                        var createdBy = firstName.plus(" ").plus(safeLastName)
+                        CreatedByCustomerShortCut= createdBy
+
+                        val customerImageFile = saveImageToCache(this, CustPhotoPath!!, "CustomerPhoto" )
+                        val aadharFrontPart = saveImageToCache(this, AadharFrontImageUri!!,  "AadharFrontImage")
+                        val aadharBackPart = saveImageToCache(this, AadharBackImageUri!!,  "AadharBackImage")
+                        val PanFrontPart = saveImageToCache(this, PanFrontImageUri!!,  "PanFrontImage")
+
+                        var req = ManageCustomerStepWiseReq(
+                            mode = "INSERT" ,
+                            step = "1",
+                            rid = "",
+                            firstName = CustFirstName,
+                            middleName= CustMiddleName,
+                            lastName=CustLastName,
+                            primaryMobileNumber = CustPrimaryMobileNumber,
+                            primaryOTP = CustPrimaryOTP,
+                            primaryMobileVerified = CustPrimaryMobileVerified,
+                            alternateMobileNumber = CustAlternateMobileNumber,
+                            alternateMobileOTP = "",
+                            pAlternateMobileVerified = "no",
+                            eMailID = CusteMailID,
+                            flatNo = CustFlatNo,
+                            aearSector = CustAreaSector,
+                            pinCode = CustPinCode,
+                            currentAddress = CustCurrentAddress,
+                            stateName= CustStateName,
+                            cityName= CustCityName,
+                            country= CustCountry!!,
+                            aadharNumber = AadharNumber,
+                            aadharNumberVerified = ConstantClass.AadharVerified,
+                            panNumber = PanNumber,
+                            panNumberVerified = PanNumberVerified,
+                            brandName="",
+                            modelName="",
+                            modelVariant="",
+                            color="",
+                            sellingPrice="",
+                            downPayment="",
+                            tenure="",
+                            emiAmount="",
+                            imeiNumber1="",
+                            imeiNumber2="",
+                            accountNumber="",
+                            bankIFSCCode="",
+                            bankName="",
+                            accountType="",
+                            branchName="",
+                            refName="",
+                            refRelationShip="",
+                            refmobileNo="",
+                            refAddress="",
+                            debitOrCreditCard="",
+                            upiMandate="yes",
+                            createdBy=createdBy,
+                            membershipfees="",
+                            retailercode=preference.getStringValue(ConstantClass.RetailerCode,""),
+                            cibilScore=userScore.toString(),
+                            activeStatus = "Pending",
+                            cibilApiResponse = CibilResponse,
+                            aadhaarApiResponse = AadhaarResponse,
+                            panApiResponse = PanResponse,
+                            isAggrementVerified=isAggrementVerified,
+                            isRetailerAggrementVerified="",
+                            custPhoto_File=customerImageFile,
+                            imeiNumber1_SealPhotoPath = null,
+                            imeiNumber2_SealPhotoPath = null,
+                            imeiNumber_PhotoPath = null,
+                            invoive_Path = null,
+                            aadharFront_Path = aadharFrontPart,
+                            aadharBack_Path = aadharBackPart,
+                            panFront_Path = PanFrontPart
+                        )
+
+                        Log.d("OfflineCustomerReq", Gson().toJson(req))
+
+                        hitApiForUploadCustomerData(req)
+
+                       // startActivity(Intent(this@NewCustomerRegistrationPage, MobileSelectionActivity::class.java))
                     }
                     else {
                         binding.alternatemobileNumber.error= "Please enter alternate mobile number ."
@@ -773,7 +864,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
-                        hitApiForVerifyCustomer()
+                        Toast.makeText(this@NewCustomerRegistrationPage, resources.message ?: "Verification failed", Toast.LENGTH_SHORT).show()
                     }
 
 
@@ -876,6 +967,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
     }
 
+
     fun startOtpTimer(resendtxt: TextView, timer: TextView) {
         resendtxt.visibility = View.INVISIBLE
         timer.visibility = View.VISIBLE
@@ -895,6 +987,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
         }
         countDownTimer.start()
     }
+
 
     private fun createImageFile(): File {
         val fileName = "IMG_${System.currentTimeMillis()}"
@@ -960,6 +1053,8 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        binding.createaccount.isEnabled = true
+                        Toast.makeText(this@NewCustomerRegistrationPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -1013,6 +1108,8 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        binding.createaccount.isEnabled = true
+                        Toast.makeText(this@NewCustomerRegistrationPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -1084,6 +1181,8 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        binding.createaccount.isEnabled = true
+                        Toast.makeText(this@NewCustomerRegistrationPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -1719,6 +1818,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
     }
 
 
+
     fun hitApiForSendOTPCibileCheck(mailidormobile: String, type: String) {
         var sendOtpReq = SendOtpReq(
             mobileoremailId = mailidormobile,
@@ -1745,6 +1845,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                 else {
                                     Toast.makeText(this@NewCustomerRegistrationPage, response.message, Toast.LENGTH_SHORT).show()
                                     ConstantClass.dialog.dismiss()
+                                    binding.createaccount.isEnabled = true
                                 }
                             }
                         }
@@ -1752,6 +1853,8 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        binding.createaccount.isEnabled = true
+                        Toast.makeText(this@NewCustomerRegistrationPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -1764,6 +1867,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
         }
 
     }
+
 
 
     fun hitApiForCibilScore(otp: String) {
@@ -1797,6 +1901,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
         )
 
         Log.d("CibilReq", Gson().toJson(cibilReq))
+
         viewCibilModel.getCibilReq(cibilReq).observe(this) { resources ->
             resources.let {
                 when (it.apiStatus) {
@@ -1810,6 +1915,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
                                 if(response.status.toLowerCase().equals("false")&& !response.resultCode.equals("101")){
                                     PopOpForCibileScoreRequestToAdmin(response.message.toString(), "Mismatch Details",false)
+                                    binding.createaccount.isEnabled = true
                                 }
 
                                 if (!response.httpResponseCode.isNullOrBlank() && response.httpResponseCode.equals("200")) {
@@ -1818,7 +1924,87 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                         userScore = data.score.bureauScore?.toFloatOrNull() ?: 0f
                                         CibilResponse = Gson().toJson(response)
                                         if(userScore >= 500f){
-                                            startActivity(Intent(this@NewCustomerRegistrationPage, MobileSelectionActivity::class.java))
+                                            if(CustCountry.isNullOrBlank()){
+                                                CustCountry ="India"
+                                            }
+                                            ConstantClass.OpenPopUpForVeryfyOTP(this)
+
+                                            val firstName = preference.getStringValue(ConstantClass.FirstName, "").orEmpty()
+                                            val lastName = preference.getStringValue(ConstantClass.LastName, "").orEmpty()
+                                            val safeLastName = if (!lastName.isNullOrBlank() && lastName != "null") lastName else ""
+                                            var createdBy = firstName.plus(" ").plus(safeLastName)
+                                            CreatedByCustomerShortCut= createdBy
+
+                                            val customerImageFile = saveImageToCache(this, CustPhotoPath!!, "CustomerPhoto" )
+                                            var req = ManageCustomerStepWiseReq(
+                                                mode = "INSERT" ,
+                                                step = "1",
+                                                rid = "",
+                                                firstName = CustFirstName,
+                                                middleName= CustMiddleName,
+                                                lastName=CustLastName,
+                                                primaryMobileNumber = CustPrimaryMobileNumber,
+                                                primaryOTP = CustPrimaryOTP,
+                                                primaryMobileVerified = CustPrimaryMobileVerified,
+                                                alternateMobileNumber = CustAlternateMobileNumber,
+                                                alternateMobileOTP = "",
+                                                pAlternateMobileVerified = "no",
+                                                eMailID = CusteMailID,
+                                                flatNo = CustFlatNo,
+                                                aearSector = CustAreaSector,
+                                                pinCode = CustPinCode,
+                                                currentAddress = CustCurrentAddress,
+                                                stateName= CustStateName,
+                                                cityName= CustCityName,
+                                                country= CustCountry!!,
+                                                aadharNumber = AadharNumber,
+                                                aadharNumberVerified = ConstantClass.AadharVerified,
+                                                panNumber = PanNumber,
+                                                panNumberVerified = PanNumberVerified,
+                                                brandName="",
+                                                modelName="",
+                                                modelVariant="",
+                                                color="",
+                                                sellingPrice="",
+                                                downPayment="",
+                                                tenure="",
+                                                emiAmount="",
+                                                imeiNumber1="",
+                                                imeiNumber2="",
+                                                accountNumber="",
+                                                bankIFSCCode="",
+                                                bankName="",
+                                                accountType="",
+                                                branchName="",
+                                                refName="",
+                                                refRelationShip="",
+                                                refmobileNo="",
+                                                refAddress="",
+                                                debitOrCreditCard="",
+                                                upiMandate="yes",
+                                                createdBy=createdBy,
+                                                membershipfees="",
+                                                retailercode=preference.getStringValue(ConstantClass.RetailerCode,""),
+                                                customerCode="",
+                                                cibilScore=userScore.toString(),
+                                                activeStatus = "Pending",
+                                                cibilApiResponse = CibilResponse,
+                                                aadhaarApiResponse = AadhaarResponse,
+                                                panApiResponse = PanResponse,
+                                                isAggrementVerified=isAggrementVerified,
+                                                isRetailerAggrementVerified="",
+                                                custPhoto_File=customerImageFile,
+                                                imeiNumber1_SealPhotoPath = null,
+                                                imeiNumber2_SealPhotoPath = null,
+                                                imeiNumber_PhotoPath = null,
+                                                invoive_Path = null,
+                                                aadharFront_Path = null,
+                                                aadharBack_Path = null,
+                                                panFront_Path = null
+                                            )
+                                            Log.d("OnlineCustomerReq", Gson().toJson(req))
+                                            hitApiForUploadCustomerData(req)
+                                            //startActivity(Intent(this@NewCustomerRegistrationPage, MobileSelectionActivity::class.java))
                                         }
                                         else{
                                             GlobalScope.launch(Dispatchers.Main) {
@@ -1829,10 +2015,12 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                     }
                                     else{
                                         PopOpForCibileScoreRequestToAdmin(response.message.toString(), "Mismatch Details",false)
+                                        binding.createaccount.isEnabled = true
                                     }
                                 }
                                 else {
                                     Toast.makeText(this@NewCustomerRegistrationPage, response.message, Toast.LENGTH_LONG).show()
+                                    binding.createaccount.isEnabled = true
                                 }
 
                             }
@@ -1841,18 +2029,20 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        binding.createaccount.isEnabled = true
+                        Toast.makeText(this@NewCustomerRegistrationPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
 
                     }
 
-
                 }
             }
         }
 
     }
+
 
 
     fun hitApiForCustomerRegister(cibilScoremsg: String, title: String) {
@@ -2047,6 +2237,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                         }
 
                         PopOpForCibileScoreRequestToAdmin(errorMessage, "Error", false)
+                        binding.createaccount.isEnabled = true
 
                     }
                 }
@@ -2056,6 +2247,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                 withContext(Dispatchers.Main) {
                     ConstantClass.dialog?.dismiss()
                     PopOpForCibileScoreRequestToAdmin("Connection timeout", "Error", false)
+                    binding.createaccount.isEnabled = true
                 }
 
             } catch (e: UnknownHostException) {
@@ -2063,6 +2255,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                 withContext(Dispatchers.Main) {
                     ConstantClass.dialog?.dismiss()
                     PopOpForCibileScoreRequestToAdmin("No internet connection", "Error", false)
+                    binding.createaccount.isEnabled = true
                 }
 
             } catch (e: IOException) {
@@ -2070,12 +2263,14 @@ class NewCustomerRegistrationPage : BaseActivity() {
                 withContext(Dispatchers.Main) {
                     ConstantClass.dialog?.dismiss()
                     PopOpForCibileScoreRequestToAdmin("Network error", "Error", false)
+                    binding.createaccount.isEnabled = true
                 }
 
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     ConstantClass.dialog?.dismiss()
                     PopOpForCibileScoreRequestToAdmin(e.message ?: "Something went wrong", "Error", false)
+                    binding.createaccount.isEnabled = true
 
                 }
             }
@@ -2083,6 +2278,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
         }
 
     }
+
 
 
     fun PopOpForCibileScoreRequestToAdmin(cibilScore : String,title:String,check:Boolean){
@@ -2135,6 +2331,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                 binding.mobileNumber.isEnabled = true
                 binding.verifyiconphonenumber.visibility = View.GONE
                 binding.verifymobilenumber.visibility = View.VISIBLE
+                binding.createaccount.isEnabled = true
                 dialog.dismiss()
             }
 
@@ -2145,6 +2342,59 @@ class NewCustomerRegistrationPage : BaseActivity() {
         }
 
         dialog.show()
+
+    }
+
+
+    // hit api for upload customer data
+
+
+    fun hitApiForUploadCustomerData(request : ManageCustomerStepWiseReq){
+
+        viewModel.uploadCustomerListForShortCutLoanCreateProcess(request).observe(this) { resources ->
+               when (resources.apiStatus) {
+                   ApiStatus.SUCCESS ->{
+                       resources.data.let { user->
+                           ConstantClass.dialog.dismiss()
+                           if(user!!.isSuccessful){
+                               var getData = user.body()
+                               Log.d("CustomerListResp", Gson().toJson(getData))
+                               Toast.makeText(this, getData!!.message, Toast.LENGTH_SHORT).show()
+
+                               if(getData!!.statuss.toLowerCase().equals("false" , ignoreCase = true)){
+                                   binding.createaccount.isEnabled = true
+                                   preference.setStringValue(ConstantClass.CustomerCode, "")
+                               }
+                               else{
+                                   preference.setStringValue(ConstantClass.CustomerCode, getData.customerCode)
+                                   startActivity(Intent(this@NewCustomerRegistrationPage, MobileSelectionActivity::class.java))
+                               }
+
+                           }
+                           else {
+                               preference.setStringValue(ConstantClass.CustomerCode, "")
+                               var errorbody = user.errorBody()
+                               Log.e("API_ERROR", errorbody?.string() ?: "Unknown error")
+                               Toast.makeText(this@NewCustomerRegistrationPage, errorbody?.string(), Toast.LENGTH_SHORT).show()
+                               binding.createaccount.isEnabled = true
+                           }
+                       }
+
+                   }
+
+                   ApiStatus.ERROR -> {
+                       ConstantClass.dialog.dismiss()
+                       binding.createaccount.isEnabled = true
+                       Toast.makeText(this@NewCustomerRegistrationPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
+                   }
+
+                   ApiStatus.LOADING -> {
+
+                   }
+
+              }
+        }
+
 
     }
 

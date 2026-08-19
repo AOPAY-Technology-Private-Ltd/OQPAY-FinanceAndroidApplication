@@ -199,6 +199,7 @@ class AllTransactionHistory : BaseActivity() {
 
                 ApiStatus.ERROR -> {
                     ConstantClass.dialog.dismiss()
+                    Toast.makeText(this@AllTransactionHistory, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                 }
 
                 ApiStatus.LOADING -> {

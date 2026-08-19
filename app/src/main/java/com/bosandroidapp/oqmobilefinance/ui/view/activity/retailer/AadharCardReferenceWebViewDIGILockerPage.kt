@@ -346,6 +346,7 @@ class AadharCardReferenceWebViewDIGILockerPage : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        Toast.makeText(this@AadharCardReferenceWebViewDIGILockerPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
