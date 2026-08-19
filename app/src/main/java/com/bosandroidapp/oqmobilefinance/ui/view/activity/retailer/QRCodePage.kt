@@ -1281,107 +1281,213 @@ class QRCodePage : BaseActivity() {
     }
 
 
-    fun hitApiForRetailerCreatedLoan(requset: LoanCreatedReq) {
+    fun hitApiForRetailerCreatedLoan(request: LoanCreatedReq) {
 
-        Log.d("customerReq", Gson().toJson(requset))
-        viewModel.getRetailerLoanCreatedReq(requset).observe(this) { resources ->
-            resources.let {
-                when (it.apiStatus) {
-                    ApiStatus.SUCCESS -> {
-                        it.data?.let { users ->
-                            users.body()?.let { response ->
-                                Log.d("customerres", Gson().toJson(response))
+        Log.d("customerReq", Gson().toJson(request))
+        viewModel.getRetailerLoanCreatedReq(request).observe(this) { resource ->
 
-                                if (response.status?.toLowerCase().equals(ConstantClass.LoanSuccessStatus)) {
-                                    loaneCode = response.data!!.loanCode!!
-                                    ConstantClass.LoanRID = response.data!!.rid!!
-                                    FirstName = CustFirstName
-                                    MiddleName = CustMiddleName
-                                    LastName = CustLastName
-                                    CustomerCodeForEnach = response.data!!.customerCode!!
-                                    LoanCodeForEnach = response.data!!.loanCode!!
-                                    RetailerCodeForEnach = response.data!!.retailerCode!!
+            when (resource.apiStatus) {
 
-                                    LoanStartDate = response.data.startDate!!
-                                    LoanEndDate = response.data.endDate!!
+                ApiStatus.LOADING -> {
+                    // Show loader if required
+                }
 
-                                    val emiAmount = EmiAmount.toDouble().roundToInt()
+                ApiStatus.SUCCESS -> {
 
-
-                                    val request = EMandateRequest(
-                                        categoryID = 7,
-                                        collectionAmount = emiAmount,
-                                        collectCollectionUntilCancle = false,
-                                        seqType = "RCUR",
-                                        iFSCCode = BankIFSCCode,
-                                        frequncy = "MNTH",
-                                        registrationID = if (ConstantClass.CheckOnlineOrOffline == ConstantClass.online) {
-                                            ConstantClass.PAN_VERIFICATION_REGISTRATION_ID
-                                        } else {
-                                            ConstantClass.PAN_VERIFICATION_REGISTRATION_ID_OFFLINE
-                                        },
-                                        accountHolderName = ConstantClass.AccountHolderName,
-                                        finalCollectionDate = LoanEndDate,
-                                        loanNo = loaneCode,
-                                        accountType = AccountType,
-                                        emailAddress = CusteMailID,
-                                        firstCollectionDate = LoanStartDate,
-                                        mobileNumber = CustPrimaryMobileNumber,
-                                        bankAccountNumberConfirmation = AccountNumber,
-                                        addIn2 = BranchAddress,
-                                        addIn3 = "",
-                                        debitType = true,
-                                        teleNumber = "",
-                                        authType = "",
-                                        bankID = BankID,
-                                        bankAccountNumber = AccountNumber
-                                    )
-
-                                    hitApiForEnach(request,false)
-
-                                }
-                                else {
-                                    if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
-                                        ConstantClass.dialog.dismiss()
-                                    }
-                                    Toast.makeText(this,response!!.message.toString(), Toast.LENGTH_SHORT).show()
-                                }
-
-                            }
-                        }
+                    if (ConstantClass.dialog != null &&
+                        ConstantClass.dialog.isShowing
+                    ) {
+                        ConstantClass.dialog.dismiss()
                     }
 
-                    ApiStatus.ERROR -> {
-                        if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
-                            ConstantClass.dialog.dismiss()
-                        }
+                    val response = resource.data
 
-                        val response = it.data
-                        if (response != null) {
-                            val errorBody = try {
-                                response.errorBody()?.string()
+                    if (response == null) {
+                        binding.LoanCreatelayout.isEnabled= true
+                        showErrorToast("Something went wrong. No response received.")
+                        return@observe
+                    }
+
+                    val responseBody = response.body()
+
+                    Log.d(
+                        "customerres",
+                        Gson().toJson(responseBody)
+                    )
+
+                    if (response.isSuccessful && responseBody != null) {
+
+                        // HTTP success response
+                        if (responseBody.status.equals(
+                                ConstantClass.LoanSuccessStatus,
+                                ignoreCase = true
+                            )
+                        ) {
+
+                            val loanData = responseBody.data
+
+                            if (loanData == null) {
+                                showErrorToast(
+                                    responseBody.message
+                                        ?: "Loan created, but loan details were not received."
+                                )
+                                return@observe
+                            }
+
+                            // -----------------------------
+                            // Loan creation successful
+                            // -----------------------------
+
+                            loaneCode = loanData.loanCode.orEmpty()
+                            ConstantClass.LoanRID = loanData.rid!!
+
+                            FirstName = CustFirstName
+                            MiddleName = CustMiddleName
+                            LastName = CustLastName
+
+                            CustomerCodeForEnach =
+                                loanData.customerCode.orEmpty()
+
+                            LoanCodeForEnach =
+                                loanData.loanCode.orEmpty()
+
+                            RetailerCodeForEnach =
+                                loanData.retailerCode.orEmpty()
+
+                            LoanStartDate =
+                                loanData.startDate.orEmpty()
+
+                            LoanEndDate =
+                                loanData.endDate.orEmpty()
+
+                            val emiAmount = try {
+                                EmiAmount.toDouble().roundToInt()
                             } catch (e: Exception) {
-                                null
+                                showErrorToast("Invalid EMI amount.")
+                                return@observe
                             }
-                            handleApiError(response.code(), errorBody)
+
+                            val mandateRequest = EMandateRequest(
+                                categoryID = 7,
+                                collectionAmount = emiAmount,
+                                collectCollectionUntilCancle = false,
+                                seqType = "RCUR",
+                                iFSCCode = BankIFSCCode,
+                                frequncy = "MNTH",
+
+                                registrationID =
+                                    if (ConstantClass.CheckOnlineOrOffline ==
+                                        ConstantClass.online
+                                    ) {
+                                        ConstantClass.PAN_VERIFICATION_REGISTRATION_ID
+                                    } else {
+                                        ConstantClass.PAN_VERIFICATION_REGISTRATION_ID_OFFLINE
+                                    },
+
+                                accountHolderName = ConstantClass.AccountHolderName,
+                                finalCollectionDate = LoanEndDate,
+                                loanNo = loaneCode,
+                                accountType = AccountType,
+                                emailAddress = CusteMailID,
+                                firstCollectionDate = LoanStartDate,
+                                mobileNumber = CustPrimaryMobileNumber,
+                                bankAccountNumberConfirmation = AccountNumber,
+                                addIn2 = BranchAddress,
+                                addIn3 = "",
+                                debitType = true,
+                                teleNumber = "",
+                                authType = "",
+                                bankID = BankID,
+                                bankAccountNumber = AccountNumber
+                            )
+
+                            Toast.makeText(this, "Loan created successfully.", Toast.LENGTH_SHORT).show()
+
+                            // Continue with eNACH
+                            hitApiForEnach(mandateRequest, false)
+
                         } else {
-                            // Network error or exception where response is null
-                            Toast.makeText(
-                                this,
-                                it.message ?: "Network error occurred. Please try again.",
-                                Toast.LENGTH_LONG
-                            ).show()
+
+                            // API returned HTTP success but business failure
+                            showErrorToast(responseBody.message ?: "Loan creation failed.")
                         }
+
+                    } else {
+                        binding.LoanCreatelayout.isEnabled= true
+                        // This normally shouldn't be reached if Retrofit
+                        // maps non-2xx responses to ERROR, but keep it safe.
+                        handleHttpError(response.code(), response.errorBody()?.string(), response.message())
+                    }
+                }
+
+                ApiStatus.ERROR -> {
+                    binding.LoanCreatelayout.isEnabled= true
+                    if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
+                        ConstantClass.dialog.dismiss()
                     }
 
-                    ApiStatus.LOADING -> {
+                    val response = resource.data
+
+                    if (response != null) {
+
+                        val errorBody = try {
+                            response.errorBody()?.string()
+                        } catch (e: Exception) {
+                            null
+                        }
+
+                        handleHttpError(response.code(), errorBody, response.message())
 
                     }
+                    else {
 
+                        // Network / connection / unknown error
+                        showErrorToast(resource.message ?: "Unable to connect to server. Please check your internet connection and try again.")
+                    }
                 }
             }
+         }
+      }
+
+    private fun showErrorToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
+    private fun handleHttpError(responseCode: Int, errorBody: String?, responseMessage: String?) {
+        if (ConstantClass.dialog?.isShowing == true) {
+            ConstantClass.dialog.dismiss()
         }
-        
+        binding.nextlayout.isEnabled = true
+
+        val serverMessage = getServerErrorMessage(errorBody)
+        val finalMessage = when {
+            !serverMessage.isNullOrBlank() -> serverMessage
+            responseCode == 400 -> "Bad request. Please check your data (400)."
+            responseCode == 401 -> "Session expired. Please login again (401)."
+            responseCode == 404 -> "Service not found. Please try again later (404)."
+            responseCode == 500 -> "Server error. Please try again later (500)."
+            !responseMessage.isNullOrBlank() -> responseMessage
+            else -> "Something went wrong (Code: $responseCode)."
+        }
+
+        showErrorToast(finalMessage)
+        Log.e("API_HTTP_ERROR", "Code: $responseCode | Body: $errorBody")
+    }
+
+
+    private fun getServerErrorMessage(errorBody: String?): String? {
+        if (errorBody.isNullOrBlank()) return null
+        return try {
+            val jsonObject = JSONObject(errorBody)
+            when {
+                jsonObject.has("message") -> jsonObject.getString("message")
+                jsonObject.has("Message") -> jsonObject.getString("Message")
+                jsonObject.has("statusMessage") -> jsonObject.getString("statusMessage")
+                else -> null
+            }
+        } catch (e: Exception) {
+            null
+        }
     }
 
 
