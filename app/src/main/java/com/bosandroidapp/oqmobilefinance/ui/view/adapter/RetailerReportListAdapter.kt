@@ -168,54 +168,11 @@ class RetailerReportListAdapter(private val ReportsDataList: MutableList<com.bos
         holder.itemView.setOnClickListener {
             if (context is RetailerCustomerReportsPage) {
 
-                val isEmandateVerified = item.isEmandateVerified
-                val isPennyDropVerified = item.isPannydropVerified
-
                 if (status.equals("Disbursed")) {
                     preference.setStringValue(ConstantClass.CustomerCode, item.customerCode)
                     LoanId = item.loanCode
                     customerCode = item.customerCode
                     context.startActivity(Intent(context, EmiLoanDetailPage::class.java))
-                }
-
-                else{
-                    if(isEmandateVerified.equals("No") && isPennyDropVerified.equals("Yes")){
-                        val startDate = item.startDate
-                        val endDate =  item.endDate
-
-                        val emiAmountVal = item.emiAmount.roundToInt()
-
-                        val request = EMandateRequest(
-                            categoryID = 7,
-                            collectionAmount = emiAmountVal,
-                            collectCollectionUntilCancle = false,
-                            seqType = "RCUR",
-                            iFSCCode = item.bankIFSCCode,
-                            frequncy = "MNTH",
-                            registrationID =  if (ConstantClass.CheckOnlineOrOffline == ConstantClass.online) {
-                                ConstantClass.PAN_VERIFICATION_REGISTRATION_ID
-                            } else {
-                                ConstantClass.PAN_VERIFICATION_REGISTRATION_ID_OFFLINE
-                            },
-                            accountHolderName = item.customerName,
-                            finalCollectionDate = endDate,
-                            loanNo = item.loanCode,
-                            accountType = item.accountType,
-                            emailAddress = CusteMailID, // Or from item if available
-                            firstCollectionDate = startDate,
-                            mobileNumber = item.custerMob,
-                            bankAccountNumberConfirmation = item.accountNumber,
-                            addIn2 = BranchAddress,
-                            addIn3 = "",
-                            debitType = true,
-                            teleNumber = "",
-                            authType = "",
-                            bankID = BankID,
-                            bankAccountNumber = item.accountNumber
-                        )
-                        hitApiForEnach(request, item, true)
-
-                    }
                 }
 
 

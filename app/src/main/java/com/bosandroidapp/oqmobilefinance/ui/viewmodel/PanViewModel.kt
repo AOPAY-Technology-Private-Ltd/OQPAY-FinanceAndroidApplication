@@ -66,7 +66,19 @@ class PanViewModel(private val repository: PanRepository) : ViewModel() {
     fun getEMandateRequestReq(req: EMandateRequest) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.getEMandateRequestReq(req)))
+            val response = repository.getEMandateRequestReq(req)
+            if (response != null && response.isSuccessful) {
+                emit(ApiResponse.success(data = response))
+            } else {
+                val code = response?.code() ?: -1
+                val message = when (code) {
+                    400 -> "Bad Request (400)"
+                    404 -> "Resource Not Found (404)"
+                    500 -> "Internal Server Error (500)"
+                    else -> "Unexpected error: $code"
+                }
+                emit(ApiResponse.error(data = response, message = message))
+            }
         }
         catch (exception: Exception) {
             emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
@@ -78,7 +90,19 @@ class PanViewModel(private val repository: PanRepository) : ViewModel() {
     fun getEMandateOnlineRequest(req: EMandateRequest) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.EMandateOnlineRequest(req)))
+            val response = repository.EMandateOnlineRequest(req)
+            if (response != null && response.isSuccessful) {
+                emit(ApiResponse.success(data = response))
+            } else {
+                val code = response?.code() ?: -1
+                val message = when (code) {
+                    400 -> "Bad Request (400)"
+                    404 -> "Resource Not Found (404)"
+                    500 -> "Internal Server Error (500)"
+                    else -> "Unexpected error: $code"
+                }
+                emit(ApiResponse.error(data = response, message = message))
+            }
         }
         catch (exception: Exception) {
             emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
@@ -89,7 +113,19 @@ class PanViewModel(private val repository: PanRepository) : ViewModel() {
     fun geteMandateSatusRequest(req: ENachStatusReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.geteMandateSatusRequest(req)))
+            val response = repository.geteMandateSatusRequest(req)
+            if (response != null && response.isSuccessful) {
+                emit(ApiResponse.success(data = response))
+            } else {
+                val code = response?.code() ?: -1
+                val message = when (code) {
+                    400 -> "Bad Request (400)"
+                    404 -> "Resource Not Found (404)"
+                    500 -> "Internal Server Error (500)"
+                    else -> "Unexpected error: $code"
+                }
+                emit(ApiResponse.error(data = response, message = message))
+            }
         }
         catch (exception: Exception) {
             emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
@@ -112,7 +148,19 @@ class PanViewModel(private val repository: PanRepository) : ViewModel() {
     fun loanApplyChargesReq(req: LoanChargeReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.loanApplyChargesReq(req)))
+            val response = repository.loanApplyChargesReq(req)
+            if (response != null && response.isSuccessful) {
+                emit(ApiResponse.success(data = response))
+            } else {
+                val code = response?.code() ?: -1
+                val message = when (code) {
+                    400 -> "Bad Request (400)"
+                    404 -> "Resource Not Found (404)"
+                    500 -> "Internal Server Error (500)"
+                    else -> "Unexpected error: $code"
+                }
+                emit(ApiResponse.error(data = response, message = message))
+            }
         }
         catch (exception: Exception) {
             emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))

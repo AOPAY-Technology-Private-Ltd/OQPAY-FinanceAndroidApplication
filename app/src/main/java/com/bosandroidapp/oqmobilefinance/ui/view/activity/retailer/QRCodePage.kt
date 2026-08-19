@@ -151,6 +151,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import okhttp3.Response
+import org.json.JSONObject
 import kotlin.math.roundToInt
 
 
@@ -1190,6 +1191,7 @@ class QRCodePage : BaseActivity() {
     }
 
 
+    
     fun updateUI(isRegistered: Boolean) {
         if (isRegistered) {
             // STEP 2: Registered
@@ -1250,13 +1252,27 @@ class QRCodePage : BaseActivity() {
         }
         binding.nextlayout.isEnabled= true
 
-        val message = when (responseCode) {
-            400 -> "Bad request. Please check entered data with code 400."
-            401 -> "Session expired. Please login again with code 401."
-            403 -> "You are not authorized to perform this action with code 403."
-            404 -> "Service not found. Please try again later with code 404."
-            500 -> "Server error. Please try after some time with code 500."
+        var message = when (responseCode) {
+            400 -> "Bad request. Please check entered data (400)."
+            401 -> "Session expired. Please login again (401)."
+            403 -> "You are not authorized to perform this action (403)."
+            404 -> "Service not found. Please try again later (404)."
+            500 -> "Server error. Please try after some time (500)."
             else -> "Something went wrong. Please try again."
+        }
+
+        // Try to parse specific error message from body if available
+        try {
+            if (!errorBody.isNullOrBlank()) {
+                val jsonObject = JSONObject(errorBody)
+                if (jsonObject.has("message")) {
+                    message = jsonObject.getString("message")
+                } else if (jsonObject.has("Message")) {
+                    message = jsonObject.getString("Message")
+                }
+            }
+        } catch (e: Exception) {
+            // Fallback to default message if parsing fails
         }
 
         Log.e("API_ERROR", "Code: $responseCode Body: $errorBody")
@@ -1289,11 +1305,8 @@ class QRCodePage : BaseActivity() {
                                     LoanStartDate = response.data.startDate!!
                                     LoanEndDate = response.data.endDate!!
 
-                                  /*  LoanStartDate = "2026-08-25T09:21:03.988Z"
-                                    LoanEndDate = "2026-09-25T09:21:03.988Z"*/
-
                                     val emiAmount = EmiAmount.toDouble().roundToInt()
-                                   /* val emiAmount = 1*/
+
 
                                     val request = EMandateRequest(
                                         categoryID = 7,
@@ -1326,10 +1339,12 @@ class QRCodePage : BaseActivity() {
 
                                     hitApiForEnach(request,false)
 
-                                } else {
+                                }
+                                else {
                                     if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
                                         ConstantClass.dialog.dismiss()
                                     }
+                                    Toast.makeText(this,response!!.message.toString(), Toast.LENGTH_SHORT).show()
                                 }
 
                             }
@@ -1341,22 +1356,22 @@ class QRCodePage : BaseActivity() {
                             ConstantClass.dialog.dismiss()
                         }
 
-                        // ✅ Print the full error details
-                        Log.e("API_ERROR", "Status: ERROR")
-                        Log.e("API_ERROR_CODE", resources.data?.code().toString())
-                        Log.e("API_ERROR_MSG", resources.message ?: "Unknown Error")
-
-                        Toast.makeText(
-                            this,
-                            "Server error occurred (Code: ${resources.data?.code() ?: "Unknown"})",
-                            Toast.LENGTH_LONG
-                        ).show()
-
-                        // Optional: Handle specific 500 error
-                        if (resources.data?.code() == 500) {
-                            Log.e("API_ERROR", "Internal Server Error from backend.")
+                        val response = it.data
+                        if (response != null) {
+                            val errorBody = try {
+                                response.errorBody()?.string()
+                            } catch (e: Exception) {
+                                null
+                            }
+                            handleApiError(response.code(), errorBody)
+                        } else {
+                            // Network error or exception where response is null
+                            Toast.makeText(
+                                this,
+                                it.message ?: "Network error occurred. Please try again.",
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
-
                     }
 
                     ApiStatus.LOADING -> {
@@ -1494,7 +1509,21 @@ class QRCodePage : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
-                        hitApiForMemberShipFee()
+                        val response = it.data
+                        if (response != null) {
+                            val errorBody = try {
+                                response.errorBody()?.string()
+                            } catch (e: Exception) {
+                                null
+                            }
+                            handleApiError(response.code(), errorBody)
+                        } else {
+                            Toast.makeText(
+                                this,
+                                it.message ?: "Network error occurred. Please try again.",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
                         Log.d("API_TIME", "Failed after: ${System.currentTimeMillis() - startTime} ms")
                     }
 
@@ -1578,7 +1607,21 @@ class QRCodePage : BaseActivity() {
                     }
 
                     ApiStatus.ERROR -> {
-
+                        val response = it.data
+                        if (response != null) {
+                            val errorBody = try {
+                                response.errorBody()?.string()
+                            } catch (e: Exception) {
+                                null
+                            }
+                            handleApiError(response.code(), errorBody)
+                        } else {
+                            Toast.makeText(
+                                this,
+                                it.message ?: "Network error occurred. Please try again.",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
                     }
 
                     ApiStatus.LOADING -> {
@@ -1611,7 +1654,21 @@ class QRCodePage : BaseActivity() {
                     }
 
                     ApiStatus.ERROR -> {
-
+                        val response = it.data
+                        if (response != null) {
+                            val errorBody = try {
+                                response.errorBody()?.string()
+                            } catch (e: Exception) {
+                                null
+                            }
+                            handleApiError(response.code(), errorBody)
+                        } else {
+                            Toast.makeText(
+                                this,
+                                it.message ?: "Network error occurred. Please try again.",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
                     }
 
                     ApiStatus.LOADING -> {
@@ -1650,7 +1707,21 @@ class QRCodePage : BaseActivity() {
                     }
 
                     ApiStatus.ERROR -> {
-
+                        val response = it.data
+                        if (response != null) {
+                            val errorBody = try {
+                                response.errorBody()?.string()
+                            } catch (e: Exception) {
+                                null
+                            }
+                            handleApiError(response.code(), errorBody)
+                        } else {
+                            Toast.makeText(
+                                this,
+                                it.message ?: "Network error occurred. Please try again.",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
                     }
 
                     ApiStatus.LOADING -> {
@@ -1716,16 +1787,20 @@ class QRCodePage : BaseActivity() {
 
                         ApiStatus.ERROR -> {
                             ConstantClass.dialog.dismiss()
-                            // ✅ Print the full error details
-                            Log.e("API_ERROR", "Status: ERROR")
-                            Log.e("API_ERROR_CODE", resources.data?.code().toString())
-                            Log.e("API_ERROR_MSG", resources.message ?: "Unknown Error")
-
-                            Toast.makeText(this, "Server error occurred (Code: ${resources.data?.code() ?: "Unknown"})", Toast.LENGTH_LONG).show()
-
-                            // Optional: Handle specific 500 error
-                            if (resources.data?.code() == 500) {
-                                Log.e("API_ERROR", "Internal Server Error from backend.")
+                            val response = it.data
+                            if (response != null) {
+                                val errorBody = try {
+                                    response.errorBody()?.string()
+                                } catch (e: Exception) {
+                                    null
+                                }
+                                handleApiError(response.code(), errorBody)
+                            } else {
+                                Toast.makeText(
+                                    this,
+                                    it.message ?: "Network error occurred. Please try again.",
+                                    Toast.LENGTH_LONG
+                                ).show()
                             }
                         }
 
@@ -1791,18 +1866,21 @@ class QRCodePage : BaseActivity() {
 
                         ApiStatus.ERROR -> {
                             ConstantClass.dialog.dismiss()
-                            // ✅ Print the full error details
-                            Log.e("API_ERROR", "Status: ERROR")
-                            Log.e("API_ERROR_CODE", resources.data?.code().toString())
-                            Log.e("API_ERROR_MSG", resources.message ?: "Unknown Error")
-
-                            Toast.makeText(this, "Server error occurred (Code: ${resources.data?.code() ?: "Unknown"})", Toast.LENGTH_LONG).show()
-
-                            // Optional: Handle specific 500 error
-                            if (resources.data?.code() == 500) {
-                                Log.e("API_ERROR", "Internal Server Error from backend.")
+                            val response = it.data
+                            if (response != null) {
+                                val errorBody = try {
+                                    response.errorBody()?.string()
+                                } catch (e: Exception) {
+                                    null
+                                }
+                                handleApiError(response.code(), errorBody)
+                            } else {
+                                Toast.makeText(
+                                    this,
+                                    it.message ?: "Network error occurred. Please try again.",
+                                    Toast.LENGTH_LONG
+                                ).show()
                             }
-
                         }
 
                         ApiStatus.LOADING -> {
@@ -1865,11 +1943,25 @@ class QRCodePage : BaseActivity() {
                     }
 
                     ApiStatus.ERROR -> {
-                        // ✅ Print the full error details
-                        Log.e("API_ERROR", "Status: ERROR")
                         binding.LoanCreatelayout.isEnabled= true
                         if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
                             ConstantClass.dialog.dismiss()
+                        }
+                        
+                        val response = it.data
+                        if (response != null) {
+                            val errorBody = try {
+                                response.errorBody()?.string()
+                            } catch (e: Exception) {
+                                null
+                            }
+                            handleApiError(response.code(), errorBody)
+                        } else {
+                            Toast.makeText(
+                                this,
+                                it.message ?: "Network error occurred. Please try again.",
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
                     }
 
@@ -1901,16 +1993,20 @@ class QRCodePage : BaseActivity() {
 
                     }
                     ApiStatus.ERROR ->{
-                        // ✅ Print the full error details
-                        Log.e("API_ERROR", "Status: ERROR")
-                        Log.e("API_ERROR_CODE", resources.data?.code().toString())
-                        Log.e("API_ERROR_MSG", resources.message ?: "Unknown Error")
-
-                        Toast.makeText(this, "Server error occurred (Code: ${resources.data?.code() ?: "Unknown"})", Toast.LENGTH_LONG).show()
-
-                        // Optional: Handle specific 500 error
-                        if (resources.data?.code() == 500) {
-                            Log.e("API_ERROR", "Internal Server Error from backend.")
+                        val response = it.data
+                        if (response != null) {
+                            val errorBody = try {
+                                response.errorBody()?.string()
+                            } catch (e: Exception) {
+                                null
+                            }
+                            handleApiError(response.code(), errorBody)
+                        } else {
+                            Toast.makeText(
+                                this,
+                                it.message ?: "Network error occurred. Please try again.",
+                                Toast.LENGTH_LONG
+                            ).show()
                         }
                     }
 

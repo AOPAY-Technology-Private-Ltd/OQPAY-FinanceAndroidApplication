@@ -41,7 +41,7 @@ class ReportSelectionPage : BaseActivity() {
             ReportSelectionItem(4, "Dues EMI", R.drawable.pendingemisicon),
             ReportSelectionItem(5, "Low Cibil Customer", R.drawable.lowcibilscoreicon),
             ReportSelectionItem(6, "Ledger Report", R.drawable.ledger),
-            ReportSelectionItem(7, "Customer List", R.drawable.customerdetailsicon)
+           // ReportSelectionItem(7, "Customer List", R.drawable.customerdetailsicon)
         )
 
         binding.rvReports.layoutManager = LinearLayoutManager(this)

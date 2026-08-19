@@ -59,7 +59,19 @@ class AuthenticationViewModel (private val repository: AuthRepository):ViewModel
     fun getRegistration(req: RegistrationReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.getregistration(req)))
+            val response = repository.getregistration(req)
+            if (response.isSuccessful) {
+                emit(ApiResponse.success(data = response))
+            } else {
+                val code = response.code()
+                val message = when (code) {
+                    400 -> "Bad Request (400)"
+                    404 -> "Resource Not Found (404)"
+                    500 -> "Internal Server Error (500)"
+                    else -> "Unexpected error: $code"
+                }
+                emit(ApiResponse.error(data = response, message = message))
+            }
         }catch (exception: Exception) {
             emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
         }
@@ -96,7 +108,19 @@ class AuthenticationViewModel (private val repository: AuthRepository):ViewModel
     fun getLogout(req: LogoutReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.getlogout(req)))
+            val response = repository.getlogout(req)
+            if (response != null && response.isSuccessful) {
+                emit(ApiResponse.success(data = response))
+            } else {
+                val code = response?.code() ?: -1
+                val message = when (code) {
+                    400 -> "Bad Request (400)"
+                    404 -> "Resource Not Found (404)"
+                    500 -> "Internal Server Error (500)"
+                    else -> "Unexpected error: $code"
+                }
+                emit(ApiResponse.error(data = response, message = message))
+            }
         }catch (exception: Exception) {
             emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
         }
@@ -162,15 +186,16 @@ class AuthenticationViewModel (private val repository: AuthRepository):ViewModel
                 val errorBody = response.errorBody()?.string()
                 val code = response.code()
                 val message = when (code) {
-                    500 -> "Internal Server Error (500)"
-                    404 -> "Resource Not Found (404)"
+                    400 -> "Bad Request (400)"
                     401 -> "Unauthorized Access (401)"
+                    404 -> "Resource Not Found (404)"
+                    500 -> "Internal Server Error (500)"
                     else -> "Unexpected error: $code"
                 }
 
                 Log.e("API_ERROR", "Code: $code | Body: $errorBody")
 
-                emit(ApiResponse.error(data = null, message = message))
+                emit(ApiResponse.error(data = response, message = message))
             }
 
         } catch (exception: Exception) {
@@ -285,7 +310,19 @@ class AuthenticationViewModel (private val repository: AuthRepository):ViewModel
     fun getgetMemberShipReqeReq(req: GetIsEligibleLoanReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.getMemberShipReq(req)))
+            val response = repository.getMemberShipReq(req)
+            if (response != null && response.isSuccessful) {
+                emit(ApiResponse.success(data = response))
+            } else {
+                val code = response?.code() ?: -1
+                val message = when (code) {
+                    400 -> "Bad Request (400)"
+                    404 -> "Resource Not Found (404)"
+                    500 -> "Internal Server Error (500)"
+                    else -> "Unexpected error: $code"
+                }
+                emit(ApiResponse.error(data = response, message = message))
+            }
         }
         catch (exception: Exception) {
             emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
@@ -343,22 +380,17 @@ class AuthenticationViewModel (private val repository: AuthRepository):ViewModel
         try {
             val response = repository.getRetailerWalletAmountReq(req)
 
-            if (response!!.isSuccessful) {
+            if (response != null && response.isSuccessful) {
                 emit(ApiResponse.success(data = response))
             } else {
-                // ❌ Handle API error (like 500)
-                val errorBody = response.errorBody()?.string()
-                val code = response.code()
+                val code = response?.code() ?: -1
                 val message = when (code) {
-                    500 -> "Internal Server Error (500)"
+                    400 -> "Bad Request (400)"
                     404 -> "Resource Not Found (404)"
-                    401 -> "Unauthorized Access (401)"
+                    500 -> "Internal Server Error (500)"
                     else -> "Unexpected error: $code"
                 }
-
-                Log.e("API_ERROR", "Code: $code | Body: $errorBody")
-
-                emit(ApiResponse.error(data = null, message = message))
+                emit(ApiResponse.error(data = response, message = message))
             }
 
         } catch (exception: Exception) {
@@ -442,7 +474,19 @@ class AuthenticationViewModel (private val repository: AuthRepository):ViewModel
     fun getSessionReq(req: SessionOutReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.sessionOutReq(req)))
+            val response = repository.sessionOutReq(req)
+            if (response != null && response.isSuccessful) {
+                emit(ApiResponse.success(data = response))
+            } else {
+                val code = response?.code() ?: -1
+                val message = when (code) {
+                    400 -> "Bad Request (400)"
+                    404 -> "Resource Not Found (404)"
+                    500 -> "Internal Server Error (500)"
+                    else -> "Unexpected error: $code"
+                }
+                emit(ApiResponse.error(data = response, message = message))
+            }
         }
         catch (exception: Exception) {
             emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
@@ -464,7 +508,19 @@ class AuthenticationViewModel (private val repository: AuthRepository):ViewModel
     fun getSessionExpiredReq(req: ValidateSessionRequest) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.sessionExpired(req)))
+            val response = repository.sessionExpired(req)
+            if (response != null && response.isSuccessful) {
+                emit(ApiResponse.success(data = response))
+            } else {
+                val code = response?.code() ?: -1
+                val message = when (code) {
+                    400 -> "Bad Request (400)"
+                    404 -> "Resource Not Found (404)"
+                    500 -> "Internal Server Error (500)"
+                    else -> "Unexpected error: $code"
+                }
+                emit(ApiResponse.error(data = response, message = message))
+            }
         }
         catch (exception: Exception) {
             emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
@@ -484,7 +540,19 @@ class AuthenticationViewModel (private val repository: AuthRepository):ViewModel
     fun UpdateEmandateDetails(req: EnachDateUploadReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
-            emit(ApiResponse.success(data = repository.UpdateEmandateDetails(req)))
+            val response = repository.UpdateEmandateDetails(req)
+            if (response != null && response.isSuccessful) {
+                emit(ApiResponse.success(data = response))
+            } else {
+                val code = response?.code() ?: -1
+                val message = when (code) {
+                    400 -> "Bad Request (400)"
+                    404 -> "Resource Not Found (404)"
+                    500 -> "Internal Server Error (500)"
+                    else -> "Unexpected error: $code"
+                }
+                emit(ApiResponse.error(data = response, message = message))
+            }
         }
         catch (exception: Exception) {
             emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))

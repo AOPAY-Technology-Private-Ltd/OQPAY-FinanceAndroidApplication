@@ -869,7 +869,7 @@ class EmiLoanDetailPage : BaseActivity() {
             mode = "UPDATE",
             loanCode = loanCode,
             paymentDate = getCurrentUtcTimestamp(),
-            paymentMode =  binding.paymentmode.selectedItem.toString(),
+            paymentMode = binding.paymentmode.selectedItem.toString(),
             utrNumber = "",
             remarks = binding.remarkEdt.text.toString(),
             createdBy = createdBy,
