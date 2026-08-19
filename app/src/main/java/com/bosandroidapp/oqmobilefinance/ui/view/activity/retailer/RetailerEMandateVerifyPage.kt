@@ -26,6 +26,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import com.bos.payment.appName.network.RetrofitClient
 import com.bosandroidapp.bosmobilefinance.ui.slideshow.ui.view.activity.retailer.cibilreportsfragment.BureauScore.Companion.userScore
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AadharNumber
@@ -83,6 +84,7 @@ import com.bosandroidapp.oqmobilefinance.data.repository.PanRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.PanViewModelFactory
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityRetailerEmandateVerifyPageBinding
+import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.AppScanInstallPage.Companion.LoanMode
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.CongratulationPage.Companion.loaneCode
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.QRCodePage.Companion.isEnachCancelled
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
@@ -90,7 +92,7 @@ import com.bosandroidapp.oqmobilefinance.ui.viewmodel.PanViewModel
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.google.gson.Gson
 
-class RetailerEMandateVerifyPage : AppCompatActivity() {
+class RetailerEMandateVerifyPage : BaseActivity() {
 
     lateinit var binding : ActivityRetailerEmandateVerifyPageBinding
     var isEmandateVerified : String= ""
@@ -123,6 +125,7 @@ class RetailerEMandateVerifyPage : AppCompatActivity() {
         )[PanViewModel::class.java]
 
         setDataInWebView()
+
     }
 
 
@@ -221,96 +224,186 @@ class RetailerEMandateVerifyPage : AppCompatActivity() {
     fun doUpdateEMandateStatus(eMandateID : String){
 
         (this@RetailerEMandateVerifyPage).runOnUiThread {
+
             var request = ENachStatusReq(
-                registrationID = ConstantClass.PAN_VERIFICATION_REGISTRATION_ID,
+                registrationID = if (ConstantClass.CheckOnlineOrOffline == ConstantClass.online) {
+                    ConstantClass.PAN_VERIFICATION_REGISTRATION_ID
+                } else {
+                    ConstantClass.PAN_VERIFICATION_REGISTRATION_ID_OFFLINE
+                },
                 eMandateID = eMandateID
             )
 
             hitApiForEMandateStatus(request)
         }
+
     }
 
 
     fun hitApiForEMandateStatus(request: ENachStatusReq) {
         Log.d("eManadateStatusReq", Gson().toJson(request))
-        panViewModel.geteMandateSatusRequest(request).observe(this) { resources ->
-            resources.let {
-                when (it.apiStatus) {
-                    ApiStatus.SUCCESS -> {
-                        it.data.let { users ->
-                            users!!.body().let { response ->
-                                Log.d("eMandateStatusRes", Gson().toJson(response))
 
-                                if(ConstantClass.dialog!=null && ConstantClass.dialog.isShowing){
-                                    ConstantClass.dialog.dismiss()
-                                }
+        if(LoanMode.equals(ConstantClass.offline)){
+            panViewModel.geteMandateSatusRequest(request).observe(this) { resources ->
+                resources.let {
+                    when (it.apiStatus) {
+                        ApiStatus.SUCCESS -> {
+                            it.data.let { users ->
+                                users!!.body().let { response ->
+                                    Log.d("eMandateStatusRes", Gson().toJson(response))
 
-                                var statusCode =  response!!.statusCode
-                                var eMandateStatus =""
-
-                                if(response.data!!.customer!=null){
-                                     eMandateStatus = response.data.customer!!.accptd!!
-                                }
-
-                                if (response!!.statusCode.equals("NP000")&& eMandateStatus.equals(eMandate)) {
-                                    isEmandateVerified= isMandate
-                                    CheckOnlineOrOffline =""
-                                    Toast.makeText(this, "ENach Mandate is Active", Toast.LENGTH_SHORT).show()
-                                    if(!isEmandateVerified.isNullOrBlank()){
-
-                                        var request = EnachDateUploadReq(
-                                            isEmandateVerified = isEmandateVerified,
-                                            emAccountType = AccountType,
-                                            isPannydropVerified = isPannydropVerified,
-                                            emAccountNumber = AccountNumber,
-                                            customerCode = CustomerCodeForEnach,
-                                            retailerCode= RetailerCodeForEnach,
-                                            loanCode= loaneCode,
-                                            emBankName=BankName,
-                                            emIfscCode =BankIFSCCode
-                                        )
-
-                                        hitApiForUploadEnachMandateDataResponse(request,isEmandateVerified)
+                                    if(ConstantClass.dialog!=null && ConstantClass.dialog.isShowing){
+                                        ConstantClass.dialog.dismiss()
                                     }
 
-                                }
+                                    var statusCode =  response!!.statusCode
+                                    var eMandateStatus =""
 
-                                else {
-                                    if(!eMandateStatus.equals(eMandatepending)){
-                                        isEmandateVerified= "No"
-                                        showingRejectioneMandatePopUp()
+                                    if(response.data!!.customer!=null){
+                                        eMandateStatus = response.data.customer!!.accptd!!
                                     }
+
+                                    if (response!!.statusCode.equals("NP000")&& eMandateStatus.equals(eMandate)) {
+                                        isEmandateVerified= isMandate
+                                        CheckOnlineOrOffline =""
+                                        Toast.makeText(this, "ENach Mandate is Active", Toast.LENGTH_SHORT).show()
+                                        if(!isEmandateVerified.isNullOrBlank()){
+
+                                            var request = EnachDateUploadReq(
+                                                isEmandateVerified = isEmandateVerified,
+                                                emAccountType = AccountType,
+                                                isPannydropVerified = isPannydropVerified,
+                                                emAccountNumber = AccountNumber,
+                                                customerCode = CustomerCodeForEnach,
+                                                retailerCode= RetailerCodeForEnach,
+                                                loanCode= loaneCode,
+                                                emBankName=BankName,
+                                                emIfscCode =BankIFSCCode
+                                            )
+
+                                            hitApiForUploadEnachMandateDataResponse(request,isEmandateVerified)
+                                        }
+
+                                    }
+
+                                    else {
+                                        if(!eMandateStatus.equals(eMandatepending)){
+                                            isEmandateVerified= "No"
+                                            showingRejectioneMandatePopUp()
+                                        }
+                                    }
+
                                 }
 
                             }
 
                         }
 
-                    }
+                        ApiStatus.ERROR -> {
+                            ConstantClass.dialog.dismiss()
+                            // ✅ Print the full error details
+                            Log.e("API_ERROR", "Status: ERROR")
+                            Log.e("API_ERROR_CODE", resources.data?.code().toString())
+                            Log.e("API_ERROR_MSG", resources.message ?: "Unknown Error")
 
-                    ApiStatus.ERROR -> {
-                        ConstantClass.dialog.dismiss()
-                        // ✅ Print the full error details
-                        Log.e("API_ERROR", "Status: ERROR")
-                        Log.e("API_ERROR_CODE", resources.data?.code().toString())
-                        Log.e("API_ERROR_MSG", resources.message ?: "Unknown Error")
+                            Toast.makeText(this, "Server error occurred (Code: ${resources.data?.code() ?: "Unknown"})", Toast.LENGTH_LONG).show()
 
-                        Toast.makeText(this, "Server error occurred (Code: ${resources.data?.code() ?: "Unknown"})", Toast.LENGTH_LONG).show()
-
-                        // Optional: Handle specific 500 error
-                        if (resources.data?.code() == 500) {
-                            Log.e("API_ERROR", "Internal Server Error from backend.")
+                            // Optional: Handle specific 500 error
+                            if (resources.data?.code() == 500) {
+                                Log.e("API_ERROR", "Internal Server Error from backend.")
+                            }
                         }
-                    }
 
-                    ApiStatus.LOADING -> {
+                        ApiStatus.LOADING -> {
+
+                        }
 
                     }
 
                 }
 
             }
+        }
+        else {
+            panViewModel.geteMandateOnlineSatusRequest(request).observe(this) { resources ->
+                resources.let {
+                    when (it.apiStatus) {
+                        ApiStatus.SUCCESS -> {
+                            it.data.let { users ->
+                                users!!.body().let { response ->
+                                    Log.d("eMandateonlineStatusRes", Gson().toJson(response))
 
+                                    if(ConstantClass.dialog!=null && ConstantClass.dialog.isShowing){
+                                        ConstantClass.dialog.dismiss()
+                                    }
+
+                                    var statusCode =  response!!.statusCode
+                                    var eMandateStatus =""
+
+                                    if(response.data!!.customer!=null){
+                                        eMandateStatus = response.data.customer!!.accptd!!
+                                    }
+
+                                    if (response!!.statusCode.equals("NP000")&& eMandateStatus.equals(eMandate)) {
+                                        isEmandateVerified= isMandate
+                                        CheckOnlineOrOffline =""
+                                        Toast.makeText(this, "ENach Mandate is Active", Toast.LENGTH_SHORT).show()
+
+                                        if(!isEmandateVerified.isNullOrBlank()){
+                                            var request = EnachDateUploadReq(
+                                                isEmandateVerified = isEmandateVerified,
+                                                emAccountType = AccountType,
+                                                isPannydropVerified = isPannydropVerified,
+                                                emAccountNumber = AccountNumber,
+                                                customerCode = CustomerCodeForEnach,
+                                                retailerCode= RetailerCodeForEnach,
+                                                loanCode= loaneCode,
+                                                emBankName=BankName,
+                                                emIfscCode =BankIFSCCode
+                                            )
+
+                                            hitApiForUploadEnachMandateDataResponse(request,isEmandateVerified)
+                                        }
+
+                                    }
+
+                                    else {
+                                        if(!eMandateStatus.equals(eMandatepending)){
+                                            isEmandateVerified= "No"
+                                            showingRejectioneMandatePopUp()
+                                        }
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+                        ApiStatus.ERROR -> {
+                            ConstantClass.dialog.dismiss()
+                            // ✅ Print the full error details
+                            Log.e("API_ERROR", "Status: ERROR")
+                            Log.e("API_ERROR_CODE", resources.data?.code().toString())
+                            Log.e("API_ERROR_MSG", resources.message ?: "Unknown Error")
+
+                            Toast.makeText(this, "Server error occurred (Code: ${resources.data?.code() ?: "Unknown"})", Toast.LENGTH_LONG).show()
+
+                            // Optional: Handle specific 500 error
+                            if (resources.data?.code() == 500) {
+                                Log.e("API_ERROR", "Internal Server Error from backend.")
+                            }
+                        }
+
+                        ApiStatus.LOADING -> {
+
+                        }
+
+                    }
+
+                }
+
+            }
         }
     }
 

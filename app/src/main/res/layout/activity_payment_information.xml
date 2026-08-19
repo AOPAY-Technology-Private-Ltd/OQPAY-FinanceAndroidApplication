@@ -307,6 +307,7 @@
                         android:layout_height="30dp"
                         app:tint="@color/black"
                         android:alpha=".8"
+                        android:visibility="gone"
                         android:src="@drawable/downarrow"/>
 
                 </LinearLayout>
@@ -623,7 +624,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/_4sdp"
             android:fontFamily="@font/inter_bold"
-            android:text="BOS Center Pvt Ltd"
+           android:text="@string/aopay_technology_ltd"
             android:textColor="@color/black"
             android:textSize="@dimen/_10ssp" />
 

@@ -6,15 +6,15 @@ plugins {
 
 android {
     namespace = "com.bosandroidapp.oqmobilefinance"
-    compileSdk = 34
+    compileSdk = 35
 
 
     defaultConfig {
         applicationId = "com.bosandroidapp.oqmobilefinance"
-        minSdk = 28
-        targetSdk = 34
-        versionCode = 4
-        versionName = "1.0.4"
+        minSdk = 27
+        targetSdk = 35
+        versionCode = 6
+        versionName = "1.0.6"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -26,6 +26,7 @@ android {
 
     buildTypes {
         release {
+            isDebuggable = true
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -49,11 +50,10 @@ android {
     sourceSets {
         getByName("main") {
             assets {
-                srcDirs("src\\main\\assets", "src\\main\\assets")
+                srcDirs("src/main/assets")
             }
         }
     }
-
 
 }
 
@@ -61,6 +61,7 @@ android {
 
 
 dependencies {
+    implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

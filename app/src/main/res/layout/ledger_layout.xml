@@ -249,7 +249,8 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingVertical="@dimen/_4sdp">
+                android:paddingVertical="@dimen/_4sdp"
+                android:visibility="gone">
 
                 <ImageView
                     android:id="@+id/ivOther"
@@ -287,6 +288,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 android:paddingVertical="@dimen/_4sdp">
 
                 <ImageView

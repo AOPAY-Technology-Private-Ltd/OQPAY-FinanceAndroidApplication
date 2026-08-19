@@ -40,6 +40,7 @@ import com.bos.payment.appName.network.RetrofitClient
 import com.chaos.view.PinView
 import com.bosandroidapp.bosmobilefinance.ui.slideshow.data.model.loginsignup.cibilscore.CibilScoreReq
 import com.bosandroidapp.bosmobilefinance.ui.slideshow.ui.view.activity.retailer.cibilreportsfragment.BureauScore.Companion.userScore
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityNewCustomerRegistrationPageBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
@@ -136,7 +137,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 
-class NewCustomerRegistrationPage : AppCompatActivity() {
+class NewCustomerRegistrationPage : BaseActivity() {
     lateinit var binding: ActivityNewCustomerRegistrationPageBinding
 
     lateinit var dialog: Dialog
@@ -216,6 +217,7 @@ class NewCustomerRegistrationPage : AppCompatActivity() {
         setDataInUI()
 
     }
+
 
     override fun onResume() {
         super.onResume()
@@ -607,7 +609,10 @@ class NewCustomerRegistrationPage : AppCompatActivity() {
 
             if (validateLoginInput(mobnumber, this) && !binding.firstName.text.toString().isNullOrBlank() && !binding.lastName.text.toString().isNullOrBlank()) {
                 if (isInternetAvailable(this@NewCustomerRegistrationPage)) {
-                    hitApiForVerifyCustomer()
+
+                    //hitApiForVerifyCustomer()
+                    hitApiForSendOTP(binding.mobileNumber.text.toString().trim(), OTPTYPE) //"Mobile"
+
                 } else {
                     Toast.makeText(this, "Please check your internet connection!!", Toast.LENGTH_SHORT).show()
                 }
@@ -695,25 +700,12 @@ class NewCustomerRegistrationPage : AppCompatActivity() {
                 CustCityName = binding.cityname.text.toString()
                 ConstantClass.ClickOnCardDashboard = "Customer"
 
-                if(CheckOnlineOrOffline.equals(ConstantClass.offline)){
-                    if(!CustAlternateMobileNumber.isNullOrBlank()){
-                     startActivity(Intent(this@NewCustomerRegistrationPage, MobileSelectionActivity::class.java))
-                 }
-                 else {
-                        binding.alternatemobileNumber.error= "Please enter alternate mobile number ."
-                        scrollToView(binding.detaillayout,  binding.alternatemobileNumber)
-                 }
-
-                }
-
-                else{
+                if(CheckOnlineOrOffline.equals(ConstantClass.online)){
                     if (CustPrimaryMobileNumber.isNullOrBlank()) {
                         Toast.makeText(this@NewCustomerRegistrationPage, "Primary mobile number is mandatory.", Toast.LENGTH_SHORT).show()
 
                     } else if (CustPrimaryMobileNumber.length != 10) {
-
                         Toast.makeText(this@NewCustomerRegistrationPage, "Please enter a valid 10-digit primary mobile number.", Toast.LENGTH_SHORT).show()
-
                     }
                     else if (CustAlternateMobileNumber.isNullOrBlank()) {
                         Toast.makeText(this@NewCustomerRegistrationPage, "Alternate mobile number is mandatory.", Toast.LENGTH_SHORT).show()
@@ -729,6 +721,18 @@ class NewCustomerRegistrationPage : AppCompatActivity() {
                     }
                     else {
                         hitApiForCibilReport()
+                    }
+
+                }
+
+                else{
+
+                    if(!CustAlternateMobileNumber.isNullOrBlank()){
+                        startActivity(Intent(this@NewCustomerRegistrationPage, MobileSelectionActivity::class.java))
+                    }
+                    else {
+                        binding.alternatemobileNumber.error= "Please enter alternate mobile number ."
+                        scrollToView(binding.detaillayout,  binding.alternatemobileNumber)
                     }
 
                 }
@@ -1789,7 +1793,7 @@ class NewCustomerRegistrationPage : AppCompatActivity() {
             otp = otp,
             consentmessage = "I agree to share my data for verification purposes",
             consentacceptence = "yes",
-            registrationID = "AOP-5039"
+            registrationID = ConstantClass.PAN_VERIFICATION_REGISTRATION_ID
         )
 
         Log.d("CibilReq", Gson().toJson(cibilReq))

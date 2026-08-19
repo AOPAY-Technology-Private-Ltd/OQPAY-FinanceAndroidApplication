@@ -1,5 +1,6 @@
 package com.bosandroidapp.oqmobilefinance.kioskmode
 
+import android.Manifest
 import android.accessibilityservice.AccessibilityService.MODE_PRIVATE
 import android.app.Activity
 import android.app.ActivityManager
@@ -7,6 +8,7 @@ import android.app.admin.DevicePolicyManager
 import android.app.usage.UsageStatsManager
 import android.content.ComponentName
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
@@ -14,6 +16,7 @@ import android.util.Base64
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 
 fun Context.isLocked(): Boolean {
@@ -21,11 +24,36 @@ fun Context.isLocked(): Boolean {
     return sharedPref.getBoolean("isLocked", false)
 }
 
+fun Context.checkStandardPermissions(): Boolean {
+    val phoneState = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE)
+    val notifications = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+    } else {
+        PackageManager.PERMISSION_GRANTED
+    }
+    val fineLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+    val coarseLocation = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+
+    return phoneState == PackageManager.PERMISSION_GRANTED &&
+            notifications == PackageManager.PERMISSION_GRANTED &&
+            fineLocation == PackageManager.PERMISSION_GRANTED &&
+            coarseLocation == PackageManager.PERMISSION_GRANTED
+}
+
+
+
+fun Context.checkAllPermissionsGranted(): Boolean {
+    return checkStandardPermissions() &&
+            isOverLay() &&
+            isAccessibilityServiceEnabled(this, MyAccessibilityService::class.java)
+}
+
 // for logout condition
 fun Context.isEMIsCompleted(): Boolean {
     val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
     return sharedPref.getBoolean("isEMIsCompleted", true)
 }
+
 
 fun Context.stopLockSituation() {
     val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
@@ -43,6 +71,26 @@ fun Context.startLockSituation() {
     val editor = sharedPref.edit()
     editor.putBoolean("isLocked", true) // key: isLoggedIn, value: true
     editor.apply()
+}
+
+fun Context.startInternetAlertSituation() {
+    val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
+    val editor = sharedPref.edit()
+    editor.putBoolean("isInternet", true) // key: isLoggedIn, value: true
+    editor.apply()
+}
+
+fun Context.stopInternetAlertSituation() {
+    val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
+    val editor = sharedPref.edit()
+    editor.putBoolean("isInternet", false) // key: isLoggedIn, value: true
+    editor.apply()
+}
+
+
+fun Context.isInternetAlertSituationCompleted(): Boolean {
+    val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
+    return sharedPref.getBoolean("isInternet", true)
 }
 
 @RequiresApi(Build.VERSION_CODES.R)
@@ -69,15 +117,25 @@ fun Context.showToast(message: String) {
 }
 
 fun Context.isAdmin():Boolean{
-    val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
-    val componentName = ComponentName(this, KioskDeviceAdminReceiver::class.java)
-    return dpm.isAdminActive(componentName)
+    return try {
+        val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+        val componentName = ComponentName(this, KioskDeviceAdminReceiver::class.java)
+        dpm.isAdminActive(componentName)
+    } catch (e: Exception) {
+        Log.e("Utils", "Error checking isAdmin: ${e.message}")
+        false
+    }
 }
 
 
 fun Context.isDeviceAdmin():Boolean{
-    val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
-    return dpm.isDeviceOwnerApp(packageName)
+    return try {
+        val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+        dpm.isDeviceOwnerApp(packageName)
+    } catch (e: Exception) {
+        Log.e("Utils", "Error checking isDeviceAdmin: ${e.message}")
+        false
+    }
 }
 
 fun Context.saveToken(data: ByteArray) {

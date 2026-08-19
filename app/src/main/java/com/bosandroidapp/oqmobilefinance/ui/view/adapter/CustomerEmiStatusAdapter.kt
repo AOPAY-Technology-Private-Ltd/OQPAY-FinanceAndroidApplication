@@ -37,26 +37,14 @@ class CustomerEmiStatusAdapter(var context: Context, var ledgerReportList: List<
         holder.binding.tvPendingAmount.text = formatIndianAmount(ledgerReportList[position]!!.pendingAmount.toString())
 
         if (ledgerReportList[position]!!.recordStatus!!.toLowerCase().equals("paid")) {
-            holder.binding.doneimage.setImageDrawable(
-                ContextCompat.getDrawable(
-                    context,
-                    com.bosandroidapp.oqmobilefinance.R.drawable.doneicon
-                )
-            )
-            holder.binding.amounttitle.text =
-                context.getString(com.bosandroidapp.oqmobilefinance.R.string.paid_amount)
+            holder.binding.doneimage.setImageDrawable(ContextCompat.getDrawable(context, com.bosandroidapp.oqmobilefinance.R.drawable.doneicon))
+            holder.binding.amounttitle.text = context.getString(com.bosandroidapp.oqmobilefinance.R.string.paid_amount)
             holder.binding.tvRecordStatus.setTextColor(context.resources.getColor(com.bosandroidapp.oqmobilefinance.R.color.green))
         }
         else {
-            holder.binding.amounttitle.text =
-                context.getString(com.bosandroidapp.oqmobilefinance.R.string.due_amount)
+            holder.binding.amounttitle.text = context.getString(com.bosandroidapp.oqmobilefinance.R.string.due_amount)
             holder.binding.tvRecordStatus.setTextColor(context.resources.getColor(com.bosandroidapp.oqmobilefinance.R.color.red))
-            holder.binding.doneimage.setImageDrawable(
-                ContextCompat.getDrawable(
-                    context,
-                    com.bosandroidapp.oqmobilefinance.R.drawable.crossicon
-                )
-            )
+            holder.binding.doneimage.setImageDrawable(ContextCompat.getDrawable(context, com.bosandroidapp.oqmobilefinance.R.drawable.crossicon))
         }
 
         holder.binding.tvEmiAmount.text = formatIndianAmount(ledgerReportList[position]?.emiAmount?.toString().takeIf { !it.isNullOrBlank() } ?: "0")

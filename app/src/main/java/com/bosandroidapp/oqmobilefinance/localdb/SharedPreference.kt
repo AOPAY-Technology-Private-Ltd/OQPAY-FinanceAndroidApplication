@@ -48,6 +48,22 @@ open class SharedPreference(mContext: Context) {
         return preferences.getString(keyFlag, "")!!
     }
 
+    fun setIntValue(keyFlag: String?, value: Int) {
+        preferences.edit().putInt(keyFlag, value).apply()
+    }
+
+    fun getIntValue(keyFlag: String?, defaultValue: Int): Int {
+        return preferences.getInt(keyFlag, defaultValue)
+    }
+
+    fun setLongValue(keyFlag: String?, value: Long) {
+        preferences.edit().putLong(keyFlag, value).apply()
+    }
+
+    fun getLongValue(keyFlag: String?, defaultValue: Long): Long {
+        return preferences.getLong(keyFlag, defaultValue)
+    }
+
 
 
 }

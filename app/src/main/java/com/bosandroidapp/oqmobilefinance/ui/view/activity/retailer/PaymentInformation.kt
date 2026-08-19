@@ -37,6 +37,7 @@ import androidx.lifecycle.lifecycleScope
 import com.bos.payment.appName.network.ApiInterface
 import com.bos.payment.appName.network.RetrofitClient
 import com.chaos.view.PinView
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityPaymentInformationBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
@@ -110,7 +111,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class PaymentInformation : AppCompatActivity() {
+class PaymentInformation : BaseActivity() {
     lateinit var  binding : ActivityPaymentInformationBinding
     lateinit var viewModel: AuthenticationViewModel
     lateinit var api: ApiInterface
@@ -169,13 +170,14 @@ class PaymentInformation : AppCompatActivity() {
         api = RetrofitClient.apiInterfaceSMS
         preference = SharedPreference(this)
 
+
         setselectionForFirstCard()
         setView()
         hitApiForBankList()
         setDataInSpinner()
         setOnClickListner()
-    }
 
+    }
 
 
     companion object{
@@ -187,6 +189,7 @@ class PaymentInformation : AppCompatActivity() {
         super.onResume()
 
         hitApiForLogin()
+
         if(ConstantClass.CheckOnlineOrOffline.equals(ConstantClass.online)){
 
             if (checkKYC) {
@@ -225,7 +228,7 @@ class PaymentInformation : AppCompatActivity() {
 
            }
 
-        }
+       }
 
 
 
@@ -242,7 +245,11 @@ class PaymentInformation : AppCompatActivity() {
         bankList.clear()
 
         var req = BankListReq(
-            registrationID = ConstantClass.PAN_VERIFICATION_REGISTRATION_ID
+            registrationID = if (ConstantClass.CheckOnlineOrOffline == ConstantClass.online) {
+                ConstantClass.PAN_VERIFICATION_REGISTRATION_ID
+            } else {
+                ConstantClass.PAN_VERIFICATION_REGISTRATION_ID_OFFLINE
+            }
         )
 
         panViewModel.getBankListReq(req).observe(this) { resources ->
@@ -461,6 +468,7 @@ class PaymentInformation : AppCompatActivity() {
 
         })
 
+
         binding.verifymobilenumber.setOnClickListener {
 
             var mobnumber = binding.refmobno.text.toString()
@@ -470,11 +478,7 @@ class PaymentInformation : AppCompatActivity() {
                     hitApiForSendOTP(mobnumber, "Mobile")
                 }
                 else {
-                    Toast.makeText(
-                        this,
-                        "Please check your internet connection!!",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(this, "Please check your internet connection!!", Toast.LENGTH_SHORT).show()
                 }
             } else {
                 if (binding.refername.text.toString().isNullOrBlank()) {
@@ -499,6 +503,7 @@ class PaymentInformation : AppCompatActivity() {
             hitApiForAadharVerification()
         }
 
+
         binding.nextlayout.setOnClickListener {
 
             when{
@@ -517,7 +522,7 @@ class PaymentInformation : AppCompatActivity() {
                     }
                     else
                     {
-                         AccountNumber = binding.accountnumber.text.toString().trim()
+                        /* AccountNumber = binding.accountnumber.text.toString().trim()
                          BankIFSCCode = binding.ifsccode.text.toString().trim()
                          BankName =  binding.bankname.text.toString().trim()
                          AccountType = binding.acounttype.selectedItem.toString().trim()
@@ -526,9 +531,9 @@ class PaymentInformation : AppCompatActivity() {
                          BranchAddress= binding.branchaddress.text.toString().trim()
                          BankID = bankList.find { it.first == BankName }?.second!!
                          Log.d("BankId", "${BankID}")
-                         setselectionForSecondCard()  // for testing
+                         setselectionForSecondCard()  // for testing*/
 
-                        /* hitApiForRequestPennyDrop()*/
+                         hitApiForRequestPennyDrop()
 
                     }
 
@@ -555,23 +560,16 @@ class PaymentInformation : AppCompatActivity() {
                                 refAddress = binding.refaddress.text.toString().trim())
 
                             if (!isValid) {
-                                binding.referenceKycChecked.isChecked = false
                                 Toast.makeText(this@PaymentInformation, errorMessage, Toast.LENGTH_SHORT).show()
                             }
                             else
                             {
-                                if(checkKYC) {
-                                    RefName = binding.refername.text.toString().trim()
-                                    RefRelationShip = binding.referrelatinonship.text.toString().trim()
-                                    RefmobileNo = binding.refmobno.text.toString().trim()
-                                    RefAddress = binding.refaddress.text.toString().trim()
-                                    startActivity(Intent(this@PaymentInformation, IMEIDetailsPage::class.java))
-                                }
-                                else {
-                                    binding.referenceKycChecked.isChecked = false
-                                    Toast.makeText(this@PaymentInformation, getString(R.string.please_accept_kyc_agreement), Toast.LENGTH_SHORT).show()
-                                }
-
+                                // Reference KYC is now optional
+                                RefName = binding.refername.text.toString().trim()
+                                RefRelationShip = binding.referrelatinonship.text.toString().trim()
+                                RefmobileNo = binding.refmobno.text.toString().trim()
+                                RefAddress = binding.refaddress.text.toString().trim()
+                                startActivity(Intent(this@PaymentInformation, IMEIDetailsPage::class.java))
                             }
 
                     }
@@ -612,7 +610,11 @@ class PaymentInformation : AppCompatActivity() {
             address = binding.branchaddress.text.toString().trim(),
             paymentMode = ConstantClass.ModeOfPayment,
             iFSCCode = binding.ifsccode.text.toString().trim(),
-            registrationID = ConstantClass.PENNYDROP_REGISTRATION_ID,
+            registrationID =  if (ConstantClass.CheckOnlineOrOffline == ConstantClass.online) {
+                ConstantClass.PENNYDROP_REGISTRATION_ID
+            } else {
+                ConstantClass.PENNYDROP_REGISTRATION_ID_OFFLINE
+            },
             refID = "",
             accountNumber = binding.accountnumber.text.toString().trim(),
         )
@@ -677,7 +679,11 @@ class PaymentInformation : AppCompatActivity() {
 
     fun hitApiForRequestPennyDropCheckStatus(refID: String){
         var request = PennyDropCheckStatusRequest(
-            registrationID = ConstantClass.PENNYDROP_REGISTRATION_ID,
+            registrationID =  if (ConstantClass.CheckOnlineOrOffline == ConstantClass.online) {
+                ConstantClass.PENNYDROP_REGISTRATION_ID
+            } else {
+                ConstantClass.PENNYDROP_REGISTRATION_ID_OFFLINE
+            },
             refID = refID,
         )
 

@@ -47,6 +47,19 @@ data class ReportsDataItem(
     @SerializedName("startDate")
     val startDate: String = "",
     @SerializedName("endDate")
-    val endDate: String = ""
-
+    val endDate: String = "",
+    @SerializedName("isPannydropVerified")
+    val isPannydropVerified: String = "",
+    @SerializedName("isEmandateVerified")
+    val isEmandateVerified: String = "",
+    @SerializedName("accountNumber")
+    val accountNumber: String = "",
+    @SerializedName("bankIFSCCode")
+    val bankIFSCCode: String = "",
+    @SerializedName("bankName")
+    val bankName: String = "",
+    @SerializedName("accountType")
+    val accountType: String = "",
+    @SerializedName("activeStatus")
+    val activeStatus: String = ""
 )

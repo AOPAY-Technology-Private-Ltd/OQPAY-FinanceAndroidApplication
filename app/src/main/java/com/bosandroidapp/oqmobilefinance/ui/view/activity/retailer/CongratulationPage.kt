@@ -16,11 +16,12 @@ import com.bosandroidapp.oqmobilefinance.databinding.ActivityCongratulationPageB
 
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.ui.slideshow.activity.DashBoard
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
 import kotlinx.coroutines.launch
 
-class CongratulationPage : AppCompatActivity() {
+class CongratulationPage : BaseActivity() {
     lateinit var binding: ActivityCongratulationPageBinding
     lateinit var viewModel: AuthenticationViewModel
     lateinit var api: ApiInterface

@@ -11,6 +11,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import com.bos.payment.appName.network.RetrofitClient
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.data.model.DueOverdueRequest
@@ -26,7 +27,7 @@ import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.google.gson.Gson
 
-class PayoutReport : AppCompatActivity() {
+class PayoutReport : BaseActivity() {
     lateinit var binding: ActivityPayoutReportBinding
     lateinit var viewModel: AuthenticationViewModel
     lateinit var preference: SharedPreference

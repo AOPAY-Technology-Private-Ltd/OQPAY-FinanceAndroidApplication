@@ -25,6 +25,7 @@ import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.bos.payment.appName.network.RetrofitClient
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.FragmentPayoutPageBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
@@ -353,7 +354,7 @@ class PayoutPage : Fragment() {
      }
 
 
-   binding.verifybuttonlayout.setOnClickListener {
+    binding.verifybuttonlayout.setOnClickListener {
 
        val (isValid, errorMessage) = isValidForm(
            accountNumber = binding.accountnumber.selectedItem?.toString()?.trim() ?: "",
@@ -379,7 +380,7 @@ class PayoutPage : Fragment() {
    }
 
 
-   binding.holdamountrequest.setOnClickListener {
+    binding.holdamountrequest.setOnClickListener {
        if(holdcheckremarks){
            Toast.makeText(requireContext(),"Please enter valid remark",Toast.LENGTH_SHORT).show()
        }
@@ -394,7 +395,6 @@ class PayoutPage : Fragment() {
 
 
    }
-
 
 
 }
@@ -536,6 +536,7 @@ class PayoutPage : Fragment() {
     }
 
 
+
     @SuppressLint("SetTextI18n")
     fun OpenPopUpForHoldAmountAlert() {
         dialog = Dialog(requireContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen)
@@ -574,7 +575,6 @@ class PayoutPage : Fragment() {
         dialog.show()
 
     }
-
 
 
    fun hitApiForWalletPayout() {

@@ -312,6 +312,7 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="@dimen/_10sdp"
                     android:gravity="center"
+                    android:visibility="gone"
                     android:background="@drawable/bg_black_border"
                     app:layout_constraintTop_toBottomOf="@id/biomatriclayout"
                     android:orientation="vertical">
@@ -412,7 +413,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/_4sdp"
             android:fontFamily="@font/inter_bold"
-            android:text="BOS Center Pvt Ltd"
+           android:text="@string/aopay_technology_ltd"
             android:textColor="@color/black"
             android:textSize="@dimen/_10ssp" />
 

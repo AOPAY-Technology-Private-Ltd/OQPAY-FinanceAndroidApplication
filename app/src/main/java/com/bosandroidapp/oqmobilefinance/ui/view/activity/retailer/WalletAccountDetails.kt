@@ -29,6 +29,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
 import com.bos.payment.appName.network.RetrofitClient
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityWalletAccountDetailsBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
@@ -65,7 +66,7 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.google.gson.Gson
 import java.util.Locale
 
-class WalletAccountDetails : AppCompatActivity() {
+class WalletAccountDetails : BaseActivity() {
     lateinit var binding : ActivityWalletAccountDetailsBinding
     lateinit var viewModel: AuthenticationViewModel
     lateinit var preference : SharedPreference
@@ -96,6 +97,7 @@ class WalletAccountDetails : AppCompatActivity() {
     }
 
 
+
     private fun setView(){
 
         viewPager = binding.viewPager
@@ -104,6 +106,7 @@ class WalletAccountDetails : AppCompatActivity() {
         val adapter = WalletPagerAdapter(supportFragmentManager, lifecycle)
         viewPager.isUserInputEnabled = true
         viewPager.adapter = adapter
+
 
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
@@ -127,6 +130,7 @@ class WalletAccountDetails : AppCompatActivity() {
             override fun onTabReselected(tab: TabLayout.Tab) {
 
             }
+
         })
 
         // Also mark the initially selected tab (0)
@@ -180,12 +184,10 @@ class WalletAccountDetails : AppCompatActivity() {
     }
 
 
-
     override fun onBackPressed() {
         CheckActiveStatus=false
         super.onBackPressed()
     }
-
 
 
     fun hitApiForLogin() {
@@ -255,6 +257,7 @@ class WalletAccountDetails : AppCompatActivity() {
         }
 
     }
+
 
     fun hitApiForRetailerLogout() {
         var loginRequest = LogoutReq(

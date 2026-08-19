@@ -389,8 +389,7 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/_4sdp"
-                android:visibility="gone">
+                android:layout_margin="@dimen/_4sdp">
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/customerreports"
@@ -490,6 +489,7 @@
                 android:padding="@dimen/_10sdp">
 
                 <TextView
+                    android:id="@+id/tvGenerateKey"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/inter_bold"
@@ -498,6 +498,19 @@
                     android:textSize="@dimen/_14ssp" />
 
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvTimer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/inter_bold"
+                android:gravity="center"
+                android:padding="@dimen/_5sdp"
+                android:text="00:00"
+                android:textColor="@color/red"
+                android:textSize="@dimen/_12ssp"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@+id/generatekeyButton" />
 
             <TextView
                 android:id="@+id/generatedkey"
@@ -512,7 +525,7 @@
                 android:padding="@dimen/_10sdp"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/generatekeyButton" />
+                app:layout_constraintTop_toBottomOf="@+id/tvTimer" />
 
             <TextView
                 android:id="@+id/clicktologin"

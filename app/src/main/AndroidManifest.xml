@@ -6,6 +6,7 @@
         android:name="android.hardware.camera"
         android:required="false" />
 
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -44,9 +45,12 @@
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
+
             <category android:name="android.intent.category.BROWSABLE" />
+
             <data android:scheme="upi" />
         </intent>
+
         <package android:name="com.google.android.apps.nbu.paisa.user" />
         <package android:name="com.phonepe.app" />
         <package android:name="net.one97.paytm" />
@@ -59,7 +63,6 @@
         <package android:name="sbi.mobile.apps.in" />
         <package android:name="in.amazon.mShop.android.shopping" />
     </queries>
-
 
     <application
         android:name=".utils.ApplicationClass"
@@ -74,14 +77,21 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="33">
         <activity
+            android:name=".kioskmode.PermissionSetupActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ui.view.activity.retailer.CustomerAppInstall"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".ui.view.activity.customer.PGWebViewActivity"
             android:exported="false"
-            android:screenOrientation="portrait"/>
-
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ui.view.activity.retailer.AppScanInstallPage"
-            android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:exported="true"
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".ui.view.activity.customer.CustomerEMIStatusReport"
             android:exported="false"
@@ -339,6 +349,7 @@
                 android:name="android.accessibilityservice"
                 android:resource="@xml/accessibility_config" />
         </service>
+
         <service
             android:name=".notification.MyFirebaseMessagingService"
             android:exported="false">
@@ -346,6 +357,7 @@
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
+
         <service
             android:name=".kioskmode.KioskPolicyService"
             android:exported="false"
@@ -362,6 +374,13 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAeWqwtaPeBBAx99493pPOCwI1ryvGriuc" />
+
+        <activity
+            android:name=".ui.view.activity.retailer.reports.CustomerListForCreatingShortCutLoanProcessPage"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize" />
+
     </application>
 
 </manifest>

@@ -1,46 +1,59 @@
 package com.bosandroidapp.oqmobilefinance.kioskmode
 
 import android.accessibilityservice.AccessibilityService
-import android.accounts.AccountManager
 import android.app.ActivityManager
 import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
+import androidx.annotation.RequiresApi
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.SETTINGS_PKG
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.gpsSettingsOpened
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.internetSettingsOpened
 import com.bosandroidapp.oqmobilefinance.utils.ACCESSIBILITYTAG
 import com.bosandroidapp.oqmobilefinance.utils.Logger
 import com.bosandroidapp.oqmobilefinance.utils.syncEmis
-
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+
 class MyAccessibilityService : AccessibilityService() {
 
 
+    @RequiresApi(Build.VERSION_CODES.R)
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
 
+        val currentPkg = event?.packageName?.toString() ?: ""
+
         CoroutineScope(Dispatchers.IO).launch {
-            syncEmis()
+            if(isInternetAvailable(this@MyAccessibilityService)){
+                syncEmis()
+            }
         }
 
-        if (isMyAppInfoPage() && !isEMIsCompleted()) {
-            Logger.d(ACCESSIBILITYTAG, "On App Info Page: Global Back")
+        
+
+        if (currentPkg.equals(packageName)&&isMyAppInfoPage() && !isEMIsCompleted()) {
+            // Logger.d(ACCESSIBILITYTAG, "On App Info Page: Global Back")
             performGlobalAction(GLOBAL_ACTION_BACK)
         }
 
+
         if (isFactoryResetting(event?.text?.toString() ?: "") && !isEMIsCompleted()) {
-            Logger.d(ACCESSIBILITYTAG, "On Factory Reset Page: Global Back")
+            // Logger.d(ACCESSIBILITYTAG, "On Factory Reset Page: Global Back")
             performGlobalAction(GLOBAL_ACTION_BACK)
             this.showToast("You are not allowed to Factory reset your device when your EMIs are pending.")
         }
 
-        val currentPkg = event?.packageName?.toString() ?: ""
 
         if (!isGpsEnabled(this) && !isEMIsCompleted()) {
             // Open GPS settings ONLY ONCE
@@ -57,28 +70,111 @@ class MyAccessibilityService : AccessibilityService() {
             return // STOP all other processing
         }
 
+
         // ✅ GPS ENABLED → RELEASE LOCK
         if (gpsSettingsOpened) {
             gpsSettingsOpened = false
         }
 
         /*if (isGoogleLogin(event) && !isEMIsCompleted()) {
-            Logger.d(ACCESSIBILITYTAG, "On Google Login Page: Global Back")
+            // Logger.d(ACCESSIBILITYTAG, "On Google Login Page: Global Back")
             performGlobalAction(GLOBAL_ACTION_BACK)
         }*/
 
 
+        /* if (isLocked()) {
+             // Logger.d(ACCESSIBILITYTAG, "Phone Locked")
+             isMyAppMinimizedOrRemoved(event)
+         }*/
+
+
         if (isLocked()) {
-            Logger.d(ACCESSIBILITYTAG, "Phone Locked")
+
+            if (!isInternetAvailable(this) && isInternetAlertSituationCompleted()) {
+                // Open Internet settings ONLY ONCE
+                if (!internetSettingsOpened) {
+                    internetSettingsOpened = true
+                    showToast("Please connect with internet")
+                    openInternetSettings()
+                    return
+                }
+                if (!currentPkg.contains(SETTINGS_PKG)) {
+                    openInternetSettings()   // FORCE BACK
+                }
+
+                return // STOP all other processing
+            }
+
+            val packageName = event?.packageName?.toString()
+
+            if(packageName==null){
+                refreshService()
+            }
+
+            Log.d("packageName", packageName.toString())
+
+            // Allow soft keyboard
+            if (isKeyboardPackage(packageName)) {
+                return
+            }
+
+            // Allow chooser/share sheet
+            if (isAllowedSystemPackage(packageName)) {
+                return
+            }
+
+           /* if (isActivityRunning(this, PGWebViewActivity::class.java)) {
+                return
+            }*/
+
+            if (ConstantClass.isPgClosing) {
+                Handler(Looper.getMainLooper()).postDelayed({
+                    ConstantClass.isPgClosing = false
+                }, 1000)
+                return
+            }
+
+            // Logger.d(ACCESSIBILITYTAG, "Phone Locked")
             isMyAppMinimizedOrRemoved(event)
+
         }
 
-
     }
+
+
+
+    override fun onServiceConnected() {
+        super.onServiceConnected()
+        val info = getServiceInfo()
+
+        // Fetch all installed packages on the device
+        val packages = getPackageManager().getInstalledPackages(0)
+        val packageNames = arrayOfNulls<String>(packages.size)
+        for (i in packages.indices) {
+            packageNames[i] = packages.get(i)!!.packageName
+        }
+
+        // Explicitly map them to the service info
+        info.packageNames = packageNames
+        setServiceInfo(info)
+    }
+
+
+
+    fun refreshService() {
+        val info = getServiceInfo()
+        if (info != null) {
+            // Re-applying the exact same info forces the system to refresh the channel
+            setServiceInfo(info)
+        }
+    }
+
+
 
     override fun onInterrupt() {
         Log.d("Accessibility", "Service interrupted")
     }
+
 
     private fun isFactoryResetting(t: String): Boolean {
         val text = t.toLowerCase()
@@ -95,6 +191,8 @@ class MyAccessibilityService : AccessibilityService() {
 
 
     private fun isMyAppMinimizedOrRemoved(event: AccessibilityEvent?) {
+        Log.d("Accessibility Package Name", "Package Name: ${event?.packageName}")
+
 
         if (!((event?.packageName?.equals("com.google.android.apps.nbu.paisa.user")) ?: false)
             && !((event?.packageName?.equals("com.phonepe.app")) ?: false)
@@ -107,14 +205,15 @@ class MyAccessibilityService : AccessibilityService() {
             && !((event?.packageName?.equals("com.hdfcbank.payzapp")) ?: false)
             && !((event?.packageName?.equals("sbi.mobile.apps.in")) ?: false)
             && !((event?.packageName?.equals("in.amazon.mShop.android.shopping")) ?: false)
-            && !((event?.packageName?.equals("com.bosandroidapp.oqmobilefinance")) ?: false)
-            && !(event?.packageName == null) && !isActivityRunning(this, KioskActivity::class.java) && !isPaymentAppRunning()
-        ) {
-            Logger.d(ACCESSIBILITYTAG, "${event.packageName}")
-            Logger.d(ACCESSIBILITYTAG, "Performing KioskActivity Intent")
+            && !((event?.packageName?.equals("com.bosandroidapp.aopayfinance")) ?: false)
+            && !(event?.packageName == null) && !isMyAppOnTop()/*!isActivityRunning(this, KioskActivity::class.java)*/  && event?.packageName != null && !isPaymentAppRunning()) {
+
+            // Logger.d(ACCESSIBILITYTAG, "${event.packageName}")
+            // Logger.d(ACCESSIBILITYTAG, "Performing KioskActivity Intent")
+
             val intent = Intent(this, KioskActivity::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            /*intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)*/
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             val options = ActivityOptions.makeCustomAnimation(this, 0, 0)
             startActivity(intent, options.toBundle())
@@ -124,9 +223,25 @@ class MyAccessibilityService : AccessibilityService() {
 
     }
 
+
+    // changes by me
+    private fun isMyAppOnTop(): Boolean {
+        val am = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+
+        for (task in am.appTasks) {
+            val top = task.taskInfo.topActivity
+            if (top?.packageName == packageName) {
+                return true
+            }
+        }
+        return false
+    }
+
+
     private fun isActivityRunning(context: Context, activityClass: Class<*>): Boolean {
         val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         val tasks = activityManager.appTasks
+        Log.d("Tasks", "${ tasks }")
         for (task in tasks) {
             val base = task.taskInfo.baseActivity
             val top = task.taskInfo.topActivity
@@ -136,6 +251,18 @@ class MyAccessibilityService : AccessibilityService() {
         }
         return false
     }
+
+ /*   private fun isActivityRunning(context: Context, activityClass: Class<*>): Boolean {
+        val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+
+        for (task in activityManager.appTasks) {
+            val top = task.taskInfo.topActivity
+            if (top?.className == activityClass.name) {
+                return true
+            }
+        }
+        return false
+    }*/
 
     private fun isMyAppInfoPage(): Boolean {
         val rootNode = rootInActiveWindow ?: return false
@@ -153,12 +280,13 @@ class MyAccessibilityService : AccessibilityService() {
                 isAppInfo = true
             }
             // Many devices show package name directly
-            if (t.contains("OQ", true)) { // crude check for package
+            if (t.contains("", true)) { // crude check for package
                 isMyApp = true
             }
         }
         return (isAppInfo && isMyApp)
     }
+
 
     private fun isGoogleLogin(event: AccessibilityEvent?): Boolean {
         Log.d("Accessibility",(event?.packageName?:"").toString())
@@ -176,11 +304,31 @@ class MyAccessibilityService : AccessibilityService() {
     }
 
 
+    fun isInternetAvailable(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+        val network = connectivityManager.activeNetwork ?: return false
+        val capabilities =
+            connectivityManager.getNetworkCapabilities(network) ?: return false
+
+        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
+                capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)
+    }
+
+
     private fun openGpsSettings() {
         val intent = Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(intent)
     }
+
+    fun openInternetSettings() {
+        val intent = Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
+    }
+
 
     private fun getVisibleText(node: AccessibilityNodeInfo?): List<String> {
         val result = mutableListOf<String>()
@@ -192,6 +340,88 @@ class MyAccessibilityService : AccessibilityService() {
         }
         return result
     }
+
+
+    private fun isKeyboardPackage(packageName: String?): Boolean {
+
+        return packageName.equals("com.google.android.inputmethod.latin", true) ||
+                packageName.equals("com.samsung.android.honeyboard", true) ||
+                packageName.equals("com.microsoft.swiftkey", true) ||
+                packageName.equals("com.touchtype.swiftkey", true) ||
+                packageName.equals("com.google.android.tts", true) ||
+
+                // System Chooser / Share Sheet
+                packageName.equals("android", true) ||
+                packageName.equals("com.android.systemui", true) ||
+                packageName.equals("com.android.intentresolver", true) ||
+                packageName.equals("com.android.permissioncontroller", true) ||
+                packageName.equals("com.google.android.permissioncontroller", true) ||
+                packageName.equals("com.google.android.permissioncontroller", true) ||
+                packageName.equals("com.android.permissioncontroller", true) ||
+
+                // Your App
+                packageName.equals("com.bosandroidapp.aopayfinance", true) ||
+
+                // Payment Apps
+                packageName.equals("sbi.mobile.apps.in", true) ||
+                packageName.equals("com.hdfcbank.payzapp", true) ||
+                packageName.equals("net.one97.paytm", true) ||
+                packageName.equals("com.mobikwik_new", true) ||
+                packageName.equals("com.freecharge.mobile", true) ||
+                packageName.equals("com.axis.axispay", true) ||
+                packageName.equals("in.amazon.mShop.android.shopping", true) ||
+                packageName.equals("com.phonepe.app", true) ||
+                packageName.equals("com.google.android.apps.nbu.paisa.user", true)||
+                // CRED
+                packageName.equals("com.dreamplug.androidapp", true)||
+                packageName.equals("com.flipkart.supermoney", true)||
+                packageName.equals("com.whatsapp", true)
+
+
+    }
+
+
+    private fun isAllowedSystemPackage(packageName: String?): Boolean {
+        return packageName.equals("android", true) ||
+                packageName.equals("com.android.settings", true) ||
+                packageName.equals("com.android.systemui", true) ||
+                packageName.equals("com.android.intentresolver", true) ||
+                packageName.equals("com.android.permissioncontroller", true) ||
+                packageName.equals("com.google.android.permissioncontroller", true)||
+
+                // Oppo / OnePlus / Realme
+                packageName.equals("com.oplus.safecenter", true) ||
+
+                packageName.equals("com.coloros.safecenter", true) ||
+
+                // Xiaomi / Redmi / Poco
+                packageName.equals("com.miui.securitycenter", true) ||
+
+                // Samsung
+                packageName.equals("com.samsung.android.lool", true) || // Device Care
+                packageName.equals("com.samsung.android.sm.devicesecurity", true) ||
+                packageName?.contains("biometric", true) ?: false ||
+                packageName?.contains("biometrics", true) ?: false ||
+                packageName?.contains("settings", true) ?: false ||
+
+                // Vivo
+                packageName.equals("com.iqoo.secure", true) ||
+                packageName.equals("com.vivo.permissionmanager", true) ||
+
+                // Huawei
+                packageName.equals("com.huawei.systemmanager", true) ||
+
+                // Motorola
+                packageName.equals("com.motorola.ccc.ota", true) ||
+
+                // Nothing
+                packageName.equals("com.nothing.smartcenter", true)||
+
+                packageName.equals("com.bosandroidapp.oqmobilefinance", true)
+
+    }
+
+
 
 
 }

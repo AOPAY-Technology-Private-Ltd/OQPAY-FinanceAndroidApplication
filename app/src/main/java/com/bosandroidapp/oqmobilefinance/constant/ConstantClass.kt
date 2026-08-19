@@ -1,6 +1,7 @@
 package com.bosandroidapp.oqmobilefinance.constant
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
 import android.content.Intent
@@ -50,6 +51,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import  com.bosandroidapp.oqmobilefinance.R
+import com.bosandroidapp.oqmobilefinance.internetchecker.NetworkMonitor
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
 import com.bosandroidapp.oqmobilefinance.workmanager.LocationUploadWorker
@@ -97,20 +99,49 @@ import java.util.TimeZone
 import java.util.concurrent.TimeUnit
 
 object ConstantClass {
-     //const val BASE_URL = "https://oqapi.bos.center/"
 
-     const val BASE_URL = "https://api.oqpay.in/"
-     const val BASE_URL_IMAGE = "https://api.oqpay.in"
+         // Production
+
+/*       const val BASE_URL = "https://api.oqpay.in/"
+         const val BASE_URL_IMAGE = "https://api.oqpay.in"
+
+
+         // production merchant id online
+         const val PAN_VERIFICATION_REGISTRATION_ID = "AOP-5039"
+         const val PENNYDROP_REGISTRATION_ID = "AOP-5039"
+
+
+         // production merchant id offline
+         const val PAN_VERIFICATION_REGISTRATION_ID_OFFLINE = "AOP-5050"
+         const val PENNYDROP_REGISTRATION_ID_OFFLINE = "AOP-5050"*/
+
+
+
+       // UAT
+       const val BASE_URL = "https://api.oqpay.co.in/"
+       const val BASE_URL_IMAGE = "https://api.oqpay.co.in"
+
+
+     // UAT merchant id online
+      const val PAN_VERIFICATION_REGISTRATION_ID = "AOP-554"
+      const val PENNYDROP_REGISTRATION_ID = "AOP-554"
+
+
+      //  UAT merchant id offline
+      const val PAN_VERIFICATION_REGISTRATION_ID_OFFLINE = "AOP-554"
+      const val PENNYDROP_REGISTRATION_ID_OFFLINE = "AOP-554"
+
+
      const val SMS_BASE_URL = "http://web.adcruxmedia.in/"
      const val PAN_BASE_URL = "https://api.aopay.in/"
+     const val ONLINE_PG = "https://api.dikshifinsure.com/"
+
      const val SMS_API_KEY = "KBSxc26XqjoiR7SA"
      const val SMS_SENDER_ID = "BOSCNT"
      const val SMS_TEMPLATE_ID = "1207175396979758678"
-     const val PAN_VERIFICATION_REGISTRATION_ID = "AOP-5039"
-     const val PENNYDROP_REGISTRATION_ID = "AOP-5039"
      const val FRP_MAIL_ID = "116164541526712076874" // info@aopay.in
      const val CustomerCode = "customerCode"
-    const val RetailerCode = "retailerCode"
+     const val RetailerCode = "retailerCode"
      const val ForgotPasswordType = "Retailer forgot password"
      const val OTPTYPE = "VerifyUser"
      const val EMILIST = "EmiList"
@@ -118,19 +149,21 @@ object ConstantClass {
      const val FCMTOKEN = "fcmtoken"
 
      const val DEVICEID = "deviceid"
+     const val CHECKACCESSIBILITY = "checkAccessibility"
      const val LoanSuccessStatus = "success"
      const val DeviceType = "Android"
      const val ClientCode = "CMP0005"
      const val DefaulterEmiDebitAutoApproved ="admin"
      const val DefaulterEmiDebitPending ="retailer"
-
      const val LoanStatus ="Pending"
-     const val SessionOutStatus = "Inactive"
+     const val SessionOutStatus = "inactive"
+     const val SessionOutStatusRejected = "rejected"
 
      const val LoginMobileorMailid = "loginMobileorMail"
 
      const val Loginpassword = "loginPassword"
      var gpsSettingsOpened = false
+     var internetSettingsOpened = false
      var CheckCompleteEmiStatus = false
      const val SETTINGS_PKG = "com.android.settings"
      const val CustomerMobileNumber = "mobileNumber"
@@ -165,6 +198,9 @@ object ConstantClass {
      const val ModeOfPayment = "IMPS"
 
      const val SUCCESS = "SUCCESS"
+     const val GENERATEKEY = "GenerateKey"
+     const val GENERATE_KEY_COUNT = "generate_key_count"
+     const val LAST_GENERATE_TIME = "last_generate_time"
 
      var PanFirstName : String= ""
      var PanMiddleName : String= ""
@@ -220,6 +256,7 @@ object ConstantClass {
      var ToBePaidAmount : String = ""
 
      var CountryName : String ? = ""
+
      var ClickOnCardDashboard : String ? = ""
      var ClickOnCardLowCibilScore : String ? = ""
 
@@ -245,6 +282,8 @@ object ConstantClass {
      var CustFirstName : String = ""
      var CustMiddleName : String = ""
      var CustLastName : String = ""
+
+     var isLockTaskStarted = false
      var CustPrimaryMobileNumber : String = ""
      var CustPrimaryOTP : String = ""
      var CustPrimaryMobileVerified : String = "no"
@@ -313,9 +352,34 @@ object ConstantClass {
     var eMandatepending = "pending"
     var isMandate = "Yes"
 
-    var IsGSTVerified : String ="1" // default active
+    var IsGSTVerified : String ="" // default active
     var IsPanVerified : String =""
     var IsAadhaarVerified : String =""
+
+
+    var isPgClosing = false
+
+    private var noInternetDialog: AlertDialog? = null
+
+     fun showNoInternetDialog(context: Context) {
+        if (noInternetDialog?.isShowing == true) return
+
+        noInternetDialog = AlertDialog.Builder(context)
+            .setTitle("No Internet")
+            .setMessage("Please check your Wi-Fi or mobile data connection.")
+            .setCancelable(false)
+            .setPositiveButton("Open Settings") { _, _ ->
+                if (NetworkMonitor(context).isConnected()) noInternetDialog?.dismiss() else {
+                    val intent = Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    context.startActivity(intent)
+                }
+
+            }
+            .create()
+
+        noInternetDialog?.show()
+    }
 
 
 
@@ -802,9 +866,10 @@ object ConstantClass {
         return outputFormat.format(date!!)
     }
 
+
     fun checkActiveStatusAndLogout(context: Context, activeStatus: String?, preference: SharedPreference) {
 
-        if (ConstantClass.SessionOutStatus.equals(activeStatus)!!) {
+        if (ConstantClass.SessionOutStatus.equals(activeStatus!!.toLowerCase())!! || ConstantClass.SessionOutStatusRejected.equals(activeStatus!!.toLowerCase())) {
             try {
                 Toast.makeText(context, "Your account is inactive. Please contact support.", Toast.LENGTH_LONG).show()
 
@@ -826,6 +891,7 @@ object ConstantClass {
         }
     }
 
+
     fun base64ToBitmap(base64String: String): Bitmap? {
         return try {
             val decodedBytes = Base64.decode(base64String, Base64.DEFAULT)
@@ -836,12 +902,25 @@ object ConstantClass {
         }
     }
 
-    fun convertToDDMMYYYY(isoDate: String ?): String {
+  /*  fun convertToDDMMYYYY(isoDate: String ?): String {
         val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SS", Locale.getDefault())
         val outputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
         val date = inputFormat.parse(isoDate)
         return outputFormat.format(date!!)
+    }*/
+
+    fun convertToDDMMYYYY(dateValue: String?): String {
+        if (dateValue.isNullOrBlank()) return "-"
+        return try {
+            val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()).apply {
+                isLenient = false
+            }
+            val outputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            inputFormat.parse(dateValue)?.let(outputFormat::format) ?: "-"
+        } catch (e: Exception) {
+            "-"
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -1137,7 +1216,7 @@ object ConstantClass {
     }
 
 
-    // DPCAPPJSON
+// DPCAPPJSON
 
    /* {
         "android.app.extra.PROVISIONING_DEVICE_ADMIN_COMPONENT_NAME":

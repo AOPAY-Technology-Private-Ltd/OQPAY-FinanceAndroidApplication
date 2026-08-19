@@ -1,6 +1,8 @@
 package com.bosandroidapp.oqmobilefinance.ui.view.activity
 
 import android.Manifest
+import android.app.admin.DevicePolicyManager
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -36,6 +38,10 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.loginType
 import com.bosandroidapp.oqmobilefinance.data.model.UploadDeviceInfoReq
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
+import com.bosandroidapp.oqmobilefinance.kioskmode.KioskDeviceAdminReceiver
+import com.bosandroidapp.oqmobilefinance.kioskmode.PermissionSetupActivity
+import com.bosandroidapp.oqmobilefinance.kioskmode.checkAllPermissionsGranted
 import com.bosandroidapp.oqmobilefinance.ui.slideshow.activity.DashBoard
 import com.bosandroidapp.oqmobilefinance.ui.slideshow.activity.LoginPage
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.NewCustomerRegistrationPage
@@ -43,10 +49,9 @@ import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.google.gson.Gson
 
-class ChooseYourRolePage : AppCompatActivity() {
+class ChooseYourRolePage : BaseActivity() {
    lateinit var binding : ActivityChooseYourRolePageBinding
     lateinit var viewModel: AuthenticationViewModel
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,6 +76,7 @@ class ChooseYourRolePage : AppCompatActivity() {
 
     fun setOnClickListner(){
 
+
         binding.retailerid.setOnClickListener{
             loginType = Retailer
             binding.retailerid.strokeColor = resources.getColor(R.color.darkpurple)
@@ -81,13 +87,38 @@ class ChooseYourRolePage : AppCompatActivity() {
 
 
         binding.customerid.setOnClickListener{
-            if(!checkPermissionsrRetailer()){
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_PHONE_STATE), 101)
-            }
-            else{
-                hitApiForUploadCustomerDeviceInfo()
-            }
+            try {
+                val dpm = getSystemService(DEVICE_POLICY_SERVICE) as DevicePolicyManager
+                val admin = ComponentName(this, KioskDeviceAdminReceiver::class.java)
 
+                if (dpm.isDeviceOwnerApp(packageName)) {
+                    dpm.setLockTaskPackages(admin, arrayOf(packageName))
+                }
+
+                if (dpm.isDeviceOwnerApp(packageName) && dpm.isAdminActive(admin)){
+                    if (!checkAllPermissionsGranted()) {
+                        startActivity(Intent(this, PermissionSetupActivity::class.java))
+                        finish()
+                    }
+                    else{
+                        if(!checkPermissionsrRetailer()){
+                            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_PHONE_STATE), 101)
+                        }
+                        else{
+                            hitApiForUploadCustomerDeviceInfo()
+                        }
+                    }
+
+                }
+                else{
+                   // intentNextPage()
+                    Toast.makeText(this,"Kindly transfer the ownership to OQ Pay.",Toast.LENGTH_SHORT).show()
+                }
+            }
+            catch (e: Exception) {
+                Log.e("DPM_ERROR", "Remote exception or Security error: ${e.message}")
+                Toast.makeText(this,"Kindly transfer the ownership to OQ Pay.",Toast.LENGTH_SHORT).show()
+            }
         }
 
 
@@ -124,6 +155,7 @@ class ChooseYourRolePage : AppCompatActivity() {
         binding.retailerid.strokeColor = resources.getColor(R.color.white)
         val mainIntent = Intent(this@ChooseYourRolePage, LoginPage::class.java)
         startActivity(mainIntent)
+
 
     }
 
@@ -183,7 +215,7 @@ class ChooseYourRolePage : AppCompatActivity() {
                      }
                     else {
                         Toast.makeText(this,"Kindly transfer the ownership to OQ Pay.",Toast.LENGTH_SHORT).show()
-                        //intentNextPage() // for working
+                       // intentNextPage() // for working
                     }
                 }
 

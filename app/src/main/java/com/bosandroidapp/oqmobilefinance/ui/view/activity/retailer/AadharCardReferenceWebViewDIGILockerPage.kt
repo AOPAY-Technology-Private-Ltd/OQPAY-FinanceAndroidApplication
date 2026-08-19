@@ -33,6 +33,7 @@ import com.bosandroidapp.oqmobilefinance.data.repository.CibilRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CibilViewModelFactory
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityReferenceAadharCardWebViewDigilockerPageBinding
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.PaymentInformation.Companion.checkKYC
@@ -44,7 +45,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class AadharCardReferenceWebViewDIGILockerPage : AppCompatActivity() {
+class AadharCardReferenceWebViewDIGILockerPage : BaseActivity() {
     lateinit var binding: ActivityReferenceAadharCardWebViewDigilockerPageBinding
     lateinit var viewModel: AuthenticationViewModel
     private lateinit var viewCibilModel: CibilViewModel
@@ -224,6 +225,7 @@ class AadharCardReferenceWebViewDIGILockerPage : AppCompatActivity() {
         )
 
         Log.d("validaterequest", Gson().toJson(request))
+
         viewModel.getSessionExpiredReq(request).observe(this){resources ->
             resources.let {
                 when (it.apiStatus) {
@@ -249,9 +251,9 @@ class AadharCardReferenceWebViewDIGILockerPage : AppCompatActivity() {
             }
         }
 
-
-
     }
+
+
 
     fun hitApiForRetailerLogout() {
         var loginRequest = LogoutReq(
@@ -293,15 +295,18 @@ class AadharCardReferenceWebViewDIGILockerPage : AppCompatActivity() {
 
 
     fun hitApiForAadharVerification(transactionId: String) {
-
-        var aadharverificationreq = AAdhaarDetailesReq(
+        val aadharverificationreq = AAdhaarDetailesReq(
             transactionID = transactionId,
-            registrationID = ConstantClass.PAN_VERIFICATION_REGISTRATION_ID,
+            registrationID = if (ConstantClass.CheckOnlineOrOffline == ConstantClass.online) {
+                ConstantClass.PAN_VERIFICATION_REGISTRATION_ID
+            } else {
+                ConstantClass.PAN_VERIFICATION_REGISTRATION_ID_OFFLINE
+            }
         )
 
         Log.d("AadharDetailsreq", Gson().toJson(aadharverificationreq))
 
-   viewCibilModel.getAAdhaarDetailesReq(aadharverificationreq).observe(this) { resources ->
+       viewCibilModel.getAAdhaarDetailesReq(aadharverificationreq).observe(this) { resources ->
             resources.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
@@ -352,5 +357,7 @@ class AadharCardReferenceWebViewDIGILockerPage : AppCompatActivity() {
         }
 
     }
+
+
 
 }

@@ -35,7 +35,9 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.bos.payment.appName.network.RetrofitClient
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivitySignupPageBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
@@ -72,6 +74,7 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isInternetAvaila
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.loginType
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.saveImageToCache
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.uriToFile
+import com.bosandroidapp.oqmobilefinance.data.gst.GstRequest
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.RegistrationReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.AadharVerificationReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.PanVerificationReq
@@ -87,13 +90,15 @@ import com.bosandroidapp.oqmobilefinance.ui.viewmodel.PanViewModel
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-class SignupPage : AppCompatActivity() {
+class SignupPage : BaseActivity() {
     lateinit var binding : ActivitySignupPageBinding
     lateinit var viewModel: AuthenticationViewModel
     lateinit var preference : SharedPreference
@@ -255,7 +260,8 @@ class SignupPage : AppCompatActivity() {
 
             }
 
-        } else {
+        }
+        else {
             // Optional: Handle failure or cancellation
             when (currentCaptureMode) {
 
@@ -482,6 +488,46 @@ class SignupPage : AppCompatActivity() {
         })
 
 
+        binding.gstEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                val gstNumber = s.toString().trim().uppercase()
+
+                // GST Format: 22AAAAA0000A1Z5
+                val gstRegex = Regex("^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z][1-9A-Z]Z[0-9A-Z]$")
+
+                binding.gstEditText.error = null
+
+                when {
+                    gstNumber.isEmpty() -> {
+                        binding.verifyGSTlayout.visibility = View.GONE
+                    }
+
+                    gstNumber.length != 15 -> {
+                        binding.verifyGSTlayout.visibility = View.GONE
+                    }
+
+                    !gstRegex.matches(gstNumber) -> {
+                        binding.gstEditText.error = "Invalid GST format"
+                        binding.verifyGSTlayout.visibility = View.GONE
+                    }
+
+                    else -> {
+                        binding.verifyGSTlayout.visibility = View.VISIBLE
+                    }
+                }
+            }
+        })
+
+
+        binding.verifyGSTlayout.setOnClickListener {
+            hitApiForGSTVerification()
+        }
+
+
         binding.createaccount.setOnClickListener {
             var firstName = binding.firstName.text.toString().trim()
             var lastName = binding.lastName.text.toString().trim()
@@ -558,6 +604,81 @@ class SignupPage : AppCompatActivity() {
             }
         }
 
+
+    }
+
+
+
+    fun hitApiForGSTVerification() {
+        var gstInReuest = GstRequest(
+            gSTNumber = binding.gstEditText.text.toString().trim(),
+            registrationID = ConstantClass.PAN_VERIFICATION_REGISTRATION_ID,
+        )
+        Log.d("gstInReuest", Gson().toJson(gstInReuest))
+
+        panViewModel.getGstNumberVerify(gstInReuest).observe(this) { resources ->
+            resources.let {
+                when (it.apiStatus) {
+                    ApiStatus.SUCCESS -> {
+                        it.data.let { users ->
+                            users!!.body().let { response ->
+                                ConstantClass.dialog.dismiss()
+                                Log.d("gstInResponse", Gson().toJson(response))
+                                 if(response!!.resultCode==101&& response.result!=null)
+                                 {
+                                     IsGSTVerified= "1"
+                                     var getData= response.result!!.taxpayerDetails
+                                     var lgnm = getData!!.lgnm
+                                     var trdnm = getData!!.tradeNam
+                                     var adrs = getData!!.pradr!!.adr
+                                     binding.storeLegalName.setText(lgnm)
+                                     binding.tradeName.setText(trdnm)
+                                     binding.storeaddresstxt.setText(adrs)
+                                     binding.gstEditText.isEnabled=false
+                                     binding.verifyGSTlayout.visibility=View.GONE
+                                     binding.verifygst.visibility=View.VISIBLE
+
+                                     binding.tradeName.isEnabled = trdnm.isNullOrEmpty()
+                                     binding.storeLegalName.isEnabled = lgnm.isNullOrEmpty()
+                                     binding.storeaddresstxt.isEnabled = adrs.isNullOrEmpty()
+
+                                 }
+                                 else {
+                                     IsGSTVerified= ""
+                                     binding.tradeName.isEnabled = true
+                                     binding.storeLegalName.isEnabled = true
+                                     binding.storeaddresstxt.isEnabled = true
+                                     binding.gstEditText.isEnabled=true
+                                     binding.verifyGSTlayout.visibility=View.VISIBLE
+                                     binding.verifygst.visibility=View.GONE
+                                     Toast.makeText(this@SignupPage, "The GST number you entered does not exist.!!", Toast.LENGTH_SHORT).show()
+                                 }
+
+                            }
+
+                        }
+
+                    }
+
+                    ApiStatus.ERROR -> {
+                        ConstantClass.dialog.dismiss()
+                        IsGSTVerified= ""
+                        binding.tradeName.isEnabled = true
+                        binding.storeLegalName.isEnabled = true
+                        binding.storeaddresstxt.isEnabled = true
+                        binding.gstEditText.isEnabled=true
+                        binding.verifyGSTlayout.visibility=View.VISIBLE
+                        binding.verifygst.visibility=View.GONE
+                    }
+
+                    ApiStatus.LOADING -> {
+                        ConstantClass.OpenPopUpForVeryfyOTP(this)
+                    }
+
+                }
+
+            }
+        }
 
     }
 
@@ -688,6 +809,7 @@ class SignupPage : AppCompatActivity() {
                                 if (response!!.code.equals("200")) {
                                     AadharCardReferenceWebViewDIGILockerPage.digilockerLink = response!!.model.kycUrl
                                     RefAadharTransactionIdNo = response.model.transactionId
+                                    preference.setStringValue(ConstantClass.RetailerCode, "")
                                     Log.d("Referencedigilockeurl",  AadharCardReferenceWebViewDIGILockerPage.digilockerLink)
                                     startActivity(Intent(this@SignupPage, AadharCardReferenceWebViewDIGILockerPage::class.java))
                                 }
@@ -700,6 +822,7 @@ class SignupPage : AppCompatActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
+                        hitApiForAadharVerification()
                     }
 
                     ApiStatus.LOADING -> {
@@ -726,7 +849,6 @@ class SignupPage : AppCompatActivity() {
             ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.CAMERA), CAMERA_REQUEST_CODE_FRONT)
         }
     }
-
 
 
     fun clickCameraForUploadDocument(mode: String) {
@@ -1040,13 +1162,14 @@ class SignupPage : AppCompatActivity() {
             binding.address.error = null
         }
 
+        // .............................................................for testing purpose............................................
 
         val aadhaarRegex = Regex("^[2-9][0-9]{11}$")
         val maskedAadhaarRegex = Regex("^[xX]{8}[0-9]{4}$")
 
 
         // Aadhaar validation
-        val isValid = aadharNumber.matches(Regex("\\d{12}")) || aadharNumber.matches(maskedAadhaarRegex)
+     /*   val isValid = aadharNumber.matches(Regex("\\d{12}")) || aadharNumber.matches(maskedAadhaarRegex)
 
         if (aadharNumber.isBlank() || aadharNumber.length != 12 ||  !isValid) {
             binding.aadharnumber.error= "Enter a valid 12-digit Aadhaar number"
@@ -1055,10 +1178,10 @@ class SignupPage : AppCompatActivity() {
             return false
         }else{
             binding.aadharnumber.error = null
-        }
+        }*/
 
 
-        if(IsAadhaarVerified.isNullOrBlank()){
+      /*  if(IsAadhaarVerified.isNullOrBlank()){
             binding.aadharnumber.error= "Please verify aadhaar number first"
             scrollToView(binding.detaillayout,  binding.aadharnumber)
             Toast.makeText(context, "Please verify aadhaar number first", Toast.LENGTH_SHORT).show()
@@ -1066,10 +1189,10 @@ class SignupPage : AppCompatActivity() {
         }
         else{
             binding.aadharnumber.error = null
-        }
+        }*/
 
 
-        // PAN validation (Regex: 5 letters, 4 digits, 1 letter)
+      /*  // PAN validation (Regex: 5 letters, 4 digits, 1 letter)
         val panRegex = Regex("[A-Z]{5}[0-9]{4}[A-Z]{1}")
         if (panNumber.isBlank() || !panRegex.matches(panNumber.uppercase())) {
             binding.panEditText.error= "Enter a valid PAN number (e.g., ABCDE1234F)"
@@ -1089,9 +1212,9 @@ class SignupPage : AppCompatActivity() {
         }
         else{
             binding.panEditText.error = null
-        }
+        }*/
 
-        if(!PanFirstName!!.toLowerCase().contains(ConstantClass.ReferenceAadhaarName.toLowerCase()) && !isSameMaskedAadhaar(ReferenceAadharNumber, PanAadhaarNumber!!) ){
+      /*  if(!PanFirstName!!.toLowerCase().contains(ConstantClass.ReferenceAadhaarName.toLowerCase()) && !isSameMaskedAadhaar(ReferenceAadharNumber, PanAadhaarNumber!!) ){
             binding.firstName.error= "Data mismatch. Please enter the valid data as per your PAN and Aadhaar records."
             scrollToView(binding.detaillayout,  binding.firstName)
             Toast.makeText(context, "Data mismatch. Please enter the name as per your PAN and Aadhaar records.", Toast.LENGTH_SHORT).show()
@@ -1099,9 +1222,12 @@ class SignupPage : AppCompatActivity() {
         }
         else {
             binding.firstName.error = null
-        }
+        }*/
 
-        if (gstNumber.isBlank() || !ConstantClass.isValidGST(gstNumber)) {
+        ///................................as per Guru teting flow....................................................................................
+
+
+        /*if (gstNumber.isBlank() || !ConstantClass.isValidGST(gstNumber)) {
             binding.gstEditText.error= "Enter a valid GST number (e.g., 07ABCDE1234F1Z5)"
             scrollToView(binding.detaillayout,  binding.gstEditText)
             Toast.makeText(context, "Enter a valid GST number (e.g., 07ABCDE1234F1Z5)", Toast.LENGTH_SHORT).show()
@@ -1110,6 +1236,16 @@ class SignupPage : AppCompatActivity() {
         else{
             binding.gstEditText.error = null
         }
+
+        if(IsGSTVerified.isNullOrBlank()){
+            binding.gstEditText.error= "Please verify gst number first."
+            scrollToView(binding.detaillayout,  binding.panEditText)
+            Toast.makeText(context, "Please verify gst number first.", Toast.LENGTH_SHORT).show()
+            return false
+        }
+        else{
+            binding.gstEditText.error = null
+        }*/
 
 
         if (storeName.isNullOrBlank() ) {
@@ -1301,6 +1437,7 @@ class SignupPage : AppCompatActivity() {
 
 
 
+
     fun isSameMaskedAadhaar(customerMasked: String, referenceMasked: String): Boolean {
         val customerLast4 = customerMasked.takeLast(4)
         val referenceLast4 = referenceMasked.takeLast(4)
@@ -1308,6 +1445,7 @@ class SignupPage : AppCompatActivity() {
         Log.d("validateAadhaarnumber" , "${isAadhaarMatched}")
         return isAadhaarMatched
     }
+
 
 
     fun emptyAboveField(){
@@ -1354,6 +1492,7 @@ class SignupPage : AppCompatActivity() {
         binding.panEditText.isEnabled= true
         binding.verifyaadharnumber.visibility=View.GONE
         binding.verifyPannumber.visibility=View.GONE
+        binding.verifygst.visibility=View.GONE
         binding.aadharnumber.isEnabled = ConstantClass.ReferenceAadhaarName.isEmpty()
         profilePhotoUri=null
         aadhaarFronthotoUri=null
@@ -1376,7 +1515,6 @@ class SignupPage : AppCompatActivity() {
         return false
     }
 
-
     fun scrollToView(scrollView: NestedScrollView, targetView: View) {
         scrollView.post {
             /*scrollView.smoothScrollTo(0, targetView.top - offset)*/
@@ -1394,8 +1532,13 @@ class SignupPage : AppCompatActivity() {
 
 
     override fun onBackPressed() {
-        emptyAboveField()
         super.onBackPressed()
+
+        lifecycleScope.launch {
+            delay(300)
+            emptyAboveField()
+        }
+
     }
 
 }

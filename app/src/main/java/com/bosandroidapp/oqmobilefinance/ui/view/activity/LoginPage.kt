@@ -58,6 +58,7 @@ import com.bosandroidapp.oqmobilefinance.data.notification.SendNotificationFeatu
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityLoginPageBinding
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.ForgetPasswordPage
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.SignupPage
@@ -67,7 +68,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
 
-class LoginPage : AppCompatActivity() {
+class LoginPage : BaseActivity() {
     lateinit var binding: ActivityLoginPageBinding
     private lateinit var viewModel: AuthenticationViewModel
     lateinit var preference : SharedPreference
@@ -217,7 +218,7 @@ class LoginPage : AppCompatActivity() {
 
         binding.customerloginlayout.setOnClickListener {
             var mobnumber = binding.mobilenumber.text.toString()
-            if (ConstantClass.validateLoginInput(mobnumber, this) ) {
+            if (ConstantClass.validateLoginInput(mobnumber, this)) {
                 if (isInternetAvailable(this@LoginPage)) {
                     /*if (!isSimPresent()) {
                         Toast.makeText(this, "No SIM detected. Insert SIM to continue.", Toast.LENGTH_LONG).show()
@@ -288,7 +289,7 @@ class LoginPage : AppCompatActivity() {
                             fcmToken = FireBaseToken
                         )
 
-                       // sendDataOnServerForUploadToken(req)
+                        // sendDataOnServerForUploadToken(req)
 
                         preference.setStringValue(ConstantClass.CustomerCode, response.customerCode.toString())
                         preference.setStringValue(ConstantClass.RetailerCode, response.retailerCode.toString())
@@ -373,11 +374,14 @@ class LoginPage : AppCompatActivity() {
 
         subtitle.text = "Enter four digit OTP send on your registered mobile number"
 
+
         startOtpTimer(resendtxt,timer)
+
 
         cancel.setOnClickListener {
             dialog.dismiss()
         }
+
 
         resendlayout.setOnClickListener {
                   if(isInternetAvailable(this@LoginPage)) {
@@ -391,6 +395,7 @@ class LoginPage : AppCompatActivity() {
 
         }
 
+
         verifyButton.setOnClickListener {
             val enteredOTP = pinView.getText().toString()
             if (enteredOTP.length == 4) {
@@ -399,11 +404,13 @@ class LoginPage : AppCompatActivity() {
 
                 // Toast.makeText(this, "Thanks for your input! The next flow is under development and will be available soon.", Toast.LENGTH_SHORT).show()
 
-            } else {
+            }
+            else {
                 Toast.makeText(this, "Please enter complete OTP", Toast.LENGTH_SHORT).show()
             }
 
         }
+
 
         dialog.show()
 
@@ -429,6 +436,7 @@ class LoginPage : AppCompatActivity() {
         }
         countDownTimer.start()
     }
+
 
 
     private fun setupOTPFocus(current: EditText, next: EditText?, previous: EditText? = null) {

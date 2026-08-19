@@ -47,6 +47,7 @@ import com.bosandroidapp.oqmobilefinance.data.repository.CibilRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CibilViewModelFactory
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityCivilReportFormBinding
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
@@ -57,7 +58,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-class CivilReportForm : AppCompatActivity() {
+class CivilReportForm : BaseActivity() {
 
     lateinit var binding : ActivityCivilReportFormBinding
     lateinit var dialog: Dialog
@@ -210,7 +211,7 @@ class CivilReportForm : AppCompatActivity() {
             otp = otp,
             consentmessage = "I agree to share my data for verification purposes",
             consentacceptence = "yes",
-            registrationID = "AOP-5039"
+            registrationID = ConstantClass.PAN_VERIFICATION_REGISTRATION_ID
         )
 
         Log.d("CibilReq",Gson().toJson(cibilReq))

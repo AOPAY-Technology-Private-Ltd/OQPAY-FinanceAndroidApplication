@@ -44,5 +44,8 @@ data class PayoutDataItem(
 	val servicesChargeGSTAmt: Double? = null,
 
 	@field:SerializedName("transferAmt")
-	val transferAmt: Double? = null
+	val transferAmt: Double? = null,
+
+	@field:SerializedName("actual_Transaction_Amount")
+	val actualTransactionAmount: Double? = null
 )

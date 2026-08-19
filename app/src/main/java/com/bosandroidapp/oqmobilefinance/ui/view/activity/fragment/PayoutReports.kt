@@ -10,6 +10,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.lifecycle.ViewModelProvider
 import com.bos.payment.appName.network.RetrofitClient
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.FragmentPayoutReportsBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
@@ -43,14 +44,20 @@ class PayoutReports : Fragment() {
 
         preference = SharedPreference(requireContext())
         viewModel = ViewModelProvider(this, CommonViewModelFactory(AuthRepository(RetrofitClient.apiInterface)))[AuthenticationViewModel::class.java]
-        hitApiForReports(reportType)
+
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        
+        hitApiForReports(reportType)
     }
 
 
     fun setview( ){
         // for report.........................................................................................
-        val adapter = ArrayAdapter.createFromResource(requireContext(),  R.array.reporttype, R.layout.mobilenamelayout)
+        val adapter = ArrayAdapter.createFromResource(requireContext(),  R.array.cibilreporttype, R.layout.mobilenamelayout)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.reporttype.adapter = adapter
         var isSpinnerFirstCall = true // declare outside the listener
@@ -70,6 +77,7 @@ class PayoutReports : Fragment() {
             }
         }
 
+
         setDataOnView(binding.reporttype.selectedItem.toString().trim())
 
     }
@@ -77,6 +85,8 @@ class PayoutReports : Fragment() {
     fun setDataOnView(status: String){
 
         if(!reportDataList.isNullOrEmpty()){
+
+            Log.d("reportList", Gson().toJson(reportDataList))
 
             val filteredList = if (status.equals("All", ignoreCase = true)) {
                 reportDataList ?: emptyList()
@@ -106,6 +116,7 @@ class PayoutReports : Fragment() {
         }
 
     }
+
 
     fun hitApiForReports(reportType:String){
 

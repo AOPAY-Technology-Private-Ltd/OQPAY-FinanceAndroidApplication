@@ -24,6 +24,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LogoutReq
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityBankDetailsPageBinding
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
 import com.bosandroidapp.oqmobilefinance.ui.view.adapter.BankPagerAdapter
@@ -34,7 +35,7 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.gson.Gson
 
-class BankDetailsPage : AppCompatActivity() {
+class BankDetailsPage : BaseActivity() {
     lateinit var viewModel: AuthenticationViewModel
     lateinit var preference : SharedPreference
     lateinit var binding : ActivityBankDetailsPageBinding

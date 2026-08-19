@@ -7,6 +7,8 @@ import com.bosandroidapp.oqmobilefinance.data.enach.ENachStatusReq
 import com.bosandroidapp.oqmobilefinance.data.enach.ENachStatusResp
 import com.bosandroidapp.oqmobilefinance.data.enach.EnachDateUploadReq
 import com.bosandroidapp.oqmobilefinance.data.enach.EnachDateUploadResp
+import com.bosandroidapp.oqmobilefinance.data.gst.GstRequest
+import com.bosandroidapp.oqmobilefinance.data.gst.GstResponse
 import com.bosandroidapp.oqmobilefinance.data.loancharge.LoanChargeReq
 import com.bosandroidapp.oqmobilefinance.data.loancharge.LoanChargeResp
 import com.bosandroidapp.oqmobilefinance.data.model.AddedBankListResp
@@ -24,6 +26,8 @@ import com.bosandroidapp.oqmobilefinance.data.model.HoldAmountWithdrawReq
 import com.bosandroidapp.oqmobilefinance.data.model.HoldAmountWithdrawResp
 import com.bosandroidapp.oqmobilefinance.data.model.LowCibilCustomerReportReq
 import com.bosandroidapp.oqmobilefinance.data.model.LowCibilCustomerReportResp
+import com.bosandroidapp.oqmobilefinance.data.model.RetailerPerCustomerListShortCutForLoanReq
+import com.bosandroidapp.oqmobilefinance.data.model.RetailerPerCustomerListShortCutForLoanResponse
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletAmountReq
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletPayoutAtMakePaymentTimeReq
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletPayoutAtMakePaymentTimeResp
@@ -88,6 +92,8 @@ import com.bosandroidapp.oqmobilefinance.data.pennydrop.PennyDropCheckStatusRequ
 import com.bosandroidapp.oqmobilefinance.data.pennydrop.PennyDropCheckStatusResponse
 import com.bosandroidapp.oqmobilefinance.data.pennydrop.PennyDropRequest
 import com.bosandroidapp.oqmobilefinance.data.pennydrop.PennyDropResponse
+import com.bosandroidapp.oqmobilefinance.data.pg.PGOnlineRequestCall
+import com.bosandroidapp.oqmobilefinance.data.pg.PGOnlineResponseCall
 import com.bosandroidapp.oqmobilefinance.data.pg.PGRequestCall
 import com.bosandroidapp.oqmobilefinance.data.pg.PGRequestResponse
 import okhttp3.MultipartBody
@@ -267,6 +273,7 @@ interface ApiInterface {
         ): Response<RegisterCustomerResp>
 
 
+
     @Multipart
     @POST("api/V1/OQFinance/ManageCustomer")
     suspend fun getRegisterCustomerReq(
@@ -316,6 +323,7 @@ interface ApiInterface {
         @Part("CreatedBy") createdBy: RequestBody,
         @Part("MemberShipFees") membershipfees: RequestBody,
         @Part("RetailerCode") retailercode: RequestBody,
+        @Part("CustomerCodes") customerCode: RequestBody,
         @Part("CibilScore") cibilScore: RequestBody,
         @Part("IsAggrementVerified") isAggrementVerified: RequestBody,
         @Part("IsRetailerAggrementVerified") IsRetailerAggrementVerified: RequestBody,
@@ -380,6 +388,7 @@ interface ApiInterface {
         @Part("CreatedBy") createdBy: RequestBody,
         @Part("MemberShipFees") membershipfees: RequestBody,
         @Part("RetailerCode") retailercode: RequestBody,
+        @Part("CustomerCodes") customerCode: RequestBody,
         @Part("PanApiResponse") PanApiResponse: RequestBody,
         @Part("AadhaarApiResponse") AadhaarApiResponse: RequestBody,
         @Part("CibilApiResponse") CibilApiResponse: RequestBody,
@@ -420,9 +429,11 @@ interface ApiInterface {
     suspend fun getRetailerWalletAmountReq(@Body req : RetailerWalletAmountReq): Response<com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletResponse>?
 
 
+
     // retailer payout report
     @POST("api/V1/OQFinance/GetPayoutTransferDetails")
     suspend fun getPayoutReportReq(@Body req : PayoutReportReq): Response<PayoutReportResp>?
+
 
 
     @POST("api/V1/OQFinance/GetLookupReports")
@@ -482,6 +493,7 @@ interface ApiInterface {
     suspend fun RetailerWalletPayoutReq(@Body req : RetailerWalletPayoutAtMakePaymentTimeReq): Response<RetailerWalletPayoutAtMakePaymentTimeResp>?
 
 
+
     @Multipart
     @POST("api/V1/OQFinance/MakePayment")
     suspend fun getCustomerReceiptUpload(
@@ -524,15 +536,18 @@ interface ApiInterface {
 
 
 
+
     // revalidate user eligible for loan or not
     @POST("api/V1/OQFinance/GetMembershipFee")
     suspend fun getMemberShipReq(@Body req : GetIsEligibleLoanReq): Response<MembershipFeeResp>?
 
 
 
+
     // get customer location......................
     @POST("api/V1/OQFinance/managecustomerlocation")
     suspend fun uploadcustomerlocation(@Body req : CustomerlocationUploadReq): Response<CustomerlocationUploadResp>?
+
 
 
 
@@ -545,6 +560,7 @@ interface ApiInterface {
     // for customer generate token key
     @POST("api/V1/OQFinance/generatekey")
     suspend fun getAccessKeyForValidateAPKReq(@Body req : GenerateAccessTokenRequest): Response<GenerateAccessTokenResponse>?
+
 
 
     //  key validate retailer end
@@ -578,12 +594,29 @@ interface ApiInterface {
     suspend fun getBankListRequest(@Body req: BankListReq): Response<BankListResponse>?
 
 
+    // for Offline eNach Api ..................................................................
     @POST("api/AOP/Enach/V1/eMandate")
     suspend fun geteMandateRequest(@Body req: EMandateRequest): Response<EMandateResponse>?
 
 
     @POST("api/AOP/Enach/V1/eMandate/getStatus")
     suspend fun geteMandateSatusRequest(@Body req: ENachStatusReq): Response<ENachStatusResp>?
+
+    //............................................................................................
+
+
+    //for online eNach Api .......................................................................
+
+    @POST("api/OQPay/Enach/V1/eMandate")
+    suspend fun geteMandateOnlineRequest(@Body req: EMandateRequest): Response<EMandateResponse>?
+
+
+
+    @POST("api/OQPay/Enach/V1/eMandate/getStatus")
+    suspend fun geteMandateOnlineSatusRequest(@Body req: ENachStatusReq): Response<ENachStatusResp>?
+
+
+    //............................................................................................
 
 
     // loan charge for each loan retailer
@@ -614,7 +647,34 @@ interface ApiInterface {
 
 
     @POST("api/AOPay/Finance/Offline/V1/PaymentGateway")
-    suspend fun callPG(@Body req : PGRequestCall) : Response<PGRequestResponse>?
+    suspend fun callPGOffline(@Body req : PGRequestCall) : Response<PGRequestResponse>?
+
+
+    @POST("api/AOP/V1/Validation/GstNumber")
+    suspend fun getGstNumberVerify(@Body req : GstRequest) : Response<GstResponse>?
+
+
+    @POST("api/OQPay/Finance/Online/V1/PaymentGateway")
+    suspend fun callPGOnline(@Body req : PGOnlineRequestCall) : Response<PGOnlineResponseCall>?
+
+
+
+    // upload invoice file...............
+    @Multipart
+    @POST("api/V1/OQFinance/UpdateCustomerPhotoPath")
+    suspend fun uploadInVoiceRequest(
+        @Query("CustomerCode") customerCode: String,
+        @Query("ColumnName") columnName: String,
+        @Query("NewValue") newValue: String,
+        @Part invoiceImage: MultipartBody.Part
+    ): Response<CustomerMakePaymentResp>?
+
+
+
+    // api for customer list short cut option for loan generate
+
+    @POST("api/V1/OQFinance/GetCustomerByRetailer")
+    suspend fun getCustomerListForShortCutLoanCreateProcess(@Body req : RetailerPerCustomerListShortCutForLoanReq) : Response<RetailerPerCustomerListShortCutForLoanResponse>?
 
 
 }

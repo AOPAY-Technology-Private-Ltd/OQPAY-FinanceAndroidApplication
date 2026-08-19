@@ -14,6 +14,7 @@ import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 
 
@@ -118,7 +119,7 @@ fun Activity.optimizeBatterry() {
 
 
 
-fun Activity.isStatsPermissionGranted():Boolean{
+fun Context.isStatsPermissionGranted():Boolean{
     val appOps = getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
     val mode = appOps.checkOpNoThrow(
         AppOpsManager.OPSTR_GET_USAGE_STATS,

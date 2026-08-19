@@ -3,6 +3,7 @@ package com.bosandroidapp.oqmobilefinance.data.repository
 import com.bos.payment.appName.network.ApiInterface
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.createMultipartFromUri
 import com.bosandroidapp.oqmobilefinance.data.enach.EnachDateUploadReq
+import com.bosandroidapp.oqmobilefinance.data.gst.GstRequest
 import com.bosandroidapp.oqmobilefinance.data.model.AddBankAccountReq
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerEmiStatusReq
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerlocationUploadReq
@@ -11,6 +12,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.GenerateAccessTokenRequest
 import com.bosandroidapp.oqmobilefinance.data.model.GetRetailerLedgerReq
 import com.bosandroidapp.oqmobilefinance.data.model.HoldAmountWithdrawReq
 import com.bosandroidapp.oqmobilefinance.data.model.LowCibilCustomerReportReq
+import com.bosandroidapp.oqmobilefinance.data.model.RetailerPerCustomerListShortCutForLoanReq
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletAmountReq
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletPayoutAtMakePaymentTimeReq
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletReportReq
@@ -215,7 +217,7 @@ class AuthRepository(private val apiInterface: ApiInterface) {
 
   suspend fun getPayoutReportReq(req: PayoutReportReq) = apiInterface.getPayoutReportReq(req)
 
-  suspend fun getAddBankAccountReq(req: com.bosandroidapp.oqmobilefinance.data.model.AddBankAccountReq) = apiInterface.addBankAccounts(req)
+  suspend fun getAddBankAccountReq(req: AddBankAccountReq) = apiInterface.addBankAccounts(req)
 
   suspend fun requestHoldAmountWithdrawRequest(req: HoldAmountWithdrawReq) = apiInterface.requestHoldAmountWithdrawRequest(req)
 
@@ -236,10 +238,27 @@ class AuthRepository(private val apiInterface: ApiInterface) {
   suspend fun uploadDeviceInfo(req: UploadDeviceInfoReq) = apiInterface.uploadDeviceInfo(req)
 
   suspend fun UpdateEmandateDetails(req: EnachDateUploadReq) = apiInterface.UpdateEmandateDetails(req)
+
+
   suspend fun sendTokenViaNotificationReq(req: NotificationSendTokenRequest) = apiInterface.sendTokenViaNotificationReq(req)
+
 
   suspend fun sendNotificationFeatureNameReq(req: SendNotificationFeatureNameRequest) = apiInterface.sendNotificationFeatureNameReq(req)
 
+
   suspend fun LoanEmIScheduleWithStatusReq(req: CustomerEmiStatusReq) = apiInterface.LoanEmIScheduleWithStatusReq(req)
+
+
+  suspend fun uploadInVoiceRequest(customerCode: String, columnName: String, newValue: String, imagePart: MultipartBody.Part) = 
+      apiInterface.uploadInVoiceRequest(
+          customerCode,
+          columnName,
+          newValue,
+          imagePart
+      )
+
+
+  suspend fun getCustomerListForShortCutLoanCreateProcess(req: RetailerPerCustomerListShortCutForLoanReq) = apiInterface.getCustomerListForShortCutLoanCreateProcess(req)
+
 
 }
