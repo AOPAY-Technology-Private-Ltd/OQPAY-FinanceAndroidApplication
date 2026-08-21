@@ -154,6 +154,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import okhttp3.Response
 import kotlin.math.roundToInt
+import kotlin.text.trim
 
 
 class QRCodePage : BaseActivity() {
@@ -188,10 +189,13 @@ class QRCodePage : BaseActivity() {
             WindowInsetsCompat.CONSUMED
         }
 
-
-        if (IMEIDetailsPage.dialog != null && IMEIDetailsPage.dialog.isShowing) {
-            IMEIDetailsPage.dialog.dismiss()
-        }
+         try{
+             if (IMEIDetailsPage.dialog != null && IMEIDetailsPage.dialog.isShowing) {
+                 IMEIDetailsPage.dialog.dismiss()
+             }
+         }catch (e: UninitializedPropertyAccessException){
+             e.message
+         }
 
 
         preference = SharedPreference(this)
@@ -213,11 +217,11 @@ class QRCodePage : BaseActivity() {
                     modetype = "INSERT",
                     rid = 0,
                     customerCode = preference.getStringValue(ConstantClass.CustomerCode,""),
-                    loanAmount = ConstantClass.LoanAmount.toDouble(),
-                    downPayment = downPayment.toDouble(),
-                    emiAmount = EmiAmount.toDouble(),
-                    tenure = Tenure.toInt(),
-                    interestRate = InterestRate.toDouble(),
+                    loanAmount = ConstantClass.LoanAmount ?: 0.0,
+                    downPayment = DownPayment?.toDoubleOrNull() ?: 0.0,
+                    emiAmount = EmiAmount?.toDoubleOrNull() ?: 0.0,
+                    tenure = Tenure?.toInt()?:0,
+                    interestRate = InterestRate?.toDoubleOrNull() ?: 0.0,
                     startDate = startDate,
                     endDate = endDate,
                     imeiNumber = ImeiNumber1,
@@ -234,7 +238,7 @@ class QRCodePage : BaseActivity() {
                     creditScore = userScore.toString(),
                     validateKey = "",
                     defaultEmidebit = DefaulterEmiDebitPending,
-                    sellingPrice = ConstantClass.SellingPrice.toDouble(),
+                    sellingPrice = ConstantClass.SellingPrice?.toDoubleOrNull() ?: 0.0,
                     loanMode = ConstantClass.offline
                 )
 
@@ -250,7 +254,7 @@ class QRCodePage : BaseActivity() {
                     rid = 0,
                     customerCode = preference.getStringValue(ConstantClass.CustomerCode,""),
                     loanAmount = ConstantClass.LoanAmount.toDouble(),
-                    downPayment = downPayment.toDouble(),
+                    downPayment = DownPayment.toDouble(),
                     emiAmount = EmiAmount.toDouble(),
                     tenure = Tenure.toInt(),
                     interestRate = InterestRate.toDouble(),
@@ -269,7 +273,7 @@ class QRCodePage : BaseActivity() {
                     recordStatus = LoanStatus,
                     creditScore = userScore.toString(),
                     validateKey = "",
-                    defaultEmidebit = DefaulterEmiDebitPending,
+                    defaultEmidebit = DefaulterEmiDebitAutoApproved,
                     sellingPrice = ConstantClass.SellingPrice.toDouble(),
                     loanMode = ConstantClass.online
                 )
@@ -1363,66 +1367,110 @@ class QRCodePage : BaseActivity() {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
                         it.data?.let { users ->
-                            users.body()?.let { response ->
-                                Log.d("customerres", Gson().toJson(response))
+                            if(users.isSuccessful){
+                                    users.body()?.let { response ->
+                                        Log.d("customerres", Gson().toJson(response))
 
-                                if (response.status?.toLowerCase().equals(ConstantClass.LoanSuccessStatus)) {
-                                    loaneCode = response.data!!.loanCode!!
-                                    ConstantClass.LoanRID = response.data!!.rid!!
-                                    FirstName = CustFirstName
-                                    MiddleName = CustMiddleName
-                                    LastName = CustLastName
-                                    CustomerCodeForEnach = response.data!!.customerCode!!
-                                    LoanCodeForEnach = response.data!!.loanCode!!
-                                    RetailerCodeForEnach = response.data!!.retailerCode!!
 
-                                    LoanStartDate = response.data.startDate!!
-                                    LoanEndDate = response.data.endDate!!
+                                        if (response.status?.toLowerCase().equals(ConstantClass.LoanSuccessStatus)) {
+                                            loaneCode = response.data!!.loanCode!!
+                                            ConstantClass.LoanRID = response.data!!.rid!!
+                                            FirstName = CustFirstName
+                                            MiddleName = CustMiddleName
+                                            LastName = CustLastName
+                                            CustomerCodeForEnach = response.data!!.customerCode!!
+                                            LoanCodeForEnach = response.data!!.loanCode!!
+                                            RetailerCodeForEnach = response.data!!.retailerCode!!
 
-                                  /*  LoanStartDate = "2026-08-25T09:21:03.988Z"
-                                    LoanEndDate = "2026-09-25T09:21:03.988Z"*/
+                                            LoanStartDate = response.data.startDate!!
+                                            LoanEndDate = response.data.endDate!!
 
-                                    val emiAmount = EmiAmount.toDouble().roundToInt()
-                                   /* val emiAmount = 1*/
+                                            /*  LoanStartDate = "2026-08-25T09:21:03.988Z"
+                                              LoanEndDate = "2026-09-25T09:21:03.988Z"*/
 
-                                    val request = EMandateRequest(
-                                        categoryID = 7,
-                                        collectionAmount = emiAmount,
-                                        collectCollectionUntilCancle = false,
-                                        seqType = "RCUR",
-                                        iFSCCode = BankIFSCCode,
-                                        frequncy = "MNTH",
-                                        registrationID = if (ConstantClass.CheckOnlineOrOffline == ConstantClass.online) {
-                                            ConstantClass.PAN_VERIFICATION_REGISTRATION_ID
+                                            val emiAmount = EmiAmount.toDouble().roundToInt()
+                                            /* val emiAmount = 1*/
+
+                                            val request = EMandateRequest(
+                                                categoryID = 7,
+                                                collectionAmount = emiAmount,
+                                                collectCollectionUntilCancle = false,
+                                                seqType = "RCUR",
+                                                iFSCCode = BankIFSCCode,
+                                                frequncy = "MNTH",
+                                                registrationID = if (ConstantClass.CheckOnlineOrOffline == ConstantClass.online) {
+                                                    ConstantClass.PAN_VERIFICATION_REGISTRATION_ID
+                                                } else {
+                                                    ConstantClass.PAN_VERIFICATION_REGISTRATION_ID_OFFLINE
+                                                },
+                                                accountHolderName = ConstantClass.AccountHolderName,
+                                                finalCollectionDate = LoanEndDate,
+                                                loanNo = loaneCode,
+                                                accountType = AccountType,
+                                                emailAddress = CusteMailID,
+                                                firstCollectionDate = LoanStartDate,
+                                                mobileNumber = CustPrimaryMobileNumber,
+                                                bankAccountNumberConfirmation = AccountNumber,
+                                                addIn2 = BranchAddress,
+                                                addIn3 = "",
+                                                debitType = true,
+                                                teleNumber = "",
+                                                authType = "",
+                                                bankID = BankID,
+                                                bankAccountNumber = AccountNumber
+                                            )
+
+                                            hitApiForEnach(request,false)
+
                                         } else {
-                                            ConstantClass.PAN_VERIFICATION_REGISTRATION_ID_OFFLINE
-                                        },
-                                        accountHolderName = ConstantClass.AccountHolderName,
-                                        finalCollectionDate = LoanEndDate,
-                                        loanNo = loaneCode,
-                                        accountType = AccountType,
-                                        emailAddress = CusteMailID,
-                                        firstCollectionDate = LoanStartDate,
-                                        mobileNumber = CustPrimaryMobileNumber,
-                                        bankAccountNumberConfirmation = AccountNumber,
-                                        addIn2 = BranchAddress,
-                                        addIn3 = "",
-                                        debitType = true,
-                                        teleNumber = "",
-                                        authType = "",
-                                        bankID = BankID,
-                                        bankAccountNumber = AccountNumber
-                                    )
+                                            if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
+                                                ConstantClass.dialog.dismiss()
+                                            }
+                                        }
 
-                                    hitApiForEnach(request,false)
-
-                                } else {
-                                    if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
-                                        ConstantClass.dialog.dismiss()
                                     }
+                                    val error =  users.message() ?: "Something went wrong"
+                                    Toast.makeText(this, error, Toast.LENGTH_LONG).show()
+                            }
+                            else{
+                                val errorBody = users.errorBody()?.string()
+
+                                Log.e("API_RESPONSE_ERROR", errorBody ?: "Unknown error")
+
+                                val errorMessage = when (users.code()) {
+
+                                    400 -> "Bad request"
+
+                                    401 -> "Unauthorized access"
+
+                                    403 -> "Access forbidden"
+
+                                    404 -> "Data not found"
+
+                                    405 -> "Method not allowed"
+
+                                    408 -> "Request timeout"
+
+                                    409 -> "Conflict occurred"
+
+                                    422 -> "Validation failed"
+
+                                    429 -> "Too many requests"
+
+                                    500 -> "Internal server error"
+
+                                    502 -> "Bad gateway"
+
+                                    503 -> "Service unavailable"
+
+                                    504 -> "Gateway timeout"
+
+                                    else -> "Something went wrong"
                                 }
+                                Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
 
                             }
+
                         }
                     }
 
@@ -1763,40 +1811,52 @@ class QRCodePage : BaseActivity() {
                     when (it.apiStatus) {
                         ApiStatus.SUCCESS -> {
                             it.data.let { users ->
-                                users!!.body().let { response ->
-                                    Log.d("eMandateRes", Gson().toJson(response))
 
-                                    if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
-                                        ConstantClass.dialog.dismiss()
-                                    }
-                                    binding.LoanCreatelayout.isEnabled= true
+                                if(users!!.isSuccessful){
+                                    users!!.body().let { response ->
+                                        Log.d("eMandateRes", Gson().toJson(response))
 
-                                    if (response!!.data?.customer != null) {
-                                        webUrl = response!!.data!!.url
-                                        startActivity(Intent(this@QRCodePage, RetailerEMandateVerifyPage::class.java))
-                                    }
-                                    else {
-                                        ConstantClass.dialog.dismiss()
-                                        isEmandateVerified= "No"
-                                        isEnachCancelled = true
-                                        Toast.makeText(this, response.message, Toast.LENGTH_SHORT).show()
+                                        if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
+                                            ConstantClass.dialog.dismiss()
+                                        }
+                                        binding.LoanCreatelayout.isEnabled= true
+
+                                        if (response!!.data?.customer != null) {
+                                            webUrl = response!!.data!!.url
+                                            startActivity(Intent(this@QRCodePage, RetailerEMandateVerifyPage::class.java))
+                                        }
+                                        else {
+                                            ConstantClass.dialog.dismiss()
+                                            isEmandateVerified= "No"
+                                            isEnachCancelled = true
+                                            Toast.makeText(this, response.message, Toast.LENGTH_SHORT).show()
+                                        }
+
+                                        if(!isEmandateVerified.isNullOrBlank()){
+                                            var request = EnachDateUploadReq(
+                                                isEmandateVerified = isEmandateVerified,
+                                                emAccountType = AccountType,
+                                                isPannydropVerified = isPannydropVerified,
+                                                emAccountNumber = AccountNumber,
+                                                customerCode = CustomerCodeForEnach,
+                                                retailerCode= RetailerCodeForEnach,
+                                                loanCode= loaneCode,
+                                                emBankName=BankName,
+                                                emIfscCode =BankIFSCCode
+                                            )
+
+                                            hitApiForUploadEnachMandateDataResponse(request)
+                                        }
+
                                     }
 
-                                    if(!isEmandateVerified.isNullOrBlank()){
-                                        var request = EnachDateUploadReq(
-                                            isEmandateVerified = isEmandateVerified,
-                                            emAccountType = AccountType,
-                                            isPannydropVerified = isPannydropVerified,
-                                            emAccountNumber = AccountNumber,
-                                            customerCode = CustomerCodeForEnach,
-                                            retailerCode= RetailerCodeForEnach,
-                                            loanCode= loaneCode,
-                                            emBankName=BankName,
-                                            emIfscCode =BankIFSCCode
-                                        )
+                                    val error = users.body()?.statusDesc ?: users.message() ?: "Something went wrong"
+                                    Toast.makeText(this, error, Toast.LENGTH_LONG).show()
 
-                                        hitApiForUploadEnachMandateDataResponse(request)
-                                    }
+                                }
+                                else {
+                                    var error = resources.data.toString()
+                                    Toast.makeText(this@QRCodePage,error, Toast.LENGTH_SHORT).show()
 
                                 }
 
@@ -1806,7 +1866,7 @@ class QRCodePage : BaseActivity() {
 
                         ApiStatus.ERROR -> {
                             ConstantClass.dialog.dismiss()
-                            // ✅ Print the full error details
+
                             Log.e("API_ERROR", "Status: ERROR")
                             Log.e("API_ERROR_CODE", resources.data?.code().toString())
                             Log.e("API_ERROR_MSG", resources.message ?: "Unknown Error")
@@ -1837,42 +1897,51 @@ class QRCodePage : BaseActivity() {
                     when (it.apiStatus) {
                         ApiStatus.SUCCESS -> {
                             it.data.let { users ->
-                                users!!.body().let { response ->
-                                    Log.d("eMandateOnlineRes", Gson().toJson(response))
 
-                                    if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
-                                        ConstantClass.dialog.dismiss()
+                                if(users!!.isSuccessful){
+                                    users!!.body().let { response ->
+                                        Log.d("eMandateOnlineRes", Gson().toJson(response))
+
+                                        if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
+                                            ConstantClass.dialog.dismiss()
+                                        }
+
+                                        binding.LoanCreatelayout.isEnabled= true
+
+                                        if (response!!.data?.customer != null) {
+                                            webUrl = response!!.data!!.url
+                                            startActivity(Intent(this@QRCodePage, RetailerEMandateVerifyPage::class.java))
+                                        }
+                                        else {
+                                            ConstantClass.dialog.dismiss()
+                                            isEmandateVerified= "No"
+                                            isEnachCancelled = true
+                                            Toast.makeText(this, response.message, Toast.LENGTH_SHORT).show()
+                                        }
+
+                                        if(!isEmandateVerified.isNullOrBlank()){
+                                            var request = EnachDateUploadReq(
+                                                isEmandateVerified = isEmandateVerified,
+                                                emAccountType = AccountType,
+                                                isPannydropVerified = isPannydropVerified,
+                                                emAccountNumber = AccountNumber,
+                                                customerCode = CustomerCodeForEnach,
+                                                retailerCode= RetailerCodeForEnach,
+                                                loanCode= loaneCode,
+                                                emBankName=BankName,
+                                                emIfscCode =BankIFSCCode
+                                            )
+
+                                            hitApiForUploadEnachMandateDataResponse(request)
+                                        }
+
                                     }
 
-                                    binding.LoanCreatelayout.isEnabled= true
-
-                                    if (response!!.data?.customer != null) {
-                                        webUrl = response!!.data!!.url
-                                        startActivity(Intent(this@QRCodePage, RetailerEMandateVerifyPage::class.java))
-                                    }
-                                    else {
-                                        ConstantClass.dialog.dismiss()
-                                        isEmandateVerified= "No"
-                                        isEnachCancelled = true
-                                        Toast.makeText(this, response.message, Toast.LENGTH_SHORT).show()
-                                    }
-
-                                    if(!isEmandateVerified.isNullOrBlank()){
-                                        var request = EnachDateUploadReq(
-                                            isEmandateVerified = isEmandateVerified,
-                                            emAccountType = AccountType,
-                                            isPannydropVerified = isPannydropVerified,
-                                            emAccountNumber = AccountNumber,
-                                            customerCode = CustomerCodeForEnach,
-                                            retailerCode= RetailerCodeForEnach,
-                                            loanCode= loaneCode,
-                                            emBankName=BankName,
-                                            emIfscCode =BankIFSCCode
-                                        )
-
-                                        hitApiForUploadEnachMandateDataResponse(request)
-                                    }
-
+                                    val error = users.body()?.statusDesc ?: users.message() ?: "Something went wrong"
+                                    Toast.makeText(this, error, Toast.LENGTH_LONG).show()
+                                }
+                                else {
+                                    Toast.makeText(this, resources.message ?: "Server error occurred", Toast.LENGTH_LONG).show()
                                 }
 
                             }

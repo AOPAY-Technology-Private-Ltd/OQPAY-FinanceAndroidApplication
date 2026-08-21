@@ -479,6 +479,7 @@ class IMEIDetailsPage : BaseActivity() {
                 accountNumber=AccountNumber,
                 bankIFSCCode= BankIFSCCode,
                 bankName= BankName,
+                IsPannyDrop = ConstantClass.isPannydropVerified,
                 accountType= AccountType,
                 branchName= BranchName,
                 refName=RefName,

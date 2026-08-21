@@ -420,7 +420,6 @@ class EMICalculationDetailsPage : BaseActivity() {
 
         })
 
-
         binding.nextbuttonlayout.setOnClickListener {
 
             val loanAmount = ConstantClass.LoanAmount ?: 0.0
@@ -473,6 +472,7 @@ class EMICalculationDetailsPage : BaseActivity() {
                     accountNumber="",
                     bankIFSCCode="",
                     bankName="",
+                    IsPannyDrop = ConstantClass.isPannydropVerified,
                     accountType="",
                     branchName="",
                     refName="",
@@ -480,7 +480,7 @@ class EMICalculationDetailsPage : BaseActivity() {
                     refmobileNo="",
                     refAddress="",
                     debitOrCreditCard="",
-                    upiMandate="yes",
+                    upiMandate= ConstantClass.UPIMandate,
                     createdBy= CreatedByCustomerShortCut,
                     membershipfees="",
                     retailercode=preference.getStringValue(ConstantClass.RetailerCode,""),

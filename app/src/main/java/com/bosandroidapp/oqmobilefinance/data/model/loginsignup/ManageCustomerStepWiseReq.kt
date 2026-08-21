@@ -40,6 +40,7 @@ data class ManageCustomerStepWiseReq(
     var accountNumber: String = "",
     var bankIFSCCode: String = "",
     var bankName: String = "",
+    var IsPannyDrop: String = "",
     var accountType: String = "",
     var branchName: String = "",
     var refName: String = "",

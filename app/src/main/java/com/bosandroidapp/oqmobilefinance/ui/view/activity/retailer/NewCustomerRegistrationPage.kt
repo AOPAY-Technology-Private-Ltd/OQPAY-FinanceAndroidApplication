@@ -787,6 +787,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                             accountNumber="",
                             bankIFSCCode="",
                             bankName="",
+                            IsPannyDrop = ConstantClass.isPannydropVerified,
                             accountType="",
                             branchName="",
                             refName="",
@@ -794,7 +795,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                             refmobileNo="",
                             refAddress="",
                             debitOrCreditCard="",
-                            upiMandate="yes",
+                            upiMandate= ConstantClass.UPIMandate,
                             createdBy=createdBy,
                             membershipfees="",
                             retailercode=preference.getStringValue(ConstantClass.RetailerCode,""),
@@ -1809,7 +1810,6 @@ class NewCustomerRegistrationPage : BaseActivity() {
     fun hitApiForCibilReport() {
         if (isInternetAvailable(this@NewCustomerRegistrationPage)) {
             hitApiForSendOTPCibileCheck(CustPrimaryMobileNumber, "Mobile")
-
         }
         else {
             Toast.makeText(this@NewCustomerRegistrationPage, "Please check your internet connection.", Toast.LENGTH_SHORT).show()
@@ -1883,7 +1883,8 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
         if(CusteMailID.isNullOrBlank()){
             emailID = "bos.centerpvtltd@gmail.com"
-        }else{
+        }
+        else{
             emailID = CusteMailID
         }
 
@@ -1974,6 +1975,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                                 accountNumber="",
                                                 bankIFSCCode="",
                                                 bankName="",
+                                                IsPannyDrop =ConstantClass.isPannydropVerified,
                                                 accountType="",
                                                 branchName="",
                                                 refName="",
@@ -1981,7 +1983,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                                 refmobileNo="",
                                                 refAddress="",
                                                 debitOrCreditCard="",
-                                                upiMandate="yes",
+                                                upiMandate= ConstantClass.UPIMandate,
                                                 createdBy=createdBy,
                                                 membershipfees="",
                                                 retailercode=preference.getStringValue(ConstantClass.RetailerCode,""),

@@ -42,9 +42,9 @@ class CustomerShortcutLoanAdapter(
         holder.binding.tvActiveStatus.text = item.activeStatus ?: ""
         
         Glide.with(context)
-            .load(item.custPhotoPath)
-            .placeholder(R.drawable.userimagee)
-            .error(R.drawable.userimagee)
+            .load(ConstantClass.BASE_URL_IMAGE+item.custPhotoPath)
+            .placeholder(R.drawable.customer)
+            .error(R.drawable.customer)
             .into(holder.binding.ivCustomer)
 
         updateStatus(holder, item)
@@ -64,15 +64,15 @@ class CustomerShortcutLoanAdapter(
                 statusText = "Pending Loan"
                 statusColor = R.color.red
             }
-            item.isPannydropVerified.isNullOrBlank()|| item.isPannydropVerified.equals("false", true) -> {
+            item.isPannydropVerified.isNullOrBlank()|| item.isPannydropVerified.equals("no", true) -> {
                 statusText = "Pennydrop Pending"
                 statusColor = R.color.orange
             }
-            item.isEmandateVerified.isNullOrBlank() || item.isEmandateVerified.equals("false", true) -> {
+            item.isEmandateVerified.isNullOrBlank() || item.isEmandateVerified.equals("no", true) -> {
                 statusText = "Emandate Pending"
                 statusColor = R.color.blue
             }
-            item.isrefKycVerified.isNullOrBlank() || item.isrefKycVerified.equals("no", true) || item.isrefKycVerified.equals("false", true) -> {
+            item.isrefKycVerified.isNullOrBlank() || item.isrefKycVerified.equals("no", true) -> {
                 statusText = "App Not Install"
                 statusColor = R.color.grey
             }

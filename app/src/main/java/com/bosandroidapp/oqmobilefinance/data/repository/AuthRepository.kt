@@ -303,6 +303,7 @@ class AuthRepository(private val apiInterface: ApiInterface) {
     val accountNumber = req.accountNumber.toRequestBody("text/plain".toMediaTypeOrNull())
     val bankIFSCCode = req.bankIFSCCode.toRequestBody("text/plain".toMediaTypeOrNull())
     val bankName = req.bankName.toRequestBody("text/plain".toMediaTypeOrNull())
+    val IsPannyDrop = req.IsPannyDrop.toRequestBody("text/plain".toMediaTypeOrNull())
     val accountType = req.accountType.toRequestBody("text/plain".toMediaTypeOrNull())
     val branchName = req.branchName.toRequestBody("text/plain".toMediaTypeOrNull())
     val refName = req.refName.toRequestBody("text/plain".toMediaTypeOrNull())
@@ -362,7 +363,7 @@ class AuthRepository(private val apiInterface: ApiInterface) {
       alternateMobileNumber, alternateMobileOTP, pAlternateMobileVerified, eMailID, flatNo, aearSector,
       pinCode, currentAddress, stateName, cityName, country, aadharNumber, aadharNumberVerified,
       panNumber, panNumberVerified, brandName, modelName, modelVariant, color, sellingPrice, downPayment,
-      tenure, emiAmount, imeiNumber1, imeiNumber2, accountNumber, bankIFSCCode, bankName, accountType,
+      tenure, emiAmount, imeiNumber1, imeiNumber2, accountNumber, bankIFSCCode, bankName,IsPannyDrop,accountType,
       branchName, refName, refRelationShip, refmobileNo, refAddress, debitOrCreditCard, upiMandate,
       createdBy, membershipfees, retailercode, customerCode, cibilScore, activeStatus,cibilApiResponse, aadhaarApiresponse , panApiResponse,isAggrementVerified,
       isRetailerAggrementVerified, custPhoto_File, imeiNumber1_SealPhotoPath, imeiNumber2_SealPhotoPath,

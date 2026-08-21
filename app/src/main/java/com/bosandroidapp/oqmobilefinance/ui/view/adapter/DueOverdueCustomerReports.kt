@@ -69,10 +69,7 @@ class DueOverdueCustomerReports(var context:Context, var dueoverDueList : Mutabl
     }
 
 
-
-
     override fun getItemCount(): Int = dueoverDueList!!.size
-
 
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -137,6 +134,7 @@ class DueOverdueCustomerReports(var context:Context, var dueoverDueList : Mutabl
         }
 
 
+
         holder.customermobImage.setOnClickListener {
             val intent = Intent(Intent.ACTION_DIAL).apply {
                 data = Uri.parse("tel:${dueoverDueList!![position]!!.primaryMobileNumber.toString()}")
@@ -145,12 +143,14 @@ class DueOverdueCustomerReports(var context:Context, var dueoverDueList : Mutabl
         }
 
 
+
         holder.customeraltremobImag.setOnClickListener {
             val intent = Intent(Intent.ACTION_DIAL).apply {
                 data = Uri.parse("tel:${dueoverDueList!![position]!!.alternateMobileNumber.toString()}")
             }
             context.startActivity(intent)
         }
+
 
 
         holder.customerRefmobImag.setOnClickListener {
@@ -163,7 +163,6 @@ class DueOverdueCustomerReports(var context:Context, var dueoverDueList : Mutabl
 
 
     }
-
 
 
 }

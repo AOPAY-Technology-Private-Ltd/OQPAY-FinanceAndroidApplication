@@ -193,13 +193,34 @@ class PaymentInformation : BaseActivity() {
         api = RetrofitClient.apiInterfaceSMS
         preference = SharedPreference(this)
 
+        // for doing shortcut option for customer
+        if(intent.hasExtra("EMandate")){
+            val eMandateStatus = intent.getStringExtra("EMandate") ?: ""
 
-        when (initialStep) {
-            1 -> setselectionForFirstCard()
-            2 -> setselectionForSecondCard()
-            3 -> setselectionForThirdCard()
-            else -> setselectionForFirstCard()
+            when {
+                eMandateStatus.isEmpty() -> {
+                    setselectionForFirstCard()
+                }
+                eMandateStatus.toLowerCase().equals("no", ignoreCase = true) -> {
+                    setselectionForSecondCard()
+                }
+                eMandateStatus.toLowerCase().equals("Yes", ignoreCase = true) -> {
+                    setselectionForThirdCard()
+                }
+                else -> {
+                    when (initialStep) {
+                        1 -> setselectionForFirstCard()
+                        2 -> setselectionForSecondCard()
+                        3 -> setselectionForThirdCard()
+                        else -> setselectionForFirstCard()
+                    }
+                }
+            }
+        }else{
+            setselectionForFirstCard()
         }
+
+
         setView()
         hitApiForBankList()
         setDataInSpinner()
@@ -258,7 +279,6 @@ class PaymentInformation : BaseActivity() {
            }
 
        }
-
 
 
     fun isSameMaskedAadhaar(customerMasked: String, referenceMasked: String): Boolean {
@@ -611,6 +631,7 @@ class PaymentInformation : BaseActivity() {
                             accountNumber=AccountNumber,
                             bankIFSCCode= BankIFSCCode,
                             bankName= BankName,
+                            IsPannyDrop = ConstantClass.isPannydropVerified,
                             accountType= AccountType,
                             branchName= BranchName,
                             refName="",
@@ -712,6 +733,7 @@ class PaymentInformation : BaseActivity() {
                                     accountNumber=AccountNumber,
                                     bankIFSCCode= BankIFSCCode,
                                     bankName= BankName,
+                                    IsPannyDrop = ConstantClass.isPannydropVerified,
                                     accountType= AccountType,
                                     branchName= BranchName,
                                     refName=RefName,
@@ -804,6 +826,7 @@ class PaymentInformation : BaseActivity() {
                                 accountNumber=AccountNumber,
                                 bankIFSCCode= BankIFSCCode,
                                 bankName= BankName,
+                                IsPannyDrop = ConstantClass.isPannydropVerified,
                                 accountType= AccountType,
                                 branchName= BranchName,
                                 refName=RefName,
@@ -996,6 +1019,7 @@ class PaymentInformation : BaseActivity() {
                                         accountNumber=AccountNumber,
                                         bankIFSCCode= BankIFSCCode,
                                         bankName= BankName,
+                                        IsPannyDrop = ConstantClass.isPannydropVerified,
                                         accountType= AccountType,
                                         branchName= BranchName,
                                         refName="",
@@ -1391,15 +1415,7 @@ class PaymentInformation : BaseActivity() {
     }
 
 
-    fun isPaymentValidForm(
-        accountNumber: String,
-        ifscCode: String,
-        bankName: String,
-        accountType: String,
-        branchName: String,
-        benName: String,
-        branchAddress: String,
-    ): Pair<Boolean, String?> {
+    fun isPaymentValidForm(accountNumber: String, ifscCode: String, bankName: String, accountType: String, branchName: String, benName: String, branchAddress: String, ): Pair<Boolean, String?> {
         // Bank details
         if (accountNumber.isBlank()) return Pair(false, "Enter account number")
 
@@ -1701,6 +1717,7 @@ class PaymentInformation : BaseActivity() {
         binding.referenceDetailsLayout.visibility=View.GONE
 
     }
+
 
 
     fun setselectionForSecondCard(){

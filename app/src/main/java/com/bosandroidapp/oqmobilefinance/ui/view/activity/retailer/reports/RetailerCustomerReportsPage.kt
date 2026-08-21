@@ -261,8 +261,7 @@ class RetailerCustomerReportsPage : BaseActivity() {
 
         resources->resources.let {
             when(it.apiStatus){
-                ApiStatus.SUCCESS -> {
-                    it.data?.let { users ->
+                ApiStatus.SUCCESS -> { it.data?.let { users ->
                         if(users.isSuccessful){
                             users.body()?.let { response ->
                                 ConstantClass.dialog.dismiss()

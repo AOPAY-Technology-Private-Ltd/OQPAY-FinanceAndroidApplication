@@ -154,7 +154,7 @@ object ConstantClass {
      const val ClientCode = "CMP0005"
      const val DefaulterEmiDebitAutoApproved ="admin"
      const val DefaulterEmiDebitPending ="retailer"
-     const val LoanStatus ="Pending"
+     var LoanStatus ="Pending"
      const val SessionOutStatus = "inactive"
      const val SessionOutStatusRejected = "rejected"
 

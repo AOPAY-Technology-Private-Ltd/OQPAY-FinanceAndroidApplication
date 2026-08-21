@@ -379,6 +379,7 @@ interface ApiInterface {
         @Part("AccountNumber") accountNumber: RequestBody,
         @Part("BankIFSCCode") bankIFSCCode: RequestBody,
         @Part("BankName") bankName: RequestBody,
+        @Part("IsPannyDrop") isPannyDrop: RequestBody,
         @Part("AccountType") accountType: RequestBody,
         @Part("BranchName") branchName: RequestBody,
         @Part("RefName") refName: RequestBody,

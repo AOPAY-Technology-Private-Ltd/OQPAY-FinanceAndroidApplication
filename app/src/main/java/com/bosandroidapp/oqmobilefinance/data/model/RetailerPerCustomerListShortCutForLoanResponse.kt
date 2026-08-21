@@ -235,15 +235,46 @@ data class CustomerListDataItem(
 	@field:SerializedName("isrefKycVerified")
 	val isrefKycVerified: String? = null,
 
-	@field:SerializedName("startDate")
-	val startDate: String? = null,
-
-	@field:SerializedName("endDate")
-	val endDate: String? = null,
-
 	@field:SerializedName("loanCode")
 	val loanCode: String? = null,
 
 	@field:SerializedName("remarks")
-	val remarks: String? = null
+	val remarks: String? = null,
+
+	@field:SerializedName("isAccessKeyVerified")
+	val isAccessKeyVerified: String? = null,
+
+	@field:SerializedName("loanEndDate")
+	val loanEndDate: String? = null,
+
+	@field:SerializedName("loanStartDate")
+	val loanStartDate: String? = null,
+
+	@field:SerializedName("defaulterEmiDebit")
+	val defaulterEmiDebit: String? = null,
+
+	@field:SerializedName("loanRID")
+	val loanRID: String? = null,
+
+	@field:SerializedName("loanStatus")
+	val loanStatus: String? = null,
+
+	@field:SerializedName("interestAmt")
+	val interestAmt: String? = null,
+
+	@field:SerializedName("processingFees")
+	val processingFees: String? = null,
+
+	@field:SerializedName("interestRate")
+	val interestRate: String? = null,
+
+	@field:SerializedName("loanAmount")
+	val loanAmount: String? = null,
+
+	@field:SerializedName("loanMode")
+	val loanMode: String? = null,
+
+	@field:SerializedName("branchAddress")
+	val branchAddress: String? = null,
+
 )
