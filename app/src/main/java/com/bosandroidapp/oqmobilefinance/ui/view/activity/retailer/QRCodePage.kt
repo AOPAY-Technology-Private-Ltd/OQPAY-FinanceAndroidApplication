@@ -1850,41 +1850,49 @@ class QRCodePage : BaseActivity() {
                     when (it.apiStatus) {
                         ApiStatus.SUCCESS -> {
                             it.data.let { users ->
-                                users!!.body().let { response ->
-                                    Log.d("eMandateRes", Gson().toJson(response))
+                                if(users!!.isSuccessful){
+                                    users!!.body().let { response ->
+                                        Log.d("eMandateRes", Gson().toJson(response))
 
-                                    if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
-                                        ConstantClass.dialog.dismiss()
+                                        if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
+                                            ConstantClass.dialog.dismiss()
+                                        }
+                                        binding.LoanCreatelayout.isEnabled= true
+
+                                        if (response!!.data?.customer != null) {
+                                            webUrl = response!!.data!!.url
+                                            startActivity(Intent(this@QRCodePage, RetailerEMandateVerifyPage::class.java))
+                                        }
+                                        else {
+                                            ConstantClass.dialog.dismiss()
+                                            isEmandateVerified= "No"
+                                            isEnachCancelled = true
+                                            Toast.makeText(this, response.message, Toast.LENGTH_SHORT).show()
+                                        }
+
+                                        if(!isEmandateVerified.isNullOrBlank()){
+                                            var request = EnachDateUploadReq(
+                                                isEmandateVerified = isEmandateVerified,
+                                                emAccountType = AccountType,
+                                                isPannydropVerified = isPannydropVerified,
+                                                emAccountNumber = AccountNumber,
+                                                customerCode = CustomerCodeForEnach,
+                                                retailerCode= RetailerCodeForEnach,
+                                                loanCode= loaneCode,
+                                                emBankName=BankName,
+                                                emIfscCode =BankIFSCCode
+                                            )
+
+                                            hitApiForUploadEnachMandateDataResponse(request)
+                                        }
+
                                     }
-                                    binding.LoanCreatelayout.isEnabled= true
-
-                                    if (response!!.data?.customer != null) {
-                                        webUrl = response!!.data!!.url
-                                        startActivity(Intent(this@QRCodePage, RetailerEMandateVerifyPage::class.java))
-                                    }
-                                    else {
-                                        ConstantClass.dialog.dismiss()
-                                        isEmandateVerified= "No"
-                                        isEnachCancelled = true
-                                        Toast.makeText(this, response.message, Toast.LENGTH_SHORT).show()
-                                    }
-
-                                    if(!isEmandateVerified.isNullOrBlank()){
-                                        var request = EnachDateUploadReq(
-                                            isEmandateVerified = isEmandateVerified,
-                                            emAccountType = AccountType,
-                                            isPannydropVerified = isPannydropVerified,
-                                            emAccountNumber = AccountNumber,
-                                            customerCode = CustomerCodeForEnach,
-                                            retailerCode= RetailerCodeForEnach,
-                                            loanCode= loaneCode,
-                                            emBankName=BankName,
-                                            emIfscCode =BankIFSCCode
-                                        )
-
-                                        hitApiForUploadEnachMandateDataResponse(request)
-                                    }
-
+                                    val error = users.body()?.statusDesc ?: users.message() ?: "Something went wrong"
+                                    Toast.makeText(this, error, Toast.LENGTH_LONG).show()
+                                }
+                                else{
+                                    var error = resources.data.toString()
+                                    Toast.makeText(this@QRCodePage,error, Toast.LENGTH_SHORT).show()
                                 }
 
                             }
@@ -1928,42 +1936,50 @@ class QRCodePage : BaseActivity() {
                     when (it.apiStatus) {
                         ApiStatus.SUCCESS -> {
                             it.data.let { users ->
-                                users!!.body().let { response ->
-                                    Log.d("eMandateOnlineRes", Gson().toJson(response))
+                                if(users!!.isSuccessful){
+                                    users!!.body().let { response ->
+                                        Log.d("eMandateOnlineRes", Gson().toJson(response))
 
-                                    if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
-                                        ConstantClass.dialog.dismiss()
+                                        if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
+                                            ConstantClass.dialog.dismiss()
+                                        }
+
+                                        binding.LoanCreatelayout.isEnabled= true
+
+                                        if (response!!.data?.customer != null) {
+                                            webUrl = response!!.data!!.url
+                                            startActivity(Intent(this@QRCodePage, RetailerEMandateVerifyPage::class.java))
+                                        }
+                                        else {
+                                            ConstantClass.dialog.dismiss()
+                                            isEmandateVerified= "No"
+                                            isEnachCancelled = true
+                                            Toast.makeText(this, response.message, Toast.LENGTH_SHORT).show()
+                                        }
+
+                                        if(!isEmandateVerified.isNullOrBlank()){
+                                            var request = EnachDateUploadReq(
+                                                isEmandateVerified = isEmandateVerified,
+                                                emAccountType = AccountType,
+                                                isPannydropVerified = isPannydropVerified,
+                                                emAccountNumber = AccountNumber,
+                                                customerCode = CustomerCodeForEnach,
+                                                retailerCode= RetailerCodeForEnach,
+                                                loanCode= loaneCode,
+                                                emBankName=BankName,
+                                                emIfscCode =BankIFSCCode
+                                            )
+
+                                            hitApiForUploadEnachMandateDataResponse(request)
+                                        }
+
                                     }
-
-                                    binding.LoanCreatelayout.isEnabled= true
-
-                                    if (response!!.data?.customer != null) {
-                                        webUrl = response!!.data!!.url
-                                        startActivity(Intent(this@QRCodePage, RetailerEMandateVerifyPage::class.java))
-                                    }
-                                    else {
-                                        ConstantClass.dialog.dismiss()
-                                        isEmandateVerified= "No"
-                                        isEnachCancelled = true
-                                        Toast.makeText(this, response.message, Toast.LENGTH_SHORT).show()
-                                    }
-
-                                    if(!isEmandateVerified.isNullOrBlank()){
-                                        var request = EnachDateUploadReq(
-                                            isEmandateVerified = isEmandateVerified,
-                                            emAccountType = AccountType,
-                                            isPannydropVerified = isPannydropVerified,
-                                            emAccountNumber = AccountNumber,
-                                            customerCode = CustomerCodeForEnach,
-                                            retailerCode= RetailerCodeForEnach,
-                                            loanCode= loaneCode,
-                                            emBankName=BankName,
-                                            emIfscCode =BankIFSCCode
-                                        )
-
-                                        hitApiForUploadEnachMandateDataResponse(request)
-                                    }
-
+                                    val error = users.body()?.statusDesc ?: users.message() ?: "Something went wrong"
+                                    Toast.makeText(this, error, Toast.LENGTH_LONG).show()
+                                }
+                                else{
+                                    var error = resources.data.toString()
+                                    Toast.makeText(this@QRCodePage,error, Toast.LENGTH_SHORT).show()
                                 }
 
                             }
@@ -1974,18 +1990,14 @@ class QRCodePage : BaseActivity() {
                             ConstantClass.dialog.dismiss()
                             val response = it.data
                             if (response != null) {
-                                val errorBody = try {
-                                    response.errorBody()?.string()
+                                val errorBody = try { response.errorBody()?.string()
                                 } catch (e: Exception) {
                                     null
                                 }
                                 handleApiError(response.code(), errorBody)
                             } else {
-                                Toast.makeText(
-                                    this,
-                                    it.message ?: "Network error occurred. Please try again.",
-                                    Toast.LENGTH_LONG
-                                ).show()
+
+                                Toast.makeText(this, it.message ?: "Network error occurred. Please try again.", Toast.LENGTH_LONG).show()
                             }
                         }
 

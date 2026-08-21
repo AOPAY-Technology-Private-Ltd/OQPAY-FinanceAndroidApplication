@@ -302,6 +302,7 @@ class AppScanInstallPage : BaseActivity() {
                 }
             }
         }
+
     }
 
 
