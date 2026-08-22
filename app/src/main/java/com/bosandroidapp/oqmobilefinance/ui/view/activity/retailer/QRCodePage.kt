@@ -650,6 +650,7 @@ class QRCodePage : BaseActivity() {
                             val err = response.errorBody()?.string()
                             Log.e("API_RESPONSE_ERROR", err ?: "Unknown error")
                             Toast.makeText(this@QRCodePage, err ?: "Unknown error", Toast.LENGTH_LONG).show()
+
                             binding.nextlayout.isEnabled= true
                         }
 
@@ -1317,26 +1318,23 @@ class QRCodePage : BaseActivity() {
 
                     if (response.isSuccessful && responseBody != null) {
 
-                        // HTTP success response
-                        if (responseBody.status.equals(
-                                ConstantClass.LoanSuccessStatus,
-                                ignoreCase = true
-                            )
-                        ) {
+
+                        if (responseBody.status.equals(ConstantClass.LoanSuccessStatus, ignoreCase = true)) {
 
                             val loanData = responseBody.data
+                            CustomerCodeForEnach = loanData!!.customerCode!!
+
 
                             if (loanData == null) {
-                                showErrorToast(
-                                    responseBody.message
-                                        ?: "Loan created, but loan details were not received."
-                                )
+                                showErrorToast(responseBody.message ?: "Loan created, but loan details were not received.")
                                 return@observe
                             }
 
-                            // -----------------------------
-                            // Loan creation successful
-                            // -----------------------------
+                            if(CustomerCodeForEnach.isNullOrBlank()){
+                                Toast.makeText(this@QRCodePage,"Customer code not found during loan creation",
+                                    Toast.LENGTH_SHORT).show()
+                                return@observe
+                            }
 
                             loaneCode = loanData.loanCode.orEmpty()
                             ConstantClass.LoanRID = loanData.rid!!
@@ -1345,20 +1343,16 @@ class QRCodePage : BaseActivity() {
                             MiddleName = CustMiddleName
                             LastName = CustLastName
 
-                            CustomerCodeForEnach =
-                                loanData.customerCode.orEmpty()
 
-                            LoanCodeForEnach =
-                                loanData.loanCode.orEmpty()
+                            LoanCodeForEnach = loanData.loanCode.orEmpty()
 
-                            RetailerCodeForEnach =
-                                loanData.retailerCode.orEmpty()
+                            RetailerCodeForEnach = loanData.retailerCode.orEmpty()
 
-                            LoanStartDate =
-                                loanData.startDate.orEmpty()
+                            LoanStartDate = loanData.startDate.orEmpty()
 
-                            LoanEndDate =
-                                loanData.endDate.orEmpty()
+                            LoanEndDate = loanData.endDate.orEmpty()
+
+
 
                             val emiAmount = try {
                                 EmiAmount.toDouble().roundToInt()
@@ -1403,19 +1397,18 @@ class QRCodePage : BaseActivity() {
 
                             Toast.makeText(this, "Loan created successfully.", Toast.LENGTH_SHORT).show()
 
-                            // Continue with eNACH
+
                             hitApiForEnach(mandateRequest, false)
 
                         } else {
 
-                            // API returned HTTP success but business failure
+
                             showErrorToast(responseBody.message ?: "Loan creation failed.")
                         }
 
                     } else {
                         binding.LoanCreatelayout.isEnabled= true
-                        // This normally shouldn't be reached if Retrofit
-                        // maps non-2xx responses to ERROR, but keep it safe.
+
                         handleHttpError(response.code(), response.errorBody()?.string(), response.message())
                     }
                 }
@@ -1441,7 +1434,6 @@ class QRCodePage : BaseActivity() {
                     }
                     else {
 
-                        // Network / connection / unknown error
                         showErrorToast(resource.message ?: "Unable to connect to server. Please check your internet connection and try again.")
                     }
                 }
@@ -1452,7 +1444,6 @@ class QRCodePage : BaseActivity() {
     private fun showErrorToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
-
     private fun handleHttpError(responseCode: Int, errorBody: String?, responseMessage: String?) {
         if (ConstantClass.dialog?.isShowing == true) {
             ConstantClass.dialog.dismiss()
@@ -1473,6 +1464,7 @@ class QRCodePage : BaseActivity() {
         showErrorToast(finalMessage)
         Log.e("API_HTTP_ERROR", "Code: $responseCode | Body: $errorBody")
     }
+
 
 
     private fun getServerErrorMessage(errorBody: String?): String? {
@@ -1850,7 +1842,9 @@ class QRCodePage : BaseActivity() {
                     when (it.apiStatus) {
                         ApiStatus.SUCCESS -> {
                             it.data.let { users ->
+
                                 if(users!!.isSuccessful){
+
                                     users!!.body().let { response ->
                                         Log.d("eMandateRes", Gson().toJson(response))
 
@@ -1860,8 +1854,13 @@ class QRCodePage : BaseActivity() {
                                         binding.LoanCreatelayout.isEnabled= true
 
                                         if (response!!.data?.customer != null) {
-                                            webUrl = response!!.data!!.url
-                                            startActivity(Intent(this@QRCodePage, RetailerEMandateVerifyPage::class.java))
+                                            if(CustomerCodeForEnach.isNullOrBlank()){
+                                                Toast.makeText(this@QRCodePage,"Customer code is required", Toast.LENGTH_SHORT).show()
+                                            }
+                                            else{
+                                                webUrl = response!!.data!!.url
+                                                startActivity(Intent(this@QRCodePage, RetailerEMandateVerifyPage::class.java))
+                                            }
                                         }
                                         else {
                                             ConstantClass.dialog.dismiss()
@@ -1887,15 +1886,19 @@ class QRCodePage : BaseActivity() {
                                         }
 
                                     }
+
                                     val error = users.body()?.statusDesc ?: users.message() ?: "Something went wrong"
                                     Toast.makeText(this, error, Toast.LENGTH_LONG).show()
                                 }
+
                                 else{
                                     var error = resources.data.toString()
                                     Toast.makeText(this@QRCodePage,error, Toast.LENGTH_SHORT).show()
                                 }
 
                             }
+
+                            handleHttpError(it.data!!.code(), it.data!!.errorBody()?.string(), it.data.message())
 
                         }
 
@@ -1930,6 +1933,7 @@ class QRCodePage : BaseActivity() {
 
             }
         }
+
         else{
             panViewModel.getEMandateOnlineRequest(request).observe(this) { resources ->
                 resources.let {
@@ -1947,8 +1951,15 @@ class QRCodePage : BaseActivity() {
                                         binding.LoanCreatelayout.isEnabled= true
 
                                         if (response!!.data?.customer != null) {
-                                            webUrl = response!!.data!!.url
-                                            startActivity(Intent(this@QRCodePage, RetailerEMandateVerifyPage::class.java))
+                                            if(CustomerCodeForEnach.isNullOrBlank()){
+                                                Toast.makeText(this@QRCodePage,"Customer code is required",
+                                                    Toast.LENGTH_SHORT).show()
+                                            }
+                                            else{
+                                                webUrl = response!!.data!!.url
+                                                startActivity(Intent(this@QRCodePage, RetailerEMandateVerifyPage::class.java))
+                                            }
+
                                         }
                                         else {
                                             ConstantClass.dialog.dismiss()
@@ -1984,6 +1995,8 @@ class QRCodePage : BaseActivity() {
 
                             }
 
+                            handleHttpError(it.data!!.code(), it.data!!.errorBody()?.string(), it.data.message())
+
                         }
 
                         ApiStatus.ERROR -> {
@@ -1995,7 +2008,8 @@ class QRCodePage : BaseActivity() {
                                     null
                                 }
                                 handleApiError(response.code(), errorBody)
-                            } else {
+                            }
+                            else {
 
                                 Toast.makeText(this, it.message ?: "Network error occurred. Please try again.", Toast.LENGTH_LONG).show()
                             }
@@ -2036,28 +2050,41 @@ class QRCodePage : BaseActivity() {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
                         it.data.let { users ->
+
                             users!!.body().let { response ->
                                 Log.d("LoanChargeRes", Gson().toJson(response))
 
-                                if(response!!.status!!.lowercase().equals("true")){
-                                    hitApiForRetailerCreatedLoan(loancreatedreq)
-                                }
-                                else {
-                                    if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
-                                        ConstantClass.dialog.dismiss()
+                                if(users.isSuccessful){
+                                    if(response!!.status!!.lowercase().equals("true")){
+                                        hitApiForRetailerCreatedLoan(loancreatedreq)
                                     }
-                                    binding.LoanCreatelayout.isEnabled= true
-                                    if(response.message.isNullOrBlank()){
-                                        Toast.makeText(this,"Loan charge failed", Toast.LENGTH_SHORT).show()
-                                    }
-                                    else{
-                                        Toast.makeText(this,response!!.message.toString(), Toast.LENGTH_SHORT).show()
+                                    else {
+                                        if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
+                                            ConstantClass.dialog.dismiss()
+                                        }
+                                        binding.LoanCreatelayout.isEnabled= true
+                                        if(response.message.isNullOrBlank()){
+                                            Toast.makeText(this,"Loan charge failed", Toast.LENGTH_SHORT).show()
+                                        }
+                                        else{
+                                            Toast.makeText(this,response!!.message.toString(), Toast.LENGTH_SHORT).show()
+                                        }
+
                                     }
 
+                                }else{
+                                    var error = resources.data.toString()
+                                    Toast.makeText(this@QRCodePage,error, Toast.LENGTH_SHORT).show()
                                 }
 
                             }
+
+                            handleHttpError(it.data!!.code(), it.data!!.errorBody()?.string(), it.data.message())
+
                         }
+
+                        handleHttpError(it.data!!.code(), it.data!!.errorBody()?.string(), it.data.message())
+
                     }
 
                     ApiStatus.ERROR -> {
@@ -2108,6 +2135,8 @@ class QRCodePage : BaseActivity() {
                                 Log.d("EmandateUploadRes", Gson().toJson(response))
                             }
                         }
+
+                        handleHttpError(it.data!!.code(), it.data!!.errorBody()?.string(), it.data.message())
 
                     }
                     ApiStatus.ERROR ->{

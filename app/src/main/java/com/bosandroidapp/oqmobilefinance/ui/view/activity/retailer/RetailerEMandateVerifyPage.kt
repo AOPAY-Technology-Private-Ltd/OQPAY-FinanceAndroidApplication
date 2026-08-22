@@ -91,6 +91,7 @@ import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.PanViewModel
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.google.gson.Gson
+import org.json.JSONObject
 
 class RetailerEMandateVerifyPage : BaseActivity() {
 
@@ -179,6 +180,7 @@ class RetailerEMandateVerifyPage : BaseActivity() {
         binding.eMandatewebview.loadUrl(webUrl!!)
     }
 
+
     fun clearWebView(webView: WebView) {
 
         webView.apply {
@@ -193,6 +195,7 @@ class RetailerEMandateVerifyPage : BaseActivity() {
             WebStorage.getInstance().deleteAllData()
         }
     }
+
 
     fun injectJs(webView: WebView?) {
         webView?.evaluateJavascript("""
@@ -220,6 +223,7 @@ class RetailerEMandateVerifyPage : BaseActivity() {
         })();
     """.trimIndent(), null)
     }
+
 
     fun doUpdateEMandateStatus(eMandateID : String){
 
@@ -249,53 +253,59 @@ class RetailerEMandateVerifyPage : BaseActivity() {
                     when (it.apiStatus) {
                         ApiStatus.SUCCESS -> {
                             it.data.let { users ->
-                                users!!.body().let { response ->
-                                    Log.d("eMandateStatusRes", Gson().toJson(response))
+                                if(users!!.isSuccessful){
+                                    users!!.body().let { response ->
+                                        Log.d("eMandateStatusRes", Gson().toJson(response))
 
-                                    if(ConstantClass.dialog!=null && ConstantClass.dialog.isShowing){
-                                        ConstantClass.dialog.dismiss()
-                                    }
+                                        if(ConstantClass.dialog!=null && ConstantClass.dialog.isShowing){
+                                            ConstantClass.dialog.dismiss()
+                                        }
 
-                                    var statusCode =  response!!.statusCode
-                                    var eMandateStatus =""
+                                        var statusCode =  response!!.statusCode
+                                        var eMandateStatus =""
 
-                                    if(response.data!!.customer!=null){
-                                        eMandateStatus = response.data.customer!!.accptd!!
-                                    }
+                                        if(response.data!!.customer!=null){
+                                            eMandateStatus = response.data.customer!!.accptd!!
+                                        }
 
-                                    if (response!!.statusCode.equals("NP000")&& eMandateStatus.equals(eMandate)) {
-                                        isEmandateVerified= isMandate
-                                        CheckOnlineOrOffline =""
-                                        Toast.makeText(this, "ENach Mandate is Active", Toast.LENGTH_SHORT).show()
-                                        if(!isEmandateVerified.isNullOrBlank()){
+                                        if (response!!.statusCode.equals("NP000")&& eMandateStatus.equals(eMandate)) {
+                                            isEmandateVerified= isMandate
+                                            CheckOnlineOrOffline =""
+                                            Toast.makeText(this, "ENach Mandate is Active", Toast.LENGTH_SHORT).show()
+                                            if(!isEmandateVerified.isNullOrBlank()){
 
-                                            var request = EnachDateUploadReq(
-                                                isEmandateVerified = isEmandateVerified,
-                                                emAccountType = AccountType,
-                                                isPannydropVerified = isPannydropVerified,
-                                                emAccountNumber = AccountNumber,
-                                                customerCode = CustomerCodeForEnach,
-                                                retailerCode= RetailerCodeForEnach,
-                                                loanCode= loaneCode,
-                                                emBankName=BankName,
-                                                emIfscCode =BankIFSCCode
-                                            )
+                                                var request = EnachDateUploadReq(
+                                                    isEmandateVerified = isEmandateVerified,
+                                                    emAccountType = AccountType,
+                                                    isPannydropVerified = isPannydropVerified,
+                                                    emAccountNumber = AccountNumber,
+                                                    customerCode = CustomerCodeForEnach,
+                                                    retailerCode= RetailerCodeForEnach,
+                                                    loanCode= loaneCode,
+                                                    emBankName=BankName,
+                                                    emIfscCode =BankIFSCCode
+                                                )
 
-                                            hitApiForUploadEnachMandateDataResponse(request,isEmandateVerified)
+                                                hitApiForUploadEnachMandateDataResponse(request,isEmandateVerified)
+                                            }
+
+                                        }
+
+                                        else {
+                                            if(!eMandateStatus.equals(eMandatepending)){
+                                                isEmandateVerified= "No"
+                                                showingRejectioneMandatePopUp()
+                                            }
                                         }
 
                                     }
-
-                                    else {
-                                        if(!eMandateStatus.equals(eMandatepending)){
-                                            isEmandateVerified= "No"
-                                            showingRejectioneMandatePopUp()
-                                        }
-                                    }
-
                                 }
-
+                                else{
+                                        var error = resources.data.toString()
+                                        Toast.makeText(this@RetailerEMandateVerifyPage,error, Toast.LENGTH_SHORT).show()
+                                }
                             }
+                            handleHttpError(it.data!!.code(), it.data!!.errorBody()?.string(), it.data.message())
 
                         }
 
@@ -329,55 +339,63 @@ class RetailerEMandateVerifyPage : BaseActivity() {
                 resources.let {
                     when (it.apiStatus) {
                         ApiStatus.SUCCESS -> {
+
                             it.data.let { users ->
-                                users!!.body().let { response ->
-                                    Log.d("eMandateonlineStatusRes", Gson().toJson(response))
+                                if(users!!.isSuccessful){
+                                    users!!.body().let { response ->
+                                        Log.d("eMandateonlineStatusRes", Gson().toJson(response))
 
-                                    if(ConstantClass.dialog!=null && ConstantClass.dialog.isShowing){
-                                        ConstantClass.dialog.dismiss()
-                                    }
+                                        if(ConstantClass.dialog!=null && ConstantClass.dialog.isShowing){
+                                            ConstantClass.dialog.dismiss()
+                                        }
 
-                                    var statusCode =  response!!.statusCode
-                                    var eMandateStatus =""
+                                        var statusCode =  response!!.statusCode
+                                        var eMandateStatus =""
 
-                                    if(response.data!!.customer!=null){
-                                        eMandateStatus = response.data.customer!!.accptd!!
-                                    }
+                                        if(response.data!!.customer!=null){
+                                            eMandateStatus = response.data.customer!!.accptd!!
+                                        }
 
-                                    if (response!!.statusCode.equals("NP000")&& eMandateStatus.equals(eMandate)) {
-                                        isEmandateVerified= isMandate
-                                        CheckOnlineOrOffline =""
-                                        Toast.makeText(this, "ENach Mandate is Active", Toast.LENGTH_SHORT).show()
+                                        if (response!!.statusCode.equals("NP000")&& eMandateStatus.equals(eMandate)) {
+                                            isEmandateVerified= isMandate
+                                            CheckOnlineOrOffline =""
+                                            Toast.makeText(this, "ENach Mandate is Active", Toast.LENGTH_SHORT).show()
 
-                                        if(!isEmandateVerified.isNullOrBlank()){
-                                            var request = EnachDateUploadReq(
-                                                isEmandateVerified = isEmandateVerified,
-                                                emAccountType = AccountType,
-                                                isPannydropVerified = isPannydropVerified,
-                                                emAccountNumber = AccountNumber,
-                                                customerCode = CustomerCodeForEnach,
-                                                retailerCode= RetailerCodeForEnach,
-                                                loanCode= loaneCode,
-                                                emBankName=BankName,
-                                                emIfscCode =BankIFSCCode
-                                            )
+                                            if(!isEmandateVerified.isNullOrBlank()){
+                                                var request = EnachDateUploadReq(
+                                                    isEmandateVerified = isEmandateVerified,
+                                                    emAccountType = AccountType,
+                                                    isPannydropVerified = isPannydropVerified,
+                                                    emAccountNumber = AccountNumber,
+                                                    customerCode = CustomerCodeForEnach,
+                                                    retailerCode= RetailerCodeForEnach,
+                                                    loanCode= loaneCode,
+                                                    emBankName=BankName,
+                                                    emIfscCode =BankIFSCCode
+                                                )
 
-                                            hitApiForUploadEnachMandateDataResponse(request,isEmandateVerified)
+                                                hitApiForUploadEnachMandateDataResponse(request,isEmandateVerified)
+                                            }
+
+                                        }
+
+                                        else {
+                                            if(!eMandateStatus.equals(eMandatepending)){
+                                                isEmandateVerified= "No"
+                                                showingRejectioneMandatePopUp()
+                                            }
                                         }
 
                                     }
-
-                                    else {
-                                        if(!eMandateStatus.equals(eMandatepending)){
-                                            isEmandateVerified= "No"
-                                            showingRejectioneMandatePopUp()
-                                        }
-                                    }
-
+                                }
+                                else{
+                                    var error = resources.data.toString()
+                                    Toast.makeText(this@RetailerEMandateVerifyPage,error, Toast.LENGTH_SHORT).show()
                                 }
 
-                            }
 
+                            }
+                            handleHttpError(it.data!!.code(), it.data!!.errorBody()?.string(), it.data.message())
                         }
 
                         ApiStatus.ERROR -> {
@@ -419,19 +437,28 @@ class RetailerEMandateVerifyPage : BaseActivity() {
                 when(it.apiStatus){
                     ApiStatus.SUCCESS ->{
                         it.data.let { users ->
-                            users!!.body().let { response ->
-                                Log.d("EmandateUploadRes", Gson().toJson(response))
-                                if(isMandate.equals(ConstantClass.isMandate)){
-                                    // success response
-                                   startActivity(Intent(this@RetailerEMandateVerifyPage, AppScanInstallPage::class.java))
-                                }
-                                else{
-                                    isEnachCancelled = true
-                                    finish()
-                                }
+                            if(users!!.isSuccessful){
+                                users!!.body().let { response ->
+                                    Log.d("EmandateUploadRes", Gson().toJson(response))
+                                    if(isMandate.equals(ConstantClass.isMandate)){
+                                        // success response
+                                        startActivity(Intent(this@RetailerEMandateVerifyPage, AppScanInstallPage::class.java))
+                                    }
+                                    else{
+                                        isEnachCancelled = true
+                                        finish()
+                                    }
 
+                                }
+                            } else{
+                                var error = resources.data.toString()
+                                Toast.makeText(this@RetailerEMandateVerifyPage,error, Toast.LENGTH_SHORT).show()
                             }
+
                         }
+
+                        handleHttpError(it.data!!.code(), it.data!!.errorBody()?.string(), it.data.message())
+
 
                     }
                     ApiStatus.ERROR ->{
@@ -511,5 +538,44 @@ class RetailerEMandateVerifyPage : BaseActivity() {
         showingRejectioneMandatePopUp()
     }
 
+    private fun handleHttpError(responseCode: Int, errorBody: String?, responseMessage: String?) {
+        if (ConstantClass.dialog?.isShowing == true) {
+            ConstantClass.dialog.dismiss()
+        }
+
+
+        val serverMessage = getServerErrorMessage(errorBody)
+        val finalMessage = when {
+            !serverMessage.isNullOrBlank() -> serverMessage
+            responseCode == 400 -> "Bad request. Please check your data (400)."
+            responseCode == 401 -> "Session expired. Please login again (401)."
+            responseCode == 404 -> "Service not found. Please try again later (404)."
+            responseCode == 500 -> "Server error. Please try again later (500)."
+            !responseMessage.isNullOrBlank() -> responseMessage
+            else -> "Something went wrong (Code: $responseCode)."
+        }
+
+        showErrorToast(finalMessage)
+        Log.e("API_HTTP_ERROR", "Code: $responseCode | Body: $errorBody")
+    }
+
+    private fun showErrorToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
+    private fun getServerErrorMessage(errorBody: String?): String? {
+        if (errorBody.isNullOrBlank()) return null
+        return try {
+            val jsonObject = JSONObject(errorBody)
+            when {
+                jsonObject.has("message") -> jsonObject.getString("message")
+                jsonObject.has("Message") -> jsonObject.getString("Message")
+                jsonObject.has("statusMessage") -> jsonObject.getString("statusMessage")
+                else -> null
+            }
+        } catch (e: Exception) {
+            null
+        }
+    }
 
 }

@@ -464,7 +464,6 @@ interface ApiInterface {
     suspend fun getCustomerLoanDetailsList(@Body req : GetCustomerLoanDetailsReq): Response<com.bosandroidapp.oqmobilefinance.data.model.loginsignup.CustomerLoanEmiResp>?
 
 
-
     // retailer trasaction history...................................................
     @POST("api/V1/OQFinance/GetWalletCreditDebitHistory")
     suspend fun getTransactionHistoryList(@Body req : TransactionHistoryReq): Response<TransactionHistoryResp>?

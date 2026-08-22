@@ -129,6 +129,7 @@ import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 import java.io.File
 import kotlin.math.roundToInt
 import kotlin.toString
@@ -255,7 +256,7 @@ class AppScanInstallPage : BaseActivity() {
     fun hitApiForUploadInvoice() {
 
         if (CustomerCodeForEnach.isNullOrBlank()) {
-            Toast.makeText(this, "Customer Code is missing!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Customer Code is required", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -412,68 +413,91 @@ class AppScanInstallPage : BaseActivity() {
             resources.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
-
                         it.data?.let { users ->
-                            users.body()?.let { response ->
-                                Log.d("LoginResponse", Gson().toJson(response))
-                                ConstantClass.dialog.dismiss()
+                            if(users.isSuccessful){
+                                users.body()?.let { response ->
+                                    Log.d("LoginResponse", Gson().toJson(response))
+                                    ConstantClass.dialog.dismiss()
 
-                                if (response.success!! && response.statusCode == 200) {
-                                    binding.accesstoken.isEnabled= false
-                                    binding.verifykeyicon.visibility= View.VISIBLE
+                                    if (response.success!! && response.statusCode == 200) {
+                                        binding.accesstoken.isEnabled= false
+                                        binding.verifykeyicon.visibility= View.VISIBLE
 
-                                    val firstName = preference.getStringValue(ConstantClass.FirstName, "").orEmpty()
-                                    val lastName = preference.getStringValue(ConstantClass.LastName, "").orEmpty()
-                                    val safeLastName = if (!lastName.isNullOrBlank() && lastName != "null") lastName else ""
-                                    var createdBy = firstName.plus(" ").plus(safeLastName)
-                                    var retailercode = preference.getStringValue(ConstantClass.RetailerCode, "")
+                                        val firstName = preference.getStringValue(ConstantClass.FirstName, "").orEmpty()
+                                        val lastName = preference.getStringValue(ConstantClass.LastName, "").orEmpty()
+                                        val safeLastName = if (!lastName.isNullOrBlank() && lastName != "null") lastName else ""
+                                        var createdBy = firstName.plus(" ").plus(safeLastName)
+                                        var retailercode = preference.getStringValue(ConstantClass.RetailerCode, "")
 
-                                    val startDate = getCurrentStartDate()
-                                    val endDate = calculateEmiEndDateFromNow(Tenure.toInt())
+                                        val startDate = getCurrentStartDate()
+                                        val endDate = calculateEmiEndDateFromNow(Tenure.toInt())
 
-                                    var loancreatedreq = LoanCreatedReq(
-                                        modetype = "UPDATE",
-                                        rid = ConstantClass.LoanRID,
-                                        customerCode = CustomerCodeForEnach,
-                                        loanAmount = ConstantClass.LoanAmount.toDouble(),
-                                        downPayment = DownPayment.toDouble(),
-                                        emiAmount = EmiAmount.toDouble(),
-                                        tenure = Tenure.toInt(),
-                                        interestRate = InterestRate.toDouble(),
-                                        startDate = startDate,
-                                        endDate = endDate,
-                                        imeiNumber = ImeiNumber1,
-                                        createdBy = createdBy,
-                                        brandname = BrandName,
-                                        modelname = ModelName,
-                                        variantname = ModelVarient,
-                                        avlcolor = ModelColor,
-                                        retailerCode = retailercode,
-                                        processingFees = ProcessingFees,
-                                        interestAmt = InterestAmt,
-                                        remarks = "",
-                                        recordStatus = LoanStatus , //"Approved"
-                                        creditScore = userScore.toString(),
-                                        validateKey = binding.accesstoken.text.toString(),
-                                        defaultEmidebit = DefaulterEmiDebitPending,
-                                        sellingPrice = ConstantClass.SellingPrice.toDouble(),
-                                        loanMode = LoanMode
-                                    )
-                                    hitApiForRetailerCreatedLoan(loancreatedreq!!)
+                                        var loancreatedreq = LoanCreatedReq(
+                                            modetype = "UPDATE",
+                                            rid = ConstantClass.LoanRID,
+                                            customerCode = CustomerCodeForEnach,
+                                            loanAmount = ConstantClass.LoanAmount.toDouble(),
+                                            downPayment = DownPayment.toDouble(),
+                                            emiAmount = EmiAmount.toDouble(),
+                                            tenure = Tenure.toInt(),
+                                            interestRate = InterestRate.toDouble(),
+                                            startDate = startDate,
+                                            endDate = endDate,
+                                            imeiNumber = ImeiNumber1,
+                                            createdBy = createdBy,
+                                            brandname = BrandName,
+                                            modelname = ModelName,
+                                            variantname = ModelVarient,
+                                            avlcolor = ModelColor,
+                                            retailerCode = retailercode,
+                                            processingFees = ProcessingFees,
+                                            interestAmt = InterestAmt,
+                                            remarks = "",
+                                            recordStatus = LoanStatus , //"Approved"
+                                            creditScore = userScore.toString(),
+                                            validateKey = binding.accesstoken.text.toString(),
+                                            defaultEmidebit = DefaulterEmiDebitPending,
+                                            sellingPrice = ConstantClass.SellingPrice.toDouble(),
+                                            loanMode = LoanMode
+                                        )
+                                        hitApiForRetailerCreatedLoan(loancreatedreq!!)
+                                    }
+                                    else {
+                                        binding.accesstoken.isEnabled= true
+                                        binding.verifykeyicon.visibility= View.GONE
+                                    }
+
+                                    Toast.makeText(this@AppScanInstallPage, response.message, Toast.LENGTH_SHORT).show()
                                 }
-                                else {
-                                    binding.accesstoken.isEnabled= true
-                                    binding.verifykeyicon.visibility= View.GONE
-                                }
-
-                                Toast.makeText(this@AppScanInstallPage, response.message, Toast.LENGTH_SHORT).show()
+                            }else{
+                                var error = resources.data.toString()
+                                Toast.makeText(this@AppScanInstallPage,error, Toast.LENGTH_SHORT).show()
                             }
+
                         }
+
+                        handleHttpError(it.data!!.code(), it.data!!.errorBody()?.string(), it.data.message())
+
                     }
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
                         binding.accesstoken.isEnabled = true
+                        val response = it.data
+                        if (response != null) {
+                            val errorBody = try {
+                                response.errorBody()?.string()
+                            } catch (e: Exception) {
+                                null
+                            }
+                            handleApiError(response.code(), errorBody)
+                        } else {
+                            Toast.makeText(
+                                this,
+                                it.message ?: "Network error occurred. Please try again.",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
 
                     }
 
@@ -496,35 +520,44 @@ class AppScanInstallPage : BaseActivity() {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
                         it.data?.let { users ->
-                            users.body()?.let { response ->
-                                Log.d("customerres", Gson().toJson(response))
+                            if(users.isSuccessful){
+                                users.body()?.let { response ->
+                                    Log.d("customerres", Gson().toJson(response))
 
-                                if (response.status?.toLowerCase().equals(ConstantClass.LoanSuccessStatus)) {
-                                    LoanMode=""
-                                    loaneCode = response.data!!.loanCode!!
-                                    FirstName = CustFirstName
-                                    MiddleName = CustMiddleName
-                                    LastName = CustLastName
-                                    CustomerCodeForEnach = response.data!!.customerCode!!
-                                    LoanCodeForEnach = response.data!!.loanCode!!
-                                    RetailerCodeForEnach = response.data!!.retailerCode!!
+                                    if (response.status?.toLowerCase().equals(ConstantClass.LoanSuccessStatus)) {
+                                        LoanMode=""
+                                        loaneCode = response.data!!.loanCode!!
+                                        FirstName = CustFirstName
+                                        MiddleName = CustMiddleName
+                                        LastName = CustLastName
+                                        CustomerCodeForEnach = response.data!!.customerCode!!
+                                        LoanCodeForEnach = response.data!!.loanCode!!
+                                        RetailerCodeForEnach = response.data!!.retailerCode!!
 
-                                    LoanStartDate = response.data.startDate!!
-                                    LoanEndDate = response.data.endDate!!
+                                        LoanStartDate = response.data.startDate!!
+                                        LoanEndDate = response.data.endDate!!
 
-                                    startActivity(Intent(this@AppScanInstallPage, CongratulationPage::class.java))
-                                    clearData()
-                                    finish()
+                                        startActivity(Intent(this@AppScanInstallPage, CongratulationPage::class.java))
+                                        clearData()
+                                        finish()
 
-                                }
-                                else {
-                                    if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
-                                        ConstantClass.dialog.dismiss()
                                     }
-                                }
+                                    else {
+                                        if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
+                                            ConstantClass.dialog.dismiss()
+                                        }
+                                    }
 
+                                }
                             }
+                            else{
+                                var error = resources.data.toString()
+                                Toast.makeText(this@AppScanInstallPage,error, Toast.LENGTH_SHORT).show()
+                            }
+
                         }
+                        handleHttpError(it.data!!.code(), it.data!!.errorBody()?.string(), it.data!!.message())
+
                     }
 
                     ApiStatus.ERROR -> {
@@ -750,6 +783,48 @@ class AppScanInstallPage : BaseActivity() {
         val fileName = "IMG_${System.currentTimeMillis()}"
         val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(fileName, ".jpg", storageDir)
+    }
+
+
+    private fun showErrorToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
+    private fun handleHttpError(responseCode: Int, errorBody: String?, responseMessage: String?) {
+        if (ConstantClass.dialog?.isShowing == true) {
+            ConstantClass.dialog.dismiss()
+        }
+
+
+        val serverMessage = getServerErrorMessage(errorBody)
+        val finalMessage = when {
+            !serverMessage.isNullOrBlank() -> serverMessage
+            responseCode == 400 -> "Bad request. Please check your data (400)."
+            responseCode == 401 -> "Session expired. Please login again (401)."
+            responseCode == 404 -> "Service not found. Please try again later (404)."
+            responseCode == 500 -> "Server error. Please try again later (500)."
+            !responseMessage.isNullOrBlank() -> responseMessage
+            else -> "Something went wrong (Code: $responseCode)."
+        }
+
+        showErrorToast(finalMessage)
+        Log.e("API_HTTP_ERROR", "Code: $responseCode | Body: $errorBody")
+    }
+
+
+    private fun getServerErrorMessage(errorBody: String?): String? {
+        if (errorBody.isNullOrBlank()) return null
+        return try {
+            val jsonObject = JSONObject(errorBody)
+            when {
+                jsonObject.has("message") -> jsonObject.getString("message")
+                jsonObject.has("Message") -> jsonObject.getString("Message")
+                jsonObject.has("statusMessage") -> jsonObject.getString("statusMessage")
+                else -> null
+            }
+        } catch (e: Exception) {
+            null
+        }
     }
 
 

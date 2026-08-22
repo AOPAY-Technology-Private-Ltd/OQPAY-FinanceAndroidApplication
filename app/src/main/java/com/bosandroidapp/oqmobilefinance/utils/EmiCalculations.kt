@@ -79,7 +79,7 @@ private suspend fun getCustomerLoanEmiDetailsReq(req: GetCustomerLoanDetailsReq)
 suspend fun Context.syncEmis() = withContext(Dispatchers.IO) {
     val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
 
-   /* if (hasDateChanged()) {*/
+    if (hasDateChanged()) {
         // Logger.d(ACCESSIBILITYTAG, "Date Changed")
         val preference = SharedPreference(this@syncEmis)
         var loanemireq = GetCustomerLoanDetailsReq(
@@ -104,7 +104,7 @@ suspend fun Context.syncEmis() = withContext(Dispatchers.IO) {
             // Logger.d(ACCESSIBILITYTAG, e.localizedMessage ?: "")
         }
 
-  /*  }*/
+    }
 
     isEMIDue(sharedPref)
 }
