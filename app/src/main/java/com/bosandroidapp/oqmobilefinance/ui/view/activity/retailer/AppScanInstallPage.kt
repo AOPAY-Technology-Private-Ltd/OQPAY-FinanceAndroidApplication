@@ -153,7 +153,7 @@ class AppScanInstallPage : BaseActivity() {
                     .load(invoicePhotoUri)
                     .centerCrop()
                     .into(binding.invoiceImage)
-                binding.tvUploadText.text= "Re- Upload"
+                binding.tvUploadText.text= "Re-Upload"
                 Invoive_Path = invoicePhotoUri
                 binding.btnUploadToServer.visibility = View.VISIBLE
         }
@@ -164,7 +164,6 @@ class AppScanInstallPage : BaseActivity() {
         }
 
     }
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {

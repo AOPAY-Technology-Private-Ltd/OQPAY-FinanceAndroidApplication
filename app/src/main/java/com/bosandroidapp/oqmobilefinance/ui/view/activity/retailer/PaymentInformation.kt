@@ -572,18 +572,88 @@ class PaymentInformation : BaseActivity() {
                     }
                     else
                     {
-                        /* AccountNumber = binding.accountnumber.text.toString().trim()
-                         BankIFSCCode = binding.ifsccode.text.toString().trim()
-                         BankName =  binding.bankname.text.toString().trim()
-                         AccountType = binding.acounttype.selectedItem.toString().trim()
-                         BranchName = binding.branchname.text.toString().trim()
-                         AccountHolderName= binding.banificeryName.text.toString().trim()
-                         BranchAddress= binding.branchaddress.text.toString().trim()
-                         BankID = bankList.find { it.first == BankName }?.second!!
-                         Log.d("BankId", "${BankID}")
-                         setselectionForSecondCard()  // for testing*/
+                        AccountNumber = binding.accountnumber.text.toString().trim()
+                        BankIFSCCode = binding.ifsccode.text.toString().trim()
+                        BankName =  binding.bankname.text.toString().trim()
+                        AccountType = binding.acounttype.selectedItem.toString().trim()
+                        BranchName = binding.branchname.text.toString().trim()
+                        AccountHolderName= binding.banificeryName.text.toString().trim()
+                        BranchAddress= binding.branchaddress.text.toString().trim()
+                        BankID = bankList.find { it.first == BankName }?.second!!
+                        ConstantClass.isPannydropVerified="yes"
+                        Log.d("BankID", "${BankID}")
+                        var req = ManageCustomerStepWiseReq(
+                            mode = "UPDATE" ,
+                            step = "3",
+                            rid = "",
+                            firstName = CustFirstName,
+                            middleName= CustMiddleName,
+                            lastName=CustLastName,
+                            primaryMobileNumber = CustPrimaryMobileNumber,
+                            primaryOTP = CustPrimaryOTP,
+                            primaryMobileVerified = CustPrimaryMobileVerified,
+                            alternateMobileNumber = CustAlternateMobileNumber,
+                            alternateMobileOTP = "",
+                            pAlternateMobileVerified = "no",
+                            eMailID = CusteMailID,
+                            flatNo = CustFlatNo,
+                            aearSector = CustAreaSector,
+                            pinCode = CustPinCode,
+                            currentAddress = CustCurrentAddress,
+                            stateName= CustStateName,
+                            cityName= CustCityName,
+                            country= CustCountry!!,
+                            aadharNumber = AadharNumber,
+                            aadharNumberVerified = ConstantClass.AadharVerified,
+                            panNumber = PanNumber,
+                            panNumberVerified = PanNumberVerified,
+                            brandName=BrandName,
+                            modelName=ConstantClass.ModelName,
+                            modelVariant=ConstantClass.ModelVarient,
+                            color=ConstantClass.ModelColor,
+                            sellingPrice= ConstantClass.SellingPrice,
+                            downPayment= DownPayment,
+                            tenure=Tenure,
+                            emiAmount=EmiAmount,
+                            imeiNumber1="",
+                            imeiNumber2="",
+                            accountNumber=AccountNumber,
+                            bankIFSCCode= BankIFSCCode,
+                            bankName= BankName,
+                            IsPannyDrop = ConstantClass.isPannydropVerified,
+                            accountType= AccountType,
+                            branchName= BranchName,
+                            refName="",
+                            refRelationShip="",
+                            refmobileNo="",
+                            refAddress="",
+                            debitOrCreditCard="",
+                            upiMandate=UPIMandate,
+                            createdBy= CreatedByCustomerShortCut,
+                            membershipfees="",
+                            retailercode=preference.getStringValue(ConstantClass.RetailerCode,""),
+                            customerCode=preference.getStringValue(ConstantClass.CustomerCode,""),
+                            cibilScore= userScore.toString(),
+                            activeStatus = ConstantClass.CustomerActiveStatus,
+                            cibilApiResponse = CibilResponse,
+                            aadhaarApiResponse = AadhaarResponse,
+                            panApiResponse = PanResponse,
+                            isAggrementVerified= isAggrementVerified,
+                            isRetailerAggrementVerified="",
+                            custPhoto_File=null,
+                            imeiNumber1_SealPhotoPath = null,
+                            imeiNumber2_SealPhotoPath = null,
+                            imeiNumber_PhotoPath = null,
+                            invoive_Path = null,
+                            aadharFront_Path = null,
+                            aadharBack_Path = null,
+                            panFront_Path = null
+                        )
 
-                         hitApiForRequestPennyDrop()
+                        Log.d("PaymentInformationreq", Gson().toJson(req))
+                        hitApiForUploadCustomerBankDataData(req)
+
+                        /* hitApiForRequestPennyDrop()*/
 
                     }
 

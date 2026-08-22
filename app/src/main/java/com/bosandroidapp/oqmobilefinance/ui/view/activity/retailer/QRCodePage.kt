@@ -1386,7 +1386,7 @@ class QRCodePage : BaseActivity() {
                                             LoanEndDate = response.data.endDate!!
 
                                             /*  LoanStartDate = "2026-08-25T09:21:03.988Z"
-                                              LoanEndDate = "2026-09-25T09:21:03.988Z"*/
+                                               LoanEndDate = "2026-09-25T09:21:03.988Z"*/
 
                                             val emiAmount = EmiAmount.toDouble().roundToInt()
                                             /* val emiAmount = 1*/
@@ -1422,7 +1422,8 @@ class QRCodePage : BaseActivity() {
 
                                             hitApiForEnach(request,false)
 
-                                        } else {
+                                        }
+                                        else {
                                             if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
                                                 ConstantClass.dialog.dismiss()
                                             }
