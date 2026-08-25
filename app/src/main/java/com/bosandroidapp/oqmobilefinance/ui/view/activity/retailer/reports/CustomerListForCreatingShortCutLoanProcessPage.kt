@@ -91,7 +91,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
         val retailerCode = preference.getStringValue(ConstantClass.RetailerCode, "")
         
         val reportreq = RetailerPerCustomerListShortCutForLoanReq(
-            retailerCode = /*retailerCode*/"DL0002",
+            retailerCode = retailerCode,
             searchText = "",
             recordStatus = reporttype
         )
@@ -128,6 +128,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
                 }
             }
         }
+
     }
 
 }

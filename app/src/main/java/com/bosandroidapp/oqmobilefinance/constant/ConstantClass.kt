@@ -102,7 +102,7 @@ object ConstantClass {
 
          // Production
 
-/*        const val BASE_URL = "https://api.oqpay.in/"
+         const val BASE_URL = "https://api.oqpay.in/"
           const val BASE_URL_IMAGE = "https://api.oqpay.in"
 
 
@@ -114,12 +114,12 @@ object ConstantClass {
 
          // production merchant id offline
          const val PAN_VERIFICATION_REGISTRATION_ID_OFFLINE = "AOP-5050"
-         const val PENNYDROP_REGISTRATION_ID_OFFLINE = "AOP-5050"*/
+         const val PENNYDROP_REGISTRATION_ID_OFFLINE = "AOP-5050"
 
 
 
     // UAT
-       const val BASE_URL = "https://api.oqpay.co.in/"
+/*     const val BASE_URL = "https://api.oqpay.co.in/"
        const val BASE_URL_IMAGE = "https://api.oqpay.co.in"
 
 
@@ -130,7 +130,7 @@ object ConstantClass {
 
       //  UAT merchant id offline
       const val PAN_VERIFICATION_REGISTRATION_ID_OFFLINE = "AOP-554"
-      const val PENNYDROP_REGISTRATION_ID_OFFLINE = "AOP-554"
+      const val PENNYDROP_REGISTRATION_ID_OFFLINE = "AOP-554"*/
 
 
      const val SMS_BASE_URL = "http://web.adcruxmedia.in/"

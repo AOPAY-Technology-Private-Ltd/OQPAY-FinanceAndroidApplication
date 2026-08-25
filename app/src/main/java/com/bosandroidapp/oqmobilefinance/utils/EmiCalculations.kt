@@ -78,6 +78,7 @@ private suspend fun getCustomerLoanEmiDetailsReq(req: GetCustomerLoanDetailsReq)
 @RequiresApi(Build.VERSION_CODES.R)
 suspend fun Context.syncEmis() = withContext(Dispatchers.IO) {
     val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
+    currentDate = SimpleDateFormat("d/M/yyyy", Locale.getDefault()).format(Date())
 
     if (hasDateChanged()) {
         // Logger.d(ACCESSIBILITYTAG, "Date Changed")
@@ -338,6 +339,7 @@ data class MonthsAndPayables(
 )
 
 
+
 private fun String.furtherDueDates(months: Long, grossPeriod: Int): ArrayList<MonthsAndPayables> {
     val list = arrayListOf<MonthsAndPayables>()
     //var nextDue = this.getJumpedDate(1)
@@ -478,17 +480,20 @@ private fun String.isLateFeesApplicable(currentDateStr: String?): Boolean {
     } catch (e: Exception) {
         false
     }
+
 }
 
 
 fun Context.hasDateChanged(): Boolean {
     val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
     val lastSync = sharedPref.getString("LoanSyncDate", "")
+
     if (lastSync != currentDate) {
         sharedPref.edit().putString("LoanSyncDate", currentDate).apply()
         // Logger.d(ACCESSIBILITYTAG, currentDate.toString())
         return true
     }
+
     return false
 }
 
@@ -511,7 +516,6 @@ fun List<com.bosandroidapp.oqmobilefinance.data.model.loginsignup.CustomerDataIt
     return arr.toString()
 }
 
-
 data class LocalLoanData(
     val startDate: String,
     val paidEmi: String,
@@ -519,7 +523,6 @@ data class LocalLoanData(
     val grossPeriod: String,
     val customergrossPeriod: String
 )
-
 
 fun String.toFormattedList(): List<LocalLoanData>? {
     try {
