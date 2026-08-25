@@ -12,15 +12,15 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.BankID
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.BranchAddress
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CusteMailID
 import com.bosandroidapp.oqmobilefinance.data.enach.EMandateRequest
-import com.bosandroidapp.oqmobilefinance.data.model.CustomerListDataItem
+import com.bosandroidapp.oqmobilefinance.data.model.CustomerShortCutDataItem
 import com.bosandroidapp.oqmobilefinance.databinding.ItemCustomerShortcutLoanBinding
 import com.bumptech.glide.Glide
 import kotlin.math.roundToInt
 
 class CustomerShortcutLoanAdapter(
-    private var customerList: List<CustomerListDataItem>,
+    private var customerList: List<CustomerShortCutDataItem>,
     private val context: Context,
-    private val onItemClick: (CustomerListDataItem) -> Unit
+    private val onItemClick: (CustomerShortCutDataItem) -> Unit
 ) : RecyclerView.Adapter<CustomerShortcutLoanAdapter.ViewHolder>() {
 
 
@@ -35,14 +35,16 @@ class CustomerShortcutLoanAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = customerList[position]
+
+        var customerDetails = item.customerDetails
         
-        holder.binding.tvName.text = "${item.firstName} ${item.lastName}"
-        holder.binding.tvMobile.text = "Mobile: ${item.primaryMobileNumber}"
-        holder.binding.tvCode.text = "Code: ${item.customerCode}"
-        holder.binding.tvActiveStatus.text = item.activeStatus ?: ""
+        holder.binding.tvName.text = "${customerDetails!!.firstName} ${customerDetails.lastName}"
+        holder.binding.tvMobile.text = "Mobile: ${customerDetails.primaryMobileNumber}"
+        holder.binding.tvCode.text = "Code: ${customerDetails.customerCode}"
+        holder.binding.tvActiveStatus.text = customerDetails!!.activeStatus ?: ""
         
         Glide.with(context)
-            .load(ConstantClass.BASE_URL_IMAGE+item.custPhotoPath)
+            .load(ConstantClass.BASE_URL_IMAGE+customerDetails.custPhotoPath)
             .placeholder(R.drawable.customer)
             .error(R.drawable.customer)
             .into(holder.binding.ivCustomer)
@@ -55,24 +57,29 @@ class CustomerShortcutLoanAdapter(
     }
 
 
-    private fun updateStatus(holder: ViewHolder, item: CustomerListDataItem) {
+    private fun updateStatus(holder: ViewHolder, item: CustomerShortCutDataItem) {
         var statusText = ""
         var statusColor = R.color.orange
 
         when {
-            item.loanCode.isNullOrBlank() -> {
+
+            item.createLoanDetails!!.loanCode.isNullOrBlank() -> {
                 statusText = "Pending Loan"
                 statusColor = R.color.red
             }
-            item.isPannydropVerified.isNullOrBlank()|| item.isPannydropVerified.equals("no", true) -> {
+
+            item.bankDetails!!.isPannydropVerified.isNullOrBlank()|| item.bankDetails!!.isPannydropVerified.equals("no", true) -> {
                 statusText = "Pennydrop Pending"
                 statusColor = R.color.orange
             }
-            item.isEmandateVerified.isNullOrBlank() || item.isEmandateVerified.equals("no", true) -> {
+
+
+            item.createLoanDetails.isEmandateVerified.isNullOrBlank() || item.createLoanDetails.isEmandateVerified.equals("no", true) -> {
                 statusText = "Emandate Pending"
                 statusColor = R.color.blue
             }
-            item.isrefKycVerified.isNullOrBlank() || item.isrefKycVerified.equals("no", true) -> {
+
+            item.referenceDetails!!.isrefKycVerified.isNullOrBlank() ||   item.referenceDetails!!.isrefKycVerified.equals("no", true) -> {
                 statusText = "App Not Install"
                 statusColor = R.color.grey
             }
@@ -92,7 +99,7 @@ class CustomerShortcutLoanAdapter(
     override fun getItemCount(): Int = customerList.size
 
 
-    fun updateData(newList: List<CustomerListDataItem>) {
+    fun updateData(newList: List<CustomerShortCutDataItem>) {
         customerList = newList
         notifyDataSetChanged()
     }

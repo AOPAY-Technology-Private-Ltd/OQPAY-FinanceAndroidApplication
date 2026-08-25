@@ -412,8 +412,7 @@ class RetailerEMandateVerifyPage : BaseActivity() {
 
         Log.d("EmandateUploadreq", Gson().toJson(request))
 
-        viewModel.UpdateEmandateDetails(request).observe(this){
-                resources ->
+        viewModel.UpdateEmandateDetails(request).observe(this){ resources ->
             resources.let {
 
                 when(it.apiStatus){

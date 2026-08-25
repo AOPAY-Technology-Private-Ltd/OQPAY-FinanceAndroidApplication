@@ -48,6 +48,7 @@ private var currentDate: String? = null
 const val ACCESSIBILITYTAG = "Accessibility Service"
 
 
+
 suspend fun String.getCurrentLastPaidDueDate(context: Context?, paidMonths: Long, payableMonths: Long, AllgrossPeriod: Int, customergrossPeriod: Int, servercurrentDate:String): ArrayList<MonthsAndPayables> = withContext(Dispatchers.IO) {
     val AllgrossPeriod = AllgrossPeriod
     val customergrossPeriod = customergrossPeriod
@@ -70,6 +71,7 @@ suspend fun String.getCurrentLastPaidDueDate(context: Context?, paidMonths: Long
 }
 
 
+
 private suspend fun getCustomerLoanEmiDetailsReq(req: GetCustomerLoanDetailsReq) =
     RetrofitClient.apiInterface.getCustomerLoanDetailsList(req)
 
@@ -78,6 +80,7 @@ private suspend fun getCustomerLoanEmiDetailsReq(req: GetCustomerLoanDetailsReq)
 @RequiresApi(Build.VERSION_CODES.R)
 suspend fun Context.syncEmis() = withContext(Dispatchers.IO) {
     val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
+    currentDate = SimpleDateFormat("d/M/yyyy", Locale.getDefault()).format(Date())
 
     if (hasDateChanged()) {
         // Logger.d(ACCESSIBILITYTAG, "Date Changed")
@@ -191,6 +194,7 @@ private suspend fun Context.isEMIDue(sharedPref: SharedPreferences) = withContex
     }
 
 }
+
 
 
 

@@ -102,6 +102,7 @@
 
 
     <string-array name="customershortcutlist">
+        <item>All</item>
         <item>Pending</item>
         <item>Approved</item>
         <item>Rejected</item>

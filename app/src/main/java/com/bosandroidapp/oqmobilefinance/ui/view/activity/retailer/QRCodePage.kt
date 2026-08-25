@@ -128,6 +128,7 @@ import com.bosandroidapp.oqmobilefinance.data.enach.EMandateRequest
 import com.bosandroidapp.oqmobilefinance.data.enach.ENachStatusReq
 import com.bosandroidapp.oqmobilefinance.data.enach.EnachDateUploadReq
 import com.bosandroidapp.oqmobilefinance.data.loancharge.LoanChargeReq
+import com.bosandroidapp.oqmobilefinance.data.model.CustomerShortCutDataItem
 import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateAccessKeyReq
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
@@ -135,6 +136,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.GetIsEligibleLoa
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LoanCreatedReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LogoutReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.RegisterCustomerResp
+import com.bosandroidapp.oqmobilefinance.data.pennydrop.BankListReq
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.repository.PanRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
@@ -155,6 +157,7 @@ import okhttp3.RequestBody
 import okhttp3.Response
 import kotlin.math.roundToInt
 import kotlin.text.trim
+import kotlin.time.Duration.Companion.milliseconds
 
 
 class QRCodePage : BaseActivity() {
@@ -163,11 +166,13 @@ class QRCodePage : BaseActivity() {
     lateinit var panViewModel: PanViewModel
     lateinit var api: ApiInterface
     lateinit var preference: SharedPreference
-
     var downPayment: String = ""
     var membershipAmt: String = ""
 
+    var bankList = mutableListOf<Pair<String, Int>>()
+
     var loancreatedreq: LoanCreatedReq? = null
+
 
 
     companion object{
@@ -193,7 +198,8 @@ class QRCodePage : BaseActivity() {
              if (IMEIDetailsPage.dialog != null && IMEIDetailsPage.dialog.isShowing) {
                  IMEIDetailsPage.dialog.dismiss()
              }
-         }catch (e: UninitializedPropertyAccessException){
+         }
+         catch (e: UninitializedPropertyAccessException){
              e.message
          }
 
@@ -282,7 +288,15 @@ class QRCodePage : BaseActivity() {
                 Log.d("LoanCreateReq", Gson().toJson(loancreatedreq))
             }
 
-            updateUI(true)
+            when (BankID) {
+                0 -> {
+                    hitApiForBankList(true)
+                }
+
+                else -> {
+                    updateUI(true)
+                }
+            }
 
             binding.LoanCreatelayout.visibility = View.VISIBLE
             binding.nextlayout.visibility = View.GONE
@@ -292,10 +306,87 @@ class QRCodePage : BaseActivity() {
             binding.LoanCreatelayout.visibility = View.GONE
             binding.nextlayout.visibility = View.VISIBLE
             updateUI(false)
+
+
         }
 
         setOnClickListner()
         hitApiForMemberShipFee()
+
+    }
+
+
+    override fun onStart() {
+        super.onStart()
+        hitApiForBankList(false)
+    }
+
+
+    fun hitApiForBankList(check: Boolean) {
+        bankList.clear()
+
+        var req = BankListReq(
+            registrationID = if (ConstantClass.CheckOnlineOrOffline == ConstantClass.online) {
+                ConstantClass.PAN_VERIFICATION_REGISTRATION_ID
+            } else {
+                ConstantClass.PAN_VERIFICATION_REGISTRATION_ID_OFFLINE
+            }
+        )
+        Log.d("BankListReq", Gson().toJson(req))
+
+        panViewModel.getBankListReq(req).observe(this) { resources ->
+            resources.let {
+                when (it.apiStatus) {
+                    ApiStatus.SUCCESS -> {
+                        it.data.let { users ->
+                            users!!.body().let { response ->
+
+                                if (response!!.status!!.toLowerCase().equals("false")) {
+
+                                    Toast.makeText(this@QRCodePage, response.message, Toast.LENGTH_SHORT).show()
+                                }
+
+                                response?.data?.banks?.forEach {
+                                    bankList.add(Pair(it!!.name!!, it.id) as Pair<String, Int>)
+                                }
+
+                                if (bankList.isNotEmpty()) {
+                                    BankID = bankList.find { it.first == BankName }?.second!!
+                                    Log.d("FetchBankList", Gson().toJson(bankList))
+
+                                    if(check){
+                                        updateUI(true)
+                                    }
+
+                                }
+
+                                Log.d("List", Gson().toJson(response?.data?.banks))
+
+                            }
+
+                        }
+
+                    }
+
+                    ApiStatus.ERROR -> {
+
+                        Toast.makeText(
+                            this@QRCodePage,
+                            resources.message ?: "Error occurred",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    ApiStatus.LOADING -> {
+
+                    }
+
+                }
+
+            }
+
+        }
+
 
     }
 
@@ -305,6 +396,7 @@ class QRCodePage : BaseActivity() {
         super.onResume()
 
         hitApiForLogin()
+
 
     }
 
@@ -353,6 +445,10 @@ class QRCodePage : BaseActivity() {
 
                     val startDate = LoanStartDate
                     val endDate = LoanEndDate
+
+                    if(CustomerCodeForEnach.isNullOrEmpty()){
+                        CustomerCodeForEnach = loancreatedreq!!.customerCode
+                    }
 
                      val emiAmount = EmiAmount.toDouble().roundToInt()
                      /* val emiAmount = 1*/
@@ -1282,7 +1378,9 @@ class QRCodePage : BaseActivity() {
     }
 
 
+
     fun updateUI(isRegistered: Boolean) {
+
         if (isRegistered) {
             // STEP 2: Registered
             showSuccessPopup()
@@ -1378,7 +1476,16 @@ class QRCodePage : BaseActivity() {
                                             FirstName = CustFirstName
                                             MiddleName = CustMiddleName
                                             LastName = CustLastName
-                                            CustomerCodeForEnach = response.data!!.customerCode!!
+
+                                            if(response.data!!.customerCode.isNullOrBlank()){
+                                                Toast.makeText(this@QRCodePage,"Customer code not found after loan creation",
+                                                    Toast.LENGTH_SHORT).show()
+                                                CustomerCodeForEnach=""
+                                            }
+                                            else{
+                                                CustomerCodeForEnach = response.data!!.customerCode!!
+                                            }
+
                                             LoanCodeForEnach = response.data!!.loanCode!!
                                             RetailerCodeForEnach = response.data!!.retailerCode!!
 
@@ -1509,6 +1616,7 @@ class QRCodePage : BaseActivity() {
     }
 
 
+
     fun String.toRequestBody(): RequestBody = RequestBody.create("text/plain".toMediaTypeOrNull(), this)
 
 
@@ -1574,6 +1682,7 @@ class QRCodePage : BaseActivity() {
 
 
     }
+
 
 
     fun hitApiForMemberShipFee() {

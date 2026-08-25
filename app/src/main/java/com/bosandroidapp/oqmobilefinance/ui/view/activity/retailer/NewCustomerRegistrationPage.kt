@@ -2283,6 +2283,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
 
 
+
     fun PopOpForCibileScoreRequestToAdmin(cibilScore : String,title:String,check:Boolean){
         dialog = Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -2381,6 +2382,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                binding.createaccount.isEnabled = true
                            }
                        }
+
 
                    }
 

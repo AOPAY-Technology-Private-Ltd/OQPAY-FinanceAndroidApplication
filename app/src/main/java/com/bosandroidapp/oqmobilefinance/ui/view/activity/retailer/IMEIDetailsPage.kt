@@ -678,7 +678,6 @@ class IMEIDetailsPage : BaseActivity() {
 
     }
 
-
     fun hitApiForUploadCustomerIMEIData(request : ManageCustomerStepWiseReq){
 
         viewModel.uploadCustomerListForShortCutLoanCreateProcess(request).observe(this) { resources ->

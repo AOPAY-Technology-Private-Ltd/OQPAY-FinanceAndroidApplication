@@ -320,7 +320,9 @@ object ConstantClass {
      var LoanCodeForEnach : String = ""
      var AccountHolderName = ""
      var BranchAddress = ""
+
      var isPannydropVerified : String= ""
+
      var isEmandateVerified : String= ""
      var isAccessKeyVerified : String= ""
      var LoanStartDate = ""

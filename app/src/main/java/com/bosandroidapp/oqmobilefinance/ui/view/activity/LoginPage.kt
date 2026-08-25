@@ -307,6 +307,8 @@ class LoginPage : BaseActivity() {
                         startActivity(intent)
                         finish()
 
+                        OpenPopUpForVeryfyRetailerOTP(response.retailerCode.toString())
+
                     } else {
                         OpenPopUpForVAlert(response?.message ?: "Login failed. Please connect with your administrator.")
                     }
@@ -327,6 +329,7 @@ class LoginPage : BaseActivity() {
 
 
     }
+
 
     fun validateLoginInput(mobileOrEmailID: String, password: String, context: Context): Boolean {
         val isMobile = mobileOrEmailID.all { it.isDigit() } && mobileOrEmailID.length == 10
@@ -401,6 +404,79 @@ class LoginPage : BaseActivity() {
             if (enteredOTP.length == 4) {
                  hitApiForOTPVerify(MobileNumber, enteredOTP,"Mobile verify")
                  var customerMobile = binding.mobilenumber.text.toString().trim()
+
+                // Toast.makeText(this, "Thanks for your input! The next flow is under development and will be available soon.", Toast.LENGTH_SHORT).show()
+
+            }
+            else {
+                Toast.makeText(this, "Please enter complete OTP", Toast.LENGTH_SHORT).show()
+            }
+
+        }
+
+
+        dialog.show()
+
+    }
+
+    // for retailer login flow
+
+    fun OpenPopUpForVeryfyRetailerOTP( reatilerCode:String){
+        dialog = Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.verifyforgetpasswordotplayour)
+
+        dialog.window?.apply {
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+            addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+
+            statusBarColor = Color.TRANSPARENT
+            navigationBarColor = Color.TRANSPARENT
+        }
+
+        dialog.setCanceledOnTouchOutside(false)
+
+        val verifyButton = dialog.findViewById<LinearLayout>(R.id.verifylayout)
+        val cancel = dialog.findViewById<ImageView>(R.id.cancel)
+        val resendlayout = dialog.findViewById<RelativeLayout>(R.id.resendlayout)
+        val resendtxt = dialog.findViewById<TextView>(R.id.resendtxt)
+        val timer = dialog.findViewById<TextView>(R.id.timer)
+        val subtitle = dialog.findViewById<TextView>(R.id.text_subtitle)
+        val pinView=dialog.findViewById<PinView>(R.id.pinview)
+
+        subtitle.text = "Enter four digit OTP send on your registered mobile number"
+
+        startOtpTimer(resendtxt,timer)
+
+        val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+        FireBaseToken
+
+
+        cancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+
+        resendlayout.setOnClickListener {
+            if(isInternetAvailable(this@LoginPage)) {
+                hitApiForReSendOTP(MobileNumber,"Mobile")
+                startOtpTimer(resendtxt,timer)
+            }
+            else{
+                Toast.makeText(this,"Please check your internet connection!!", Toast.LENGTH_SHORT).show()
+            }
+
+
+        }
+
+
+        verifyButton.setOnClickListener {
+            val enteredOTP = pinView.getText().toString()
+            if (enteredOTP.length == 4) {
+                var reatilerCode = reatilerCode
+                hitApiForOTPVerify(MobileNumber, enteredOTP,"Mobile verify")
+                var customerMobile = binding.mobilenumber.text.toString().trim()
 
                 // Toast.makeText(this, "Thanks for your input! The next flow is under development and will be available soon.", Toast.LENGTH_SHORT).show()
 
