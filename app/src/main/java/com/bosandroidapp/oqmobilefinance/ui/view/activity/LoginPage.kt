@@ -50,6 +50,8 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isInternetAvaila
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.loginType
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.uploadDataOnFirebaseConsole
 import com.bosandroidapp.oqmobilefinance.data.model.GenerateAccessTokenRequest
+import com.bosandroidapp.oqmobilefinance.data.model.RetailerLoginOtpRequest
+import com.bosandroidapp.oqmobilefinance.data.model.RetailerLoginOtpResendRequest
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LoginReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.VerifyOTPReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.SendOtpReq
@@ -71,11 +73,11 @@ import kotlinx.coroutines.launch
 class LoginPage : BaseActivity() {
     lateinit var binding: ActivityLoginPageBinding
     private lateinit var viewModel: AuthenticationViewModel
-    lateinit var preference : SharedPreference
-    lateinit var dialog : Dialog
+    lateinit var preference: SharedPreference
+    lateinit var dialog: Dialog
     lateinit var countDownTimer: CountDownTimer
-    lateinit var api : ApiInterface
-    var  FireBaseToken: String = ""
+    lateinit var api: ApiInterface
+    var FireBaseToken: String = ""
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -86,9 +88,12 @@ class LoginPage : BaseActivity() {
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
 
-        viewModel = ViewModelProvider(this, CommonViewModelFactory(AuthRepository(RetrofitClient.apiInterface)))[AuthenticationViewModel::class.java]
+        viewModel = ViewModelProvider(
+            this,
+            CommonViewModelFactory(AuthRepository(RetrofitClient.apiInterface))
+        )[AuthenticationViewModel::class.java]
         preference = SharedPreference(this)
-        api =  RetrofitClient.apiInterfaceSMS
+        api = RetrofitClient.apiInterfaceSMS
 
         setonclicklistner()
         getFirebaseToken()
@@ -107,15 +112,16 @@ class LoginPage : BaseActivity() {
     }
 
 
-    fun setLayoutForLogin(){
-        if(loginType.equals(Retailer)){
-            binding.retailerLogin.visibility= View.VISIBLE
-            binding.customerLogin.visibility=View.GONE
+    fun setLayoutForLogin() {
+        if (loginType.equals(Retailer)) {
+            binding.retailerLogin.visibility = View.VISIBLE
+            binding.customerLogin.visibility = View.GONE
             binding.emailormobilenumber.requestFocus()
 
             binding.emailormobilenumber.postDelayed({
                 binding.emailormobilenumber.requestFocus()
-                val imm = getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                val imm =
+                    getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(binding.emailormobilenumber, InputMethodManager.SHOW_FORCED)
 
                 binding.main.viewTreeObserver.addOnGlobalLayoutListener {
@@ -125,7 +131,10 @@ class LoginPage : BaseActivity() {
                     val screenHeight = binding.main.rootView.height
                     val keypadHeight = screenHeight - rect.bottom
 
-                    Log.d("KeyboardCheck", "screenHeight=$screenHeight, rect.bottom=${rect.bottom}, keypadHeight=$keypadHeight")
+                    Log.d(
+                        "KeyboardCheck",
+                        "screenHeight=$screenHeight, rect.bottom=${rect.bottom}, keypadHeight=$keypadHeight"
+                    )
 
                     if (keypadHeight > screenHeight * 0.20) {
                         // ✅ Keyboard is open
@@ -139,33 +148,30 @@ class LoginPage : BaseActivity() {
 
             }, 300)
 
-        }
-
-        else{
-            binding.retailerLogin.visibility= View.GONE
-            binding.customerLogin.visibility=View.VISIBLE
+        } else {
+            binding.retailerLogin.visibility = View.GONE
+            binding.customerLogin.visibility = View.VISIBLE
             binding.customerLoginLayout.visibility = View.VISIBLE
         }
     }
 
 
+    fun setonclicklistner() {
 
-    fun setonclicklistner(){
-
-       /* binding.customerGenerateKeyLayout.setOnClickListener{
-            hitApiForGetAndCheckAccessToken()
-        }
+        /* binding.customerGenerateKeyLayout.setOnClickListener{
+             hitApiForGetAndCheckAccessToken()
+         }
 
 
-        binding.clicktologin.setOnClickListener {
-            preference.setBooleanValue(ConstantClass.CustomerAccessKey,true)
-            val intent = Intent(this@LoginPage, DashBoard::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            startActivity(intent)
-            finish()
-        }*/
+         binding.clicktologin.setOnClickListener {
+             preference.setBooleanValue(ConstantClass.CustomerAccessKey,true)
+             val intent = Intent(this@LoginPage, DashBoard::class.java)
+             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+             startActivity(intent)
+             finish()
+         }*/
 
-        binding.signupText.setOnClickListener{
+        binding.signupText.setOnClickListener {
             val mainIntent = Intent(this@LoginPage, SignupPage::class.java)
             startActivity(mainIntent)
         }
@@ -177,7 +183,7 @@ class LoginPage : BaseActivity() {
                     if (containsEmoji(it.toString())) {
                         binding.emailormobilenumber.error = "Emoji not allowed"
                         binding.loginlayout.isEnabled = false
-                    }else{
+                    } else {
                         binding.loginlayout.isEnabled = true
                     }
                 }
@@ -191,19 +197,18 @@ class LoginPage : BaseActivity() {
             var emailOfMobile = binding.emailormobilenumber.text.toString().trim()
             var password = binding.password.text.toString().trim()
 
-           if(validateLoginInput(emailOfMobile,password,this)){
-               if(isInternetAvailable(this@LoginPage)) {
-                   if (!isSimPresent()) {
-                       Toast.makeText(this, "No SIM detected. Insert SIM to continue.", Toast.LENGTH_LONG).show()
-                       return@setOnClickListener
-                   }
-                   hitApiForLogin(emailOfMobile,password)
-               }
-               else{
-                   Toast.makeText(this,"Please check your internet connection!!",Toast.LENGTH_SHORT).show()
-               }
-           }
-
+            if (validateLoginInput(emailOfMobile, password, this)) {
+                if (isInternetAvailable(this@LoginPage)) {
+                    if (!isSimPresent()) {
+                        Toast.makeText(this, "No SIM detected. Insert SIM to continue.", Toast.LENGTH_LONG).show()
+                        return@setOnClickListener
+                    }
+                    hitApiForLogin(emailOfMobile, password)
+                }
+                else {
+                    Toast.makeText(this, "Please check your internet connection!!", Toast.LENGTH_SHORT).show()
+                }
+            }
 
         }
 
@@ -224,13 +229,15 @@ class LoginPage : BaseActivity() {
                         Toast.makeText(this, "No SIM detected. Insert SIM to continue.", Toast.LENGTH_LONG).show()
                         return@setOnClickListener
                     }*/
-                    hitApiForSendOTP(mobnumber,"Mobile")
+                    hitApiForSendOTP(mobnumber, "Mobile")
+                } else {
+                    Toast.makeText(
+                        this,
+                        "Please check your internet connection!!",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
-                else {
-                    Toast.makeText(this, "Please check your internet connection!!", Toast.LENGTH_SHORT).show()
-                }
-            }
-            else{
+            } else {
 
             }
 
@@ -250,10 +257,87 @@ class LoginPage : BaseActivity() {
     }
 
 
-    fun hitApiForLogin(emailOfMobile:String,password:String){
+    fun hitApiForCustomerLogin(emailOfMobile: String, password: String){
         val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
-        preference.setStringValue("deviceid",deviceId)
+        preference.setStringValue("deviceid", deviceId)
 
+        var loginRequest = LoginReq(
+            mobileormailid = emailOfMobile,
+            password = password,
+            logintype = loginType,
+            deviceId = deviceId,
+            token = FireBaseToken
+        )
+
+        Log.d("LoginReq", Gson().toJson(loginRequest))
+
+        viewModel.getLogin(loginRequest).observe(this) { it ->
+
+            when (it.apiStatus) {
+
+                ApiStatus.LOADING -> {
+                    ConstantClass.OpenPopUpForVeryfyOTP(this)
+                }
+
+                ApiStatus.SUCCESS -> {
+                    ConstantClass.dialog.dismiss()
+                    it.data.let { users ->
+                        if(users!!.isSuccessful){
+                            val getData =  users.body()!!.data
+                            val errorCode = users.body()!!.code
+                            val message = users.body()!!.message
+
+                            if (getData!=null && errorCode==200) {
+                                preference.setStringValue(ConstantClass.CustomerCode, getData.customerCode.toString())
+                                preference.setStringValue(ConstantClass.RetailerCode, getData.retailerCode.toString())
+                                preference.setStringValue(ConstantClass.FirstName, getData.firstName.toString())
+                                preference.setStringValue(ConstantClass.LastName, getData.lastName.toString())
+                                preference.setStringValue(ConstantClass.CustomerMobileNumber, getData.mobileNo.toString())
+                                preference.setStringValue(ConstantClass.CustomerEmailID, getData.emailID.toString())
+                                preference.setBooleanValue(ConstantClass.LoggedIn, true)
+                                preference.setStringValue(ConstantClass.LoginType, loginType)
+                                preference.setStringValue(ConstantClass.LoginMobileorMailid, emailOfMobile)
+                                preference.setStringValue(ConstantClass.Loginpassword, password)
+                                preference.setStringValue(ConstantClass.ClientCode, "CMP0005")
+
+                                val  intent = Intent(this@LoginPage, DashBoard::class.java)
+                                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                startActivity(intent)
+                                finish()
+                            }
+                            else {
+                                OpenPopUpForVAlert(message ?: "Login failed. Please connect with your administrator.")
+                            }
+                        }
+                        else {
+                            var errormsg = users.errorBody()
+                            Toast.makeText(this@LoginPage,errormsg.toString(), Toast.LENGTH_SHORT).show()
+                        }
+
+                    }
+
+
+                }
+
+                ApiStatus.ERROR -> {
+                    ConstantClass.dialog.dismiss()
+                    val errorMessage = it.message ?: "Something went wrong"
+                    Toast.makeText(this@LoginPage, errorMessage, Toast.LENGTH_SHORT).show()
+                    OpenPopUpForVAlert(errorMessage)
+
+                    Log.e("LoginError", errorMessage)
+                }
+
+            }
+
+        }
+
+    }
+
+
+    fun hitApiForLogin(emailOfMobile: String, password: String) {
+        val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+        preference.setStringValue("deviceid", deviceId)
 
         var loginRequest = LoginReq(
             mobileormailid = emailOfMobile,
@@ -277,40 +361,17 @@ class LoginPage : BaseActivity() {
                     ConstantClass.dialog.dismiss()
 
                     val response = it.data?.body()
+                    val getData = response!!.data
+                    val errorCode = response!!.code
+                    val message = response.message
+
                     Log.d("LoginResponse", Gson().toJson(response))
 
-                    if (response != null && response.statuss!!.toLowerCase().equals("true",ignoreCase = true)) {
-
-                        val req = NotificationSendTokenRequest(
-                            deviceType= ConstantClass.DeviceType,
-                            clientCode = ConstantClass.ClientCode,
-                            customerCode = response.customerCode.toString(),
-                            retailerCode = response.retailerCode.toString(),
-                            fcmToken = FireBaseToken
-                        )
-
-                        // sendDataOnServerForUploadToken(req)
-
-                        preference.setStringValue(ConstantClass.CustomerCode, response.customerCode.toString())
-                        preference.setStringValue(ConstantClass.RetailerCode, response.retailerCode.toString())
-                        preference.setStringValue(ConstantClass.FirstName, response.firstName.toString())
-                        preference.setStringValue(ConstantClass.LastName, response.lastName.toString())
-                        preference.setStringValue(ConstantClass.CustomerMobileNumber, response.mobileno.toString())
-                        preference.setStringValue(ConstantClass.CustomerEmailID, response.emailID.toString())
-                        preference.setBooleanValue(ConstantClass.LoggedIn, true)
-                        preference.setStringValue(ConstantClass.LoginType, loginType)
-                        preference.setStringValue(ConstantClass.LoginMobileorMailid, emailOfMobile)
-                        preference.setStringValue(ConstantClass.Loginpassword, password)
-
-                        val intent = Intent(this@LoginPage, DashBoard::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                        startActivity(intent)
-                        finish()
-
-                        OpenPopUpForVeryfyRetailerOTP(response.retailerCode.toString())
-
-                    } else {
-                        OpenPopUpForVAlert(response?.message ?: "Login failed. Please connect with your administrator.")
+                    if (getData!=null && errorCode==200) {
+                        OpenPopUpForVeryfyRetailerOTP(getData.retailerCode.toString(),emailOfMobile,password)
+                    }
+                    else {
+                        OpenPopUpForVAlert(message ?: "Login failed. Please connect with your administrator.")
                     }
                 }
 
@@ -351,7 +412,7 @@ class LoginPage : BaseActivity() {
 
 
     // for customer login flow
-    fun OpenPopUpForVeryfyOTP(MobileNumber: String, otp:String){
+    fun OpenPopUpForVeryfyOTP(MobileNumber: String, otp: String) {
         dialog = Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.verifyforgetpasswordotplayour)
@@ -373,12 +434,12 @@ class LoginPage : BaseActivity() {
         val resendtxt = dialog.findViewById<TextView>(R.id.resendtxt)
         val timer = dialog.findViewById<TextView>(R.id.timer)
         val subtitle = dialog.findViewById<TextView>(R.id.text_subtitle)
-        val pinView=dialog.findViewById<PinView>(R.id.pinview)
+        val pinView = dialog.findViewById<PinView>(R.id.pinview)
 
         subtitle.text = "Enter four digit OTP send on your registered mobile number"
 
 
-        startOtpTimer(resendtxt,timer)
+        startOtpTimer(resendtxt, timer)
 
 
         cancel.setOnClickListener {
@@ -387,84 +448,12 @@ class LoginPage : BaseActivity() {
 
 
         resendlayout.setOnClickListener {
-                  if(isInternetAvailable(this@LoginPage)) {
-                      hitApiForReSendOTP(MobileNumber,"Mobile")
-                      startOtpTimer(resendtxt,timer)
-                  }
-                  else{
-                      Toast.makeText(this,"Please check your internet connection!!", Toast.LENGTH_SHORT).show()
-                  }
-
-
-        }
-
-
-        verifyButton.setOnClickListener {
-            val enteredOTP = pinView.getText().toString()
-            if (enteredOTP.length == 4) {
-                 hitApiForOTPVerify(MobileNumber, enteredOTP,"Mobile verify")
-                 var customerMobile = binding.mobilenumber.text.toString().trim()
-
-                // Toast.makeText(this, "Thanks for your input! The next flow is under development and will be available soon.", Toast.LENGTH_SHORT).show()
-
-            }
-            else {
-                Toast.makeText(this, "Please enter complete OTP", Toast.LENGTH_SHORT).show()
-            }
-
-        }
-
-
-        dialog.show()
-
-    }
-
-    // for retailer login flow
-
-    fun OpenPopUpForVeryfyRetailerOTP( reatilerCode:String){
-        dialog = Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog.setContentView(R.layout.verifyforgetpasswordotplayour)
-
-        dialog.window?.apply {
-            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-            addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
-
-            statusBarColor = Color.TRANSPARENT
-            navigationBarColor = Color.TRANSPARENT
-        }
-
-        dialog.setCanceledOnTouchOutside(false)
-
-        val verifyButton = dialog.findViewById<LinearLayout>(R.id.verifylayout)
-        val cancel = dialog.findViewById<ImageView>(R.id.cancel)
-        val resendlayout = dialog.findViewById<RelativeLayout>(R.id.resendlayout)
-        val resendtxt = dialog.findViewById<TextView>(R.id.resendtxt)
-        val timer = dialog.findViewById<TextView>(R.id.timer)
-        val subtitle = dialog.findViewById<TextView>(R.id.text_subtitle)
-        val pinView=dialog.findViewById<PinView>(R.id.pinview)
-
-        subtitle.text = "Enter four digit OTP send on your registered mobile number"
-
-        startOtpTimer(resendtxt,timer)
-
-        val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
-        FireBaseToken
-
-
-        cancel.setOnClickListener {
-            dialog.dismiss()
-        }
-
-
-        resendlayout.setOnClickListener {
-            if(isInternetAvailable(this@LoginPage)) {
-                hitApiForReSendOTP(MobileNumber,"Mobile")
-                startOtpTimer(resendtxt,timer)
-            }
-            else{
-                Toast.makeText(this,"Please check your internet connection!!", Toast.LENGTH_SHORT).show()
+            if (isInternetAvailable(this@LoginPage)) {
+                hitApiForReSendOTP(MobileNumber, "Mobile")
+                startOtpTimer(resendtxt, timer)
+            } else {
+                Toast.makeText(this, "Please check your internet connection!!", Toast.LENGTH_SHORT)
+                    .show()
             }
 
 
@@ -474,14 +463,12 @@ class LoginPage : BaseActivity() {
         verifyButton.setOnClickListener {
             val enteredOTP = pinView.getText().toString()
             if (enteredOTP.length == 4) {
-                var reatilerCode = reatilerCode
-                hitApiForOTPVerify(MobileNumber, enteredOTP,"Mobile verify")
+                hitApiForOTPVerify(MobileNumber, enteredOTP, "Mobile verify")
                 var customerMobile = binding.mobilenumber.text.toString().trim()
 
                 // Toast.makeText(this, "Thanks for your input! The next flow is under development and will be available soon.", Toast.LENGTH_SHORT).show()
 
-            }
-            else {
+            } else {
                 Toast.makeText(this, "Please enter complete OTP", Toast.LENGTH_SHORT).show()
             }
 
@@ -493,7 +480,70 @@ class LoginPage : BaseActivity() {
     }
 
 
-    fun startOtpTimer( resendtxt:TextView, timer:TextView) {
+    // for retailer login flow
+
+    fun OpenPopUpForVeryfyRetailerOTP(reatilerCode: String,emailOfMobile: String,password: String) {
+        dialog = Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.verifyforgetpasswordotplayour)
+
+        dialog.window?.apply {
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+            addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+
+            statusBarColor = Color.TRANSPARENT
+            navigationBarColor = Color.TRANSPARENT
+        }
+
+        dialog.setCanceledOnTouchOutside(false)
+
+        val verifyButton = dialog.findViewById<LinearLayout>(R.id.verifylayout)
+        val cancel = dialog.findViewById<ImageView>(R.id.cancel)
+        val resendlayout = dialog.findViewById<RelativeLayout>(R.id.resendlayout)
+        val resendtxt = dialog.findViewById<TextView>(R.id.resendtxt)
+        val timer = dialog.findViewById<TextView>(R.id.timer)
+        val subtitle = dialog.findViewById<TextView>(R.id.text_subtitle)
+        val pinView = dialog.findViewById<PinView>(R.id.pinview)
+
+        subtitle.text = "Enter four digit OTP send on your registered Email ID"
+
+        startOtpTimer(resendtxt, timer)
+
+        cancel.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        resendlayout.setOnClickListener {
+            if (isInternetAvailable(this@LoginPage)) {
+                var retailerCode = reatilerCode
+                hitApiForResendOTPVerifyRetailer(retailerCode)
+                startOtpTimer(resendtxt, timer)
+            }
+            else {
+                Toast.makeText(this, "Please check your internet connection!!", Toast.LENGTH_SHORT).show()
+            }
+
+        }
+
+        verifyButton.setOnClickListener {
+            val enteredOTP = pinView.getText().toString()
+            if (enteredOTP.length == 4) {
+                var retailerCode = reatilerCode
+                hitApiForOTPVerifyRetailer(retailerCode, enteredOTP,emailOfMobile,password)
+            } else {
+                Toast.makeText(this, "Please enter complete OTP", Toast.LENGTH_SHORT).show()
+            }
+
+        }
+
+        dialog.show()
+
+    }
+
+
+
+    fun startOtpTimer(resendtxt: TextView, timer: TextView) {
         resendtxt.visibility = View.INVISIBLE
         timer.visibility = View.VISIBLE
 
@@ -514,7 +564,6 @@ class LoginPage : BaseActivity() {
     }
 
 
-
     private fun setupOTPFocus(current: EditText, next: EditText?, previous: EditText? = null) {
         current.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -523,6 +572,7 @@ class LoginPage : BaseActivity() {
                     next?.requestFocus()
                 }
             }
+
             override fun afterTextChanged(s: Editable?) {}
         })
 
@@ -539,10 +589,11 @@ class LoginPage : BaseActivity() {
     }
 
 
-    fun hitApiForSendOTP(mailidormobile: String,type : String) {
+    fun hitApiForSendOTP(mailidormobile: String, type: String) {
         var sendOtpReq = SendOtpReq(
             mobileoremailId = mailidormobile,
-            otpType = type)
+            otpType = type
+        )
         Log.d("SendOTPREQ", Gson().toJson(sendOtpReq))
 
         viewModel.sendOTPReq(sendOtpReq).observe(this) { resources ->
@@ -558,11 +609,14 @@ class LoginPage : BaseActivity() {
                                 if (response.statuss.equals("True")) {
                                     var firstName = "Customer"
                                     var customerName = firstName
-                                    hitApiForMobVerify(mailidormobile,customerName,otp)
-                                }
-                                else{
-                                    Toast.makeText(this@LoginPage,response.message,Toast.LENGTH_SHORT).show()
-                                    if( ConstantClass.dialog.isShowing){
+                                    hitApiForMobVerify(mailidormobile, customerName, otp)
+                                } else {
+                                    Toast.makeText(
+                                        this@LoginPage,
+                                        response.message,
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    if (ConstantClass.dialog.isShowing) {
                                         ConstantClass.dialog.dismiss()
                                     }
                                 }
@@ -573,7 +627,11 @@ class LoginPage : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
-                        Toast.makeText(this@LoginPage, resources.message ?: "Error verifying OTP", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@LoginPage,
+                            resources.message ?: "Error verifying OTP",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -588,13 +646,14 @@ class LoginPage : BaseActivity() {
     }
 
 
-    fun hitApiForMobVerify(mobnumber:String,customerName:String,OTP:String){
+    fun hitApiForMobVerify(mobnumber: String, customerName: String, OTP: String) {
         // hint: Dear  Naim Khan, Your OTP for Verification is 1234. Please Do Not Share the OTP With Anyone. Thanks For Using BOSOQ BOS CENTER
-        var message = "Dear $customerName, Your OTP for Verification is $OTP. Please Do Not Share the OTP With Anyone. Thanks For Using BOSOQ BOS CENTER"
+        var message =
+            "Dear $customerName, Your OTP for Verification is $OTP. Please Do Not Share the OTP With Anyone. Thanks For Using BOSOQ BOS CENTER"
 
-        lifecycleScope.launch{
+        lifecycleScope.launch {
             try {
-                val response =api.sendSMSForVerifyMob(
+                val response = api.sendSMSForVerifyMob(
                     apikey = ConstantClass.SMS_API_KEY,
                     senderid = ConstantClass.SMS_SENDER_ID,
                     templateid = ConstantClass.SMS_TEMPLATE_ID,
@@ -603,17 +662,20 @@ class LoginPage : BaseActivity() {
                 )
 
                 if (response!!.isSuccessful) {
-                    Toast.makeText(this@LoginPage,"Otp sent on your mobile number!!" , Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@LoginPage,
+                        "Otp sent on your mobile number!!",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     val loanData = response.body()
 
-                    if(ConstantClass.dialog!=null && ConstantClass.dialog.isShowing){
+                    if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
                         ConstantClass.dialog.dismiss()
-                        OpenPopUpForVeryfyOTP(mobnumber,OTP)
+                        OpenPopUpForVeryfyOTP(mobnumber, OTP)
                     }
 
                     Log.d("API_SUCCESS", loanData.toString())
-                }
-                else {
+                } else {
                     Log.e("API_ERROR", response.errorBody()?.string() ?: "Unknown error")
                 }
 
@@ -624,7 +686,141 @@ class LoginPage : BaseActivity() {
     }
 
 
-    fun hitApiForOTPVerify(mobileOrEmailID: String, otp: String,message: String) {
+    fun hitApiForResendOTPVerifyRetailer(reatilerCode: String) {
+        val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+
+        var verifyotpreq = RetailerLoginOtpResendRequest(
+            retailerCode = reatilerCode,
+            deviceId = deviceId
+        )
+        Log.d("VerifyOTPReq", Gson().toJson(verifyotpreq))
+
+        viewModel.getRetailerResendLoginOtp(verifyotpreq).observe(this) { resources ->
+            resources.let {
+                when (it.apiStatus) {
+                    ApiStatus.SUCCESS -> {
+                        it.data?.let { users ->
+                            ConstantClass.dialog.dismiss()
+                            if(users.isSuccessful){
+                                users.body()?.let { response ->
+                                    var errorCode = response.code
+                                    var getData = response.data
+
+                                    if(errorCode==200 && getData!=null){
+                                        Toast.makeText(this@LoginPage, response.message.toString(), Toast.LENGTH_SHORT).show()
+                                    }
+                                    else{
+                                        Toast.makeText(this@LoginPage, response.message.toString(), Toast.LENGTH_SHORT).show()
+                                    }
+
+                                    Log.d("VerifyOTPRes", response.message.toString())
+                                }
+                            }else {
+                                var error = users.errorBody()?.string() ?: "Unknown error"
+                                Toast.makeText(this@LoginPage, error.toString(), Toast.LENGTH_SHORT).show()
+                            }
+
+                        }
+                    }
+
+                    ApiStatus.ERROR -> {
+                        ConstantClass.dialog.dismiss()
+                        Toast.makeText(this@LoginPage, resources.message ?: "Error verifying OTP", Toast.LENGTH_SHORT).show()
+                    }
+
+                    ApiStatus.LOADING -> {
+                        ConstantClass.OpenPopUpForVeryfyOTP(this)
+
+                    }
+                }
+            }
+        }
+
+    }
+
+
+    fun hitApiForOTPVerifyRetailer(reatilerCode: String, OTP: String, emailOfMobile: String, password: String) {
+        val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
+
+        var verifyotpreq = RetailerLoginOtpRequest(
+            retailerCode = reatilerCode,
+            otp = OTP,
+            deviceId = deviceId,
+            token = FireBaseToken
+        )
+        Log.d("VerifyOTPReq", Gson().toJson(verifyotpreq))
+
+        viewModel.getRetailerLoginOTPRequest(verifyotpreq).observe(this) { resources ->
+            resources.let {
+                when (it.apiStatus) {
+                    ApiStatus.SUCCESS -> {
+                        it.data?.let { users ->
+                            ConstantClass.dialog.dismiss()
+                            if(users.isSuccessful){
+                                users.body()?.let { response ->
+                                    var errorCode = response.code
+                                    var getData = response.data
+
+                                    if(errorCode==200 && getData!=null){
+
+                                        preference.setStringValue(ConstantClass.CustomerCode, getData.customerCode.toString())
+                                        preference.setStringValue(ConstantClass.RetailerCode, getData.retailerCode.toString())
+                                        preference.setStringValue(ConstantClass.FirstName, getData.firstName.toString())
+                                        preference.setStringValue(ConstantClass.LastName, getData.lastName.toString())
+                                        preference.setStringValue(ConstantClass.CustomerMobileNumber, getData.mobileNo.toString())
+                                        preference.setStringValue(ConstantClass.CustomerEmailID, getData.emailID.toString())
+                                        preference.setBooleanValue(ConstantClass.LoggedIn, true)
+                                        preference.setStringValue(ConstantClass.LoginType, loginType)
+                                        preference.setStringValue(ConstantClass.LoginMobileorMailid, emailOfMobile)
+                                        preference.setStringValue(ConstantClass.Loginpassword, password)
+                                        preference.setStringValue(ConstantClass.ClientCode, "CMP0005")
+
+                                        val req = NotificationSendTokenRequest(
+                                            deviceType = ConstantClass.DeviceType,
+                                            clientCode = preference.getStringValue(ConstantClass.ClientCode, ""),
+                                            customerCode = getData.customerCode.toString(),
+                                            retailerCode = getData.retailerCode.toString(),
+                                            fcmToken = FireBaseToken
+                                        )
+                                        sendDataOnServerForUploadToken(req)
+
+                                        val  intent = Intent(this@LoginPage, DashBoard::class.java)
+                                             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                             startActivity(intent)
+                                             finish()
+
+                                    }
+                                    else{
+                                        Toast.makeText(this@LoginPage, response.message.toString(), Toast.LENGTH_SHORT).show()
+                                    }
+
+                                    Log.d("VerifyOTPRes", response.message.toString())
+                                }
+                            }else {
+                                var error = users.errorBody()?.string() ?: "Unknown error"
+                                Toast.makeText(this@LoginPage, error.toString(), Toast.LENGTH_SHORT).show()
+                            }
+
+                        }
+                    }
+
+                    ApiStatus.ERROR -> {
+                        ConstantClass.dialog.dismiss()
+                        Toast.makeText(this@LoginPage, resources.message ?: "Error verifying OTP", Toast.LENGTH_SHORT).show()
+                    }
+
+                    ApiStatus.LOADING -> {
+                        ConstantClass.OpenPopUpForVeryfyOTP(this)
+
+                    }
+                }
+            }
+        }
+
+    }
+
+
+    fun hitApiForOTPVerify(mobileOrEmailID: String, otp: String, message: String) {
         var verifyotpreq = VerifyOTPReq(
             mobileormailid = mobileOrEmailID,
             otp = otp,
@@ -641,7 +837,7 @@ class LoginPage : BaseActivity() {
                                 Log.d("VerifyOTPRes", response.message)
                                 if (response.statuss.equals("True")) {
 
-                                    hitApiForLogin(mobileOrEmailID,"")
+                                    hitApiForCustomerLogin(mobileOrEmailID, "")
 
                                     if (dialog != null && dialog.isShowing) {
                                         dialog.dismiss()
@@ -656,7 +852,11 @@ class LoginPage : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
-                        Toast.makeText(this@LoginPage, resources.message ?: "Error verifying OTP", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@LoginPage,
+                            resources.message ?: "Error verifying OTP",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -671,7 +871,7 @@ class LoginPage : BaseActivity() {
     }
 
 
-    fun hitApiForReSendOTP(mailidormobile: String,type : String) {
+    fun hitApiForReSendOTP(mailidormobile: String, type: String) {
         var sendOtpReq = SendOtpReq(
             mobileoremailId = mailidormobile,
             otpType = type
@@ -685,17 +885,21 @@ class LoginPage : BaseActivity() {
                             users.body()?.let { response ->
                                 ConstantClass.dialog.dismiss()
                                 Log.d("SendRes", response.message)
-                                        var otp = response.value
-                                        var customerName = "Customer"
-                                        hitApiForResendMobVerify(mailidormobile,customerName,otp)
-                                    }
+                                var otp = response.value
+                                var customerName = "Customer"
+                                hitApiForResendMobVerify(mailidormobile, customerName, otp)
+                            }
                         }
 
                     }
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
-                        Toast.makeText(this@LoginPage, resources.message ?: "Error resending OTP", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@LoginPage,
+                            resources.message ?: "Error resending OTP",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -709,44 +913,48 @@ class LoginPage : BaseActivity() {
     }
 
 
-    fun hitApiForResendMobVerify(mobnumber:String,customerName:String,OTP:String){
-    // hint: Dear  Naim Khan, Your OTP for Verification is 1234. Please Do Not Share the OTP With Anyone. Thanks For Using BOSOQ BOS CENTER
-    var message = "Dear $customerName, Your OTP for Verification is $OTP. Please Do Not Share the OTP With Anyone. Thanks For Using BOSOQ BOS CENTER "
+    fun hitApiForResendMobVerify(mobnumber: String, customerName: String, OTP: String) {
+        // hint: Dear  Naim Khan, Your OTP for Verification is 1234. Please Do Not Share the OTP With Anyone. Thanks For Using BOSOQ BOS CENTER
+        var message =
+            "Dear $customerName, Your OTP for Verification is $OTP. Please Do Not Share the OTP With Anyone. Thanks For Using BOSOQ BOS CENTER "
 
-    lifecycleScope.launch{
-        try {
-            val response =api.sendSMSForVerifyMob(
-                apikey = ConstantClass.SMS_API_KEY,
-                senderid = ConstantClass.SMS_SENDER_ID,
-                templateid = ConstantClass.SMS_TEMPLATE_ID,
-                mobnumber = mobnumber,
-                message = message)
+        lifecycleScope.launch {
+            try {
+                val response = api.sendSMSForVerifyMob(
+                    apikey = ConstantClass.SMS_API_KEY,
+                    senderid = ConstantClass.SMS_SENDER_ID,
+                    templateid = ConstantClass.SMS_TEMPLATE_ID,
+                    mobnumber = mobnumber,
+                    message = message
+                )
 
-            if (response!!.isSuccessful) {
-                Toast.makeText(this@LoginPage,"Otp sent on your mobile number!!" , Toast.LENGTH_SHORT).show()
-                val loanData = response.body()
+                if (response!!.isSuccessful) {
+                    Toast.makeText(
+                        this@LoginPage,
+                        "Otp sent on your mobile number!!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    val loanData = response.body()
 
-                if(ConstantClass.dialog!=null && ConstantClass.dialog.isShowing){
-                    ConstantClass.dialog.dismiss()
+                    if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
+                        ConstantClass.dialog.dismiss()
+                    }
+                    Log.d("API_SUCCESS", loanData.toString())
+                } else {
+                    Log.e("API_ERROR", response.errorBody()?.string() ?: "Unknown error")
                 }
-                Log.d("API_SUCCESS", loanData.toString())
-            }
-            else {
-                Log.e("API_ERROR", response.errorBody()?.string() ?: "Unknown error")
+            } catch (e: Exception) {
+                Log.e("API_EXCEPTION", e.toString())
             }
         }
-        catch (e: Exception) {
-            Log.e("API_EXCEPTION", e.toString())
-        }
-    }
 
-}
+    }
 
 
 
     @SuppressLint("SetTextI18n")
-    fun OpenPopUpForVAlert(message : String ?){
-        dialog = Dialog(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen)
+    fun OpenPopUpForVAlert(message: String?) {
+        dialog = Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.signoutalert)
 
@@ -764,10 +972,12 @@ class LoginPage : BaseActivity() {
         val txt = dialog.findViewById<TextView>(R.id.dialog_message)
         val image = dialog.findViewById<ImageView>(R.id.imageview)
 
-        image.visibility=View.VISIBLE
-        done.visibility= View.GONE
+        image.visibility = View.VISIBLE
+        done.visibility = View.GONE
 
-        txt.text=/*"Your loan application was created, but you must validate your PAN  again since 90 days have passed"*/ message
+        txt.text =
+                /*"Your loan application was created, but you must validate your PAN  again since 90 days have passed"*/
+            message
 
         cancel.setOnClickListener {
             dialog.dismiss()
@@ -778,7 +988,7 @@ class LoginPage : BaseActivity() {
     }
 
 
-    fun getFirebaseToken(){
+    fun getFirebaseToken() {
         FirebaseMessaging.getInstance().token
             .addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
@@ -786,12 +996,12 @@ class LoginPage : BaseActivity() {
                     return@addOnCompleteListener
                 }
                 val fcmToken = task.result
-                FireBaseToken= fcmToken
-                preference.setStringValue(ConstantClass.FCMTOKEN,FireBaseToken)
+                FireBaseToken = fcmToken
+                preference.setStringValue(ConstantClass.FCMTOKEN, FireBaseToken)
                 //sendDataToEmail("FCM Token: $fcmToken") // for testing
                 Log.d("FCM_TOKEN", fcmToken)
             }
-       }
+    }
 
 
     // for tsting ........................
@@ -821,7 +1031,9 @@ class LoginPage : BaseActivity() {
     }
 
 
-    fun sendDataOnServerForUploadToken(request : NotificationSendTokenRequest){
+    fun sendDataOnServerForUploadToken(request: NotificationSendTokenRequest) {
+        Log.d("savetoken", Gson().toJson(request))
+
         viewModel.NotificationSendTokenRequest(request).observe(this) { it ->
 
             when (it.apiStatus) {
@@ -829,7 +1041,7 @@ class LoginPage : BaseActivity() {
 
                 }
 
-                ApiStatus.SUCCESS ->{
+                ApiStatus.SUCCESS -> {
                     val response = it.data?.body()
                     Log.d("LoginResponse", Gson().toJson(response))
 
@@ -848,5 +1060,6 @@ class LoginPage : BaseActivity() {
         }
 
     }
+
 
 }

@@ -6,12 +6,15 @@ import com.bosandroidapp.oqmobilefinance.data.enach.EnachDateUploadReq
 import com.bosandroidapp.oqmobilefinance.data.gst.GstRequest
 import com.bosandroidapp.oqmobilefinance.data.model.AddBankAccountReq
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerEmiStatusReq
+import com.bosandroidapp.oqmobilefinance.data.model.CustomerSearchForShortCutLoanRequest
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerlocationUploadReq
 import com.bosandroidapp.oqmobilefinance.data.model.DueOverdueRequest
 import com.bosandroidapp.oqmobilefinance.data.model.GenerateAccessTokenRequest
 import com.bosandroidapp.oqmobilefinance.data.model.GetRetailerLedgerReq
 import com.bosandroidapp.oqmobilefinance.data.model.HoldAmountWithdrawReq
 import com.bosandroidapp.oqmobilefinance.data.model.LowCibilCustomerReportReq
+import com.bosandroidapp.oqmobilefinance.data.model.RetailerLoginOtpRequest
+import com.bosandroidapp.oqmobilefinance.data.model.RetailerLoginOtpResendRequest
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerPerCustomerListShortCutForLoanReq
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletAmountReq
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletPayoutAtMakePaymentTimeReq
@@ -147,6 +150,10 @@ class AuthRepository(private val apiInterface: ApiInterface) {
 
   suspend fun getlogin(req: LoginReq) = apiInterface.login(req)
 
+  suspend fun getRetailerLoginOtp(req: RetailerLoginOtpRequest) = apiInterface.retailerLoginOtp(req)
+
+  suspend fun retailerResendLoginOtp(req: RetailerLoginOtpResendRequest) = apiInterface.retailerResendLoginOtp(req)
+
   suspend fun getlogout(req: LogoutReq) = apiInterface.logout(req)
 
   suspend fun sendOTP(req: SendOtpReq) = apiInterface.sendOTP(req)
@@ -263,6 +270,7 @@ class AuthRepository(private val apiInterface: ApiInterface) {
   suspend fun getCustomerListForShortCutLoanCreateProcess(req: RetailerPerCustomerListShortCutForLoanReq) = apiInterface.getCustomerListForShortCutLoanCreateProcess(req)
 
 
+  suspend fun getCustomerDataForSearch(req: CustomerSearchForShortCutLoanRequest) = apiInterface.getCustomerDataForSearch(req)
 
 
   suspend fun getCustomShortCutDataRequest(req: ManageCustomerStepWiseReq): Response<RegisterCustomerResp> {

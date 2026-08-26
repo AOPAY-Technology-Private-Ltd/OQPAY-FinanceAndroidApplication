@@ -14,6 +14,8 @@ import com.bosandroidapp.oqmobilefinance.data.loancharge.LoanChargeResp
 import com.bosandroidapp.oqmobilefinance.data.model.AddedBankListResp
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerEmiStatusReq
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerEmiStatusResponse
+import com.bosandroidapp.oqmobilefinance.data.model.CustomerSearchForShortCutLoanRequest
+import com.bosandroidapp.oqmobilefinance.data.model.CustomerSearchForShortCutLoanResponse
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerlocationUploadReq
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerlocationUploadResp
 import com.bosandroidapp.oqmobilefinance.data.model.DueOverdueRequest
@@ -24,8 +26,12 @@ import com.bosandroidapp.oqmobilefinance.data.model.GetRetailerLedgerReq
 import com.bosandroidapp.oqmobilefinance.data.model.GetRetailerLedgerResponse
 import com.bosandroidapp.oqmobilefinance.data.model.HoldAmountWithdrawReq
 import com.bosandroidapp.oqmobilefinance.data.model.HoldAmountWithdrawResp
+import com.bosandroidapp.oqmobilefinance.data.model.LoginResponse
 import com.bosandroidapp.oqmobilefinance.data.model.LowCibilCustomerReportReq
 import com.bosandroidapp.oqmobilefinance.data.model.LowCibilCustomerReportResp
+import com.bosandroidapp.oqmobilefinance.data.model.RetailerLoginOtpRequest
+import com.bosandroidapp.oqmobilefinance.data.model.RetailerLoginOtpResendRequest
+import com.bosandroidapp.oqmobilefinance.data.model.RetailerLoginOtpResponse
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerPerCustomerListShortCutForLoanReq
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerPerCustomerListShortCutForLoanResponse
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletAmountReq
@@ -170,8 +176,22 @@ interface ApiInterface {
         ):Response<RegistrationRes>
 
 
+
     @POST("api/V1/OQFinance/Login")
-    suspend fun login(@Body req: LoginReq): Response<RegistrationRes>?
+    suspend fun login(@Body req: LoginReq): Response<LoginResponse>?
+
+
+
+    // retailer sent otp for verify and login
+
+    @POST("api/V1/OQFinance/VerifyRetailerLoginOTP")
+    suspend fun retailerLoginOtp(@Body req: RetailerLoginOtpRequest): Response<RetailerLoginOtpResponse>?
+
+
+
+    // retailer resend otp for verify and login
+    @POST("api/V1/OQFinance/ResendLoginOTP")
+    suspend fun retailerResendLoginOtp(@Body req: RetailerLoginOtpResendRequest): Response<RetailerLoginOtpResponse>?
 
 
     @POST("api/V1/OQFinance/Logout")
@@ -730,6 +750,7 @@ interface ApiInterface {
 
 
 
+
     // upload invoice file...............
     @Multipart
     @POST("api/V1/OQFinance/UpdateCustomerPhotoPath")
@@ -746,6 +767,13 @@ interface ApiInterface {
 
     @POST("api/V1/OQFinance/GetCustomerByRetailer")
     suspend fun getCustomerListForShortCutLoanCreateProcess(@Body req : RetailerPerCustomerListShortCutForLoanReq) : Response<RetailerPerCustomerListShortCutForLoanResponse>?
+
+
+
+    // search customer for shortcut flow ................................................................................................
+
+    @POST("api/V1/OQFinance/RetailerSearchCustomer")
+    suspend fun getCustomerDataForSearch(@Body req : CustomerSearchForShortCutLoanRequest) : Response<CustomerSearchForShortCutLoanResponse>?
 
 
 }

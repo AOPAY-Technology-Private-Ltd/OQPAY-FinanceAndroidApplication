@@ -6,11 +6,14 @@ import androidx.lifecycle.liveData
 import com.bosandroidapp.oqmobilefinance.data.enach.EnachDateUploadReq
 import com.bosandroidapp.oqmobilefinance.data.model.AddBankAccountReq
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerEmiStatusReq
+import com.bosandroidapp.oqmobilefinance.data.model.CustomerSearchForShortCutLoanRequest
 import com.bosandroidapp.oqmobilefinance.data.model.DueOverdueRequest
 import com.bosandroidapp.oqmobilefinance.data.model.GenerateAccessTokenRequest
 import com.bosandroidapp.oqmobilefinance.data.model.GetRetailerLedgerReq
 import com.bosandroidapp.oqmobilefinance.data.model.HoldAmountWithdrawReq
 import com.bosandroidapp.oqmobilefinance.data.model.LowCibilCustomerReportReq
+import com.bosandroidapp.oqmobilefinance.data.model.RetailerLoginOtpRequest
+import com.bosandroidapp.oqmobilefinance.data.model.RetailerLoginOtpResendRequest
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerPerCustomerListShortCutForLoanReq
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletAmountReq
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletPayoutAtMakePaymentTimeReq
@@ -92,6 +95,35 @@ class AuthenticationViewModel (private val repository: AuthRepository):ViewModel
             emit(ApiResponse.error(data = null, message = e.message ?: "Unknown error occurred"))
         }
     }
+
+
+    fun getRetailerLoginOTPRequest(req: RetailerLoginOtpRequest) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            emit(handleApiResponse(repository.getRetailerLoginOtp(req), "Login"))
+        } catch (e: HttpException) {
+            emit(ApiResponse.error(data = null, message = "Server Error: ${e.code()}"))
+        } catch (e: IOException) {
+            emit(ApiResponse.error(data = null, message = "Network error! Please check your connection."))
+        } catch (e: Exception) {
+            emit(ApiResponse.error(data = null, message = e.message ?: "Unknown error occurred"))
+        }
+    }
+
+
+    fun getRetailerResendLoginOtp(req: RetailerLoginOtpResendRequest) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            emit(handleApiResponse(repository.retailerResendLoginOtp(req), "Login"))
+        } catch (e: HttpException) {
+            emit(ApiResponse.error(data = null, message = "Server Error: ${e.code()}"))
+        } catch (e: IOException) {
+            emit(ApiResponse.error(data = null, message = "Network error! Please check your connection."))
+        } catch (e: Exception) {
+            emit(ApiResponse.error(data = null, message = e.message ?: "Unknown error occurred"))
+        }
+    }
+
 
     fun getLogout(req: LogoutReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
@@ -435,6 +467,19 @@ class AuthenticationViewModel (private val repository: AuthRepository):ViewModel
             emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
+
+
+
+
+    fun getCustomerDataForSearch(req: CustomerSearchForShortCutLoanRequest) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            emit(handleApiResponse(repository.getCustomerDataForSearch(req), "Customer List"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
+        }
+    }
+
 
 
     fun uploadCustomerListForShortCutLoanCreateProcess(req: ManageCustomerStepWiseReq) = liveData(Dispatchers.IO) {

@@ -590,19 +590,23 @@ class NewCustomerRegistrationPage : BaseActivity() {
             onBackPressed()
         }
 
-        binding.acceptTermConditionCheck.setOnClickListener {
 
+
+        binding.acceptTermConditionCheck.setOnClickListener {
             OpenPopUpForTermCondition()
 
         }
+
 
         binding.cameraicon.setOnClickListener {
             checkCameraPermissionAndOpenCamera()
         }
 
+
         binding.back.setOnClickListener {
             OpenPopUpForVAlert()
         }
+
 
         binding.verifymobilenumber.setOnClickListener {
             clickemailId = false
@@ -627,6 +631,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
         }
 
+
         binding.alternateverifymobilenumber.setOnClickListener {
             clickemailId = false
             clickalternatemobile = true
@@ -645,6 +650,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
             }
 
         }
+
 
         binding.verifyEmailId.setOnClickListener {
             clickemailId = true
@@ -969,6 +975,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
     }
 
 
+
     fun startOtpTimer(resendtxt: TextView, timer: TextView) {
         resendtxt.visibility = View.INVISIBLE
         timer.visibility = View.VISIBLE
@@ -990,6 +997,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
     }
 
 
+
     private fun createImageFile(): File {
         val fileName = "IMG_${System.currentTimeMillis()}"
         val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
@@ -997,11 +1005,13 @@ class NewCustomerRegistrationPage : BaseActivity() {
     }
 
 
+
     fun clickCameraForUploadDocument() {
         val photoFile = createImageFile()
         photoUri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", photoFile)
         cameraLauncher.launch(photoUri!!)
     }
+
 
 
     private fun checkCameraPermissionAndOpenCamera() {
@@ -1015,6 +1025,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
             )
         }
     }
+
 
 
     fun hitApiForReSendOTP(mailidormobile: String, type: String) {
@@ -1066,6 +1077,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
             }
         }
     }
+
 
 
     fun hitApiForSendOTP(mailidormobile: String, type: String) {
@@ -1122,6 +1134,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
             }
         }
     }
+
 
 
     fun hitApiForOTPVerify(mobileOrEmailID: String, otp: String, message: String) {
@@ -1196,6 +1209,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
         }
 
     }
+
 
 
     fun isValidForm(
@@ -1339,7 +1353,9 @@ class NewCustomerRegistrationPage : BaseActivity() {
             binding.cityname.error = null
         }
 
+
         if (!checkcityName) return Pair(false, "Please enter a valid city.")
+
 
         if (primarymobverified.isBlank()|| primarymobverified.isNotBlank() && !primarymobverified.equals("yes")){
             binding.mobileNumber.error= "Please verify your primary mobile number first."
@@ -1349,7 +1365,8 @@ class NewCustomerRegistrationPage : BaseActivity() {
             binding.mobileNumber.error = null
         }
 
-        if (imagepath!!.isBlank()){
+
+        if (imagepath!!.isNullOrBlank()){
             binding.imagenotuploaded.visibility = View.VISIBLE
             scrollToView(binding.detaillayout, binding.imagenotuploaded)
             return Pair(false, "Please upload the customer photo.")
@@ -1357,6 +1374,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
         else{
             binding.imagenotuploaded.visibility = View.GONE
         }
+
 
         if (!isAccepted) return Pair(false, "Please accept the terms and conditions.")
 
@@ -1558,6 +1576,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
         return false
     }
 
+
     fun setDataIfGeetingPanVerification(){
 
         Log.d("PanVerification", "PanFirstName: $PanFirstName")
@@ -1586,20 +1605,25 @@ class NewCustomerRegistrationPage : BaseActivity() {
             binding.firstName.setText(AadhaarName)
         }
 
+
         binding.middleName.setText(PanMiddleName)
         binding.lastName.setText(PanLastName)
+
 
         if(binding.verifyiconphonenumber.visibility==View.GONE){
             binding.mobileNumber.setText(PanMobileNumber)
         }
 
+
         binding.emailId.setText(PanEmailId)
+
 
         if(PanBuilding.isNotEmpty()){
             binding.flathouseno.setText(PanBuilding)
         }else{
             binding.flathouseno.setText(AadharHouse)
         }
+
 
         if(PanAddress.isNotEmpty()){
             binding.areasector.setText(PanAddress)
@@ -1608,11 +1632,13 @@ class NewCustomerRegistrationPage : BaseActivity() {
             binding.areasector.setText(AadharStreet)
         }
 
+
         if(PanPinCode.isNotEmpty()){
             binding.pincode.setText(PanPinCode)
         }else{
             binding.pincode.setText(AadharPin)
         }
+
 
         if(PanState.isNotEmpty()){
             binding.statename.setText(PanState)
@@ -1629,6 +1655,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
             binding.currentaddress.setText(AadharLoc)
         }
 
+
         binding.cityname.setText(PanCity)
         CustCountry= PanCountry
 
@@ -1639,6 +1666,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
         else{
             binding.mobileNumber.isEnabled= true
         }
+
 
         if(PanEmailId.isNotEmpty()){
             binding.emailId.isEnabled= false
@@ -1661,9 +1689,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                 }
             }
         }
-        else {
-            customerImagePath = ""
-        }
+
 
 
         if(binding.firstName.text.toString().isNotEmpty()){
@@ -1697,6 +1723,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
 
     }
+
 
 
     fun hitApiForLogin() {
@@ -1768,6 +1795,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
     }
 
 
+
     fun hitApiForRetailerLogout() {
         var loginRequest = LogoutReq(
             retailerCode = preference.getStringValue(ConstantClass.RetailerCode, ""),
@@ -1805,6 +1833,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
         }
 
     }
+
 
 
     fun hitApiForCibilReport() {
@@ -1867,7 +1896,6 @@ class NewCustomerRegistrationPage : BaseActivity() {
         }
 
     }
-
 
 
     fun hitApiForCibilScore(otp: String) {
@@ -2044,7 +2072,6 @@ class NewCustomerRegistrationPage : BaseActivity() {
         }
 
     }
-
 
 
     fun hitApiForCustomerRegister(cibilScoremsg: String, title: String) {
@@ -2280,7 +2307,6 @@ class NewCustomerRegistrationPage : BaseActivity() {
         }
 
     }
-
 
 
 

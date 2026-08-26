@@ -81,8 +81,7 @@
             android:layout_height="match_parent"
             android:layout_margin="@dimen/_5sdp"
             android:layout_weight=".1"
-            android:src="@drawable/searchicon"
-            app:tint="@color/grey" />
+            android:src="@drawable/searchicon" />
 
     </LinearLayout>
 

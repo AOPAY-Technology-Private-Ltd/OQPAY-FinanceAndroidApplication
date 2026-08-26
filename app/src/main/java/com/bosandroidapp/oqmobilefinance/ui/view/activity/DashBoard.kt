@@ -266,8 +266,9 @@ class DashBoard : BaseActivity() {
             }
 
             hitApiForLogin(preference.getStringValue(ConstantClass.RetailerCode, ""))
+
             var request = SendNotificationFeatureNameRequest(
-                clientCode = ConstantClass.ClientCode,
+                clientCode = preference.getStringValue(ConstantClass.ClientCode,""),
                 customerCode =  preference.getStringValue(ConstantClass.CustomerCode,""),
                 retailerCode = preference.getStringValue(ConstantClass.RetailerCode,""),
                 title = "EMI Overdue",
@@ -922,6 +923,7 @@ class DashBoard : BaseActivity() {
         WorkManager.getInstance(this).enqueueUniquePeriodicWork("EMI_ALERT_WORK", ExistingPeriodicWorkPolicy.UPDATE, workRequest)
     }
 
+
     fun hitApiForCustomerLogin(retailerOrCustomerCode: String) {
 
        var deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
@@ -963,6 +965,8 @@ class DashBoard : BaseActivity() {
 
     }
 
+
+
     fun hitApiForLogin(retailerOrCustomerCode: String) {
 
         var deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
@@ -1001,6 +1005,7 @@ class DashBoard : BaseActivity() {
         }
 
 
+
         var request = ValidateSessionRequest(
             preference.getStringValue(ConstantClass.RetailerCode, ""),
             deviceId,
@@ -1034,7 +1039,6 @@ class DashBoard : BaseActivity() {
         }
 
     }
-
 
 
     fun hitApiForRetailerLogout() {

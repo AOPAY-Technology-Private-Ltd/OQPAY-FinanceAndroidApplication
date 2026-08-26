@@ -91,8 +91,17 @@ class WalletAccountDetails : BaseActivity() {
         preference = SharedPreference(this)
         viewModel = ViewModelProvider(this, CommonViewModelFactory(AuthRepository(RetrofitClient.apiInterface)))[AuthenticationViewModel::class.java]
         reportType= "Payout"
+
+
         setView()
         setclickListner()
+
+        // for new changes hide hold amount card
+
+        binding.walletamountcard.setCardBackgroundColor(ContextCompat.getColor(this, R.color.white))
+        binding.holdamountcard.setCardBackgroundColor(ContextCompat.getColor(this, R.color.purple))
+        binding.walletamounttxt.setTextColor(resources.getColor(R.color.darkpurple))
+        binding.holdamounttxt.setTextColor(resources.getColor(R.color.white))
 
     }
 
@@ -107,14 +116,13 @@ class WalletAccountDetails : BaseActivity() {
         viewPager.isUserInputEnabled = true
         viewPager.adapter = adapter
 
-
-
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             val tabView =  LayoutInflater.from(tabLayout.context).inflate(R.layout.tab_title, null)
             val text=tabView.findViewById<TextView>(R.id.tabText)
             text.text = statusArray[position]
             tab.customView= tabView
         }.attach()
+
 
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
@@ -157,7 +165,7 @@ class WalletAccountDetails : BaseActivity() {
             binding.holdamountcard.setCardBackgroundColor(ContextCompat.getColor(this, R.color.white))
             binding.walletamounttxt.setTextColor(resources.getColor(R.color.white))
             binding.holdamounttxt.setTextColor(resources.getColor(R.color.darkpurple))
-            CheckActiveStatus = false
+            CheckActiveStatus = false // visible hold Bank payout
             reportType= "Payout"
             setView()
 
@@ -169,7 +177,7 @@ class WalletAccountDetails : BaseActivity() {
             binding.holdamountcard.setCardBackgroundColor(ContextCompat.getColor(this, R.color.purple))
             binding.walletamounttxt.setTextColor(resources.getColor(R.color.darkpurple))
             binding.holdamounttxt.setTextColor(resources.getColor(R.color.white))
-            CheckActiveStatus = true
+            CheckActiveStatus = true // visible hold amount payout
             reportType= "Holding"
             setView()
         }

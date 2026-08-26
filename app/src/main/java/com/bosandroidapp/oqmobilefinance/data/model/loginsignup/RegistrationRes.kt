@@ -30,6 +30,8 @@ data class RegistrationRes(@SerializedName("lastName")
                            val value: String = "",
                            @SerializedName("mobileNo")
                            val mobileno: String? = "",
+                           @SerializedName("clientCode")
+                           val clientCode: String? = "",
                            @SerializedName("retailerCode")
                            val retailerCode: String? = "",
                            @SerializedName("profile_Photo")

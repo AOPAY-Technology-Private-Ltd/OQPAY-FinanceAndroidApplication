@@ -2,6 +2,7 @@ package com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.reports
 
 import android.app.Dialog
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -23,6 +24,7 @@ import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
@@ -92,12 +94,14 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.Tenure
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ToBePaidAmount
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.UPIMandate
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.cacheImageAndGetUri
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.cacheImageAndGetUriForShortCutLoan
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isAccessKeyVerified
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isAggrementVerified
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isEmandateVerified
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isPannydropVerified
 import com.bosandroidapp.oqmobilefinance.data.enach.EMandateRequest
 import com.bosandroidapp.oqmobilefinance.data.enach.EnachDateUploadReq
+import com.bosandroidapp.oqmobilefinance.data.model.CustomerSearchForShortCutLoanRequest
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerShortCutDataItem
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerPerCustomerListShortCutForLoanReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.ManageCustomerStepWiseReq
@@ -109,6 +113,7 @@ import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.PanViewModelFacto
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityCustomerListForCreatingShortCutLoanProcessPageBinding
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.AppScanInstallPage
+import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.AppScanInstallPage.Companion.CustomerPhotoPath
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.AppScanInstallPage.Companion.LoanMode
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.CongratulationPage.Companion.loaneCode
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.IMEIDetailsPage
@@ -146,6 +151,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
         binding = ActivityCustomerListForCreatingShortCutLoanProcessPageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { view, insets ->
             val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(systemBarsInsets.left, 0, systemBarsInsets.right, systemBarsInsets.bottom)
@@ -175,32 +181,84 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
             }
 
             override fun onTextChanged(s: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                val search = s.toString().lowercase().trim()
-                if (search.isEmpty()) {
-                    customerAdapter.updateData(customerList)
-                } else {
-                    val result = customerList.filter {
-                        val details = it.customerDetails
-                        val loan = it.createLoanDetails
-                        details?.customerCode?.lowercase()?.contains(search) == true ||
-                                details?.firstName?.lowercase()?.contains(search) == true ||
-                                details?.lastName?.lowercase()?.contains(search) == true ||
-                                details?.primaryMobileNumber?.lowercase()?.contains(search) == true ||
-                                loan?.loanCode?.lowercase()?.contains(search) == true
-                    }
-                    customerAdapter.updateData(result)
-                }
-            }
-
-            override fun afterTextChanged(p0: Editable?) {
+                val search = s.toString().trim()
+                binding.searchIcon.imageTintList = ColorStateList.valueOf(
+                    ContextCompat.getColor(
+                        this@CustomerListForCreatingShortCutLoanProcessPage,
+                        if (search.isNullOrBlank()) R.color.grey else R.color.blue
+                    )
+                )
 
             }
+
+            override fun afterTextChanged(s: Editable?) {}
 
         })
+
+        binding.searchIcon.setOnClickListener {
+            val search = binding.searcMobile.text.toString().trim()
+            if (search.isNotEmpty()) {
+                hitApiForSearchCustomer(search)
+            } else {
+                Toast.makeText(this, "Please enter search text", Toast.LENGTH_SHORT).show()
+            }
+        }
 
         binding.back.setOnClickListener {
             finish()
         }
+
+    }
+
+
+    fun hitApiForSearchCustomer(searchtxt: String) {
+        var req = CustomerSearchForShortCutLoanRequest(
+            searchText = searchtxt
+        )
+
+        viewModel.getCustomerDataForSearch(req).observe(this) { resource ->
+            resource.let {
+                when (it.apiStatus) {
+                    ApiStatus.SUCCESS -> {
+                        ConstantClass.dialog.dismiss()
+                        it.data?.let { users ->
+                            if (users.isSuccessful) {
+                                users.body()?.let { response ->
+                                    if (response.code == 200 && response.status == true) {
+                                        customerList.clear()
+                                        response.data?.filterNotNull()?.let { customerList.addAll(it) }
+                                        var customerStaus = customerList.firstOrNull()?.customerDetails!!.activeStatus
+                                        val shortcutList = resources.getStringArray(R.array.customershortcutlist)
+                                        val position = shortcutList.indexOfFirst { it.equals(customerStaus, ignoreCase = true) }
+                                        if (position >= 0) {
+                                            binding.reporttype.setSelection(position)
+                                        }
+                                        setDataInView(customerList)
+                                    }
+                                    else {
+                                        Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage, response.message, Toast.LENGTH_SHORT).show()
+                                        customerList.clear()
+                                        setDataInView(customerList)
+                                    }
+                                }
+                            } else {
+                                Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage, "Error: ${users.message()}", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+
+                    ApiStatus.ERROR -> {
+                        ConstantClass.dialog.dismiss()
+                        Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage, resource.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
+                    }
+
+                    ApiStatus.LOADING -> {
+                        ConstantClass.OpenPopUpForVeryfyOTP(this)
+                    }
+                }
+            }
+        }
+
     }
 
 
@@ -259,27 +317,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
         binding.showCustomerreports.adapter = customerAdapter
     }
 
-    /* Search for a customer by code, name, or loan code and automatically trigger click logic if found.*/
 
-    fun searchAndHandleCustomer(query: String) {
-        val search = query.lowercase().trim()
-        val foundItem = customerList.find {
-            val details = it.customerDetails
-            val loan = it.createLoanDetails
-            details?.customerCode?.lowercase() == search ||
-                    details?.firstName?.lowercase() == search ||
-                    details?.lastName?.lowercase() == search ||
-                    "${details?.firstName?.lowercase()} ${details?.lastName?.lowercase()}" == search ||
-                    loan?.loanCode?.lowercase() == search
-        }
-
-        if (foundItem != null) {
-            handleCustomerClick(foundItem)
-        } else {
-            Toast.makeText(this, "Customer not found with: $query", Toast.LENGTH_SHORT).show()
-        }
-    }
-    
 
     private fun handleCustomerClick(item: CustomerShortCutDataItem) {
         val customerDetails = item.customerDetails
@@ -297,7 +335,11 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
 
             if (customerDetails != null) {
                 val image = ConstantClass.BASE_URL_IMAGE + customerDetails.custPhotoPath
-                CustPhotoPath = cacheImageAndGetUri(this, image)
+                CustPhotoPath = cacheImageAndGetUriForShortCutLoan(this@CustomerListForCreatingShortCutLoanProcessPage, image)
+                if(CustPhotoPath==null){
+                    CustomerPhotoPath=""
+                    CustomerPhotoPath = image
+                }
                 CustomerCodeForEnach = customerDetails.customerCode!!
                 preference.setStringValue(ConstantClass.CustomerCode, CustomerCodeForEnach)
                 CustFirstName = customerDetails.firstName!!
@@ -893,14 +935,12 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
         val retailerCode = preference.getStringValue(ConstantClass.RetailerCode, "")
 
         val reportreq = RetailerPerCustomerListShortCutForLoanReq(
-            retailerCode = retailerCode,
-            searchText = searchText
+            retailerCode = retailerCode
         )
 
         Log.d("RetailerCustomerListReq", Gson().toJson(reportreq))
 
-        viewModel.getCustomerListForShortCutLoanCreateProcess(reportreq)
-            .observe(this) { resources ->
+        viewModel.getCustomerListForShortCutLoanCreateProcess(reportreq).observe(this) { resources ->
                 when (resources.apiStatus) {
 
                     ApiStatus.SUCCESS -> {
@@ -908,7 +948,8 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
                         resources.data?.let { users ->
                             users.body()?.let { response ->
                                 Log.d("RetailerCustomerListResponse", Gson().toJson(response))
-                                customerList = (response.data ?: mutableListOf()) as MutableList<CustomerShortCutDataItem>
+                                customerList.clear()
+                                response.data?.filterNotNull()?.let { customerList.addAll(it) }
 
                                 if (customerList.isNotEmpty()) {
                                     binding.showCustomerreports.visibility = View.VISIBLE

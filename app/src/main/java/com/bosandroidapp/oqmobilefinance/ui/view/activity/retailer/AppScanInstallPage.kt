@@ -143,6 +143,7 @@ class AppScanInstallPage : BaseActivity() {
 
     companion object{
         var LoanMode=""
+        var CustomerPhotoPath=""
     }
 
     private val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
@@ -196,8 +197,16 @@ class AppScanInstallPage : BaseActivity() {
 
     fun setDataOnUi(){
             binding.username.text = CustFirstName.plus(" ").plus(CustLastName)
-            binding.customerimage.setImageURI(CustPhotoPath)
+            if(CustPhotoPath!=null){
+                binding.customerimage.setImageURI(CustPhotoPath)
+            }
+            else {
+                Glide.with(this).load(CustomerPhotoPath).
+                placeholder(R.drawable.customer).error(R.drawable.customer).into( binding.customerimage)
+            }
+
     }
+
 
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -509,6 +518,7 @@ class AppScanInstallPage : BaseActivity() {
 
                                     LoanStartDate = response.data.startDate!!
                                     LoanEndDate = response.data.endDate!!
+                                    CustomerPhotoPath=""
 
                                     startActivity(Intent(this@AppScanInstallPage, CongratulationPage::class.java))
                                     clearData()

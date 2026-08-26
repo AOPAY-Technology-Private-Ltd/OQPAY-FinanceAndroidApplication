@@ -76,7 +76,8 @@ class PayoutPage : Fragment() {
     private val bankAccountNumber: MutableList<String?> = mutableListOf()
 
     companion object {
-        var CheckActiveStatus: Boolean = false
+       /* var CheckActiveStatus: Boolean = false*/  // for changes new flow
+        var CheckActiveStatus: Boolean = true
     }
 
 
@@ -118,13 +119,17 @@ class PayoutPage : Fragment() {
         binding.walletamount.text = "₹ ".plus(WalletBalance)
         binding.holdamount.text = "₹ ".plus(HoldAmount)
 
-        if (CheckActiveStatus) {
+      /*  if (CheckActiveStatus) {
             binding.walletpayoutlayout.visibility = View.GONE
             binding.holdammountlayout.visibility = View.VISIBLE
         } else {
             binding.walletpayoutlayout.visibility = View.VISIBLE
             binding.holdammountlayout.visibility = View.GONE
-        }
+        }*/
+
+
+        binding.walletpayoutlayout.visibility = View.GONE
+        binding.holdammountlayout.visibility = View.VISIBLE
 
 
         binding.amountEdittxt.addTextChangedListener(object : TextWatcher {

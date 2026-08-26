@@ -88,6 +88,7 @@
         android:gravity="center"
         app:layout_constraintTop_toBottomOf="@id/headerlayout">
 
+
         <androidx.cardview.widget.CardView
             android:id="@+id/walletamountcard"
             android:layout_width="@dimen/_120sdp"
@@ -95,6 +96,7 @@
             app:cardBackgroundColor="@color/purple"
             app:cardCornerRadius="@dimen/_15sdp"
             app:cardUseCompatPadding="true"
+            android:visibility="gone"
             android:layout_gravity="center"
             android:layout_marginRight="@dimen/_10sdp">
 
@@ -131,6 +133,8 @@
                 android:textSize="@dimen/_11ssp"
                 android:padding="@dimen/_2sdp"
                 android:layout_margin="@dimen/_4sdp"
+                android:clickable="true"
+                android:focusable="true"
                 android:textColor="@color/darkpurple"
                 android:layout_gravity="center"/>
 

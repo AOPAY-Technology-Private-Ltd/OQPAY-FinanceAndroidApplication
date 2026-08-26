@@ -130,6 +130,8 @@ object ConstantClass {
       const val PAN_VERIFICATION_REGISTRATION_ID_OFFLINE = "AOP-554"
       const val PENNYDROP_REGISTRATION_ID_OFFLINE = "AOP-554"
 
+
+
      const val SMS_BASE_URL = "http://web.adcruxmedia.in/"
      const val PAN_BASE_URL = "https://api.aopay.in/"
      const val ONLINE_PG = "https://api.dikshifinsure.com/"
@@ -150,7 +152,7 @@ object ConstantClass {
      const val CHECKACCESSIBILITY = "checkAccessibility"
      const val LoanSuccessStatus = "success"
      const val DeviceType = "Android"
-     const val ClientCode = "CMP0005"
+     const val ClientCode = "clientcode"
      const val DefaulterEmiDebitAutoApproved ="admin"
      const val DefaulterEmiDebitPending ="retailer"
      var LoanStatus ="Pending"
@@ -513,8 +515,62 @@ object ConstantClass {
                 }
             }
 
-            // ✅ Return a content Uri (works safely for sharing / upload)
+
             FileProvider.getUriForFile(context, context.packageName + ".fileprovider",  // must match manifest
+                cacheFile
+            )
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    fun cacheImageAndGetUriForShortCutLoan(
+        context: Context,
+        imageUrl: String
+    ): Uri? {
+        return try {
+
+            val fileName = imageUrl
+                .substringAfterLast("/")
+                .substringBefore("?")
+
+            val sharedDir = File(context.cacheDir, "shared_images")
+
+            if (!sharedDir.exists()) {
+                sharedDir.mkdirs()
+            }
+
+            val cacheFile = File(sharedDir, fileName)
+
+            if (!cacheFile.exists()) {
+
+                val connection = URL(imageUrl).openConnection() as HttpURLConnection
+
+                connection.connectTimeout = 15_000
+                connection.readTimeout = 15_000
+                connection.requestMethod = "GET"
+
+                connection.connect()
+
+                if (connection.responseCode != HttpURLConnection.HTTP_OK) {
+                    connection.disconnect()
+                    return null
+                }
+
+                connection.inputStream.use { input ->
+                    FileOutputStream(cacheFile).use { output ->
+                        input.copyTo(output)
+                    }
+                }
+
+                connection.disconnect()
+            }
+
+            FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.fileprovider",
                 cacheFile
             )
 

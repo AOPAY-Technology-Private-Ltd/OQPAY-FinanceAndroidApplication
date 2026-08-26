@@ -11,8 +11,13 @@ data class RetailerPerCustomerListShortCutForLoanResponse(
 	val message: String? = null,
 
 	@field:SerializedName("status")
-	val status: String? = null
-)
+	val status: String? = null,
+
+	@field:SerializedName("code")
+    val code: Int? = null
+
+  )
+
 
 data class CustomerShortCutDataItem(
 

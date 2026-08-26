@@ -197,6 +197,7 @@ class ChooseYourRolePage : BaseActivity() {
             deviceName = DeviceName,
             manufacturer = deviceManufacturer
         )
+
         Log.d("DeviceInfoReq", Gson().toJson(request))
 
         viewModel.uploadDeviceInfo(request).observe(this) { it ->
