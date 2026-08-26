@@ -35,6 +35,7 @@ import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityPanCardVerificationPageBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerCodeHaveEligiblity
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CheckOnlineOrOffline
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ENTEREDCUSTOMERDOB
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.LoginMobileorMailid
@@ -276,9 +277,11 @@ class PanCardVerificationPage : BaseActivity() {
                             users!!.body().let { response ->
                                 ConstantClass.dialog.dismiss()
                                 Log.d("PanVerificationResp", Gson().toJson(response))
+
                                 if (response!!.httpResponseCode == 203) {
                                     Toast.makeText(this@PanCardVerificationPage, "Please enter valid pan number!!", Toast.LENGTH_SHORT).show()
                                 }
+
                                 if (response!!.httpResponseCode == 205) {
                                     Toast.makeText(this@PanCardVerificationPage, "Please enter valid pan number!!", Toast.LENGTH_SHORT).show()
                                 }
@@ -300,6 +303,7 @@ class PanCardVerificationPage : BaseActivity() {
                                     }
                                     else {
                                         PanNumber = response.result!!.pan!!
+                                        AlreadyCustomerCodeHaveEligiblity
                                         PanDOB = formattedApiDob
                                         PanFirstName = response.result!!.firstName!!
                                         PanMiddleName = response.result!!.middleName!!
@@ -319,6 +323,7 @@ class PanCardVerificationPage : BaseActivity() {
                                     }
 
                                 }
+
                                 else {
                                     Toast.makeText(this@PanCardVerificationPage, "Please enter valid pan number!!", Toast.LENGTH_SHORT).show()
                                 }

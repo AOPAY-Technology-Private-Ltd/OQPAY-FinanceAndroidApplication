@@ -93,19 +93,18 @@ import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.google.gson.Gson
 
 class RetailerEMandateVerifyPage : BaseActivity() {
-
     lateinit var binding : ActivityRetailerEmandateVerifyPageBinding
     var isEmandateVerified : String= ""
     var isPannydropVerified : String= "Yes"
     lateinit var viewModel: AuthenticationViewModel
     lateinit var panViewModel: PanViewModel
-
     lateinit var dialog: Dialog
 
 
     companion object{
         var webUrl: String? = ""
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -125,9 +124,18 @@ class RetailerEMandateVerifyPage : BaseActivity() {
         )[PanViewModel::class.java]
 
         setDataInWebView()
+        setonclicklistner()
 
     }
 
+
+    fun setonclicklistner(){
+
+        binding.back.setOnClickListener {
+            onBackPressed()
+        }
+
+    }
 
     fun setDataInWebView() {
 
@@ -238,7 +246,6 @@ class RetailerEMandateVerifyPage : BaseActivity() {
         }
 
     }
-
 
     fun hitApiForEMandateStatus(request: ENachStatusReq) {
         Log.d("eManadateStatusReq", Gson().toJson(request))
@@ -407,7 +414,6 @@ class RetailerEMandateVerifyPage : BaseActivity() {
         }
     }
 
-
     fun  hitApiForUploadEnachMandateDataResponse(request:EnachDateUploadReq,isMandate: String){
 
         Log.d("EmandateUploadreq", Gson().toJson(request))
@@ -457,7 +463,6 @@ class RetailerEMandateVerifyPage : BaseActivity() {
         }
 
     }
-
 
     fun showingRejectioneMandatePopUp(){
         dialog = Dialog(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen)

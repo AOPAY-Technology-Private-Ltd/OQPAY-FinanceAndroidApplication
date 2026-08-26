@@ -240,6 +240,7 @@ object ConstantClass {
 
      lateinit var  dialog : Dialog
 
+     var AlreadyCustomerCodeHaveEligiblity : String = ""
      var PanNumber : String = ""
      var CheckOnlineOrOffline : String = "Offline"
      var PanNumberVerified : String = "yes"
