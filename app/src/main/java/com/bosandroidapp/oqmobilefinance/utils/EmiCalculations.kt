@@ -438,7 +438,6 @@ private fun String.getGrossDate(grossPeriod: Int): String {
 }
 
 
-
 /*private fun String.isLateFeesApplicable(): Boolean {
 
     val format = "d/M/yyyy"
@@ -516,6 +515,7 @@ fun List<com.bosandroidapp.oqmobilefinance.data.model.loginsignup.CustomerDataIt
     return arr.toString()
 }
 
+
 data class LocalLoanData(
     val startDate: String,
     val paidEmi: String,
@@ -523,6 +523,7 @@ data class LocalLoanData(
     val grossPeriod: String,
     val customergrossPeriod: String
 )
+
 
 fun String.toFormattedList(): List<LocalLoanData>? {
     try {

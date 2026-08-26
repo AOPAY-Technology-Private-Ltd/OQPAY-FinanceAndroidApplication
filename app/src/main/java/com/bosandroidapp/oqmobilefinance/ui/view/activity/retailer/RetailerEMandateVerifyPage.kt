@@ -108,6 +108,7 @@ class RetailerEMandateVerifyPage : BaseActivity() {
         var webUrl: String? = ""
     }
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

@@ -59,6 +59,7 @@ data class Data(
 	val notice: String? = null
 )
 
+
 data class Customer(
 
 	@field:SerializedName("addnl5")

@@ -102,7 +102,7 @@ object ConstantClass {
 
          // Production
 
-         const val BASE_URL = "https://api.oqpay.in/"
+          const val BASE_URL = "https://api.oqpay.in/"
           const val BASE_URL_IMAGE = "https://api.oqpay.in"
 
 

@@ -598,6 +598,7 @@ interface ApiInterface {
     suspend fun geteMandateRequest(@Body req: EMandateRequest): Response<EMandateResponse>?
 
 
+
     @POST("api/AOP/Enach/V1/eMandate/getStatus")
     suspend fun geteMandateSatusRequest(@Body req: ENachStatusReq): Response<ENachStatusResp>?
 
@@ -608,6 +609,7 @@ interface ApiInterface {
 
     @POST("api/OQPay/Enach/V1/eMandate")
     suspend fun geteMandateOnlineRequest(@Body req: EMandateRequest): Response<EMandateResponse>?
+
 
 
 

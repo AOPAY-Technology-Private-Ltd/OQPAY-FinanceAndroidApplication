@@ -406,14 +406,15 @@ class DashBoard : BaseActivity() {
 
 
         binding.appBarDashBoard.deskdesign.clicktologin.setOnClickListener {
-            val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
+           /* val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
             val loanDetails = sharedPref.getString("LoanData", "")
             if(loanDetails.isNullOrBlank()){
                 Toast.makeText(this,resources.getString(R.string.customerdashboard), Toast.LENGTH_LONG).show()
             }
             else{
-                showContinueDialog()
-            }
+
+            }*/
+            showContinueDialog()
         }
 
 
