@@ -384,15 +384,9 @@ class DashBoard : BaseActivity() {
 
             var generateKey = preference.getStringValue(ConstantClass.GENERATEKEY, "")
 
+
             if (generateKey.isNotEmpty() && binding.appBarDashBoard.deskdesign.generatedkey.text != "Key Expired") {
-                val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
-                val loanDetails = sharedPref.getString("LoanData", "")
-                if(loanDetails.isNullOrBlank()){
-                    Toast.makeText(this,resources.getString(R.string.customerdashboard), Toast.LENGTH_LONG).show()
-                }
-                else {
-                   // showContinueDialog()
-                }
+                showContinueDialog()
             }
 
             else {
