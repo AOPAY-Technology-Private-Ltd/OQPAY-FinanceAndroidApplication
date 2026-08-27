@@ -56,6 +56,20 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AadharPin
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AadharState
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AadharStreet
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AadharTransactionIdNo
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerAearSector
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerAlternateEmailID
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerAlternateMobileNumber
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerCityName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerCodeHaveEligiblity
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerCurrentAddress
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerFirstName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerFlatNo
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerImage
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerLastName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerMiddleName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerPinCode
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerPrimaryMobileNumber
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerStateName
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CheckOnlineOrOffline
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CibilResponse
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CreatedByCustomerShortCut
@@ -100,6 +114,7 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanState
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.base64ToBitmap
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.bitmapToUri
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.createMultipartFromUri
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.downloadImageToTemp
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.getCityStateFromPincode
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.iisAggrementVerified
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isAggrementVerified
@@ -110,6 +125,7 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.scrollToView
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.uriToFile
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.validateLoginInput
 import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
+import com.bosandroidapp.oqmobilefinance.data.model.UpdateCustomerUploadDataReq
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
 import com.bosandroidapp.oqmobilefinance.data.model.VerifyCustomerReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LogoutReq
@@ -126,6 +142,7 @@ import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.CibilViewModel
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
+import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -183,9 +200,11 @@ class NewCustomerRegistrationPage : BaseActivity() {
                 binding.userimage.visibility = View.VISIBLE
                 binding.lockimage.visibility = View.GONE
                 binding.userimage.setImageURI(photoUri)
+
                 val imageFile = uriToFile(photoUri!!, this)
                 customerImagePath = imageFile!!.absolutePath
                 binding.imagenotuploaded.visibility = View.GONE
+
             }
             else{
                 photoUri = null
@@ -228,6 +247,13 @@ class NewCustomerRegistrationPage : BaseActivity() {
        if(CheckOnlineOrOffline.equals(ConstantClass.online)) {
            setDataIfGeetingPanVerification()
        }
+        else {
+           if(AlreadyCustomerCodeHaveEligiblity.isNotEmpty()){
+               setDataIfCustomerAlreadyExist()
+           }
+
+       }
+
         hitApiForLogin()
     }
 
@@ -738,12 +764,13 @@ class NewCustomerRegistrationPage : BaseActivity() {
                 else{
                     ConstantClass.OpenPopUpForVeryfyOTP(this)
                     
-                    if(!CustAlternateMobileNumber.isNullOrBlank()){
+                      if(!CustAlternateMobileNumber.isNullOrBlank()){
                         userScore=0f
                         
                         if(CustCountry.isNullOrBlank()){
                             CustCountry ="India"
                         }
+
                         val firstName = preference.getStringValue(ConstantClass.FirstName, "").orEmpty()
                         val lastName = preference.getStringValue(ConstantClass.LastName, "").orEmpty()
                         val safeLastName = if (!lastName.isNullOrBlank() && lastName != "null") lastName else ""
@@ -755,76 +782,114 @@ class NewCustomerRegistrationPage : BaseActivity() {
                         val aadharBackPart = saveImageToCache(this, AadharBackImageUri!!,  "AadharBackImage")
                         val PanFrontPart = saveImageToCache(this, PanFrontImageUri!!,  "PanFrontImage")
 
-                        var req = ManageCustomerStepWiseReq(
-                            mode = "INSERT" ,
-                            step = "1",
-                            rid = "",
-                            firstName = CustFirstName,
-                            middleName= CustMiddleName,
-                            lastName=CustLastName,
-                            primaryMobileNumber = CustPrimaryMobileNumber,
-                            primaryOTP = CustPrimaryOTP,
-                            primaryMobileVerified = CustPrimaryMobileVerified,
-                            alternateMobileNumber = CustAlternateMobileNumber,
-                            alternateMobileOTP = "",
-                            pAlternateMobileVerified = "no",
-                            eMailID = CusteMailID,
-                            flatNo = CustFlatNo,
-                            aearSector = CustAreaSector,
-                            pinCode = CustPinCode,
-                            currentAddress = CustCurrentAddress,
-                            stateName= CustStateName,
-                            cityName= CustCityName,
-                            country= CustCountry!!,
-                            aadharNumber = AadharNumber,
-                            aadharNumberVerified = ConstantClass.AadharVerified,
-                            panNumber = PanNumber,
-                            panNumberVerified = PanNumberVerified,
-                            brandName="",
-                            modelName="",
-                            modelVariant="",
-                            color="",
-                            sellingPrice="",
-                            downPayment="",
-                            tenure="",
-                            emiAmount="",
-                            imeiNumber1="",
-                            imeiNumber2="",
-                            accountNumber="",
-                            bankIFSCCode="",
-                            bankName="",
-                            IsPannyDrop = ConstantClass.isPannydropVerified,
-                            accountType="",
-                            branchName="",
-                            refName="",
-                            refRelationShip="",
-                            refmobileNo="",
-                            refAddress="",
-                            debitOrCreditCard="",
-                            upiMandate= ConstantClass.UPIMandate,
-                            createdBy=createdBy,
-                            membershipfees="",
-                            retailercode=preference.getStringValue(ConstantClass.RetailerCode,""),
-                            cibilScore=userScore.toString(),
-                            activeStatus = "Pending",
-                            cibilApiResponse = CibilResponse,
-                            aadhaarApiResponse = AadhaarResponse,
-                            panApiResponse = PanResponse,
-                            isAggrementVerified=isAggrementVerified,
-                            isRetailerAggrementVerified="",
-                            custPhoto_File=customerImageFile,
-                            imeiNumber1_SealPhotoPath = null,
-                            imeiNumber2_SealPhotoPath = null,
-                            imeiNumber_PhotoPath = null,
-                            invoive_Path = null,
-                            aadharFront_Path = aadharFrontPart,
-                            aadharBack_Path = aadharBackPart,
-                            panFront_Path = PanFrontPart
-                        )
+                        if(AlreadyCustomerCodeHaveEligiblity.isNotEmpty()){
 
-                        Log.d("OfflineCustomerReq", Gson().toJson(req))
+                            var req = UpdateCustomerUploadDataReq(
+                                customerCode = AlreadyCustomerCodeHaveEligiblity,
+                                updatedBy = createdBy,
+                                firstName = CustFirstName,
+                                lastName = CustLastName,
+                                primaryMobileNumber = CustPrimaryMobileNumber,
+                                primaryOTP = CustPrimaryOTP,
+                                primaryMobileVerified = CustPrimaryMobileVerified,
+                                currentAddress = CustCurrentAddress,
+                                pinCode = CustPinCode,
+                                country= CustCountry!!,
+                                stateName= CustStateName,
+                                cityName= CustCityName,
+                                aadharNumber = AadharNumber,
+                                aadharNumberVerified = ConstantClass.AadharVerified,
+                                panNumber = PanNumber,
+                                panNumberVerified = PanNumberVerified,
+                                IsAggrementVerified = isAggrementVerified,
+                                memberShipFees="",
+                                panApiResponse = PanResponse,
+                                aadhaarApiResponse = AadhaarResponse,
+                                cibilApiResponse = CibilResponse,
+                                cibilScore = userScore.toInt().toString(),
+                                retailerCode = preference.getStringValue(ConstantClass.RetailerCode, ""),
+                                activeStatus = "Pending",
+                                custPhoto_path = "",
+                                custPhoto_File = customerImageFile
+                            )
 
-                        hitApiForUploadCustomerData(req)
+                            hitApiForUpdateCustomerData(req)
+
+                        }
+
+                        else {
+
+                            var req = ManageCustomerStepWiseReq(
+                                mode = "INSERT" ,
+                                step = "1",
+                                rid = "",
+                                firstName = CustFirstName,
+                                middleName= CustMiddleName,
+                                lastName=CustLastName,
+                                primaryMobileNumber = CustPrimaryMobileNumber,
+                                primaryOTP = CustPrimaryOTP,
+                                primaryMobileVerified = CustPrimaryMobileVerified,
+                                alternateMobileNumber = CustAlternateMobileNumber,
+                                alternateMobileOTP = "",
+                                pAlternateMobileVerified = "no",
+                                eMailID = CusteMailID,
+                                flatNo = CustFlatNo,
+                                aearSector = CustAreaSector,
+                                pinCode = CustPinCode,
+                                currentAddress = CustCurrentAddress,
+                                stateName= CustStateName,
+                                cityName= CustCityName,
+                                country= CustCountry!!,
+                                aadharNumber = AadharNumber,
+                                aadharNumberVerified = ConstantClass.AadharVerified,
+                                panNumber = PanNumber,
+                                panNumberVerified = PanNumberVerified,
+                                brandName="",
+                                modelName="",
+                                modelVariant="",
+                                color="",
+                                sellingPrice="",
+                                downPayment="",
+                                tenure="",
+                                emiAmount="",
+                                imeiNumber1="",
+                                imeiNumber2="",
+                                accountNumber="",
+                                bankIFSCCode="",
+                                bankName="",
+                                IsPannyDrop = ConstantClass.isPannydropVerified,
+                                accountType="",
+                                branchName="",
+                                refName="",
+                                refRelationShip="",
+                                refmobileNo="",
+                                refAddress="",
+                                debitOrCreditCard="",
+                                upiMandate= ConstantClass.UPIMandate,
+                                createdBy=createdBy,
+                                membershipfees="",
+                                retailercode=preference.getStringValue(ConstantClass.RetailerCode,""),
+                                cibilScore=userScore.toString(),
+                                activeStatus = "Pending",
+                                cibilApiResponse = CibilResponse,
+                                aadhaarApiResponse = AadhaarResponse,
+                                panApiResponse = PanResponse,
+                                isAggrementVerified=isAggrementVerified,
+                                isRetailerAggrementVerified="",
+                                custPhoto_File=customerImageFile,
+                                imeiNumber1_SealPhotoPath = null,
+                                imeiNumber2_SealPhotoPath = null,
+                                imeiNumber_PhotoPath = null,
+                                invoive_Path = null,
+                                aadharFront_Path = aadharFrontPart,
+                                aadharBack_Path = aadharBackPart,
+                                panFront_Path = PanFrontPart
+                            )
+
+                            Log.d("OfflineCustomerReq", Gson().toJson(req))
+
+                            hitApiForUploadCustomerData(req)
+                        }
 
                        // startActivity(Intent(this@NewCustomerRegistrationPage, MobileSelectionActivity::class.java))
                     }
@@ -842,7 +907,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
     }
 
-    fun hitApiForVerifyCustomer(){
+     fun hitApiForVerifyCustomer(){
         var sendOtpReq = VerifyCustomerReq(
             primaryMobileNumber = binding.mobileNumber.text.toString().trim()
         )
@@ -975,7 +1040,6 @@ class NewCustomerRegistrationPage : BaseActivity() {
     }
 
 
-
     fun startOtpTimer(resendtxt: TextView, timer: TextView) {
         resendtxt.visibility = View.INVISIBLE
         timer.visibility = View.VISIBLE
@@ -997,7 +1061,6 @@ class NewCustomerRegistrationPage : BaseActivity() {
     }
 
 
-
     private fun createImageFile(): File {
         val fileName = "IMG_${System.currentTimeMillis()}"
         val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
@@ -1005,13 +1068,11 @@ class NewCustomerRegistrationPage : BaseActivity() {
     }
 
 
-
     fun clickCameraForUploadDocument() {
         val photoFile = createImageFile()
         photoUri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", photoFile)
         cameraLauncher.launch(photoUri!!)
     }
-
 
 
     private fun checkCameraPermissionAndOpenCamera() {
@@ -1025,7 +1086,6 @@ class NewCustomerRegistrationPage : BaseActivity() {
             )
         }
     }
-
 
 
     fun hitApiForReSendOTP(mailidormobile: String, type: String) {
@@ -1463,6 +1523,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
     }
 
 
+
     fun hitApiForResendMobVerify(mobnumber: String, customerName: String, OTP: String) {
         // hint: Dear  Naim Khan, Your OTP for Verification is 1234. Please Do Not Share the OTP With Anyone. Thanks For Using BOSOQ BOS CENTER
         var message = "Dear $customerName, Your OTP for Verification is $OTP. Please Do Not Share the OTP With Anyone. Thanks For Using BOSOQ BOS CENTER "
@@ -1691,7 +1752,6 @@ class NewCustomerRegistrationPage : BaseActivity() {
         }
 
 
-
         if(binding.firstName.text.toString().isNotEmpty()){
            binding.firstName.isEnabled = false
         }
@@ -1718,6 +1778,53 @@ class NewCustomerRegistrationPage : BaseActivity() {
         }
         else {
             binding.mobileNumber.isEnabled = true
+        }
+
+
+
+    }
+
+
+    fun setDataIfCustomerAlreadyExist(){
+        binding.firstName.setText(AlreadyCustomerFirstName)
+        binding.middleName.setText(AlreadyCustomerMiddleName)
+        binding.lastName.setText(AlreadyCustomerLastName)
+        binding.mobileNumber.setText(AlreadyCustomerPrimaryMobileNumber)
+        binding.alternatemobileNumber.setText(AlreadyCustomerAlternateMobileNumber)
+        binding.emailId.setText(AlreadyCustomerAlternateEmailID)
+        binding.flathouseno.setText(AlreadyCustomerFlatNo)
+        binding.areasector.setText(AlreadyCustomerAearSector)
+        binding.pincode.setText(AlreadyCustomerPinCode)
+        binding.currentaddress.setText(AlreadyCustomerCurrentAddress)
+        binding.statename.setText(AlreadyCustomerStateName)
+        binding.cityname.setText(AlreadyCustomerCityName)
+
+        if(!AlreadyCustomerImage.isNullOrBlank()){
+                var CustomerImage = ConstantClass.BASE_URL_IMAGE + AlreadyCustomerImage
+                binding.lockimage.visibility = View.GONE
+                binding.userimage.visibility = View.VISIBLE
+
+                Glide.with(this)
+                .load(CustomerImage)
+                .into( binding.userimage)
+
+            lifecycleScope.launch(Dispatchers.IO) {
+                val imageFile = downloadImageToTemp(
+                    this@NewCustomerRegistrationPage,
+                    CustomerImage
+                )
+
+                withContext(Dispatchers.Main) {
+                    if (imageFile != null) {
+                        customerImagePath = imageFile!!.absolutePath
+                        Log.d("IMAGE", "File saved: ${imageFile.absolutePath}")
+                        Log.d("IMAGE", "Exists: ${imageFile.exists()}")
+                    } else {
+                        Log.e("IMAGE", "Download failed")
+                    }
+                }
+            }
+
         }
 
 
@@ -1796,6 +1903,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
 
 
+
     fun hitApiForRetailerLogout() {
         var loginRequest = LogoutReq(
             retailerCode = preference.getStringValue(ConstantClass.RetailerCode, ""),
@@ -1835,7 +1943,6 @@ class NewCustomerRegistrationPage : BaseActivity() {
     }
 
 
-
     fun hitApiForCibilReport() {
         if (isInternetAvailable(this@NewCustomerRegistrationPage)) {
             hitApiForSendOTPCibileCheck(CustPrimaryMobileNumber, "Mobile")
@@ -1845,7 +1952,6 @@ class NewCustomerRegistrationPage : BaseActivity() {
         }
 
     }
-
 
 
     fun hitApiForSendOTPCibileCheck(mailidormobile: String, type: String) {
@@ -1965,75 +2071,112 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                             CreatedByCustomerShortCut= createdBy
 
                                             val customerImageFile = saveImageToCache(this, CustPhotoPath!!, "CustomerPhoto" )
-                                            var req = ManageCustomerStepWiseReq(
-                                                mode = "INSERT" ,
-                                                step = "1",
-                                                rid = "",
-                                                firstName = CustFirstName,
-                                                middleName= CustMiddleName,
-                                                lastName=CustLastName,
-                                                primaryMobileNumber = CustPrimaryMobileNumber,
-                                                primaryOTP = CustPrimaryOTP,
-                                                primaryMobileVerified = CustPrimaryMobileVerified,
-                                                alternateMobileNumber = CustAlternateMobileNumber,
-                                                alternateMobileOTP = "",
-                                                pAlternateMobileVerified = "no",
-                                                eMailID = CusteMailID,
-                                                flatNo = CustFlatNo,
-                                                aearSector = CustAreaSector,
-                                                pinCode = CustPinCode,
-                                                currentAddress = CustCurrentAddress,
-                                                stateName= CustStateName,
-                                                cityName= CustCityName,
-                                                country= CustCountry!!,
-                                                aadharNumber = AadharNumber,
-                                                aadharNumberVerified = ConstantClass.AadharVerified,
-                                                panNumber = PanNumber,
-                                                panNumberVerified = PanNumberVerified,
-                                                brandName="",
-                                                modelName="",
-                                                modelVariant="",
-                                                color="",
-                                                sellingPrice="",
-                                                downPayment="",
-                                                tenure="",
-                                                emiAmount="",
-                                                imeiNumber1="",
-                                                imeiNumber2="",
-                                                accountNumber="",
-                                                bankIFSCCode="",
-                                                bankName="",
-                                                IsPannyDrop =ConstantClass.isPannydropVerified,
-                                                accountType="",
-                                                branchName="",
-                                                refName="",
-                                                refRelationShip="",
-                                                refmobileNo="",
-                                                refAddress="",
-                                                debitOrCreditCard="",
-                                                upiMandate= ConstantClass.UPIMandate,
-                                                createdBy=createdBy,
-                                                membershipfees="",
-                                                retailercode=preference.getStringValue(ConstantClass.RetailerCode,""),
-                                                customerCode="",
-                                                cibilScore=userScore.toString(),
-                                                activeStatus = "Pending",
-                                                cibilApiResponse = CibilResponse,
-                                                aadhaarApiResponse = AadhaarResponse,
-                                                panApiResponse = PanResponse,
-                                                isAggrementVerified=isAggrementVerified,
-                                                isRetailerAggrementVerified="",
-                                                custPhoto_File=customerImageFile,
-                                                imeiNumber1_SealPhotoPath = null,
-                                                imeiNumber2_SealPhotoPath = null,
-                                                imeiNumber_PhotoPath = null,
-                                                invoive_Path = null,
-                                                aadharFront_Path = null,
-                                                aadharBack_Path = null,
-                                                panFront_Path = null
-                                            )
-                                            Log.d("OnlineCustomerReq", Gson().toJson(req))
-                                            hitApiForUploadCustomerData(req)
+
+                                            if(AlreadyCustomerCodeHaveEligiblity.isNotEmpty()){
+                                                var req = UpdateCustomerUploadDataReq(
+                                                    customerCode = AlreadyCustomerCodeHaveEligiblity,
+                                                    updatedBy = createdBy,
+                                                    firstName = CustFirstName,
+                                                    lastName = CustLastName,
+                                                    primaryMobileNumber = CustPrimaryMobileNumber,
+                                                    primaryOTP = CustPrimaryOTP,
+                                                    primaryMobileVerified = CustPrimaryMobileVerified,
+                                                    currentAddress = CustCurrentAddress,
+                                                    pinCode = CustPinCode,
+                                                    country= CustCountry!!,
+                                                    stateName= CustStateName,
+                                                    cityName= CustCityName,
+                                                    aadharNumber = AadharNumber,
+                                                    aadharNumberVerified = ConstantClass.AadharVerified,
+                                                    panNumber = PanNumber,
+                                                    panNumberVerified = PanNumberVerified,
+                                                    IsAggrementVerified = isAggrementVerified,
+                                                    memberShipFees="",
+                                                    panApiResponse = PanResponse,
+                                                    aadhaarApiResponse = AadhaarResponse,
+                                                    cibilApiResponse = CibilResponse,
+                                                    cibilScore = userScore.toInt().toString(),
+                                                    retailerCode = preference.getStringValue(ConstantClass.RetailerCode, ""),
+                                                    activeStatus = "Pending",
+                                                    custPhoto_path = "",
+                                                    custPhoto_File = customerImageFile
+                                                )
+
+                                                hitApiForUpdateCustomerData(req)
+
+                                            }
+                                            else{
+                                                var req = ManageCustomerStepWiseReq(
+                                                    mode = "INSERT" ,
+                                                    step = "1",
+                                                    rid = "",
+                                                    firstName = CustFirstName,
+                                                    middleName= CustMiddleName,
+                                                    lastName=CustLastName,
+                                                    primaryMobileNumber = CustPrimaryMobileNumber,
+                                                    primaryOTP = CustPrimaryOTP,
+                                                    primaryMobileVerified = CustPrimaryMobileVerified,
+                                                    alternateMobileNumber = CustAlternateMobileNumber,
+                                                    alternateMobileOTP = "",
+                                                    pAlternateMobileVerified = "no",
+                                                    eMailID = CusteMailID,
+                                                    flatNo = CustFlatNo,
+                                                    aearSector = CustAreaSector,
+                                                    pinCode = CustPinCode,
+                                                    currentAddress = CustCurrentAddress,
+                                                    stateName= CustStateName,
+                                                    cityName= CustCityName,
+                                                    country= CustCountry!!,
+                                                    aadharNumber = AadharNumber,
+                                                    aadharNumberVerified = ConstantClass.AadharVerified,
+                                                    panNumber = PanNumber,
+                                                    panNumberVerified = PanNumberVerified,
+                                                    brandName="",
+                                                    modelName="",
+                                                    modelVariant="",
+                                                    color="",
+                                                    sellingPrice="",
+                                                    downPayment="",
+                                                    tenure="",
+                                                    emiAmount="",
+                                                    imeiNumber1="",
+                                                    imeiNumber2="",
+                                                    accountNumber="",
+                                                    bankIFSCCode="",
+                                                    bankName="",
+                                                    IsPannyDrop =ConstantClass.isPannydropVerified,
+                                                    accountType="",
+                                                    branchName="",
+                                                    refName="",
+                                                    refRelationShip="",
+                                                    refmobileNo="",
+                                                    refAddress="",
+                                                    debitOrCreditCard="",
+                                                    upiMandate= ConstantClass.UPIMandate,
+                                                    createdBy=createdBy,
+                                                    membershipfees="",
+                                                    retailercode=preference.getStringValue(ConstantClass.RetailerCode,""),
+                                                    customerCode="",
+                                                    cibilScore=userScore.toString(),
+                                                    activeStatus = "Pending",
+                                                    cibilApiResponse = CibilResponse,
+                                                    aadhaarApiResponse = AadhaarResponse,
+                                                    panApiResponse = PanResponse,
+                                                    isAggrementVerified=isAggrementVerified,
+                                                    isRetailerAggrementVerified="",
+                                                    custPhoto_File=customerImageFile,
+                                                    imeiNumber1_SealPhotoPath = null,
+                                                    imeiNumber2_SealPhotoPath = null,
+                                                    imeiNumber_PhotoPath = null,
+                                                    invoive_Path = null,
+                                                    aadharFront_Path = null,
+                                                    aadharBack_Path = null,
+                                                    panFront_Path = null
+                                                )
+                                                Log.d("OnlineCustomerReq", Gson().toJson(req))
+                                                hitApiForUploadCustomerData(req)
+                                            }
+
                                             //startActivity(Intent(this@NewCustomerRegistrationPage, MobileSelectionActivity::class.java))
                                         }
                                         else{
@@ -2043,6 +2186,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
                                         }
                                     }
+
                                     else{
                                         PopOpForCibileScoreRequestToAdmin(response.message.toString(), "Mismatch Details",false)
                                         binding.createaccount.isEnabled = true
@@ -2092,222 +2236,262 @@ class NewCustomerRegistrationPage : BaseActivity() {
         val aadharBackPart = AadharBackImageUri?.let { createMultipartFromUri(this, it, "CustAadharBackPhoto_File", "AadharBackImage") }
         val panFrontPart = PanFrontImageUri?.let { createMultipartFromUri(this, it, "CustPanNumberPhoto_File", "PanFrontImage") }
 
-        // Map safely (avoid !!)
-        val requestMap = hashMapOf(
-            "Mode" to "INSERT".toRequestBody(),
-            "FirstName" to (CustFirstName ?: "").toRequestBody(),
-            "MiddleName" to (CustMiddleName ?: "").toRequestBody(),
-            "LastName" to (CustLastName ?: "").toRequestBody(),
-            "PrimaryMobileNumber" to (CustPrimaryMobileNumber ?: "").toRequestBody(),
-            "PrimaryOTP" to (CustPrimaryOTP ?: "").toRequestBody(),
-            "PrimaryMobileVerified" to (CustPrimaryMobileVerified ?: "").toRequestBody(),
-            "AlternateMobileNumber" to (CustAlternateMobileNumber ?: "").toRequestBody(),
-            "AlternateMobileOTP" to "".toRequestBody(),
-            "PAlternateMobileVerified" to "".toRequestBody(),
-            "EMailID" to (CusteMailID ?: "").toRequestBody(),
-            "FlatNo" to (CustFlatNo ?: "").toRequestBody(),
-            "AearSector" to (CustAreaSector ?: "").toRequestBody(),
-            "PinCode" to (CustPinCode ?: "").toRequestBody(),
-            "CurrentAddress" to (CustCurrentAddress ?: "").toRequestBody(),
-            "StateName" to (CustStateName ?: "").toRequestBody(),
-            "CityName" to (CustCityName ?: "").toRequestBody(),
-            "Country" to (CustCountry ?: "").toRequestBody(),
-            "AadharNumber" to (AadharNumber ?: "").toRequestBody(),
-            "AadharNumberVerified" to (ConstantClass.AadharVerified ?: "").toRequestBody(),
-            "PANNumber" to (PanNumber ?: "").toRequestBody(),
-            "PANNumberVerified" to (PanNumberVerified ?: "").toRequestBody(),
-            "BrandName" to "".toRequestBody(),
-            "ModelName" to "".toRequestBody(),
-            "ModelVariant" to "".toRequestBody(),
-            "Color" to "".toRequestBody(),
-            "SellingPrice" to "".toRequestBody(),
-            "DownPayment" to "".toRequestBody(),
-            "Tenure" to "".toRequestBody(),
-            "EMIAmount" to "".toRequestBody(),
-            "IMEINumber1" to "".toRequestBody(),
-            "IMEINumber2" to "".toRequestBody(),
-            "AccountNumber" to "".toRequestBody(),
-            "BankIFSCCode" to "".toRequestBody(),
-            "BankName" to "".toRequestBody(),
-            "AccountType" to "".toRequestBody(),
-            "BranchName" to "".toRequestBody(),
-            "RefName" to "".toRequestBody(),
-            "MemberShipFees" to "".toRequestBody(),
-            "PanApiResponse" to (PanResponse ?: "").toRequestBody(),
-            "AadhaarApiResponse" to (AadhaarResponse ?: "").toRequestBody(),
-            "CibilApiResponse" to (CibilResponse ?: "").toRequestBody(),
-            "CustomerCodes" to "".toRequestBody(),
-            "RefRelationShip" to "".toRequestBody(),
-            "RefmobileNo" to "".toRequestBody(),
-            "RefAddress" to "".toRequestBody(),
-            "DebitOrCreditCard" to "".toRequestBody(),
-            "UPIMandate" to "yes".toRequestBody(),
-            "CreatedBy" to "".toRequestBody(),
-            "RetailerCode" to  (retailercode ?: "").toRequestBody(),
-            "CibilScore" to userScore.toInt().toString().toRequestBody(),
-            "IsAggrementVerified" to "".toRequestBody(),
-            "IsRetailerAggrementVerified" to "".toRequestBody(),
-        )
 
-        // Debug log full request
-        Log.e("API_REQ_MAP", Gson().toJson(requestMap))
+        if(AlreadyCustomerCodeHaveEligiblity.isNotEmpty()){
+            val customerImageFile = saveImageToCache(this, CustPhotoPath!!, "CustomerPhoto" )
 
-        Log.e("API_REQ_IMAGES", "CustPhoto=$CustPhotoPath | AadharFront=$AadharFrontImageUri | PanFront=$PanFrontImageUri")
+            var req = UpdateCustomerUploadDataReq(
+                customerCode = AlreadyCustomerCodeHaveEligiblity,
+                updatedBy = retailercode,
+                firstName = CustFirstName,
+                lastName = CustLastName,
+                primaryMobileNumber = CustPrimaryMobileNumber,
+                primaryOTP = CustPrimaryOTP,
+                primaryMobileVerified = CustPrimaryMobileVerified,
+                currentAddress = CustCurrentAddress,
+                pinCode = CustPinCode,
+                country= CustCountry!!,
+                stateName= CustStateName,
+                cityName= CustCityName,
+                aadharNumber = AadharNumber,
+                aadharNumberVerified = ConstantClass.AadharVerified,
+                panNumber = PanNumber,
+                panNumberVerified = PanNumberVerified,
+                IsAggrementVerified = isAggrementVerified,
+                memberShipFees="",
+                panApiResponse = PanResponse,
+                aadhaarApiResponse = AadhaarResponse,
+                cibilApiResponse = userScore.toInt().toString(),
+                cibilScore = cibilScoremsg.toString(),
+                retailerCode = preference.getStringValue(ConstantClass.RetailerCode, ""),
+                activeStatus = "Pending",
+                custPhoto_path = "",
+                custPhoto_File = customerImageFile
+            )
 
-        lifecycleScope.launch {
-            try {
-                val response = registerCustomerApiHolder.getCustomerCibilApprovedReq(
-                    requestMap["Mode"]!!,
-                    requestMap["FirstName"]!!,
-                    requestMap["MiddleName"]!!,
-                    requestMap["LastName"]!!,
-                    requestMap["PrimaryMobileNumber"]!!,
-                    requestMap["PrimaryOTP"]!!,
-                    requestMap["PrimaryMobileVerified"]!!,
-                    requestMap["AlternateMobileNumber"]!!,
-                    requestMap["AlternateMobileOTP"]!!,
-                    requestMap["PAlternateMobileVerified"]!!,
-                    requestMap["EMailID"]!!,
-                    requestMap["FlatNo"]!!,
-                    requestMap["AearSector"]!!,
-                    requestMap["PinCode"]!!,
-                    requestMap["CurrentAddress"]!!,
-                    requestMap["StateName"]!!,
-                    requestMap["CityName"]!!,
-                    requestMap["Country"]!!,
-                    requestMap["AadharNumber"]!!,
-                    requestMap["AadharNumberVerified"]!!,
-                    requestMap["PANNumber"]!!,
-                    requestMap["PANNumberVerified"]!!,
-                    requestMap["BrandName"]!!,
-                    requestMap["ModelName"]!!,
-                    requestMap["ModelVariant"]!!,
-                    requestMap["Color"]!!,
-                    requestMap["SellingPrice"]!!,
-                    requestMap["DownPayment"]!!,
-                    requestMap["Tenure"]!!,
-                    requestMap["EMIAmount"]!!,
-                    requestMap["IMEINumber1"]!!,
-                    requestMap["IMEINumber2"]!!,
-                    requestMap["AccountNumber"]!!,
-                    requestMap["BankIFSCCode"]!!,
-                    requestMap["BankName"]!!,
-                    requestMap["AccountType"]!!,
-                    requestMap["BranchName"]!!,
-                    requestMap["RefName"]!!,
-                    requestMap["RefRelationShip"]!!,
-                    requestMap["RefmobileNo"]!!,
-                    requestMap["RefAddress"]!!,
-                    requestMap["DebitOrCreditCard"]!!,
-                    requestMap["UPIMandate"]!!,
-                    requestMap["CreatedBy"]!!,
-                    requestMap["MemberShipFees"]!!,
-                    requestMap["PanApiResponse"]!!,
-                    requestMap["AadhaarApiResponse"]!!,
-                    requestMap["CibilApiResponse"]!!,
-                    requestMap["CustomerCodes"]!!,
-                    requestMap["RetailerCode"]!!,
-                    requestMap["CibilScore"]!!,
-                    requestMap["IsAggrementVerified"]!!,
-                    requestMap["IsRetailerAggrementVerified"]!!,
-                    custPhotoPart,
-                    imei1SealPart,
-                    imei2SealPart,
-                    imeiPhotoPart,
-                    invoicePart,
-                    aadharFrontPart,
-                    aadharBackPart,
-                    panFrontPart
-                )
+            hitApiForUpdateCustomerData(req)
 
-                withContext(Dispatchers.Main) {
-                    ConstantClass.dialog?.takeIf { it.isShowing }?.dismiss()
-                    Log.e("API_RESPONSE_CODE", response.code().toString())
+        }
 
-                    if (response.isSuccessful) {
-                        val body = response.body()
-                        Log.e("API_RESPONSE_SUCCESS", Gson().toJson(body))
-                        PopOpForCibileScoreRequestToAdmin(cibilScoremsg, title,true)
-                    }
-                    else {
-                        val errorBody = response.errorBody()?.string()
+        else{
 
-                        Log.e("API_RESPONSE_ERROR", errorBody ?: "Unknown error")
+            // Map safely (avoid !!)
+            val requestMap = hashMapOf(
+                "Mode" to "INSERT".toRequestBody(),
+                "FirstName" to (CustFirstName ?: "").toRequestBody(),
+                "MiddleName" to (CustMiddleName ?: "").toRequestBody(),
+                "LastName" to (CustLastName ?: "").toRequestBody(),
+                "PrimaryMobileNumber" to (CustPrimaryMobileNumber ?: "").toRequestBody(),
+                "PrimaryOTP" to (CustPrimaryOTP ?: "").toRequestBody(),
+                "PrimaryMobileVerified" to (CustPrimaryMobileVerified ?: "").toRequestBody(),
+                "AlternateMobileNumber" to (CustAlternateMobileNumber ?: "").toRequestBody(),
+                "AlternateMobileOTP" to "".toRequestBody(),
+                "PAlternateMobileVerified" to "".toRequestBody(),
+                "EMailID" to (CusteMailID ?: "").toRequestBody(),
+                "FlatNo" to (CustFlatNo ?: "").toRequestBody(),
+                "AearSector" to (CustAreaSector ?: "").toRequestBody(),
+                "PinCode" to (CustPinCode ?: "").toRequestBody(),
+                "CurrentAddress" to (CustCurrentAddress ?: "").toRequestBody(),
+                "StateName" to (CustStateName ?: "").toRequestBody(),
+                "CityName" to (CustCityName ?: "").toRequestBody(),
+                "Country" to (CustCountry ?: "").toRequestBody(),
+                "AadharNumber" to (AadharNumber ?: "").toRequestBody(),
+                "AadharNumberVerified" to (ConstantClass.AadharVerified ?: "").toRequestBody(),
+                "PANNumber" to (PanNumber ?: "").toRequestBody(),
+                "PANNumberVerified" to (PanNumberVerified ?: "").toRequestBody(),
+                "BrandName" to "".toRequestBody(),
+                "ModelName" to "".toRequestBody(),
+                "ModelVariant" to "".toRequestBody(),
+                "Color" to "".toRequestBody(),
+                "SellingPrice" to "".toRequestBody(),
+                "DownPayment" to "".toRequestBody(),
+                "Tenure" to "".toRequestBody(),
+                "EMIAmount" to "".toRequestBody(),
+                "IMEINumber1" to "".toRequestBody(),
+                "IMEINumber2" to "".toRequestBody(),
+                "AccountNumber" to "".toRequestBody(),
+                "BankIFSCCode" to "".toRequestBody(),
+                "BankName" to "".toRequestBody(),
+                "AccountType" to "".toRequestBody(),
+                "BranchName" to "".toRequestBody(),
+                "RefName" to "".toRequestBody(),
+                "MemberShipFees" to "".toRequestBody(),
+                "PanApiResponse" to (PanResponse ?: "").toRequestBody(),
+                "AadhaarApiResponse" to (AadhaarResponse ?: "").toRequestBody(),
+                "CibilApiResponse" to (CibilResponse ?: "").toRequestBody(),
+                "CustomerCodes" to "".toRequestBody(),
+                "RefRelationShip" to "".toRequestBody(),
+                "RefmobileNo" to "".toRequestBody(),
+                "RefAddress" to "".toRequestBody(),
+                "DebitOrCreditCard" to "".toRequestBody(),
+                "UPIMandate" to "yes".toRequestBody(),
+                "CreatedBy" to "".toRequestBody(),
+                "RetailerCode" to  (retailercode ?: "").toRequestBody(),
+                "CibilScore" to userScore.toInt().toString().toRequestBody(),
+                "IsAggrementVerified" to "".toRequestBody(),
+                "IsRetailerAggrementVerified" to "".toRequestBody(),
+            )
 
-                        val errorMessage = when (response.code()) {
+            // Debug log full request
+            Log.e("API_REQ_MAP", Gson().toJson(requestMap))
 
-                            400 -> "Bad request"
+            Log.e("API_REQ_IMAGES", "CustPhoto=$CustPhotoPath | AadharFront=$AadharFrontImageUri | PanFront=$PanFrontImageUri")
 
-                            401 -> "Unauthorized access"
+            lifecycleScope.launch {
+                try {
+                    val response = registerCustomerApiHolder.getCustomerCibilApprovedReq(
+                        requestMap["Mode"]!!,
+                        requestMap["FirstName"]!!,
+                        requestMap["MiddleName"]!!,
+                        requestMap["LastName"]!!,
+                        requestMap["PrimaryMobileNumber"]!!,
+                        requestMap["PrimaryOTP"]!!,
+                        requestMap["PrimaryMobileVerified"]!!,
+                        requestMap["AlternateMobileNumber"]!!,
+                        requestMap["AlternateMobileOTP"]!!,
+                        requestMap["PAlternateMobileVerified"]!!,
+                        requestMap["EMailID"]!!,
+                        requestMap["FlatNo"]!!,
+                        requestMap["AearSector"]!!,
+                        requestMap["PinCode"]!!,
+                        requestMap["CurrentAddress"]!!,
+                        requestMap["StateName"]!!,
+                        requestMap["CityName"]!!,
+                        requestMap["Country"]!!,
+                        requestMap["AadharNumber"]!!,
+                        requestMap["AadharNumberVerified"]!!,
+                        requestMap["PANNumber"]!!,
+                        requestMap["PANNumberVerified"]!!,
+                        requestMap["BrandName"]!!,
+                        requestMap["ModelName"]!!,
+                        requestMap["ModelVariant"]!!,
+                        requestMap["Color"]!!,
+                        requestMap["SellingPrice"]!!,
+                        requestMap["DownPayment"]!!,
+                        requestMap["Tenure"]!!,
+                        requestMap["EMIAmount"]!!,
+                        requestMap["IMEINumber1"]!!,
+                        requestMap["IMEINumber2"]!!,
+                        requestMap["AccountNumber"]!!,
+                        requestMap["BankIFSCCode"]!!,
+                        requestMap["BankName"]!!,
+                        requestMap["AccountType"]!!,
+                        requestMap["BranchName"]!!,
+                        requestMap["RefName"]!!,
+                        requestMap["RefRelationShip"]!!,
+                        requestMap["RefmobileNo"]!!,
+                        requestMap["RefAddress"]!!,
+                        requestMap["DebitOrCreditCard"]!!,
+                        requestMap["UPIMandate"]!!,
+                        requestMap["CreatedBy"]!!,
+                        requestMap["MemberShipFees"]!!,
+                        requestMap["PanApiResponse"]!!,
+                        requestMap["AadhaarApiResponse"]!!,
+                        requestMap["CibilApiResponse"]!!,
+                        requestMap["CustomerCodes"]!!,
+                        requestMap["RetailerCode"]!!,
+                        requestMap["CibilScore"]!!,
+                        requestMap["IsAggrementVerified"]!!,
+                        requestMap["IsRetailerAggrementVerified"]!!,
+                        custPhotoPart,
+                        imei1SealPart,
+                        imei2SealPart,
+                        imeiPhotoPart,
+                        invoicePart,
+                        aadharFrontPart,
+                        aadharBackPart,
+                        panFrontPart
+                    )
 
-                            403 -> "Access forbidden"
+                    withContext(Dispatchers.Main) {
+                        ConstantClass.dialog?.takeIf { it.isShowing }?.dismiss()
+                        Log.e("API_RESPONSE_CODE", response.code().toString())
 
-                            404 -> "Data not found"
-
-                            405 -> "Method not allowed"
-
-                            408 -> "Request timeout"
-
-                            409 -> "Conflict occurred"
-
-                            422 -> "Validation failed"
-
-                            429 -> "Too many requests"
-
-                            500 -> "Internal server error"
-
-                            502 -> "Bad gateway"
-
-                            503 -> "Service unavailable"
-
-                            504 -> "Gateway timeout"
-
-                            else -> "Something went wrong"
+                        if (response.isSuccessful) {
+                            val body = response.body()
+                            Log.e("API_RESPONSE_SUCCESS", Gson().toJson(body))
+                            PopOpForCibileScoreRequestToAdmin(cibilScoremsg, title,true)
                         }
+                        else {
+                            val errorBody = response.errorBody()?.string()
 
-                        PopOpForCibileScoreRequestToAdmin(errorMessage, "Error", false)
+                            Log.e("API_RESPONSE_ERROR", errorBody ?: "Unknown error")
+
+                            val errorMessage = when (response.code()) {
+
+                                400 -> "Bad request"
+
+                                401 -> "Unauthorized access"
+
+                                403 -> "Access forbidden"
+
+                                404 -> "Data not found"
+
+                                405 -> "Method not allowed"
+
+                                408 -> "Request timeout"
+
+                                409 -> "Conflict occurred"
+
+                                422 -> "Validation failed"
+
+                                429 -> "Too many requests"
+
+                                500 -> "Internal server error"
+
+                                502 -> "Bad gateway"
+
+                                503 -> "Service unavailable"
+
+                                504 -> "Gateway timeout"
+
+                                else -> "Something went wrong"
+                            }
+
+                            PopOpForCibileScoreRequestToAdmin(errorMessage, "Error", false)
+                            binding.createaccount.isEnabled = true
+
+                        }
+                    }
+                }
+                catch (e: SocketTimeoutException) {
+
+                    withContext(Dispatchers.Main) {
+                        ConstantClass.dialog?.dismiss()
+                        PopOpForCibileScoreRequestToAdmin("Connection timeout", "Error", false)
+                        binding.createaccount.isEnabled = true
+                    }
+
+                } catch (e: UnknownHostException) {
+
+                    withContext(Dispatchers.Main) {
+                        ConstantClass.dialog?.dismiss()
+                        PopOpForCibileScoreRequestToAdmin("No internet connection", "Error", false)
+                        binding.createaccount.isEnabled = true
+                    }
+
+                } catch (e: IOException) {
+
+                    withContext(Dispatchers.Main) {
+                        ConstantClass.dialog?.dismiss()
+                        PopOpForCibileScoreRequestToAdmin("Network error", "Error", false)
+                        binding.createaccount.isEnabled = true
+                    }
+
+                } catch (e: Exception) {
+                    withContext(Dispatchers.Main) {
+                        ConstantClass.dialog?.dismiss()
+                        PopOpForCibileScoreRequestToAdmin(e.message ?: "Something went wrong", "Error", false)
                         binding.createaccount.isEnabled = true
 
                     }
                 }
+
             }
-            catch (e: SocketTimeoutException) {
-
-                withContext(Dispatchers.Main) {
-                    ConstantClass.dialog?.dismiss()
-                    PopOpForCibileScoreRequestToAdmin("Connection timeout", "Error", false)
-                    binding.createaccount.isEnabled = true
-                }
-
-            } catch (e: UnknownHostException) {
-
-                withContext(Dispatchers.Main) {
-                    ConstantClass.dialog?.dismiss()
-                    PopOpForCibileScoreRequestToAdmin("No internet connection", "Error", false)
-                    binding.createaccount.isEnabled = true
-                }
-
-            } catch (e: IOException) {
-
-                withContext(Dispatchers.Main) {
-                    ConstantClass.dialog?.dismiss()
-                    PopOpForCibileScoreRequestToAdmin("Network error", "Error", false)
-                    binding.createaccount.isEnabled = true
-                }
-
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    ConstantClass.dialog?.dismiss()
-                    PopOpForCibileScoreRequestToAdmin(e.message ?: "Something went wrong", "Error", false)
-                    binding.createaccount.isEnabled = true
-
-                }
-            }
-
         }
 
-    }
 
+    }
 
 
     fun PopOpForCibileScoreRequestToAdmin(cibilScore : String,title:String,check:Boolean){
@@ -2376,8 +2560,6 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
 
     // hit api for upload customer data
-
-
     fun hitApiForUploadCustomerData(request : ManageCustomerStepWiseReq){
 
         viewModel.uploadCustomerListForShortCutLoanCreateProcess(request).observe(this) { resources ->
@@ -2425,6 +2607,49 @@ class NewCustomerRegistrationPage : BaseActivity() {
               }
         }
 
+
+    }
+
+
+    // hit api if already customer taken loan through retailer
+    fun hitApiForUpdateCustomerData(req : UpdateCustomerUploadDataReq){
+
+        Log.d("UpdateReq", Gson().toJson(req))
+        viewModel.UpdateCustomerUploadDataReq(req).observe(this){ resources ->
+            resources.let {
+                when (it.apiStatus) {
+                    ApiStatus.SUCCESS -> {
+                        it.data?.let { users ->
+                            users.body()?.let { response ->
+                                Log.d("UpdateRes", Gson().toJson(response))
+                                var getdata = response.data
+                                var errorCode = response.code
+                                var message = response.message
+
+                                ConstantClass.dialog.dismiss()
+
+                                if(errorCode==200 && getdata!=null ){
+                                    Toast.makeText(this@NewCustomerRegistrationPage, message, Toast.LENGTH_SHORT).show()
+                                    startActivity(Intent(this@NewCustomerRegistrationPage, MobileSelectionActivity::class.java))
+                                }
+                                else {
+                                    Toast.makeText(this@NewCustomerRegistrationPage, message, Toast.LENGTH_SHORT).show()
+                                }
+
+                            }
+                        }
+                    }
+
+                    ApiStatus.LOADING ->{
+                        ConstantClass.OpenPopUpForVeryfyOTP(this)
+                    }
+
+                    ApiStatus.ERROR -> {
+                        Toast.makeText(this@NewCustomerRegistrationPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()}
+                     }
+                }
+
+        }
 
     }
 

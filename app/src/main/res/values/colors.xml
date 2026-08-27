@@ -49,6 +49,8 @@
 
     <color name="red">#F02E2E</color>
 
+    <color name="customerpendingcolor">#DB49C8</color>
+
 
 
 </resources>

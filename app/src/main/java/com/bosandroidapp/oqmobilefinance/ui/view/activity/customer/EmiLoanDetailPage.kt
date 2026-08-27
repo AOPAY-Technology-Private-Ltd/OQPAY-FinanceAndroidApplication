@@ -536,7 +536,6 @@ class EmiLoanDetailPage : BaseActivity() {
             checkCameraPermissionAndOpenCamera()
         }
 
-
         binding.txnNumber.addTextChangedListener(object: TextWatcher{
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
 
@@ -558,7 +557,6 @@ class EmiLoanDetailPage : BaseActivity() {
             }
 
         })
-
 
         binding.submitpayment.setOnClickListener {
 
@@ -662,6 +660,7 @@ class EmiLoanDetailPage : BaseActivity() {
                             hitApiForRequestPG(req)
                         }
                         else{
+
                             var req = PGOnlineRequestCall(
                                 amount = emiamount,
                                 registrationID =  ConstantClass.PAN_VERIFICATION_REGISTRATION_ID,
@@ -669,6 +668,7 @@ class EmiLoanDetailPage : BaseActivity() {
                                 customerCode = preference.getStringValue(ConstantClass.CustomerCode, ""),
                                 loanCode = loanCode
                             )
+
                             hitApiForRequestPGOnline(req)
 
                         }
@@ -681,7 +681,6 @@ class EmiLoanDetailPage : BaseActivity() {
             }
 
         }
-
 
     }
 
@@ -706,6 +705,7 @@ class EmiLoanDetailPage : BaseActivity() {
             ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.CAMERA), CAMERA_REQUEST_CODE_FRONT)
         }
     }
+
 
 
     fun clickCameraForUploadDocument() {
@@ -845,6 +845,7 @@ class EmiLoanDetailPage : BaseActivity() {
     }
 
 
+
     fun HitApiForPayEmiAmount(emicount:Int,loopcount :Int,emiamount : String,fine:String?/*,imageFile:File*/){
 
         var createdBy=""
@@ -933,6 +934,7 @@ class EmiLoanDetailPage : BaseActivity() {
 
 
 
+
     fun OpenPopUpForVeryfyOTP(){
         dialog = Dialog(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -979,6 +981,7 @@ class EmiLoanDetailPage : BaseActivity() {
     }
 
 
+
     fun calculateEMIPaymentStatus(paidEMI: Int, emiAmount: Double, tenure: Int?): Pair<Double, Double?> {
         val paidAmount = paidEMI * emiAmount
         val remainingAmount = (tenure?.minus(paidEMI))?.times(emiAmount)
@@ -1011,6 +1014,7 @@ class EmiLoanDetailPage : BaseActivity() {
         context.startActivity(Intent.createChooser(shareIntent, "Share Image"))
 
     }
+
 
 
     fun HitApiForRetailerWalletPayoutAmount(selectedNoofEmi:Int,j :Int,emiAmountWithFine : String,ForServerlatefine:String?,imageFile:File){
@@ -1058,6 +1062,7 @@ class EmiLoanDetailPage : BaseActivity() {
                                 Log.d("payoutresponse", response.toString())
 
                                 if(response.statuss.equals("True")){
+
                                     /*var selectedNoofEmi = binding.noOfEmi.selectedItem.toString().toInt()
 
                                     lifecycleScope.launch {

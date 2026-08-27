@@ -216,9 +216,11 @@ class DashBoard : BaseActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onResume() {
         super.onResume()
+
         getFirebaseToken()
         setDataHeader()
         checkAndStartKeyTimer()
+
         if (logintype.equals(Customer)) {
             hitApiForCustomerLogin(preference.getStringValue(ConstantClass.CustomerCode, ""))
             HitApiForEmiList()
@@ -386,35 +388,30 @@ class DashBoard : BaseActivity() {
             var generateKey = preference.getStringValue(ConstantClass.GENERATEKEY, "")
 
             if (generateKey.isNotEmpty() && binding.appBarDashBoard.deskdesign.generatedkey.text != "Key Expired") {
-                val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
-                val loanDetails = sharedPref.getString("LoanData", "")
-                if(loanDetails.isNullOrBlank()){
-                    Toast.makeText(this,resources.getString(R.string.customerdashboard), Toast.LENGTH_LONG).show()
-                }
-                else {
-                    showContinueDialog()
-                }
+                showContinueDialog()
             }
-
             else {
+
                 if (canGenerateKey()) {
                     hitApiForGetAndCheckAccessToken()
                 }
-            }
 
+            }
 
         }
 
 
         binding.appBarDashBoard.deskdesign.clicktologin.setOnClickListener {
-            val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
+           /* val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
             val loanDetails = sharedPref.getString("LoanData", "")
+
             if(loanDetails.isNullOrBlank()){
                 Toast.makeText(this,resources.getString(R.string.customerdashboard), Toast.LENGTH_LONG).show()
             }
             else{
                 showContinueDialog()
-            }
+            }*/
+            showContinueDialog()
         }
 
 

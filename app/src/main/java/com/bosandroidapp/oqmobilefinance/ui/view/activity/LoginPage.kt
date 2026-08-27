@@ -120,8 +120,7 @@ class LoginPage : BaseActivity() {
 
             binding.emailormobilenumber.postDelayed({
                 binding.emailormobilenumber.requestFocus()
-                val imm =
-                    getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                val imm = getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 imm.showSoftInput(binding.emailormobilenumber, InputMethodManager.SHOW_FORCED)
 
                 binding.main.viewTreeObserver.addOnGlobalLayoutListener {
@@ -148,7 +147,8 @@ class LoginPage : BaseActivity() {
 
             }, 300)
 
-        } else {
+        }
+        else {
             binding.retailerLogin.visibility = View.GONE
             binding.customerLogin.visibility = View.VISIBLE
             binding.customerLoginLayout.visibility = View.VISIBLE
@@ -231,11 +231,7 @@ class LoginPage : BaseActivity() {
                     }*/
                     hitApiForSendOTP(mobnumber, "Mobile")
                 } else {
-                    Toast.makeText(
-                        this,
-                        "Please check your internet connection!!",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(this, "Please check your internet connection!!", Toast.LENGTH_SHORT).show()
                 }
             } else {
 
@@ -300,6 +296,15 @@ class LoginPage : BaseActivity() {
                                 preference.setStringValue(ConstantClass.Loginpassword, password)
                                 preference.setStringValue(ConstantClass.ClientCode, "CMP0005")
 
+                                val req = NotificationSendTokenRequest(
+                                    deviceType = ConstantClass.DeviceType,
+                                    clientCode = preference.getStringValue(ConstantClass.ClientCode, ""),
+                                    customerCode = getData.customerCode.toString(),
+                                    retailerCode = getData.retailerCode.toString(),
+                                    fcmToken = FireBaseToken
+                                )
+                                sendDataOnServerForUploadToken(req)
+
                                 val  intent = Intent(this@LoginPage, DashBoard::class.java)
                                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                 startActivity(intent)
@@ -329,6 +334,7 @@ class LoginPage : BaseActivity() {
                 }
 
             }
+
 
         }
 
@@ -610,12 +616,9 @@ class LoginPage : BaseActivity() {
                                     var firstName = "Customer"
                                     var customerName = firstName
                                     hitApiForMobVerify(mailidormobile, customerName, otp)
-                                } else {
-                                    Toast.makeText(
-                                        this@LoginPage,
-                                        response.message,
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                }
+                                else {
+                                    Toast.makeText(this@LoginPage, response.message, Toast.LENGTH_SHORT).show()
                                     if (ConstantClass.dialog.isShowing) {
                                         ConstantClass.dialog.dismiss()
                                     }
@@ -627,11 +630,8 @@ class LoginPage : BaseActivity() {
 
                     ApiStatus.ERROR -> {
                         ConstantClass.dialog.dismiss()
-                        Toast.makeText(
-                            this@LoginPage,
-                            resources.message ?: "Error verifying OTP",
-                            Toast.LENGTH_SHORT
-                        ).show()
+
+                        Toast.makeText(this@LoginPage, resources.message ?: "Error verifying OTP", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
@@ -662,11 +662,7 @@ class LoginPage : BaseActivity() {
                 )
 
                 if (response!!.isSuccessful) {
-                    Toast.makeText(
-                        this@LoginPage,
-                        "Otp sent on your mobile number!!",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(this@LoginPage, "Otp sent on your mobile number!!", Toast.LENGTH_SHORT).show()
                     val loanData = response.body()
 
                     if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {

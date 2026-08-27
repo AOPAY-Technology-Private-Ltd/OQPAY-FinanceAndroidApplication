@@ -45,6 +45,30 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AadharBackImageUri
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AadharFrontImageUri
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AadharNumber
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerAccountNumber
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerAccountType
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerAearSector
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerAlternateMobileNumber
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerBankIFSCCode
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerBankName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerBranchName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerCityName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerCodeHaveEligiblity
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerCountry
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerCurrentAddress
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerCustPhotoPath
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerFirstName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerFlatNo
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerImage
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerLastName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerMiddleName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerPinCode
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerPrimaryMobileNumber
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerRefAddress
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerRefName
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerRefRelationShip
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerRefmobileNo
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AlreadyCustomerStateName
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CheckOnlineOrOffline
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.LoginMobileorMailid
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.Loginpassword
@@ -208,13 +232,50 @@ class AadharCardVerificationPage : BaseActivity() {
                         it.data.let { users ->
                             users!!.body().let { response ->
                                 Log.d("CheckEligibleResp", Gson().toJson(response))
-                                if(response!!.statuss.equals("True")){
-                                    AadharFrontImageUri = photoFrontUri
-                                    AadharBackImageUri = photoBackUri
-                                    AadharNumber = aadharNumber
-                                    ConstantClass.AadharVerified = "no"
-                                    val intent = Intent(this, NewCustomerRegistrationPage::class.java)
-                                    startActivity(intent)
+                                if(response!!.statuss!!.toLowerCase().equals("true",ignoreCase = true)){
+
+                                    if(response.value!=null){
+                                        AlreadyCustomerCodeHaveEligiblity = response.value!!.customerCode!!
+                                        AlreadyCustomerImage = response.value.custPhotoPath!!
+                                        AlreadyCustomerFirstName = response.value.firstName!!
+                                        //AlreadyCustomerMiddleName = response.value.middleName!!
+                                        AlreadyCustomerLastName = response.value.lastName!!
+                                        AlreadyCustomerPrimaryMobileNumber = response.value.primaryMobileNumber!!
+                                        AlreadyCustomerAlternateMobileNumber = response.value.alternateMobileNumber!!
+                                        AlreadyCustomerFlatNo = response.value.flatNo!!
+                                        AlreadyCustomerAearSector = response.value.aearSector!!
+                                        AlreadyCustomerCurrentAddress = response.value.currentAddress!!
+                                        AlreadyCustomerCountry = response.value.country!!
+                                        AlreadyCustomerPinCode = response.value.pinCode!!
+                                        AlreadyCustomerStateName = response.value.stateName!!
+                                        AlreadyCustomerCityName = response.value.cityName!!
+                                        AlreadyCustomerAccountNumber = response.value.accountNumber!!
+                                        AlreadyCustomerBankIFSCCode = response.value.bankIFSCCode!!
+                                        AlreadyCustomerBankName = response.value.bankName!!
+                                        AlreadyCustomerAccountType = response.value.accountType!!
+                                        AlreadyCustomerBranchName = response.value.branchName!!
+                                        AlreadyCustomerRefName = response.value.refName!!
+                                        AlreadyCustomerRefRelationShip = response.value.refRelationShip!!
+                                        AlreadyCustomerRefmobileNo = response.value.refmobileNo!!
+                                        AlreadyCustomerRefAddress = response.value.refAddress!!
+                                        AadharFrontImageUri = photoFrontUri
+                                        AadharBackImageUri = photoBackUri
+                                        AadharNumber = aadharNumber
+                                        ConstantClass.AadharVerified = "no"
+                                        val intent = Intent(this, NewCustomerRegistrationPage::class.java)
+                                        startActivity(intent)
+                                    }
+
+                                    else{
+                                        AlreadyCustomerCodeHaveEligiblity=""
+                                        AadharFrontImageUri = photoFrontUri
+                                        AadharBackImageUri = photoBackUri
+                                        AadharNumber = aadharNumber
+                                        ConstantClass.AadharVerified = "no"
+                                        val intent = Intent(this, NewCustomerRegistrationPage::class.java)
+                                        startActivity(intent)
+                                    }
+
                                 }
                                 else{
                                     ConstantClass.dialog.dismiss()

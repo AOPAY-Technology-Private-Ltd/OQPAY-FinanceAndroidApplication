@@ -19,6 +19,8 @@ import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletAmountReq
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletPayoutAtMakePaymentTimeReq
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletReportReq
 import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
+import com.bosandroidapp.oqmobilefinance.data.model.ShortCutCustomerRequest
+import com.bosandroidapp.oqmobilefinance.data.model.UpdateCustomerUploadDataReq
 import com.bosandroidapp.oqmobilefinance.data.model.UploadDeviceInfoReq
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateAccessKeyReq
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
@@ -490,6 +492,31 @@ class AuthenticationViewModel (private val repository: AuthRepository):ViewModel
             emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
+
+
+
+    fun getCustomerDataSummaryForShortCut(req: ShortCutCustomerRequest) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            emit(handleApiResponse(repository.getCustomerDataSummaryForShortCut(req), "Customer List"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
+        }
+    }
+
+
+
+
+    fun UpdateCustomerUploadDataReq(req: UpdateCustomerUploadDataReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            emit(handleApiResponse(repository.updateCustomerDataReq(req), "Customer List"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
+        }
+    }
+
+
 
 
 }

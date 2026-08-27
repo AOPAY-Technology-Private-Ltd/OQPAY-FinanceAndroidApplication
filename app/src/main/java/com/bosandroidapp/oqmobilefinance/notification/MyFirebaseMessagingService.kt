@@ -25,18 +25,14 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
         Log.e("FCM_TEST", "onMessageReceived called")
 
-        val action = remoteMessage.data["action"]
-
-        val intent = Intent(this, KioskPolicyService::class.java).apply {
-            putExtra("action", action)
-        }
-
-        ContextCompat.startForegroundService(this, intent)
 
     }
+
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
     }
+
+
 
 }

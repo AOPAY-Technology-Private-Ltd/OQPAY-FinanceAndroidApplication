@@ -146,6 +146,7 @@ class KioskActivity : BaseActivity() {
                 if(isInternetAvailable(this@KioskActivity)){
                     if(!binding.amount.text.toString().isNullOrBlank()){
                         emiamount = binding.amount.text.toString().replace("₹ ","").toDouble()
+
                         if(binding.noOfEmi.selectedItem.toString().isNullOrBlank()){
                             isApiRunning = false
                             HitApiForEmiList()
@@ -183,16 +184,14 @@ class KioskActivity : BaseActivity() {
 
                                     Log.d("emiAmountWithFine", emiAmountWithFine)
                                     Log.d("EMIAmount", emiAmountWithFine)
-                                    emiList.add(
-                                        EmiLoanDetailPage.EmiData(
+
+                                    emiList.add(EmiLoanDetailPage.EmiData(
                                             selectedNoofEmi,
                                             emiNo = j,
                                             emiAmount = emiAmountWithFine,
                                             lateFine = ForServerlatefine!!,
                                             BounceChargeApplicable,
-                                            loanCode
-                                        )
-                                    )
+                                            loanCode))
                                 }
 
                                 val email = preference.getStringValue(ConstantClass.CustomerEmailID, "") .ifEmpty { "bos.centerpvtltd@gmail.com" }
@@ -213,6 +212,7 @@ class KioskActivity : BaseActivity() {
                                     )
                                     hitApiForRequestPG(req)
                                 }
+
                                 else{
                                     var req = PGOnlineRequestCall(
                                         amount = emiamount,

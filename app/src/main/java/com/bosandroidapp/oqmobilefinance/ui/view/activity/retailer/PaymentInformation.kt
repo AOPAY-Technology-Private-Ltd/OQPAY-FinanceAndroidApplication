@@ -1689,6 +1689,7 @@ class PaymentInformation : BaseActivity() {
             }
         }
 
+
         var request = ValidateSessionRequest(
             preference.getStringValue(ConstantClass.RetailerCode, ""),
             preference.getStringValue(ConstantClass.DEVICEID, ""),
@@ -1696,6 +1697,7 @@ class PaymentInformation : BaseActivity() {
         )
 
         Log.d("validaterequest", Gson().toJson(request))
+
         viewModel.getSessionExpiredReq(request).observe(this){resources ->
             resources.let {
                 when (it.apiStatus) {
@@ -1789,7 +1791,6 @@ class PaymentInformation : BaseActivity() {
     }
 
 
-
     fun setselectionForSecondCard(){
         selectFirst = false
         selectThird = false
@@ -1811,7 +1812,6 @@ class PaymentInformation : BaseActivity() {
         binding.referenceDetailsLayout.visibility=View.GONE
 
     }
-
 
 
     fun setselectionForThirdCard(){
@@ -1841,7 +1841,6 @@ class PaymentInformation : BaseActivity() {
             binding.referenceKycChecked.visibility = View.GONE
         }
     }
-
 
 
     fun hitApiForAadharVerification() {
@@ -1899,7 +1898,6 @@ class PaymentInformation : BaseActivity() {
 
     }
 
-
     fun hitApiForUploadCustomerBankDataData(request : ManageCustomerStepWiseReq){
 
         viewModel.uploadCustomerListForShortCutLoanCreateProcess(request).observe(this) { resources ->
@@ -1945,7 +1943,6 @@ class PaymentInformation : BaseActivity() {
 
 
     }
-
 
     fun hitApiForUploadCustomerEMandateData(request : ManageCustomerStepWiseReq){
 

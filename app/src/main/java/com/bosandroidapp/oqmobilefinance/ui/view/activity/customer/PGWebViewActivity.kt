@@ -147,8 +147,8 @@ class PGWebViewActivity : BaseActivity() {
 
                     false // Let WebView load the URL itself
 
-                } else {
-
+                } else
+                {
                     try {
                         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
 
@@ -157,11 +157,13 @@ class PGWebViewActivity : BaseActivity() {
 
                         if (activities.isNotEmpty()) {
                             startActivity(Intent.createChooser(intent, "Pay with"))
-                        } else {
+                        }
+                        else {
                             Toast.makeText(this@PGWebViewActivity, "No UPI app found", Toast.LENGTH_SHORT).show()
                         }
 
-                    } catch (e: Exception) {
+                    }
+                    catch (e: Exception) {
                         Log.e("UPI", "Error launching app", e)
                         Toast.makeText(this@PGWebViewActivity, "No app found to handle this action", Toast.LENGTH_SHORT).show()
                     }
@@ -287,7 +289,6 @@ class PGWebViewActivity : BaseActivity() {
 
     }
 
-
     private fun closePg() {
         binding.pgwebview.stopLoading()
         binding.pgwebview.loadUrl("about:blank")
@@ -295,6 +296,7 @@ class PGWebViewActivity : BaseActivity() {
         binding.pgwebview.removeAllViews()
         binding.pgwebview.destroy()
     }
+
 
     fun showingSuccessPopUp(utrNumber: String){
         dialog = Dialog(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen)

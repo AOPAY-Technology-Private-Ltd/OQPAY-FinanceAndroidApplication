@@ -28,6 +28,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bos.payment.appName.network.RetrofitClient
 import com.bosandroidapp.bosmobilefinance.ui.slideshow.ui.view.activity.retailer.cibilreportsfragment.BureauScore.Companion.userScore
@@ -95,6 +96,7 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ToBePaidAmount
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.UPIMandate
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.cacheImageAndGetUri
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.cacheImageAndGetUriForShortCutLoan
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.downloadImageToTemp
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isAccessKeyVerified
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isAggrementVerified
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isEmandateVerified
@@ -103,7 +105,10 @@ import com.bosandroidapp.oqmobilefinance.data.enach.EMandateRequest
 import com.bosandroidapp.oqmobilefinance.data.enach.EnachDateUploadReq
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerSearchForShortCutLoanRequest
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerShortCutDataItem
+import com.bosandroidapp.oqmobilefinance.data.model.CustomerStepDataItem
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerPerCustomerListShortCutForLoanReq
+import com.bosandroidapp.oqmobilefinance.data.model.ShortCutCustomerRequest
+import com.bosandroidapp.oqmobilefinance.data.model.ShortCutCustomerResponse
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.ManageCustomerStepWiseReq
 import com.bosandroidapp.oqmobilefinance.data.pennydrop.BankListReq
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
@@ -118,6 +123,7 @@ import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.AppScanInstal
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.CongratulationPage.Companion.loaneCode
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.IMEIDetailsPage
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.MobileSelectionActivity
+import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.NewCustomerRegistrationPage
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.PaymentInformation
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.QRCodePage
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.QRCodePage.Companion.isEnachCancelled
@@ -128,6 +134,9 @@ import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.PanViewModel
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.google.gson.Gson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.collections.isNotEmpty
 import kotlin.math.roundToInt
 
@@ -136,9 +145,9 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
     private lateinit var viewModel: AuthenticationViewModel
     private lateinit var panViewModel: PanViewModel
     var bankList = mutableListOf<Pair<String, Int>>()
-    private var customerList: MutableList<CustomerShortCutDataItem> = mutableListOf()
+    private var customerList: MutableList<CustomerStepDataItem> = mutableListOf()
 
-    private var FilterReportDataList: MutableList<CustomerShortCutDataItem> = mutableListOf()
+    private var FilterReportDataList: MutableList<CustomerStepDataItem> = mutableListOf()
     private lateinit var customerAdapter: CustomerShortcutLoanAdapter
     private lateinit var binding: ActivityCustomerListForCreatingShortCutLoanProcessPageBinding
 
@@ -172,49 +181,78 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
     }
 
 
+
     fun setonclickListner() {
 
-        binding.searcMobile.addTextChangedListener(object : TextWatcher {
+        binding.searcCustomer.addTextChangedListener(object : TextWatcher {
+
 
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
             }
 
+
             override fun onTextChanged(s: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 val search = s.toString().trim()
-                binding.searchIcon.imageTintList = ColorStateList.valueOf(
+
+              /*  if(search.isNotEmpty()){
+                    var filterList = customerList.filter {
+                        it.customerStatus!!.lowercase().contains(selectedItem.lowercase())
+                    } as MutableList<CustomerStepDataItem>
+                    customerDataAccordingToStatus(filterList)
+                }*/
+
+              /*  binding.searchIcon.imageTintList = ColorStateList.valueOf(
                     ContextCompat.getColor(
                         this@CustomerListForCreatingShortCutLoanProcessPage,
                         if (search.isNullOrBlank()) R.color.grey else R.color.blue
                     )
-                )
+                )*/
+
 
             }
 
-            override fun afterTextChanged(s: Editable?) {}
+            override fun afterTextChanged(s: Editable?) {
+                val search = s.toString().trim()
+
+                if(search.isNotEmpty()){
+                    var filterList = customerList.filter {
+                                it.fullName!!.lowercase().contains(search.lowercase()) ||
+                                it.customerCode!!.lowercase().contains(search.lowercase())||
+                                it.mobileNumber!!.lowercase().contains(search.lowercase())
+
+                    } as MutableList<CustomerStepDataItem>
+                    customerDataAccordingToStatus(filterList)
+                }
+            }
 
         })
 
-        binding.searchIcon.setOnClickListener {
+
+      /*  binding.searchIcon.setOnClickListener {
             val search = binding.searcMobile.text.toString().trim()
             if (search.isNotEmpty()) {
-                hitApiForSearchCustomer(search)
+                hitApiForCustomerwiseDetails(search)
             } else {
                 Toast.makeText(this, "Please enter search text", Toast.LENGTH_SHORT).show()
             }
-        }
+        }*/
+
 
         binding.back.setOnClickListener {
             finish()
         }
 
+
     }
 
 
-    fun hitApiForSearchCustomer(searchtxt: String) {
+    fun hitApiForCustomerwiseDetails(customerCode: String?,step: String?) {
         var req = CustomerSearchForShortCutLoanRequest(
-            searchText = searchtxt
+            searchText = customerCode
         )
+
+        Log.d("SearchReq", Gson().toJson(req))
 
         viewModel.getCustomerDataForSearch(req).observe(this) { resource ->
             resource.let {
@@ -225,20 +263,11 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
                             if (users.isSuccessful) {
                                 users.body()?.let { response ->
                                     if (response.code == 200 && response.status == true) {
-                                        customerList.clear()
-                                        response.data?.filterNotNull()?.let { customerList.addAll(it) }
-                                        var customerStaus = customerList.firstOrNull()?.customerDetails!!.activeStatus
-                                        val shortcutList = resources.getStringArray(R.array.customershortcutlist)
-                                        val position = shortcutList.indexOfFirst { it.equals(customerStaus, ignoreCase = true) }
-                                        if (position >= 0) {
-                                            binding.reporttype.setSelection(position)
-                                        }
-                                        setDataInView(customerList)
+                                        var getCustomerData = response.data!![0]
+                                        handleCustomerClick(getCustomerData,step)
                                     }
                                     else {
                                         Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage, response.message, Toast.LENGTH_SHORT).show()
-                                        customerList.clear()
-                                        setDataInView(customerList)
                                     }
                                 }
                             } else {
@@ -262,7 +291,8 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
     }
 
 
-    fun setDataInView(customerList: List<CustomerShortCutDataItem>) {
+
+   /* fun setDataInView(customerList: List<CustomerShortCutDataItem>) {
         Log.d("List", Gson().toJson(customerList))
         if (customerList.isNotEmpty()) {
             binding.showCustomerreports.visibility = View.VISIBLE
@@ -272,7 +302,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
             binding.showCustomerreports.visibility = View.GONE
             binding.notfoundimage.visibility = View.VISIBLE
         }
-    }
+    }*/
 
 
     fun setview() {
@@ -281,23 +311,22 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
         binding.reporttype.adapter = adapter
 
         binding.reporttype.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                parent: AdapterView<*>,
-                view: View?,
-                position: Int,
-                id: Long) {
+
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+
                 val selectedItem = parent.getItemAtPosition(position).toString()
+
                 if(selectedItem=="All"){
                     hitApiForGetReports()
-                    binding.searcMobile.setText("")
+                    binding.searcCustomer.setText("")
                 }
                 else {
                     var filterList = customerList.filter {
-                        var customerDetailsData = it.customerDetails
-                        customerDetailsData!!.activeStatus!!.lowercase().contains(selectedItem.lowercase())
-                    } as MutableList<CustomerShortCutDataItem>
+                        it.customerStatus!!.lowercase().contains(selectedItem.lowercase())
+                    } as MutableList<CustomerStepDataItem>
                     customerDataAccordingToStatus(filterList)
                 }
+
 
             }
 
@@ -311,15 +340,16 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
 
     private fun setupRecyclerView() {
         customerAdapter = CustomerShortcutLoanAdapter(customerList, this) { item ->
-            handleCustomerClick(item)
+            var customer = item.customerCode
+            var step = item.currentStep
+            hitApiForCustomerwiseDetails(customer,step)
         }
         binding.showCustomerreports.layoutManager = LinearLayoutManager(this)
         binding.showCustomerreports.adapter = customerAdapter
     }
 
 
-
-    private fun handleCustomerClick(item: CustomerShortCutDataItem) {
+    private fun handleCustomerClick(item: CustomerShortCutDataItem,step : String?) {
         val customerDetails = item.customerDetails
         val productDetails = item.productDetails
         val bankDetails = item.bankDetails
@@ -329,17 +359,31 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
         val createLoanDetails = item.createLoanDetails
         val invoiceAndAppVerification = item.invoiceAndAppVerification
 
-        if (invoiceAndAppVerification?.isAccessKeyVerified.isNullOrBlank() ||
-            invoiceAndAppVerification?.isAccessKeyVerified.equals("no", ignoreCase = true)
-        ) {
+        if (invoiceAndAppVerification?.isAccessKeyVerified.isNullOrBlank() || invoiceAndAppVerification?.isAccessKeyVerified.equals("no", ignoreCase = true)) {
 
             if (customerDetails != null) {
                 val image = ConstantClass.BASE_URL_IMAGE + customerDetails.custPhotoPath
-                CustPhotoPath = cacheImageAndGetUriForShortCutLoan(this@CustomerListForCreatingShortCutLoanProcessPage, image)
-                if(CustPhotoPath==null){
-                    CustomerPhotoPath=""
-                    CustomerPhotoPath = image
+
+                lifecycleScope.launch(Dispatchers.IO) {
+
+                    val imageFile = downloadImageToTemp(
+                        this@CustomerListForCreatingShortCutLoanProcessPage,
+                        image
+                    )
+
+                    withContext(Dispatchers.Main) {
+                        if (imageFile != null) {
+                            var filepath = imageFile!!.absolutePath
+                            Log.d("IMAGE", "File saved: ${imageFile.absolutePath}")
+                            Log.d("IMAGE", "Exists: ${imageFile.exists()}")
+                        } else {
+                            Log.e("IMAGE", "Download failed")
+                        }
+                    }
+
                 }
+
+                CustomerPhotoPath = image
                 CustomerCodeForEnach = customerDetails.customerCode!!
                 preference.setStringValue(ConstantClass.CustomerCode, CustomerCodeForEnach)
                 CustFirstName = customerDetails.firstName!!
@@ -442,15 +486,18 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
             }
 
             if (createLoanDetails?.loanCode.isNullOrBlank()) {
-                showOnlineOfflineDialog(item)
-            } else {
-                proceedWithLoanLogic(item)
+                showOnlineOfflineDialog(item, step!!)
             }
+            else {
+                proceedWithLoanLogic(item,step!!)
+            }
+
         }
+
     }
 
 
-    private fun showOnlineOfflineDialog(item: CustomerShortCutDataItem) {
+    private fun showOnlineOfflineDialog(item: CustomerShortCutDataItem,step : String) {
         val dialog = Dialog(this)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.dialog_online_offline)
@@ -488,7 +535,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
 
             dialog.dismiss()
 
-            navigateToNextStep(item)
+            navigateToNextStep(item,step)
         }
 
         dialog.show()
@@ -496,24 +543,22 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
 
 
 
-    private fun navigateToNextStep(item: CustomerShortCutDataItem) {
+    private fun navigateToNextStep(item: CustomerShortCutDataItem, step: String) {
         var customerDetails = item.customerDetails
-        var productDetails = item.productDetails
-        var bankDetails = item.bankDetails
-        var eMandateDetails = item.eMandateDetails
-        var referenceDetails = item.referenceDetails
-        var imeiDetails = item.imeiDetails
-        var loanData = item.createLoanDetails
 
-        when {
+
+        when(step) {
+            "0"-> {
+                startActivity(Intent(this, NewCustomerRegistrationPage::class.java))
+            }
             // Step 1: Mobile Selection (Brand/EMI)
-            productDetails!!.brandName.isNullOrBlank() -> {
+            "1" -> {
                 startActivity(Intent(this, MobileSelectionActivity::class.java))
             }
 
 
             // Step 2: Payment Info - Bank/Pennydrop (EMandate is blank)
-            bankDetails!!.bankName.isNullOrBlank()|| bankDetails!!.isPannydropVerified!!.equals("no", ignoreCase = true)&&productDetails.tenure!!.isNotEmpty() -> {
+           "2" -> {
                 startActivity(Intent(this, PaymentInformation::class.java).apply {
                     putExtra("EMandate", "")
                 })
@@ -521,7 +566,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
 
 
             // Step 3: Payment Info - E-Mandate (Before Loan Created)
-            bankDetails!!.isPannydropVerified!!.equals("yes", ignoreCase = true)&& eMandateDetails!!.upiMandate.isNullOrBlank() && productDetails.tenure!!.isNotEmpty()  -> {
+            "3"  -> {
                 startActivity(Intent(this, PaymentInformation::class.java).apply {
                     putExtra("EMandate", "NO")
                 })
@@ -529,7 +574,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
 
 
             // Step 4: Payment Info - Reference (Before Loan Created)
-            eMandateDetails!!.upiMandate!!.isNotEmpty()&& referenceDetails!!.refName.isNullOrBlank()-> {
+            "4"-> {
                 startActivity(Intent(this, PaymentInformation::class.java).apply {
                     putExtra("EMandate", "Yes")
                 })
@@ -537,13 +582,13 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
 
 
             // Step 5: IMEI Details
-            imeiDetails!!.imeiNumber1.isNullOrBlank()&& productDetails.tenure!!.isNotEmpty() -> {
+           "5"-> {
                 startActivity(Intent(this, IMEIDetailsPage::class.java))
             }
 
 
             // Step 6: Create Loan (QR Code)
-            loanData!!.loanCode.isNullOrBlank()&& productDetails.tenure!!.isNotEmpty()  -> {
+            "6"  -> {
                 startActivity(Intent(this, QRCodePage::class.java))
             }
 
@@ -718,7 +763,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
     }
 
 
-    private fun proceedWithLoanLogic(item: CustomerShortCutDataItem) {
+    private fun proceedWithLoanLogic(item: CustomerShortCutDataItem,step: String) {
         var loanData = item.createLoanDetails
         var invoiceAppVerification = item.invoiceAndAppVerification
 
@@ -729,7 +774,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
             // Step 7: E-Mandate Process (After Loan Created)
             hitApiForBankList(item)
 
-        } else if (!isAccessKeyVerifiedStatus) {
+        } else if (!isAccessKeyVerifiedStatus ) {
             // Step 8: App Install
             startActivity(Intent(this, AppScanInstallPage::class.java))
         }
@@ -930,17 +975,19 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
     }
 
 
+
     fun hitApiForGetReports(searchText: String = "", isAutoClick: Boolean = false) {
 
         val retailerCode = preference.getStringValue(ConstantClass.RetailerCode, "")
 
-        val reportreq = RetailerPerCustomerListShortCutForLoanReq(
+        val reportreq = ShortCutCustomerRequest(
+            searchText =searchText,
             retailerCode = retailerCode
         )
 
         Log.d("RetailerCustomerListReq", Gson().toJson(reportreq))
 
-        viewModel.getCustomerListForShortCutLoanCreateProcess(reportreq).observe(this) { resources ->
+        viewModel.getCustomerDataSummaryForShortCut(reportreq).observe(this) { resources ->
                 when (resources.apiStatus) {
 
                     ApiStatus.SUCCESS -> {
@@ -949,23 +996,31 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
                             users.body()?.let { response ->
                                 Log.d("RetailerCustomerListResponse", Gson().toJson(response))
                                 customerList.clear()
-                                response.data?.filterNotNull()?.let { customerList.addAll(it) }
+                                var getdata = response.data
+                                var errorCode = response.code
+                                var status = response.success
 
-                                if (customerList.isNotEmpty()) {
-                                    binding.showCustomerreports.visibility = View.VISIBLE
-                                    binding.notfoundimage.visibility = View.GONE
-                                    customerAdapter.updateData(customerList)
+                                if(errorCode==200 && status==true){
+                                    customerList = response.data as MutableList<CustomerStepDataItem>
+                                    if (customerList.isNotEmpty()) {
+                                        binding.showCustomerreports.visibility = View.VISIBLE
+                                        binding.notfoundimage.visibility = View.GONE
+                                        customerAdapter.updateData(customerList)
 
-                                    if (isAutoClick && customerList.size == 1) {
-                                        handleCustomerClick(customerList[0])
                                     }
+                                    else {
+                                        binding.showCustomerreports.visibility = View.GONE
+                                        binding.notfoundimage.visibility = View.VISIBLE
+                                        if (isAutoClick) {
+                                            Toast.makeText(this, "Customer not found", Toast.LENGTH_SHORT).show()
+                                        }
+                                    }
+
                                 }
                                 else {
                                     binding.showCustomerreports.visibility = View.GONE
                                     binding.notfoundimage.visibility = View.VISIBLE
-                                    if (isAutoClick) {
-                                        Toast.makeText(this, "Customer not found", Toast.LENGTH_SHORT).show()
-                                    }
+                                    Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage, response.message, Toast.LENGTH_SHORT).show()
                                 }
 
                             }
@@ -985,7 +1040,8 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
             }
     }
 
-    fun customerDataAccordingToStatus(customerList: MutableList<CustomerShortCutDataItem>){
+
+    fun customerDataAccordingToStatus(customerList: MutableList<CustomerStepDataItem>){
         if (customerList.isNotEmpty()) {
             binding.showCustomerreports.visibility = View.VISIBLE
             binding.notfoundimage.visibility = View.GONE

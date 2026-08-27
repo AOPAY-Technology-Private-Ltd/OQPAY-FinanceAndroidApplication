@@ -20,6 +20,9 @@ import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletAmountReq
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletPayoutAtMakePaymentTimeReq
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletReportReq
 import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
+import com.bosandroidapp.oqmobilefinance.data.model.ShortCutCustomerRequest
+import com.bosandroidapp.oqmobilefinance.data.model.UpdateCustomerDataIfAlreadyExistResponse
+import com.bosandroidapp.oqmobilefinance.data.model.UpdateCustomerUploadDataReq
 import com.bosandroidapp.oqmobilefinance.data.model.UploadDeviceInfoReq
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateAccessKeyReq
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
@@ -381,6 +384,51 @@ class AuthRepository(private val apiInterface: ApiInterface) {
 
   }
 
+
+  suspend fun getCustomerDataSummaryForShortCut(req: ShortCutCustomerRequest) = apiInterface.getCustomerDataForSummary(req)
+
+
+
+
+  suspend fun updateCustomerDataReq(req: UpdateCustomerUploadDataReq): Response<UpdateCustomerDataIfAlreadyExistResponse> {
+    val customerCode = req.customerCode.toRequestBody("text/plain".toMediaTypeOrNull())
+    val updatedBy = req.updatedBy.toRequestBody("text/plain".toMediaTypeOrNull())
+    val firstName = req.firstName.toRequestBody("text/plain".toMediaTypeOrNull())
+    val lastName = req.lastName.toRequestBody("text/plain".toMediaTypeOrNull())
+    val primaryMobileNumber = req.primaryMobileNumber.toRequestBody("text/plain".toMediaTypeOrNull())
+    val primaryOTP = req.primaryOTP.toRequestBody("text/plain".toMediaTypeOrNull())
+    val primaryMobileVerified = req.primaryMobileVerified.toRequestBody("text/plain".toMediaTypeOrNull())
+    val currentAddress = req.currentAddress.toRequestBody("text/plain".toMediaTypeOrNull())
+    val pinCode = req.pinCode.toRequestBody("text/plain".toMediaTypeOrNull())
+    val country = req.country.toRequestBody("text/plain".toMediaTypeOrNull())
+    val stateName = req.stateName.toRequestBody("text/plain".toMediaTypeOrNull())
+    val cityName = req.cityName.toRequestBody("text/plain".toMediaTypeOrNull())
+    val aadharNumber = req.aadharNumber.toRequestBody("text/plain".toMediaTypeOrNull())
+    val aadharNumberVerified = req.aadharNumberVerified.toRequestBody("text/plain".toMediaTypeOrNull())
+    val panNumber = req.panNumber.toRequestBody("text/plain".toMediaTypeOrNull())
+    val panNumberVerified = req.panNumberVerified.toRequestBody("text/plain".toMediaTypeOrNull())
+    val IsAggrementVerified = req.IsAggrementVerified.toRequestBody("text/plain".toMediaTypeOrNull())
+    val memberShipFees = req.memberShipFees.toRequestBody("text/plain".toMediaTypeOrNull())
+    val panApiResponse = req.panApiResponse.toRequestBody("text/plain".toMediaTypeOrNull())
+    val aadhaarApiResponse = req.aadhaarApiResponse.toRequestBody("text/plain".toMediaTypeOrNull())
+    val cibilApiResponse = req.cibilApiResponse.toRequestBody("text/plain".toMediaTypeOrNull())
+    val cibilScore = req.cibilScore.toRequestBody("text/plain".toMediaTypeOrNull())
+    val retailerCode = req.retailerCode.toRequestBody("text/plain".toMediaTypeOrNull())
+    val activeStatus = req.activeStatus.toRequestBody("text/plain".toMediaTypeOrNull())
+    val custPhoto_path = req.custPhoto_path.toRequestBody("text/plain".toMediaTypeOrNull())
+
+    val custPhoto_File = req.custPhoto_File?.let {
+      val requestFile = it.asRequestBody("image/*".toMediaTypeOrNull())
+      MultipartBody.Part.createFormData("custPhoto_File", it.name, requestFile)
+    }
+
+
+    return apiInterface.customerUpdateDataIfAlreadyExistReq(
+      customerCode, updatedBy ,firstName, lastName, primaryMobileNumber, primaryOTP, primaryMobileVerified,currentAddress, pinCode, country, stateName, cityName, aadharNumber, aadharNumberVerified,panNumber, panNumberVerified, IsAggrementVerified, memberShipFees, panApiResponse, aadhaarApiResponse, cibilApiResponse,
+      cibilScore, retailerCode, activeStatus, custPhoto_path, custPhoto_File)
+
+
+  }
 
 
 }

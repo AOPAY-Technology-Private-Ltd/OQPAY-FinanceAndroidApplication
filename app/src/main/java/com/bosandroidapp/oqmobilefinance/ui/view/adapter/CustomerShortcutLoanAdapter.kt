@@ -13,14 +13,15 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.BranchAddress
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CusteMailID
 import com.bosandroidapp.oqmobilefinance.data.enach.EMandateRequest
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerShortCutDataItem
+import com.bosandroidapp.oqmobilefinance.data.model.CustomerStepDataItem
 import com.bosandroidapp.oqmobilefinance.databinding.ItemCustomerShortcutLoanBinding
 import com.bumptech.glide.Glide
 import kotlin.math.roundToInt
 
 class CustomerShortcutLoanAdapter(
-    private var customerList: List<CustomerShortCutDataItem>,
+    private var customerList: List<CustomerStepDataItem>,
     private val context: Context,
-    private val onItemClick: (CustomerShortCutDataItem) -> Unit
+    private val onItemClick: (CustomerStepDataItem) -> Unit
 ) : RecyclerView.Adapter<CustomerShortcutLoanAdapter.ViewHolder>() {
 
 
@@ -36,15 +37,15 @@ class CustomerShortcutLoanAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = customerList[position]
 
-        var customerDetails = item.customerDetails
+       /* var customerDetails = item.customerDetails*/
         
-        holder.binding.tvName.text = "${customerDetails!!.firstName} ${customerDetails.lastName}"
-        holder.binding.tvMobile.text = "Mobile: ${customerDetails.primaryMobileNumber}"
-        holder.binding.tvCode.text = "Code: ${customerDetails.customerCode}"
-        holder.binding.tvActiveStatus.text = customerDetails!!.activeStatus ?: ""
+        holder.binding.tvName.text = "${item!!.fullName}"
+        holder.binding.tvMobile.text = "Mobile: ${item.mobileNumber}"
+        holder.binding.tvCode.text = "Code: ${item.customerCode}"
+        holder.binding.tvActiveStatus.text = item!!.customerStatus ?: ""
         
         Glide.with(context)
-            .load(ConstantClass.BASE_URL_IMAGE+customerDetails.custPhotoPath)
+            .load(ConstantClass.BASE_URL_IMAGE+item.customerImage)
             .placeholder(R.drawable.customer)
             .error(R.drawable.customer)
             .into(holder.binding.ivCustomer)
@@ -57,33 +58,52 @@ class CustomerShortcutLoanAdapter(
     }
 
 
-    private fun updateStatus(holder: ViewHolder, item: CustomerShortCutDataItem) {
+    private fun updateStatus(holder: ViewHolder, item: CustomerStepDataItem) {
         var statusText = ""
         var statusColor = R.color.orange
 
-        when {
+        when (item.currentStep){
+            "0" -> {
+                statusText = "Pending Customer"
+                statusColor = R.color.customerpendingcolor
+            }
 
-            item.createLoanDetails!!.loanCode.isNullOrBlank() -> {
+            "1"-> {
+                statusText = "Pending Product"
+                statusColor = R.color.colorPrimary
+            }
+
+            "2"->{
+                statusText = "Pending Bank"
+                statusColor = R.color.orange
+            }
+
+            "3" -> {
+                statusText = "Pending UPIMandate"
+                statusColor = R.color.lightpink
+            }
+
+            "4"-> {
+                statusText = "Pending Reference"
+                statusColor = R.color.yellow
+            }
+
+            "5"-> {
+                statusText = "Pending IMEIDetails"
+                statusColor = R.color.blue
+            }
+
+            "6"->{
                 statusText = "Pending Loan"
                 statusColor = R.color.red
             }
 
-            item.bankDetails!!.isPannydropVerified.isNullOrBlank()|| item.bankDetails!!.isPannydropVerified.equals("no", true) -> {
-                statusText = "Pennydrop Pending"
-                statusColor = R.color.orange
-            }
-
-
-            item.createLoanDetails.isEmandateVerified.isNullOrBlank() || item.createLoanDetails.isEmandateVerified.equals("no", true) -> {
-                statusText = "Emandate Pending"
-                statusColor = R.color.blue
-            }
-
-            item.referenceDetails!!.isrefKycVerified.isNullOrBlank() ||   item.referenceDetails!!.isrefKycVerified.equals("no", true) -> {
+            "7"->{
                 statusText = "App Not Install"
                 statusColor = R.color.grey
             }
-            else -> {
+
+            "8"->{
                 statusText = "Active"
                 statusColor = R.color.green
             }
@@ -99,7 +119,7 @@ class CustomerShortcutLoanAdapter(
     override fun getItemCount(): Int = customerList.size
 
 
-    fun updateData(newList: List<CustomerShortCutDataItem>) {
+    fun updateData(newList: List<CustomerStepDataItem>) {
         customerList = newList
         notifyDataSetChanged()
     }

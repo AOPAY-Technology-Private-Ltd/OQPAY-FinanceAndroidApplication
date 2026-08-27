@@ -102,7 +102,7 @@ object ConstantClass {
 
          // Production
 
-      /* const val BASE_URL = "https://api.oqpay.in/"
+        /* const val BASE_URL = "https://api.oqpay.in/"
          const val BASE_URL_IMAGE = "https://api.oqpay.in"
 
 
@@ -114,7 +114,6 @@ object ConstantClass {
          // production merchant id offline
          const val PAN_VERIFICATION_REGISTRATION_ID_OFFLINE = "AOP-5050"
          const val PENNYDROP_REGISTRATION_ID_OFFLINE = "AOP-5050"*/
-
 
 
        // UAT
@@ -240,7 +239,6 @@ object ConstantClass {
 
      lateinit var  dialog : Dialog
 
-     var AlreadyCustomerCodeHaveEligiblity : String = ""
      var PanNumber : String = ""
      var CheckOnlineOrOffline : String = "Offline"
      var PanNumberVerified : String = "yes"
@@ -366,6 +364,32 @@ object ConstantClass {
     var IsPanVerified : String =""
     var IsAadhaarVerified : String =""
 
+    // already customer exist
+    var AlreadyCustomerCodeHaveEligiblity : String = ""
+    var AlreadyCustomerImage : String = ""
+    var AlreadyCustomerFirstName : String = ""
+    var AlreadyCustomerMiddleName : String = ""
+    var AlreadyCustomerLastName : String = ""
+    var AlreadyCustomerPrimaryMobileNumber : String = ""
+    var AlreadyCustomerAlternateMobileNumber: String = ""
+    var AlreadyCustomerAlternateEmailID: String = ""
+    var AlreadyCustomerFlatNo : String = ""
+    var AlreadyCustomerAearSector : String = ""
+    var AlreadyCustomerCurrentAddress : String = ""
+    var AlreadyCustomerPinCode : String = ""
+    var AlreadyCustomerCountry : String = ""
+    var AlreadyCustomerStateName : String = ""
+    var AlreadyCustomerCityName : String = ""
+    var AlreadyCustomerCustPhotoPath : String = ""
+    var AlreadyCustomerAccountNumber : String = ""
+    var AlreadyCustomerBankIFSCCode : String = ""
+    var AlreadyCustomerBankName : String = ""
+    var AlreadyCustomerAccountType : String = ""
+    var AlreadyCustomerBranchName : String = ""
+    var AlreadyCustomerRefName : String = ""
+    var AlreadyCustomerRefRelationShip : String = ""
+    var AlreadyCustomerRefmobileNo : String = ""
+    var AlreadyCustomerRefAddress : String = ""
 
     var isPgClosing = false
 
@@ -747,22 +771,38 @@ object ConstantClass {
     }
 
 
-    fun saveImageToPictures(context: Context, imageFile: File): File? {
+    fun downloadImageToTemp(context: Context, imageUrl: String): File? {
         return try {
-            val picturesDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-            val newFile = File(picturesDir, imageFile.name)
+            val url = URL(imageUrl)
+            val connection = url.openConnection() as HttpURLConnection
 
-            imageFile.copyTo(newFile, overwrite = true)
+            connection.connectTimeout = 15_000
+            connection.readTimeout = 15_000
+            connection.requestMethod = "GET"
+            connection.connect()
 
-            // Notify media scanner so it shows in Gallery
-            MediaScannerConnection.scanFile(context, arrayOf(newFile.absolutePath), null, null)
+            if (connection.responseCode != HttpURLConnection.HTTP_OK) {
+                connection.disconnect()
+                return null
+            }
 
-            newFile
+            val file = File(context.cacheDir, "customer_photo_${System.currentTimeMillis()}.jpg")
+
+            connection.inputStream.use { input ->
+                FileOutputStream(file).use { output ->
+                    input.copyTo(output)
+                }
+            }
+
+            connection.disconnect()
+
+            file
         } catch (e: Exception) {
             e.printStackTrace()
             null
         }
     }
+
 
 
     fun createMultipartFromUri(context: Context, uri: Uri?, partName: String, filename:String): MultipartBody.Part? {
@@ -966,6 +1006,7 @@ object ConstantClass {
         }
     }
 
+
   /*  fun convertToDDMMYYYY(isoDate: String ?): String {
         val inputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SS", Locale.getDefault())
         val outputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
@@ -973,6 +1014,7 @@ object ConstantClass {
         val date = inputFormat.parse(isoDate)
         return outputFormat.format(date!!)
     }*/
+
 
     fun convertToDDMMYYYY(dateValue: String?): String {
         if (dateValue.isNullOrBlank()) return "-"

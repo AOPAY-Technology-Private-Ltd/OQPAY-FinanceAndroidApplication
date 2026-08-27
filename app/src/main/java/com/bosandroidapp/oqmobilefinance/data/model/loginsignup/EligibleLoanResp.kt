@@ -122,7 +122,7 @@ data class Value(
 	val custPanNumberPhotoPath: String? = null,
 
 	@field:SerializedName("refAdhaarNumber")
-	val refAdhaarNumber: Any? = null,
+	val refAdhaarNumber: String? = null,
 
 	@field:SerializedName("refAddress")
 	val refAddress: String? = null,
@@ -152,7 +152,7 @@ data class Value(
 	val currentAddress: String? = null,
 
 	@field:SerializedName("alternateMobileOTP")
-	val alternateMobileOTP: Any? = null,
+	val alternateMobileOTP: String? = null,
 
 	@field:SerializedName("aadharNumber")
 	val aadharNumber: String? = null,
@@ -164,7 +164,7 @@ data class Value(
 	val createdBy: String? = null,
 
 	@field:SerializedName("middleName")
-	val middleName: Any? = null,
+	val middleName: String? = null,
 
 	@field:SerializedName("custAadharPhoto_Path")
 	val custAadharPhotoPath: String? = null,

@@ -224,14 +224,6 @@ class IDVerificationPage : BaseActivity() {
                                     AadharTransactionIdNo = response.model.transactionId
                                     Log.d("Customerdigilockeurl", digilockerLink)
 
-                                   /* val url = digilockerLink
-
-                                    val customTabsIntent = CustomTabsIntent.Builder()
-                                        .setShowTitle(true)
-                                        .build()
-
-                                    customTabsIntent.launchUrl(this, Uri.parse(url))*/
-
                                     startActivity(Intent(this@IDVerificationPage, AadharCardWebViewDIGILockerPage::class.java))
                                     finish()
                                 }

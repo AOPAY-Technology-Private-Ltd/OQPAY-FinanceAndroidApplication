@@ -64,12 +64,12 @@
         app:layout_constraintTop_toBottomOf="@id/headlayout">
 
         <EditText
-            android:id="@+id/searcMobile"
+            android:id="@+id/searcCustomer"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:background="@null"
-            android:hint="Hint: Customer name,Loan Id,mobile,code"
+            android:hint="Hint: Customer name,mobile,code"
             android:textStyle="bold"
             android:padding="@dimen/_10sdp"
             android:textColor="@color/edt_color"

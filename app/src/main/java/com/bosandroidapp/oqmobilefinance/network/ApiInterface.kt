@@ -41,6 +41,9 @@ import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletReportReq
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletReportResp
 import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
 import com.bosandroidapp.oqmobilefinance.data.model.SessionOutResponse
+import com.bosandroidapp.oqmobilefinance.data.model.ShortCutCustomerRequest
+import com.bosandroidapp.oqmobilefinance.data.model.ShortCutCustomerResponse
+import com.bosandroidapp.oqmobilefinance.data.model.UpdateCustomerDataIfAlreadyExistResponse
 import com.bosandroidapp.oqmobilefinance.data.model.UploadDeviceInfoReq
 import com.bosandroidapp.oqmobilefinance.data.model.UploadDeviceInfoResp
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateAccessKeyReq
@@ -497,6 +500,40 @@ interface ApiInterface {
         ): Response<RegisterCustomerResp>
 
 
+    // update customer data if already exist
+
+    @Multipart
+    @POST("api/V1/OQFinance/UpdateCustomer")
+    suspend fun customerUpdateDataIfAlreadyExistReq(
+        @Part("CustomerCode") customerCode: RequestBody,
+        @Part("UpdatedBy") UpdatedBy: RequestBody,
+        @Part("FirstName") FirstName: RequestBody,
+        @Part("LastName") LastName: RequestBody,
+        @Part("PrimaryMobileNumber") PrimaryMobileNumber: RequestBody,
+        @Part("PrimaryOTP") PrimaryOTP: RequestBody,
+        @Part("PrimaryMobileVerified") PrimaryMobileVerified: RequestBody,
+        @Part("CurrentAddress") CurrentAddress: RequestBody,
+        @Part("PinCode") PinCode: RequestBody,
+        @Part("Country") Country: RequestBody,
+        @Part("StateName") StateName: RequestBody,
+        @Part("CityName") CityName: RequestBody,
+        @Part("AadharNumber") AadharNumber: RequestBody,
+        @Part("AadharNumberVerified") AadharNumberVerified: RequestBody,
+        @Part("PANNumber") PANNumber: RequestBody,
+        @Part("PANNumberVerified") PANNumberVerified: RequestBody,
+        @Part("IsAggrementVerified") IsAggrementVerified: RequestBody,
+        @Part("MemberShipFees") MemberShipFees: RequestBody,
+        @Part("PanApiResponse") PanApiResponse: RequestBody,
+        @Part("AadhaarApiResponse") AadhaarApiResponse: RequestBody,
+        @Part("CibilApiResponse") CibilApiResponse: RequestBody,
+        @Part("CibilScore") CibilScore: RequestBody,
+        @Part("RetailerCode") RetailerCode: RequestBody,
+        @Part("activeStatus") activeStatus: RequestBody,
+        @Part("custPhoto_path") custPhotoPath: RequestBody,
+        @Part custPhoto_File: MultipartBody.Part?
+    ): Response<UpdateCustomerDataIfAlreadyExistResponse>
+
+
     @POST("api/V1/OQFinance/GetUpdateProfile")
     suspend fun getRetailerProfileGetUpdateReq(@Body req : RetailerProfileReq): Response<RetailerProfileRespo>?
 
@@ -560,6 +597,7 @@ interface ApiInterface {
     // retailer transaction history...................................................
     @POST("api/V1/OQFinance/GetWalletCreditDebitHistory")
     suspend fun getTransactionHistoryList(@Body req : TransactionHistoryReq): Response<TransactionHistoryResp>?
+
 
 
     @Multipart
@@ -659,6 +697,7 @@ interface ApiInterface {
     suspend fun validateTokenFromRetailerReq(@Body req : ValidateAccessKeyReq): Response<ValidateAccessKeyResp>?
 
 
+
     //  retailer sessionout api
     @POST("api/V1/OQFinance/RetailerStatusManage")
     suspend fun sessionOutReq(@Body req : SessionOutReq): Response<SessionOutResponse>?
@@ -668,6 +707,7 @@ interface ApiInterface {
     //  customer mobile verification api
     @POST("api/V1/OQFinance/VerifyCustomer")
     suspend fun verifycustomerReq(@Body req : VerifyCustomerReq): Response<VerifyCustomerResp>?
+
 
 
 
@@ -774,6 +814,13 @@ interface ApiInterface {
 
     @POST("api/V1/OQFinance/RetailerSearchCustomer")
     suspend fun getCustomerDataForSearch(@Body req : CustomerSearchForShortCutLoanRequest) : Response<CustomerSearchForShortCutLoanResponse>?
+
+
+    @POST("api/V1/OQFinance/GetCustomerByRetailerSummary")
+    suspend fun getCustomerDataForSummary(@Body req : ShortCutCustomerRequest) : Response<ShortCutCustomerResponse>?
+
+
+
 
 
 }
