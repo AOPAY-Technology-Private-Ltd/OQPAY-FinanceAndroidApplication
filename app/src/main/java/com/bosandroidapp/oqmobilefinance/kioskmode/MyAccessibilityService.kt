@@ -18,6 +18,7 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.SETTINGS_PKG
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.gpsSettingsOpened
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.internetSettingsOpened
+import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.utils.ACCESSIBILITYTAG
 import com.bosandroidapp.oqmobilefinance.utils.Logger
 import com.bosandroidapp.oqmobilefinance.utils.syncEmis
@@ -34,9 +35,13 @@ class MyAccessibilityService : AccessibilityService() {
 
         val currentPkg = event?.packageName?.toString() ?: ""
 
-        CoroutineScope(Dispatchers.IO).launch {
-            if(isInternetAvailable(this@MyAccessibilityService)){
-                syncEmis()
+        val preference = SharedPreference(this)
+        if (preference.getBoolanValue(ConstantClass.LoggedIn, false) && 
+            preference.getStringValue(ConstantClass.CustomerCode, "").isNotEmpty()) {
+            CoroutineScope(Dispatchers.IO).launch {
+                if (isInternetAvailable(this@MyAccessibilityService)) {
+                    syncEmis()
+                }
             }
         }
 

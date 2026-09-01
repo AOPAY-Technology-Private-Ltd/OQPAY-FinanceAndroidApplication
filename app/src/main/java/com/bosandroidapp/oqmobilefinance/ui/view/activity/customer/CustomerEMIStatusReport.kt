@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
-import com.bos.payment.appName.network.RetrofitClient
+
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isInternetAvailable
@@ -23,6 +23,7 @@ import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFa
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityCustomerEmistatusReportBinding
 import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
+import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.ui.slideshow.adapter.CustomerEMIDetailsAdapter
 import com.bosandroidapp.oqmobilefinance.ui.view.adapter.CustomerEmiStatusAdapter
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
@@ -36,6 +37,7 @@ class CustomerEMIStatusReport : BaseActivity() {
     lateinit var preference : SharedPreference
     var customerLoanEmiDetailsList : MutableList<CustomerEMIDataItem?>? = mutableListOf()
     lateinit var adapter : CustomerEmiStatusAdapter
+
 
     companion object{
         var loanCode : String = ""
@@ -95,7 +97,6 @@ class CustomerEMIStatusReport : BaseActivity() {
                                 if(ConstantClass.dialog!=null && ConstantClass.dialog.isShowing) {
                                     ConstantClass.dialog.dismiss()
                                 }
-
                                     if(response!=null){
                                         var LoanEmiList = response.data
                                         customerLoanEmiDetailsList = LoanEmiList as MutableList<CustomerEMIDataItem?>?

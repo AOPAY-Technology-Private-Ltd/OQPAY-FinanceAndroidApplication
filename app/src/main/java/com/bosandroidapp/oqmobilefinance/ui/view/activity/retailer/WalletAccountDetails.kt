@@ -28,7 +28,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
-import com.bos.payment.appName.network.RetrofitClient
+
 import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityWalletAccountDetailsBinding
@@ -40,11 +40,11 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.WalletBalance
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.getDeviceIpAddress
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isInternetAvailable
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.loginType
-import com.bosandroidapp.oqmobilefinance.data.model.DataItem
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletAmountReq
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletReportReq
 import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
+import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.DataItem
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LoginReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LogoutReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.RetailerProfileReq
@@ -52,6 +52,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.RetailerWalletPa
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
+import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.fragment.PayoutPage.Companion.CheckActiveStatus
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.fragment.PayoutReports.Companion.reportType

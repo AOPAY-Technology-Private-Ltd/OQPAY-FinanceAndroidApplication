@@ -14,7 +14,7 @@ import com.bosandroidapp.oqmobilefinance.databinding.RetailerWalletReportsBindin
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.formatDateToReport
 import com.bosandroidapp.oqmobilefinance.data.model.BankDataItem
-import com.bosandroidapp.oqmobilefinance.data.model.DataItem
+
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.CustomerDataItem
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.customer.EmiLoanDetailPage
@@ -25,6 +25,7 @@ import com.bosandroidapp.oqmobilefinance.ui.view.model.ColorList
 class BankDetailsListAdapter (var context: Context, var bankdetailslist : List<BankDataItem?>?): RecyclerView.Adapter<BankDetailsListAdapter.ViewHolder>() {
 
     lateinit var preference : SharedPreference
+
 
     class ViewHolder (private val binding: BankDetailsCardLayoutBinding): RecyclerView.ViewHolder(binding.root) {
         var accountName = binding.accountName

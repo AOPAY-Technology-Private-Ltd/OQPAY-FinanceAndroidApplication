@@ -14,7 +14,7 @@ import android.provider.Settings
 import android.util.Log
 import android.view.WindowManager
 import androidx.lifecycle.ViewModelProvider
-import com.bos.payment.appName.network.RetrofitClient
+
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LogoutReq

@@ -36,7 +36,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.workDataOf
-import com.bos.payment.appName.network.RetrofitClient
+import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityDashBoardBinding
 import com.bosandroidapp.oqmobilefinance.databinding.NavHeaderDashBoardBinding
@@ -204,6 +204,7 @@ class DashBoard : BaseActivity() {
         val coarLocationPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
         return phoneStatePermission == PackageManager.PERMISSION_GRANTED && notificationPermission == PackageManager.PERMISSION_GRANTED && fineLocationPermission== PackageManager.PERMISSION_GRANTED && coarLocationPermission== PackageManager.PERMISSION_GRANTED
     }
+
 
 
     private fun checkPermissionsrRetailer(): Boolean {

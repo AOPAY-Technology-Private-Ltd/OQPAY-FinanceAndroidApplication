@@ -22,7 +22,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bos.payment.appName.network.RetrofitClient
+import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityKioskBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
@@ -522,6 +522,8 @@ class KioskActivity : BaseActivity() {
                                     stopLockTask()
                                     val intent = Intent(this@KioskActivity, PGWebViewActivity::class.java)
                                     intent.putExtra("pgurl", response.preparePOSTForm)
+                                    intent.putExtra("mode", ConstantClass.offline)
+                                    intent.putExtra("merchantid", "")
                                     startActivity(intent)
                                 }
                                 else {
@@ -572,6 +574,8 @@ class KioskActivity : BaseActivity() {
                                     stopLockTask()
                                     val intent = Intent(this@KioskActivity, PGWebViewActivity::class.java)
                                     intent.putExtra("pgurl", response!!.intentUrl)
+                                    intent.putExtra("mode", ConstantClass.online)
+                                    intent.putExtra("merchantid", response!!.marchentOrderID)
                                     startActivity(intent)
                                 }
                                 else {

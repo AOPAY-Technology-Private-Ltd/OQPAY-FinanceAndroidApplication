@@ -33,8 +33,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.bos.payment.appName.network.ApiInterface
-import com.bos.payment.appName.network.RetrofitClient
+import com.bosandroidapp.oqmobilefinance.network.ApiInterface
+import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
 import com.chaos.view.PinView
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass

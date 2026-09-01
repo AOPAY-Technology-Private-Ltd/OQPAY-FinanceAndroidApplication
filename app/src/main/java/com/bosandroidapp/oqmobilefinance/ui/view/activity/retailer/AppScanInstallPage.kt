@@ -1,8 +1,10 @@
 package com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -24,6 +26,7 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
@@ -33,8 +36,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import okhttp3.RequestBody.Companion.toRequestBody
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.createMultipartFromUri
-import com.bos.payment.appName.network.ApiInterface
-import com.bos.payment.appName.network.RetrofitClient
 import com.bosandroidapp.bosmobilefinance.ui.slideshow.ui.view.activity.retailer.cibilreportsfragment.BureauScore.Companion.userScore
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
@@ -116,6 +117,8 @@ import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFa
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityAppScanInstallPageBinding
 import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
+import com.bosandroidapp.oqmobilefinance.network.ApiInterface
+import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.ui.slideshow.activity.DashBoard
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.CongratulationPage.Companion.FirstName
@@ -164,6 +167,14 @@ class AppScanInstallPage : BaseActivity() {
             binding.btnUploadToServer.visibility = View.GONE
         }
 
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
+        if (isGranted) {
+            launchCamera()
+        } else {
+            Toast.makeText(this, "Camera permission is required to upload invoice", Toast.LENGTH_SHORT).show()
+        }
     }
 
 
@@ -242,9 +253,11 @@ class AppScanInstallPage : BaseActivity() {
 
 
         binding.btnUploadInvoice.setOnClickListener {
-            val photoFile = createImageFile()
-            invoicePhotoUri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", photoFile)
-            cameraLauncher.launch(invoicePhotoUri!!)
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                launchCamera()
+            } else {
+                requestPermissionLauncher.launch(Manifest.permission.CAMERA)
+            }
         }
 
 
@@ -255,7 +268,6 @@ class AppScanInstallPage : BaseActivity() {
                 Toast.makeText(this@AppScanInstallPage, "Select invoice first!!", Toast.LENGTH_SHORT).show()
             }
         }
-
 
     }
 
@@ -269,46 +281,59 @@ class AppScanInstallPage : BaseActivity() {
 
         ConstantClass.OpenPopUpForVeryfyOTP(this)
 
-        val invoicePart = createMultipartFromUri(this, Invoive_Path, "Image_FileName", "InvoivePath")
+        try {
+            val invoicePart = createMultipartFromUri(this, Invoive_Path, "Image_FileName", "InvoivePath")
 
-        if (invoicePart == null) {
-            ConstantClass.dialog.dismiss()
-            Toast.makeText(this, "Failed to process image", Toast.LENGTH_SHORT).show()
-            return
-        }
-
-        viewModel.uploadInVoiceRequest(
-            customerCode = CustomerCodeForEnach,
-            columnName = "Invoive_Path",
-            newValue = "Invoice",
-            imagePart = invoicePart
-        ).observe(this) { resources ->
-            when (resources.apiStatus) {
-                ApiStatus.SUCCESS -> {
+            if (invoicePart == null) {
+                if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
                     ConstantClass.dialog.dismiss()
-                    val response = resources.data?.body()
-                    Log.d("UPLOAD_SUCCESS", response.toString())
+                }
+                Toast.makeText(this, "Failed to process image", Toast.LENGTH_SHORT).show()
+                return
+            }
 
-                    if (response != null && response.statuss == "200") {
-                        Toast.makeText(this@AppScanInstallPage, "Invoice uploaded successfully!", Toast.LENGTH_SHORT).show()
-                        binding.btnUploadToServer.visibility = View.GONE
-                        binding.tvUploadText.text = "Uploaded"
-                        binding.validatekeylayout.visibility = View.VISIBLE
-                        binding.doneicon.visibility = View.VISIBLE
-                        binding.btnUploadInvoice.isEnabled = false
-                    } else {
-                        val serverMsg = response?.message ?: "Unknown server error"
-                        Toast.makeText(this@AppScanInstallPage, "Server Error: $serverMsg", Toast.LENGTH_LONG).show()
+            viewModel.uploadInVoiceRequest(
+                customerCode = CustomerCodeForEnach,
+                columnName = "Invoive_Path",
+                newValue = "Invoice",
+                imagePart = invoicePart
+            ).observe(this) { resources ->
+                when (resources.apiStatus) {
+                    ApiStatus.SUCCESS -> {
+                        if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
+                            ConstantClass.dialog.dismiss()
+                        }
+                        val response = resources.data?.body()
+                        Log.d("UPLOAD_SUCCESS", response.toString())
+
+                        if (response != null && response.statuss == "200") {
+                            Toast.makeText(this@AppScanInstallPage, "Invoice uploaded successfully!", Toast.LENGTH_SHORT).show()
+                            binding.btnUploadToServer.visibility = View.GONE
+                            binding.tvUploadText.text = "Uploaded"
+                            binding.validatekeylayout.visibility = View.VISIBLE
+                            binding.doneicon.visibility = View.VISIBLE
+                            binding.btnUploadInvoice.isEnabled = false
+                        } else {
+                            val serverMsg = response?.message ?: "Unknown server error"
+                            Toast.makeText(this@AppScanInstallPage, "Server Error: $serverMsg", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                    ApiStatus.ERROR -> {
+                        if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
+                            ConstantClass.dialog.dismiss()
+                        }
+                        Toast.makeText(this@AppScanInstallPage, "Upload failed: ${resources.message}", Toast.LENGTH_SHORT).show()
+                    }
+                    ApiStatus.LOADING -> {
+                        // Loader already shown via OpenPopUpForVeryfyOTP
                     }
                 }
-                ApiStatus.ERROR -> {
-                    ConstantClass.dialog.dismiss()
-                    Toast.makeText(this@AppScanInstallPage, "Upload failed: ${resources.message}", Toast.LENGTH_SHORT).show()
-                }
-                ApiStatus.LOADING -> {
-                    // Loader already shown via OpenPopUpForVeryfyOTP
-                }
             }
+        } catch (e: Exception) {
+            if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
+                ConstantClass.dialog.dismiss()
+            }
+            Toast.makeText(this, "Error processing invoice: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -758,6 +783,21 @@ class AppScanInstallPage : BaseActivity() {
         val fileName = "IMG_${System.currentTimeMillis()}"
         val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         return File.createTempFile(fileName, ".jpg", storageDir)
+    }
+
+    private fun launchCamera() {
+        try {
+            val photoFile = createImageFile()
+            if (photoFile != null) {
+                invoicePhotoUri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", photoFile)
+                cameraLauncher.launch(invoicePhotoUri!!)
+            } else {
+                Toast.makeText(this, "Failed to create image file", Toast.LENGTH_SHORT).show()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Toast.makeText(this, "Camera error: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
     }
 
 

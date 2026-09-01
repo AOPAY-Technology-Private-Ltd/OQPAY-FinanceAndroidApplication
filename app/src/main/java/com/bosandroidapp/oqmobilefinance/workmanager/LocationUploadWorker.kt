@@ -6,13 +6,14 @@ import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.bos.payment.appName.network.RetrofitClient
+
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.getDeviceIpAddress
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.getPublicIpAddress
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerlocationUploadReq
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
+import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
 import com.google.gson.Gson
 
 

@@ -1,4 +1,4 @@
-package com.bos.payment.appName.network
+package com.bosandroidapp.oqmobilefinance.network
 
 import com.bosandroidapp.bosmobilefinance.ui.slideshow.data.model.loginsignup.cibilscore.CibilScoreReq
 import com.bosandroidapp.oqmobilefinance.data.enach.EMandateRequest
@@ -20,8 +20,12 @@ import com.bosandroidapp.oqmobilefinance.data.model.CustomerlocationUploadReq
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerlocationUploadResp
 import com.bosandroidapp.oqmobilefinance.data.model.DueOverdueRequest
 import com.bosandroidapp.oqmobilefinance.data.model.DueOverdueResponse
+import com.bosandroidapp.oqmobilefinance.data.model.EmandateOptionSelectetionReq
+import com.bosandroidapp.oqmobilefinance.data.model.EmandateOptionSelectetionResponse
 import com.bosandroidapp.oqmobilefinance.data.model.GenerateAccessTokenRequest
 import com.bosandroidapp.oqmobilefinance.data.model.GenerateAccessTokenResponse
+import com.bosandroidapp.oqmobilefinance.data.model.GetOrderStatusOnlinePGRequest
+import com.bosandroidapp.oqmobilefinance.data.model.GetOrderStatusOnlinePGResponse
 import com.bosandroidapp.oqmobilefinance.data.model.GetRetailerLedgerReq
 import com.bosandroidapp.oqmobilefinance.data.model.GetRetailerLedgerResponse
 import com.bosandroidapp.oqmobilefinance.data.model.HoldAmountWithdrawReq
@@ -29,6 +33,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.HoldAmountWithdrawResp
 import com.bosandroidapp.oqmobilefinance.data.model.LoginResponse
 import com.bosandroidapp.oqmobilefinance.data.model.LowCibilCustomerReportReq
 import com.bosandroidapp.oqmobilefinance.data.model.LowCibilCustomerReportResp
+import com.bosandroidapp.oqmobilefinance.data.model.ManageCustomerStepWiseResponse
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerLoginOtpRequest
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerLoginOtpResendRequest
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerLoginOtpResponse
@@ -43,6 +48,8 @@ import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
 import com.bosandroidapp.oqmobilefinance.data.model.SessionOutResponse
 import com.bosandroidapp.oqmobilefinance.data.model.ShortCutCustomerRequest
 import com.bosandroidapp.oqmobilefinance.data.model.ShortCutCustomerResponse
+import com.bosandroidapp.oqmobilefinance.data.model.UPIMandateRequest
+import com.bosandroidapp.oqmobilefinance.data.model.UPIMandateResponse
 import com.bosandroidapp.oqmobilefinance.data.model.UpdateCustomerDataIfAlreadyExistResponse
 import com.bosandroidapp.oqmobilefinance.data.model.UploadDeviceInfoReq
 import com.bosandroidapp.oqmobilefinance.data.model.UploadDeviceInfoResp
@@ -430,7 +437,7 @@ interface ApiInterface {
         @Part aadharFront_Path: MultipartBody.Part?,
         @Part aadharBack_Path: MultipartBody.Part?,
         @Part panFront_Path: MultipartBody.Part?
-    ): Response<RegisterCustomerResp>
+    ): Response<ManageCustomerStepWiseResponse>
 
 
 
@@ -554,8 +561,10 @@ interface ApiInterface {
     suspend fun loanSettlementReportReq(@Body req : LoanSettlementReportReq): Response<LoanSettlementReportResp>?
 
 
+
     @POST("api/V1/OQFinance/WalletBalance")
     suspend fun getRetailerWalletAmountReq(@Body req : RetailerWalletAmountReq): Response<com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletResponse>?
+
 
 
 
@@ -565,14 +574,17 @@ interface ApiInterface {
 
 
 
+
     @POST("api/V1/OQFinance/GetLookupReports")
     suspend fun getRetailerWalletReport(@Body req : RetailerWalletReportReq): Response<RetailerWalletReportResp>?
+
 
 
 
     // api for both addbank and get bank list.............................................................................
     @POST("api/V1/OQFinance/RetailerBankAccountManage")
     suspend fun addBankAccounts(@Body req : com.bosandroidapp.oqmobilefinance.data.model.AddBankAccountReq): Response<AddedBankListResp>?
+
 
 
 
@@ -725,6 +737,12 @@ interface ApiInterface {
     suspend fun getBankListRequest(@Body req: BankListReq): Response<BankListResponse>?
 
 
+    // select option for eMandate ............................................................
+
+    @POST("api/V1/OQFinance/GetRegistrationApis")
+    suspend fun geteMandateSelectOptionRequest(@Body req: EmandateOptionSelectetionReq): Response<EmandateOptionSelectetionResponse>?
+
+
     // for Offline eNach Api ..................................................................
     @POST("api/AOP/Enach/V1/eMandate")
     suspend fun geteMandateRequest(@Body req: EMandateRequest): Response<EMandateResponse>?
@@ -742,6 +760,9 @@ interface ApiInterface {
     suspend fun geteMandateOnlineRequest(@Body req: EMandateRequest): Response<EMandateResponse>?
 
 
+    // for UPI Mandate Api ....................................................................
+    @POST("api/OQPay/Finance/V1/SetupSubscription/Pennydrop")
+    suspend fun getUpiMandateOnlineRequest(@Body req: UPIMandateRequest): Response<UPIMandateResponse>?
 
     @POST("api/OQPay/Enach/V1/eMandate/getStatus")
     suspend fun geteMandateOnlineSatusRequest(@Body req: ENachStatusReq): Response<ENachStatusResp>?
@@ -789,6 +810,9 @@ interface ApiInterface {
     suspend fun callPGOnline(@Body req : PGOnlineRequestCall) : Response<PGOnlineResponseCall>?
 
 
+    // getStatus Of PG on callback
+    @POST("api/OQPay/Finance/Online/GetOrderStatus")
+    suspend fun getOrderOnlineStatusPgRequest(@Body req : GetOrderStatusOnlinePGRequest) : Response<GetOrderStatusOnlinePGResponse>?
 
 
     // upload invoice file...............

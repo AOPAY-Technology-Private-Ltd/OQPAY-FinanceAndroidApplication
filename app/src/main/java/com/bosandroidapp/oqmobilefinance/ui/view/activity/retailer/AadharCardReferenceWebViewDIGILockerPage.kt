@@ -13,7 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
-import com.bos.payment.appName.network.RetrofitClient
+
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityAadharCardWebViewDigilockerPageBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AadhaarResponse
@@ -35,6 +35,7 @@ import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFa
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityReferenceAadharCardWebViewDigilockerPageBinding
 import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
+import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.PaymentInformation.Companion.checkKYC
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel

@@ -12,14 +12,14 @@ import com.bosandroidapp.oqmobilefinance.databinding.LoandetailesItemlayoutBindi
 import com.bosandroidapp.oqmobilefinance.databinding.RetailerWalletReportsBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.formatDateToReport
-import com.bosandroidapp.oqmobilefinance.data.model.DataItem
+import com.bosandroidapp.oqmobilefinance.data.model.WalletReportDataItem
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.CustomerDataItem
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.customer.EmiLoanDetailPage
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.customer.EmiLoanDetailPage.Companion.LoanId
 import com.bosandroidapp.oqmobilefinance.ui.view.model.ColorList
 
-class RetailerWalletAdapter (var context: Context, var retailerWalletReportList :List<DataItem?>?): RecyclerView.Adapter<RetailerWalletAdapter.ViewHolder>() {
+class RetailerWalletAdapter (var context: Context, var retailerWalletReportList :List<WalletReportDataItem?>?): RecyclerView.Adapter<RetailerWalletAdapter.ViewHolder>() {
 
     lateinit var preference : SharedPreference
 

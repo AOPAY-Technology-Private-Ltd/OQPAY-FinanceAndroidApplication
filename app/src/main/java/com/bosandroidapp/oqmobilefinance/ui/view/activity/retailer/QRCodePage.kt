@@ -21,6 +21,8 @@ import android.view.WindowManager
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -31,8 +33,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.transition.Visibility
-import com.bos.payment.appName.network.ApiInterface
-import com.bos.payment.appName.network.RetrofitClient
+
+
 import com.bosandroidapp.bosmobilefinance.ui.slideshow.ui.view.activity.retailer.cibilreportsfragment.BureauScore.Companion.userScore
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.CongratulationPage.Companion.FirstName
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.CongratulationPage.Companion.LastName
@@ -129,7 +131,10 @@ import com.bosandroidapp.oqmobilefinance.data.enach.ENachStatusReq
 import com.bosandroidapp.oqmobilefinance.data.enach.EnachDateUploadReq
 import com.bosandroidapp.oqmobilefinance.data.loancharge.LoanChargeReq
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerShortCutDataItem
+import com.bosandroidapp.oqmobilefinance.data.model.EmandateOptionSelectetionReq
+import com.bosandroidapp.oqmobilefinance.data.model.EmandateSelectDataItem
 import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
+import com.bosandroidapp.oqmobilefinance.data.model.UPIMandateRequest
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateAccessKeyReq
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.GetIsEligibleLoanReq
@@ -141,8 +146,11 @@ import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.repository.PanRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
+import com.bosandroidapp.oqmobilefinance.network.ApiInterface
+import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.ui.slideshow.activity.DashBoard
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
+import com.bosandroidapp.oqmobilefinance.ui.view.adapter.EmandateOptionAdapter
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.AppScanInstallPage.Companion.LoanMode
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.RetailerEMandateVerifyPage.Companion.webUrl
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
@@ -170,8 +178,10 @@ class QRCodePage : BaseActivity() {
     var membershipAmt: String = ""
 
     var bankList = mutableListOf<Pair<String, Int>>()
-
     var loancreatedreq: LoanCreatedReq? = null
+    var selectedAuthType: String = ""
+
+    var emandateSelectList : MutableList<Pair<String, List<EmandateSelectDataItem>>?>  = mutableListOf()
 
 
 
@@ -211,108 +221,210 @@ class QRCodePage : BaseActivity() {
 
 
         if(preference.getStringValue(ConstantClass.CustomerCode,"").isNotEmpty()&& ! ConstantClass.ClickOnCardLowCibilScore.equals(CardType)){
-            val startDate = getCurrentStartDate()
-            val endDate = calculateEmiEndDateFromNow(Tenure.toInt())
-            val firstName = preference.getStringValue(ConstantClass.FirstName, "").orEmpty()
-            val lastName = preference.getStringValue(ConstantClass.LastName, "").orEmpty()
-            val safeLastName = if (!lastName.isNullOrBlank() && lastName != "null") lastName else ""
-            var createdBy = firstName.plus(" ").plus(safeLastName)
-
-            if (ConstantClass.CheckOnlineOrOffline.equals(ConstantClass.offline)){
-                loancreatedreq = LoanCreatedReq(
-                    modetype = "INSERT",
-                    rid = 0,
-                    customerCode = preference.getStringValue(ConstantClass.CustomerCode,""),
-                    loanAmount = ConstantClass.LoanAmount ?: 0.0,
-                    downPayment = DownPayment?.toDoubleOrNull() ?: 0.0,
-                    emiAmount = EmiAmount?.toDoubleOrNull() ?: 0.0,
-                    tenure = Tenure?.toInt()?:0,
-                    interestRate = InterestRate?.toDoubleOrNull() ?: 0.0,
-                    startDate = startDate,
-                    endDate = endDate,
-                    imeiNumber = ImeiNumber1,
-                    createdBy = createdBy,
-                    brandname = BrandName,
-                    modelname = ModelName,
-                    variantname = ModelVarient,
-                    avlcolor = ModelColor,
-                    retailerCode = preference.getStringValue(ConstantClass.RetailerCode,""),
-                    processingFees = ProcessingFees,
-                    interestAmt = InterestAmt,
-                    remarks = "",
-                    recordStatus = LoanStatus,
-                    creditScore = userScore.toString(),
-                    validateKey = "",
-                    defaultEmidebit = DefaulterEmiDebitPending,
-                    sellingPrice = ConstantClass.SellingPrice?.toDoubleOrNull() ?: 0.0,
-                    loanMode = ConstantClass.offline
-                )
-
-                LoanMode = ConstantClass.offline
-
-                Log.d("LoanCreateReq", Gson().toJson(loancreatedreq))
-
-            }
-            else{
-
-                loancreatedreq = LoanCreatedReq(
-                    modetype = "INSERT",
-                    rid = 0,
-                    customerCode = preference.getStringValue(ConstantClass.CustomerCode,""),
-                    loanAmount = ConstantClass.LoanAmount.toDouble(),
-                    downPayment = DownPayment.toDouble(),
-                    emiAmount = EmiAmount.toDouble(),
-                    tenure = Tenure.toInt(),
-                    interestRate = InterestRate.toDouble(),
-                    startDate = startDate,
-                    endDate = endDate,
-                    imeiNumber = ImeiNumber1,
-                    createdBy = createdBy,
-                    brandname = BrandName,
-                    modelname = ModelName,
-                    variantname = ModelVarient,
-                    avlcolor = ModelColor,
-                    retailerCode = preference.getStringValue(ConstantClass.RetailerCode,""),
-                    processingFees = ProcessingFees,
-                    interestAmt = InterestAmt,
-                    remarks = "",
-                    recordStatus = LoanStatus,
-                    creditScore = userScore.toString(),
-                    validateKey = "",
-                    defaultEmidebit = DefaulterEmiDebitAutoApproved,
-                    sellingPrice = ConstantClass.SellingPrice.toDouble(),
-                    loanMode = ConstantClass.online
-                )
-                LoanMode = ConstantClass.online
-
-                Log.d("LoanCreateReq", Gson().toJson(loancreatedreq))
-            }
-
-            when (BankID) {
-                0 -> {
-                    hitApiForBankList(true)
-                }
-
-                else -> {
-                    updateUI(true)
-                }
-            }
-
-            binding.LoanCreatelayout.visibility = View.VISIBLE
-            binding.nextlayout.visibility = View.GONE
+            updateLoanRequest(true)
         }
-
         else{
             binding.LoanCreatelayout.visibility = View.GONE
             binding.nextlayout.visibility = View.VISIBLE
             updateUI(false)
-
-
         }
 
         setOnClickListner()
         hitApiForMemberShipFee()
 
+    }
+
+
+
+
+    private fun fetchEmandateOptions() {
+        val req = EmandateOptionSelectetionReq(
+            mode = ConstantClass.CheckOnlineOrOffline,
+            registrationID = if (ConstantClass.CheckOnlineOrOffline == ConstantClass.online) {
+                ConstantClass.Enach_Option_Online_REGISTRATION_ID
+            } else {
+                ConstantClass.Enach_Option_Offline_REGISTRATION_ID
+            }
+        )
+        setupEmandateOptions(req)
+    }
+
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun setupEmandateOptions(req : EmandateOptionSelectetionReq) {
+        Log.d("EmandateOptionReq", Gson().toJson(req))
+
+        viewModel.geteMandateSelectOptionRequest(req).observe(this) { resources ->
+            resources.let {
+                when(it.apiStatus){
+                    ApiStatus.SUCCESS -> {
+                        it.data.let { users ->
+                            if(users!!.isSuccessful){
+                                users!!.body().let { response ->
+                                    var getdata = response!!.data
+                                    var code = response!!.code
+                                    var message = response!!.message
+                                    if(code==200){
+                                        if(getdata!!.isNotEmpty()&&getdata.size>0){
+                                            emandateSelectList.clear()
+                                            emandateSelectList.addAll(listOf(Pair(req.mode!!,getdata!!) as Pair<String, List<EmandateSelectDataItem>>?))
+                                            binding.emandateOptionLayout.visibility = View.VISIBLE
+
+                                           val adapter = EmandateOptionAdapter(emandateSelectList) { selectedOption ->
+                                               var mode = selectedOption.first
+                                               var option = selectedOption.second
+                                               selectedAuthType = option.apiName ?: ""
+                                               Log.d("SelectedMandate", " $selectedAuthType")
+
+                                               val emiAmount = EmiAmount.toDouble().roundToInt()
+
+                                               val request = EMandateRequest(
+                                                   categoryID = 7,
+                                                   collectionAmount = emiAmount,
+                                                   collectCollectionUntilCancle = false,
+                                                   seqType = "RCUR",
+                                                   iFSCCode = BankIFSCCode,
+                                                   frequncy = "MNTH",
+                                                   registrationID = if (mode == ConstantClass.online) {
+                                                           ConstantClass.PAN_VERIFICATION_REGISTRATION_ID
+                                                   }
+                                                   else {
+                                                           ConstantClass.PAN_VERIFICATION_REGISTRATION_ID_OFFLINE
+                                                        },
+                                                   accountHolderName = ConstantClass.AccountHolderName,
+                                                   finalCollectionDate = LoanEndDate,
+                                                   loanNo = loaneCode,
+                                                   accountType = AccountType,
+                                                   emailAddress = CusteMailID,
+                                                   firstCollectionDate = LoanStartDate,
+                                                   mobileNumber = CustPrimaryMobileNumber,
+                                                   bankAccountNumberConfirmation = AccountNumber,
+                                                   addIn2 = BranchAddress,
+                                                   addIn3 = "",
+                                                   debitType = true,
+                                                   teleNumber = "",
+                                                   authType = "",
+                                                   bankID = BankID,
+                                                   bankAccountNumber = AccountNumber
+                                               )
+
+                                               hitApiForEnach(request,mode,true)
+
+                                           }
+
+                                           binding.selectOptionForeMandate.adapter = adapter
+
+                                        }
+                                    }
+                                    else{
+                                        binding.emandateOptionLayout.visibility = View.GONE
+                                        Toast.makeText(this@QRCodePage, message, Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            }
+                           else{
+                                Toast.makeText(this@QRCodePage, resources.message ?: "EMandate Options Error occurred", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                    ApiStatus.ERROR -> {
+                        Toast.makeText(this@QRCodePage, resources.message ?: "EMandate Options Error occurred", Toast.LENGTH_SHORT).show()
+                    }
+                    ApiStatus.LOADING -> {
+
+                    }
+                }
+            }
+
+
+        }
+
+    }
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun updateLoanRequest(showPopup: Boolean) {
+        val startDate = getCurrentStartDate()
+        val endDate = calculateEmiEndDateFromNow(Tenure.toInt())
+        val firstName = preference.getStringValue(ConstantClass.FirstName, "").orEmpty()
+        val lastName = preference.getStringValue(ConstantClass.LastName, "").orEmpty()
+        val safeLastName = if (!lastName.isNullOrBlank() && lastName != "null") lastName else ""
+        val createdBy = firstName.plus(" ").plus(safeLastName)
+
+        if (ConstantClass.CheckOnlineOrOffline.equals(ConstantClass.offline)) {
+            loancreatedreq = LoanCreatedReq(
+                modetype = "INSERT",
+                rid = 0,
+                customerCode = preference.getStringValue(ConstantClass.CustomerCode, ""),
+                loanAmount = ConstantClass.LoanAmount ?: 0.0,
+                downPayment = DownPayment?.toDoubleOrNull() ?: 0.0,
+                emiAmount = EmiAmount?.toDoubleOrNull() ?: 0.0,
+                tenure = Tenure?.toInt() ?: 0,
+                interestRate = InterestRate?.toDoubleOrNull() ?: 0.0,
+                startDate = startDate,
+                endDate = endDate,
+                imeiNumber = ImeiNumber1,
+                createdBy = createdBy,
+                brandname = BrandName,
+                modelname = ModelName,
+                variantname = ModelVarient,
+                avlcolor = ModelColor,
+                retailerCode = preference.getStringValue(ConstantClass.RetailerCode, ""),
+                processingFees = ProcessingFees,
+                interestAmt = InterestAmt,
+                remarks = "",
+                recordStatus = LoanStatus,
+                creditScore = userScore.toString(),
+                validateKey = "",
+                defaultEmidebit = DefaulterEmiDebitPending,
+                sellingPrice = ConstantClass.SellingPrice?.toDoubleOrNull() ?: 0.0,
+                loanMode = ConstantClass.offline
+            )
+            LoanMode = ConstantClass.offline
+        } else {
+            loancreatedreq = LoanCreatedReq(
+                modetype = "INSERT",
+                rid = 0,
+                customerCode = preference.getStringValue(ConstantClass.CustomerCode, ""),
+                loanAmount = ConstantClass.LoanAmount.toDouble(),
+                downPayment = DownPayment.toDouble(),
+                emiAmount = EmiAmount.toDouble(),
+                tenure = Tenure.toInt(),
+                interestRate = InterestRate.toDouble(),
+                startDate = startDate,
+                endDate = endDate,
+                imeiNumber = ImeiNumber1,
+                createdBy = createdBy,
+                brandname = BrandName,
+                modelname = ModelName,
+                variantname = ModelVarient,
+                avlcolor = ModelColor,
+                retailerCode = preference.getStringValue(ConstantClass.RetailerCode, ""),
+                processingFees = ProcessingFees,
+                interestAmt = InterestAmt,
+                remarks = "",
+                recordStatus = LoanStatus,
+                creditScore = userScore.toString(),
+                validateKey = "",
+                defaultEmidebit = DefaulterEmiDebitAutoApproved,
+                sellingPrice = ConstantClass.SellingPrice.toDouble(),
+                loanMode = ConstantClass.online
+            )
+            LoanMode = ConstantClass.online
+        }
+
+        when (BankID) {
+            0 -> {
+                hitApiForBankList(true, showPopup)
+            }
+            else -> {
+                updateUI(true, showPopup)
+            }
+        }
+
+        binding.LoanCreatelayout.visibility = View.VISIBLE
+        binding.nextlayout.visibility = View.GONE
     }
 
 
@@ -322,7 +434,7 @@ class QRCodePage : BaseActivity() {
     }
 
 
-    fun hitApiForBankList(check: Boolean) {
+    fun hitApiForBankList(check: Boolean, showPopup: Boolean = true) {
         bankList.clear()
 
         var req = BankListReq(
@@ -355,7 +467,7 @@ class QRCodePage : BaseActivity() {
                                     Log.d("FetchBankList", Gson().toJson(bankList))
 
                                     if(check){
-                                        updateUI(true)
+                                        updateUI(true, showPopup)
                                     }
 
                                 }
@@ -391,16 +503,15 @@ class QRCodePage : BaseActivity() {
     }
 
 
-
     override fun onResume() {
         super.onResume()
 
         hitApiForLogin()
 
-
     }
 
 
+   //geteMandateSelectOptionRequest
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun setOnClickListner() {
@@ -436,12 +547,9 @@ class QRCodePage : BaseActivity() {
 
         binding.LoanCreatelayout.setOnClickListener {
             if (loancreatedreq != null) {
-                if (!loaneCode.isNullOrEmpty()) {
+               /* if (!loaneCode.isNullOrEmpty()) {
 
                     // Loan already created in a previous attempt, retry E-Nach directly
-
-                   /* LoanStartDate = "2026-08-25T09:21:03.988Z"
-                    LoanEndDate = "2026-09-25T09:21:03.988Z"*/
 
                     val startDate = LoanStartDate
                     val endDate = LoanEndDate
@@ -450,8 +558,7 @@ class QRCodePage : BaseActivity() {
                         CustomerCodeForEnach = loancreatedreq!!.customerCode
                     }
 
-                     val emiAmount = EmiAmount.toDouble().roundToInt()
-                     /* val emiAmount = 1*/
+                    val emiAmount = EmiAmount.toDouble().roundToInt()
 
                     val request = EMandateRequest(
                         categoryID = 7,
@@ -460,10 +567,12 @@ class QRCodePage : BaseActivity() {
                         seqType = "RCUR",
                         iFSCCode = BankIFSCCode,
                         frequncy = "MNTH",
-                        registrationID =  if (ConstantClass.CheckOnlineOrOffline == ConstantClass.online) {
-                            ConstantClass.PAN_VERIFICATION_REGISTRATION_ID
-                        } else {
-                            ConstantClass.PAN_VERIFICATION_REGISTRATION_ID_OFFLINE
+                        registrationID = selectedRegistrationID.ifBlank {
+                            if (ConstantClass.CheckOnlineOrOffline == ConstantClass.online) {
+                                ConstantClass.PAN_VERIFICATION_REGISTRATION_ID
+                            } else {
+                                ConstantClass.PAN_VERIFICATION_REGISTRATION_ID_OFFLINE
+                            }
                         },
                         accountHolderName = ConstantClass.AccountHolderName,
                         finalCollectionDate = endDate,
@@ -477,22 +586,19 @@ class QRCodePage : BaseActivity() {
                         addIn3 = "",
                         debitType = true,
                         teleNumber = "",
-                        authType = "",
+                        authType = selectedAuthType,
                         bankID = BankID,
                         bankAccountNumber = AccountNumber
                     )
 
-                    hitApiForEnach(request,true)
-                    //startActivity(Intent(this@QRCodePage, AppScanInstallPage::class.java))
+                    hitApiForEnach(request,"",true)
                 }
-                else {
+                else {*/
                     // No loan created yet, proceed with the normal flow
                     binding.LoanCreatelayout.isEnabled= false
-                   // startActivity(Intent(this@QRCodePage, AppScanInstallPage::class.java))
                     hitApiForCheckLoanCharge(loancreatedreq!!)
 
-                  // for testing purpose.
-                }
+                /*}*/
             }
             else{
                 binding.LoanCreatelayout.isEnabled= true
@@ -1379,11 +1485,13 @@ class QRCodePage : BaseActivity() {
 
 
 
-    fun updateUI(isRegistered: Boolean) {
+    fun updateUI(isRegistered: Boolean, showPopup: Boolean = true) {
 
         if (isRegistered) {
             // STEP 2: Registered
-            showSuccessPopup()
+            if (showPopup) {
+                showSuccessPopup()
+            }
             binding.statusCardContainer.setBackgroundResource(R.drawable.bg_status_success)
             binding.statusTitle.text = "Customer Status"
             binding.statusTitle.setTextColor(Color.parseColor("#2E7D32")) // Green
@@ -1469,9 +1577,13 @@ class QRCodePage : BaseActivity() {
                                     users.body()?.let { response ->
                                         Log.d("customerres", Gson().toJson(response))
 
+                                        if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
+                                            ConstantClass.dialog.dismiss()
+                                        }
 
                                         if (response.status?.toLowerCase().equals(ConstantClass.LoanSuccessStatus)) {
-                                            loaneCode = response.data!!.loanCode!!
+                                            binding.LoanCreatelayout.isEnabled = false
+                                           loaneCode = response.data!!.loanCode!!
                                             ConstantClass.LoanRID = response.data!!.rid!!
                                             FirstName = CustFirstName
                                             MiddleName = CustMiddleName
@@ -1492,42 +1604,7 @@ class QRCodePage : BaseActivity() {
                                             LoanStartDate = response.data.startDate!!
                                             LoanEndDate = response.data.endDate!!
 
-                                            /*  LoanStartDate = "2026-08-25T09:21:03.988Z"
-                                               LoanEndDate = "2026-09-25T09:21:03.988Z"*/
-
-                                            val emiAmount = EmiAmount.toDouble().roundToInt()
-                                            /* val emiAmount = 1*/
-
-                                            val request = EMandateRequest(
-                                                categoryID = 7,
-                                                collectionAmount = emiAmount,
-                                                collectCollectionUntilCancle = false,
-                                                seqType = "RCUR",
-                                                iFSCCode = BankIFSCCode,
-                                                frequncy = "MNTH",
-                                                registrationID = if (ConstantClass.CheckOnlineOrOffline == ConstantClass.online) {
-                                                    ConstantClass.PAN_VERIFICATION_REGISTRATION_ID
-                                                } else {
-                                                    ConstantClass.PAN_VERIFICATION_REGISTRATION_ID_OFFLINE
-                                                },
-                                                accountHolderName = ConstantClass.AccountHolderName,
-                                                finalCollectionDate = LoanEndDate,
-                                                loanNo = loaneCode,
-                                                accountType = AccountType,
-                                                emailAddress = CusteMailID,
-                                                firstCollectionDate = LoanStartDate,
-                                                mobileNumber = CustPrimaryMobileNumber,
-                                                bankAccountNumberConfirmation = AccountNumber,
-                                                addIn2 = BranchAddress,
-                                                addIn3 = "",
-                                                debitType = true,
-                                                teleNumber = "",
-                                                authType = "",
-                                                bankID = BankID,
-                                                bankAccountNumber = AccountNumber
-                                            )
-
-                                            hitApiForEnach(request,false)
+                                            fetchEmandateOptions()
 
                                         }
                                         else {
@@ -1799,6 +1876,7 @@ class QRCodePage : BaseActivity() {
     }
 
 
+
     fun hitApiForLogin() {
 
         var sessionOutReq = SessionOutReq(
@@ -1911,11 +1989,11 @@ class QRCodePage : BaseActivity() {
     }
 
 
-    fun hitApiForEnach(request: EMandateRequest,check: Boolean) {
+    fun hitApiForEnach(request: EMandateRequest, mode: String, check: Boolean) {
         Log.d("eManadateReq", Gson().toJson(request))
 
-        if(LoanMode.equals(ConstantClass.offline)) {
 
+        if(mode.equals(ConstantClass.offline)) {
             panViewModel.getEMandateRequestReq(request).observe(this) { resources ->
                 resources.let {
                     when (it.apiStatus) {
@@ -1929,7 +2007,7 @@ class QRCodePage : BaseActivity() {
                                         if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
                                             ConstantClass.dialog.dismiss()
                                         }
-                                        binding.LoanCreatelayout.isEnabled= true
+                                        /*binding.LoanCreatelayout.isEnabled= true*/
 
                                         if (response!!.data?.customer != null) {
                                             webUrl = response!!.data!!.url
@@ -1952,7 +2030,8 @@ class QRCodePage : BaseActivity() {
                                                 retailerCode= RetailerCodeForEnach,
                                                 loanCode= loaneCode,
                                                 emBankName=BankName,
-                                                emIfscCode =BankIFSCCode
+                                                emIfscCode =BankIFSCCode,
+                                                emumrn = response.data!!.customer!!.umrn
                                             )
 
                                             hitApiForUploadEnachMandateDataResponse(request)
@@ -2001,82 +2080,91 @@ class QRCodePage : BaseActivity() {
 
             }
         }
+
         else{
-            panViewModel.getEMandateOnlineRequest(request).observe(this) { resources ->
-                resources.let {
-                    when (it.apiStatus) {
-                        ApiStatus.SUCCESS -> {
-                            it.data.let { users ->
 
-                                if(users!!.isSuccessful){
-                                    users!!.body().let { response ->
-                                        Log.d("eMandateOnlineRes", Gson().toJson(response))
+            if(selectedAuthType!!.contains(ConstantClass.UPIAUTOPAY)){
+                var request = UPIMandateRequest(
+                   registrationID = request.registrationID
+                )
+                Log.d("UPIMandateReq", Gson().toJson(request))
+                panViewModel.getUpiMandateOnlineRequest(request).observe(this) { resources ->
+                    resources.let {
+                        when (it.apiStatus) {
+                            ApiStatus.SUCCESS -> {
+                                it.data.let { users ->
 
-                                        if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
-                                            ConstantClass.dialog.dismiss()
+                                    if(users!!.isSuccessful){
+                                        users!!.body().let { response ->
+                                            Log.d("eMandateUpiOnlineRes", Gson().toJson(response))
+
+                                            if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
+                                                ConstantClass.dialog.dismiss()
+                                            }
+
+                                            /*binding.LoanCreatelayout.isEnabled= true*/
+
+                                            if (response!!.code=="200" ) {
+                                                webUrl = response!!.intentUrl
+                                                startActivity(Intent(this@QRCodePage, RetailerEMandateVerifyPage::class.java))
+                                            }
+                                            else {
+                                                ConstantClass.dialog.dismiss()
+                                                isEmandateVerified= "No"
+                                                isEnachCancelled = true
+                                                Toast.makeText(this, response.errorMessage.toString(), Toast.LENGTH_SHORT).show()
+                                            }
+
+                                            if(!isEmandateVerified.isNullOrBlank()){
+                                                var request = EnachDateUploadReq(
+                                                    isEmandateVerified = isEmandateVerified,
+                                                    emAccountType = AccountType,
+                                                    isPannydropVerified = isPannydropVerified,
+                                                    emAccountNumber = AccountNumber,
+                                                    customerCode = CustomerCodeForEnach,
+                                                    retailerCode= RetailerCodeForEnach,
+                                                    loanCode= loaneCode,
+                                                    emBankName=BankName,
+                                                    emIfscCode =BankIFSCCode,
+                                                    emumrn = ""
+                                                )
+
+                                                hitApiForUploadEnachMandateDataResponse(request)
+                                            }
+
                                         }
 
-                                        binding.LoanCreatelayout.isEnabled= true
-
-                                        if (response!!.data?.customer != null) {
-                                            webUrl = response!!.data!!.url
-                                            startActivity(Intent(this@QRCodePage, RetailerEMandateVerifyPage::class.java))
-                                        }
-                                        else {
-                                            ConstantClass.dialog.dismiss()
-                                            isEmandateVerified= "No"
-                                            isEnachCancelled = true
-                                            Toast.makeText(this, response.message, Toast.LENGTH_SHORT).show()
-                                        }
-
-                                        if(!isEmandateVerified.isNullOrBlank()){
-                                            var request = EnachDateUploadReq(
-                                                isEmandateVerified = isEmandateVerified,
-                                                emAccountType = AccountType,
-                                                isPannydropVerified = isPannydropVerified,
-                                                emAccountNumber = AccountNumber,
-                                                customerCode = CustomerCodeForEnach,
-                                                retailerCode= RetailerCodeForEnach,
-                                                loanCode= loaneCode,
-                                                emBankName=BankName,
-                                                emIfscCode =BankIFSCCode
-                                            )
-
-                                            hitApiForUploadEnachMandateDataResponse(request)
-                                        }
-
+                                        Toast.makeText(this, "Upi AutoPay not working", Toast.LENGTH_LONG).show()
+                                    }
+                                    else {
+                                        Toast.makeText(this, resources.message ?: "Server error occurred", Toast.LENGTH_LONG).show()
                                     }
 
-                                    val error = users.body()?.statusDesc ?: users.message() ?: "Something went wrong"
-                                    Toast.makeText(this, error, Toast.LENGTH_LONG).show()
-                                }
-                                else {
-                                    Toast.makeText(this, resources.message ?: "Server error occurred", Toast.LENGTH_LONG).show()
                                 }
 
                             }
 
-                        }
+                            ApiStatus.ERROR -> {
+                                ConstantClass.dialog.dismiss()
+                                // ✅ Print the full error details
+                                Log.e("API_ERROR", "Status: ERROR")
+                                Log.e("API_ERROR_CODE", resources.data?.code().toString())
+                                Log.e("API_ERROR_MSG", resources.message ?: "Unknown Error")
 
-                        ApiStatus.ERROR -> {
-                            ConstantClass.dialog.dismiss()
-                            // ✅ Print the full error details
-                            Log.e("API_ERROR", "Status: ERROR")
-                            Log.e("API_ERROR_CODE", resources.data?.code().toString())
-                            Log.e("API_ERROR_MSG", resources.message ?: "Unknown Error")
+                                Toast.makeText(this, "Server error occurred (Code: ${resources.data?.code() ?: "Unknown"})", Toast.LENGTH_LONG).show()
 
-                            Toast.makeText(this, "Server error occurred (Code: ${resources.data?.code() ?: "Unknown"})", Toast.LENGTH_LONG).show()
+                                // Optional: Handle specific 500 error
+                                if (resources.data?.code() == 500) {
+                                    Log.e("API_ERROR", "Internal Server Error from backend.")
+                                }
 
-                            // Optional: Handle specific 500 error
-                            if (resources.data?.code() == 500) {
-                                Log.e("API_ERROR", "Internal Server Error from backend.")
                             }
 
-                        }
+                            ApiStatus.LOADING -> {
+                                if(check){
+                                    ConstantClass.OpenPopUpForVeryfyOTP(this)
+                                }
 
-                        ApiStatus.LOADING -> {
-                            if(check){
-                                ConstantClass.OpenPopUpForVeryfyOTP(this)
                             }
 
                         }
@@ -2084,8 +2172,94 @@ class QRCodePage : BaseActivity() {
                     }
 
                 }
-
             }
+
+            else{
+                panViewModel.getEMandateOnlineRequest(request).observe(this) { resources ->
+                    resources.let {
+                        when (it.apiStatus) {
+                            ApiStatus.SUCCESS -> {
+                                it.data.let { users ->
+
+                                    if(users!!.isSuccessful){
+                                        users!!.body().let { response ->
+                                            Log.d("eMandateOnlineRes", Gson().toJson(response))
+
+                                            if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
+                                                ConstantClass.dialog.dismiss()
+                                            }
+
+                                          /*  binding.LoanCreatelayout.isEnabled= true*/
+
+                                            if (response!!.data?.customer != null) {
+                                                webUrl = response!!.data!!.url
+                                                startActivity(Intent(this@QRCodePage, RetailerEMandateVerifyPage::class.java))
+                                            }
+                                            else {
+                                                ConstantClass.dialog.dismiss()
+                                                isEmandateVerified= "No"
+                                                isEnachCancelled = true
+                                                Toast.makeText(this, response.message, Toast.LENGTH_SHORT).show()
+                                            }
+
+                                            if(!isEmandateVerified.isNullOrBlank()){
+                                                var request = EnachDateUploadReq(
+                                                    isEmandateVerified = isEmandateVerified,
+                                                    emAccountType = AccountType,
+                                                    isPannydropVerified = isPannydropVerified,
+                                                    emAccountNumber = AccountNumber,
+                                                    customerCode = CustomerCodeForEnach,
+                                                    retailerCode= RetailerCodeForEnach,
+                                                    loanCode= loaneCode,
+                                                    emBankName=BankName,
+                                                    emIfscCode =BankIFSCCode ,
+                                                    emumrn = "")
+                                                hitApiForUploadEnachMandateDataResponse(request)
+                                            }
+
+                                        }
+
+                                        val error = users.body()?.statusDesc ?: users.message() ?: "Something went wrong"
+                                        Toast.makeText(this, error, Toast.LENGTH_LONG).show()
+                                    }
+                                    else {
+                                        Toast.makeText(this, resources.message ?: "Server error occurred", Toast.LENGTH_LONG).show()
+                                    }
+
+                                }
+
+                            }
+
+                            ApiStatus.ERROR -> {
+                                ConstantClass.dialog.dismiss()
+                                // ✅ Print the full error details
+                                Log.e("API_ERROR", "Status: ERROR")
+                                Log.e("API_ERROR_CODE", resources.data?.code().toString())
+                                Log.e("API_ERROR_MSG", resources.message ?: "Unknown Error")
+
+                                Toast.makeText(this, "Server error occurred (Code: ${resources.data?.code() ?: "Unknown"})", Toast.LENGTH_LONG).show()
+
+                                // Optional: Handle specific 500 error
+                                if (resources.data?.code() == 500) {
+                                    Log.e("API_ERROR", "Internal Server Error from backend.")
+                                }
+
+                            }
+
+                            ApiStatus.LOADING -> {
+                                if(check){
+                                    ConstantClass.OpenPopUpForVeryfyOTP(this)
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+            }
+
         }
 
     }
@@ -2120,11 +2294,12 @@ class QRCodePage : BaseActivity() {
                                         ConstantClass.dialog.dismiss()
                                     }
 
-                                    binding.LoanCreatelayout.isEnabled= true
+                                    binding.LoanCreatelayout.isEnabled= false
                                     if(response.message.isNullOrBlank()){
                                         Toast.makeText(this,"Loan charge failed", Toast.LENGTH_SHORT).show()
                                     }
                                     else{
+                                        binding.LoanCreatelayout.isEnabled= true
                                         Toast.makeText(this,response!!.message.toString(), Toast.LENGTH_SHORT).show()
                                     }
 

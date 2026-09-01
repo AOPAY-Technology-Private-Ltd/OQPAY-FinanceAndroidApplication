@@ -30,7 +30,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.ViewModelProvider
-import com.bos.payment.appName.network.RetrofitClient
+
 import com.bosandroidapp.bosmobilefinance.ui.slideshow.ui.view.activity.retailer.cibilreportsfragment.BureauScore.Companion.userScore
 import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
@@ -88,6 +88,7 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.iisAggrementVeri
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isAggrementVerified
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.loginType
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.saveImageToCache
+import com.bosandroidapp.oqmobilefinance.data.model.ManageCustomerStepWiseResponse
 import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LoginReq
@@ -96,12 +97,15 @@ import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.ManageCustomerSt
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
+import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.ui.slideshow.activity.DashBoard
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
+import com.bosandroidapp.oqmobilefinance.utils.ApiResponse
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
+import retrofit2.Response
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -686,15 +690,18 @@ class IMEIDetailsPage : BaseActivity() {
                     resources.data.let { user->
                         ConstantClass.dialog.dismiss()
                         if(user!!.isSuccessful){
-                            var getData = user.body()
-                            Log.d("IMEIDetailsresponse", Gson().toJson(getData))
-                            Toast.makeText(this, getData!!.message, Toast.LENGTH_SHORT).show()
+                            val responseBody = user.body()
+                            val status = responseBody?.success
+                            val errorCode = responseBody?.code
+                            val customerCode = responseBody?.data?.customerCode
+                            Log.d("IMEIDetailsresponse", Gson().toJson(responseBody))
+                            Toast.makeText(this, responseBody?.message, Toast.LENGTH_SHORT).show()
 
-                            if(getData!!.statuss.toLowerCase().equals("false",ignoreCase = true)){
-
+                            if(status == true ){
+                                startActivity(Intent(this@IMEIDetailsPage, QRCodePage::class.java))
                             }
                             else{
-                                startActivity(Intent(this@IMEIDetailsPage, QRCodePage::class.java))
+
                             }
 
                         }

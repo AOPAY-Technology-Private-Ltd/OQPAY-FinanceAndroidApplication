@@ -1,10 +1,11 @@
 package com.bosandroidapp.oqmobilefinance.data.repository
 
-import com.bos.payment.appName.network.ApiInterface
+import com.bosandroidapp.oqmobilefinance.network.ApiInterface
 import com.bosandroidapp.oqmobilefinance.data.enach.EMandateRequest
 import com.bosandroidapp.oqmobilefinance.data.enach.ENachStatusReq
 import com.bosandroidapp.oqmobilefinance.data.gst.GstRequest
 import com.bosandroidapp.oqmobilefinance.data.loancharge.LoanChargeReq
+import com.bosandroidapp.oqmobilefinance.data.model.UPIMandateRequest
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.AadharVerificationReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.PanVerificationReq
 import com.bosandroidapp.oqmobilefinance.data.pennydrop.BankListReq
@@ -25,6 +26,8 @@ class PanRepository(private val apiInterface: ApiInterface) {
 
     suspend fun getEMandateRequestReq(req: EMandateRequest) = apiInterface.geteMandateRequest(req)
     suspend fun EMandateOnlineRequest(req: EMandateRequest) = apiInterface.geteMandateOnlineRequest(req)
+
+    suspend fun getUpiMandateOnlineRequest(req: UPIMandateRequest) = apiInterface.getUpiMandateOnlineRequest(req)
     suspend fun geteMandateSatusRequest(req: ENachStatusReq) = apiInterface.geteMandateSatusRequest(req)
     suspend fun geteMandateOnlineSatusRequest(req: ENachStatusReq) = apiInterface.geteMandateOnlineSatusRequest(req)
     suspend fun loanApplyChargesReq(req: LoanChargeReq) = apiInterface.loanApplyChargesReq(req)

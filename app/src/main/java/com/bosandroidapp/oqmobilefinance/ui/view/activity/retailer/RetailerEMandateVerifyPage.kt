@@ -24,7 +24,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
-import com.bos.payment.appName.network.RetrofitClient
+
 import com.bosandroidapp.bosmobilefinance.ui.slideshow.ui.view.activity.retailer.cibilreportsfragment.BureauScore.Companion.userScore
 import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
@@ -84,6 +84,7 @@ import com.bosandroidapp.oqmobilefinance.data.repository.PanRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.PanViewModelFactory
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityRetailerEmandateVerifyPageBinding
+import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.AppScanInstallPage.Companion.LoanMode
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.CongratulationPage.Companion.loaneCode
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.QRCodePage.Companion.isEnachCancelled
@@ -176,14 +177,11 @@ class RetailerEMandateVerifyPage : BaseActivity() {
 
                 Log.d("WEBVIEW", "Loaded URL: $url")
 
-
-                 // ✅ Inject JS AFTER page load
                 injectJs(view)
             }
         }
 
         clearWebView(binding.eMandatewebview)
-        // ✅ Load URL AFTER setup
         binding.eMandatewebview.loadUrl(webUrl!!)
     }
 
@@ -285,7 +283,8 @@ class RetailerEMandateVerifyPage : BaseActivity() {
                                                 retailerCode= RetailerCodeForEnach,
                                                 loanCode= loaneCode,
                                                 emBankName=BankName,
-                                                emIfscCode =BankIFSCCode
+                                                emIfscCode =BankIFSCCode,
+                                                emumrn = response.data.customer!!.umrn
                                             )
 
                                             hitApiForUploadEnachMandateDataResponse(request,isEmandateVerified)
@@ -296,7 +295,7 @@ class RetailerEMandateVerifyPage : BaseActivity() {
                                     else {
                                         if(!eMandateStatus.equals(eMandatepending)){
                                             isEmandateVerified= "No"
-                                            showingRejectioneMandatePopUp()
+                                            showingRejectioneMandatePopUp(response.data.customer!!.umrn!!)
                                         }
                                     }
 
@@ -357,6 +356,7 @@ class RetailerEMandateVerifyPage : BaseActivity() {
                                         Toast.makeText(this, "ENach Mandate is Active", Toast.LENGTH_SHORT).show()
 
                                         if(!isEmandateVerified.isNullOrBlank()){
+
                                             var request = EnachDateUploadReq(
                                                 isEmandateVerified = isEmandateVerified,
                                                 emAccountType = AccountType,
@@ -366,10 +366,12 @@ class RetailerEMandateVerifyPage : BaseActivity() {
                                                 retailerCode= RetailerCodeForEnach,
                                                 loanCode= loaneCode,
                                                 emBankName=BankName,
-                                                emIfscCode =BankIFSCCode
+                                                emIfscCode =BankIFSCCode,
+                                                emumrn = response.data.customer!!.umrn
                                             )
 
                                             hitApiForUploadEnachMandateDataResponse(request,isEmandateVerified)
+
                                         }
 
                                     }
@@ -377,7 +379,7 @@ class RetailerEMandateVerifyPage : BaseActivity() {
                                     else {
                                         if(!eMandateStatus.equals(eMandatepending)){
                                             isEmandateVerified= "No"
-                                            showingRejectioneMandatePopUp()
+                                            showingRejectioneMandatePopUp(response.data.customer!!.umrn!!)
                                         }
                                     }
 
@@ -413,6 +415,7 @@ class RetailerEMandateVerifyPage : BaseActivity() {
             }
         }
     }
+
 
     fun  hitApiForUploadEnachMandateDataResponse(request:EnachDateUploadReq,isMandate: String){
 
@@ -464,7 +467,7 @@ class RetailerEMandateVerifyPage : BaseActivity() {
 
     }
 
-    fun showingRejectioneMandatePopUp(){
+    fun showingRejectioneMandatePopUp(emumrn: String){
         dialog = Dialog(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.enach_reject_alert)
@@ -493,7 +496,8 @@ class RetailerEMandateVerifyPage : BaseActivity() {
                     retailerCode= RetailerCodeForEnach,
                     loanCode= loaneCode,
                     emBankName=BankName,
-                    emIfscCode =BankIFSCCode
+                    emIfscCode =BankIFSCCode,
+                    emumrn = emumrn
                 )
 
                 hitApiForUploadEnachMandateDataResponse(request,isEmandateVerified)
@@ -512,7 +516,7 @@ class RetailerEMandateVerifyPage : BaseActivity() {
 
     override fun onBackPressed() {
         isEmandateVerified= "No"
-        showingRejectioneMandatePopUp()
+        showingRejectioneMandatePopUp("")
     }
 
 

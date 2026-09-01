@@ -7,6 +7,7 @@ import com.bosandroidapp.oqmobilefinance.data.enach.EMandateRequest
 import com.bosandroidapp.oqmobilefinance.data.enach.ENachStatusReq
 import com.bosandroidapp.oqmobilefinance.data.gst.GstRequest
 import com.bosandroidapp.oqmobilefinance.data.loancharge.LoanChargeReq
+import com.bosandroidapp.oqmobilefinance.data.model.UPIMandateRequest
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.AadharVerificationReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.PanVerificationReq
 import com.bosandroidapp.oqmobilefinance.data.pennydrop.BankListReq
@@ -79,6 +80,19 @@ class PanViewModel(private val repository: PanRepository) : ViewModel() {
         emit(ApiResponse.loading(data = null))
         try {
             emit(ApiResponse.success(data = repository.EMandateOnlineRequest(req)))
+        }
+        catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
+        }
+    }
+
+    //
+
+
+    fun getUpiMandateOnlineRequest(req: UPIMandateRequest) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            emit(ApiResponse.success(data = repository.getUpiMandateOnlineRequest(req)))
         }
         catch (exception: Exception) {
             emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))

@@ -8,6 +8,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.AddBankAccountReq
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerEmiStatusReq
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerSearchForShortCutLoanRequest
 import com.bosandroidapp.oqmobilefinance.data.model.DueOverdueRequest
+import com.bosandroidapp.oqmobilefinance.data.model.EmandateOptionSelectetionReq
 import com.bosandroidapp.oqmobilefinance.data.model.GenerateAccessTokenRequest
 import com.bosandroidapp.oqmobilefinance.data.model.GetRetailerLedgerReq
 import com.bosandroidapp.oqmobilefinance.data.model.HoldAmountWithdrawReq
@@ -415,10 +416,23 @@ class AuthenticationViewModel (private val repository: AuthRepository):ViewModel
         }
     }
 
+
+
     fun UpdateEmandateDetails(req: EnachDateUploadReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
             emit(handleApiResponse(repository.UpdateEmandateDetails(req), "E-Mandate Update"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
+        }
+    }
+
+
+
+    fun geteMandateSelectOptionRequest(req: EmandateOptionSelectetionReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            emit(handleApiResponse(repository.geteMandateSelectOptionRequest(req), "E-Mandate Update"))
         } catch (exception: Exception) {
             emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }

@@ -10,16 +10,17 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.lifecycle.ViewModelProvider
-import com.bos.payment.appName.network.RetrofitClient
+
 import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.FragmentPayoutReportsBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
-import com.bosandroidapp.oqmobilefinance.data.model.DataItem
+import com.bosandroidapp.oqmobilefinance.data.model.WalletReportDataItem
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletReportReq
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
+import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.ui.view.adapter.RetailerWalletAdapter
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
@@ -31,7 +32,7 @@ class PayoutReports : Fragment() {
     lateinit var binding: FragmentPayoutReportsBinding
     lateinit var preference : SharedPreference
     lateinit var viewModel: AuthenticationViewModel
-    var reportDataList: List<DataItem?>? = arrayListOf()
+    var reportDataList: List<WalletReportDataItem?>? = arrayListOf()
 
 
     companion object{

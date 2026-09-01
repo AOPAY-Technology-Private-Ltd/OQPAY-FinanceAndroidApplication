@@ -30,7 +30,9 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.bos.payment.appName.network.RetrofitClient
+import com.bosandroidapp.oqmobilefinance.data.model.EmandateOptionSelectetionReq
+import com.bosandroidapp.oqmobilefinance.data.model.EmandateSelectDataItem
+import com.bosandroidapp.oqmobilefinance.ui.view.adapter.EmandateOptionAdapter
 import com.bosandroidapp.bosmobilefinance.ui.slideshow.ui.view.activity.retailer.cibilreportsfragment.BureauScore.Companion.userScore
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
@@ -109,6 +111,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.CustomerStepDataItem
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerPerCustomerListShortCutForLoanReq
 import com.bosandroidapp.oqmobilefinance.data.model.ShortCutCustomerRequest
 import com.bosandroidapp.oqmobilefinance.data.model.ShortCutCustomerResponse
+import com.bosandroidapp.oqmobilefinance.data.model.UPIMandateRequest
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.ManageCustomerStepWiseReq
 import com.bosandroidapp.oqmobilefinance.data.pennydrop.BankListReq
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
@@ -117,6 +120,7 @@ import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFa
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.PanViewModelFactory
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityCustomerListForCreatingShortCutLoanProcessPageBinding
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
+import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.AppScanInstallPage
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.AppScanInstallPage.Companion.CustomerPhotoPath
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.AppScanInstallPage.Companion.LoanMode
@@ -150,6 +154,10 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
     private var FilterReportDataList: MutableList<CustomerStepDataItem> = mutableListOf()
     private lateinit var customerAdapter: CustomerShortcutLoanAdapter
     private lateinit var binding: ActivityCustomerListForCreatingShortCutLoanProcessPageBinding
+
+    private var selectedRegistrationID: String = ""
+    private var selectedAuthType: String = ""
+    private var emandateSelectList: MutableList<Pair<String, List<EmandateSelectDataItem>>?> = mutableListOf()
 
     lateinit var dialog: Dialog
 
@@ -195,20 +203,6 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, p1: Int, p2: Int, p3: Int) {
                 val search = s.toString().trim()
 
-              /*  if(search.isNotEmpty()){
-                    var filterList = customerList.filter {
-                        it.customerStatus!!.lowercase().contains(selectedItem.lowercase())
-                    } as MutableList<CustomerStepDataItem>
-                    customerDataAccordingToStatus(filterList)
-                }*/
-
-              /*  binding.searchIcon.imageTintList = ColorStateList.valueOf(
-                    ContextCompat.getColor(
-                        this@CustomerListForCreatingShortCutLoanProcessPage,
-                        if (search.isNullOrBlank()) R.color.grey else R.color.blue
-                    )
-                )*/
-
 
             }
 
@@ -229,14 +223,6 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
         })
 
 
-      /*  binding.searchIcon.setOnClickListener {
-            val search = binding.searcMobile.text.toString().trim()
-            if (search.isNotEmpty()) {
-                hitApiForCustomerwiseDetails(search)
-            } else {
-                Toast.makeText(this, "Please enter search text", Toast.LENGTH_SHORT).show()
-            }
-        }*/
 
 
         binding.back.setOnClickListener {
@@ -289,20 +275,6 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
         }
 
     }
-
-
-
-   /* fun setDataInView(customerList: List<CustomerShortCutDataItem>) {
-        Log.d("List", Gson().toJson(customerList))
-        if (customerList.isNotEmpty()) {
-            binding.showCustomerreports.visibility = View.VISIBLE
-            binding.notfoundimage.visibility = View.GONE
-            customerAdapter.updateData(customerList)
-        } else {
-            binding.showCustomerreports.visibility = View.GONE
-            binding.notfoundimage.visibility = View.VISIBLE
-        }
-    }*/
 
 
     fun setview() {
@@ -638,18 +610,16 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
         acounttype.text = AccountType
 
         if (bankList.isNotEmpty()) {
+
             BankID = bankList.find { it.first == BankName }?.second!!
             Log.d("FetchBankList", Gson().toJson(bankList))
         }
 
         nextLayout.setOnClickListener {
             if (banificeryName.text.toString().isEmpty()) {
-                Toast.makeText(
-                    this@CustomerListForCreatingShortCutLoanProcessPage,
-                    "Please enter banificery name",
-                    Toast.LENGTH_SHORT
-                ).show()
-            } else {
+                Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage, "Please enter banificery name", Toast.LENGTH_SHORT).show()
+            } 
+            else {
                 val startDate = LoanStartDate
                 val endDate = LoanEndDate
                 val emiAmountVal = productDetails!!.emiAmount?.toDoubleOrNull()?.roundToInt() ?: 0
@@ -662,10 +632,11 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
                     iFSCCode = bankDetails!!.bankIFSCCode,
                     frequncy = "MNTH",
                     registrationID = if (LoanMode == ConstantClass.online) {
-                        ConstantClass.PAN_VERIFICATION_REGISTRATION_ID
-                    } else {
-                        ConstantClass.PAN_VERIFICATION_REGISTRATION_ID_OFFLINE
-                    },
+                            ConstantClass.PAN_VERIFICATION_REGISTRATION_ID
+                    }
+                    else {
+                            ConstantClass.PAN_VERIFICATION_REGISTRATION_ID_OFFLINE
+                           },
                     accountHolderName = "${customerDetails.firstName} ${customerDetails.lastName}",
                     finalCollectionDate = endDate,
                     loanNo = createLoanDetails!!.loanCode,
@@ -716,8 +687,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
 
                                 if (response!!.status!!.toLowerCase().equals("false")) {
                                     ConstantClass.dialog.dismiss()
-                                    Toast.makeText(
-                                        this@CustomerListForCreatingShortCutLoanProcessPage,
+                                    Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage,
                                         response.message,
                                         Toast.LENGTH_SHORT
                                     ).show()
@@ -772,7 +742,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
 
         if (!isEmandateVerifiedStatus) {
             // Step 7: E-Mandate Process (After Loan Created)
-            hitApiForBankList(item)
+            showEmandateSelectionDialog(item)
 
         } else if (!isAccessKeyVerifiedStatus ) {
             // Step 8: App Install
@@ -780,6 +750,105 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
         }
         else {
             Toast.makeText(this, "Loan process is already completed for this customer.", Toast.LENGTH_SHORT).show()
+        }
+
+    }
+
+
+    private fun showEmandateSelectionDialog(item: CustomerShortCutDataItem) {
+        val dialog = Dialog(this, R.style.FullScreenDialog)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(R.layout.dialog_emandate_selection)
+
+        dialog.window?.apply {
+            setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        }
+
+        dialog.setCanceledOnTouchOutside(false)
+
+
+        val btnProceed = dialog.findViewById<LinearLayout>(R.id.nextlayout)
+        val back = dialog.findViewById<ImageView>(R.id.back)
+
+        fetchEmandateOptionsForDialog(dialog)
+
+        btnProceed.setOnClickListener {
+            if (selectedRegistrationID.isNotBlank()) {
+                dialog.dismiss()
+                hitApiForBankList(item)
+            } else {
+                Toast.makeText(this, "Please select an E-Mandate service", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        back.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+
+    }
+
+
+    private fun fetchEmandateOptionsForDialog(dialog: Dialog) {
+        val req = EmandateOptionSelectetionReq(
+            mode = LoanMode,
+            registrationID = if (LoanMode == ConstantClass.online) {
+                ConstantClass.Enach_Option_Online_REGISTRATION_ID
+            } else {
+                ConstantClass.Enach_Option_Offline_REGISTRATION_ID
+            }
+        )
+        setupEmandateOptionsInDialog(req, dialog)
+    }
+
+
+    private fun setupEmandateOptionsInDialog(req: EmandateOptionSelectetionReq, dialog: Dialog) {
+        val layout = dialog.findViewById<LinearLayout>(R.id.emandateOptionLayout)
+        val rv = dialog.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.selectOptionForeMandate)
+
+        Log.d("EmandateOptionReq", Gson().toJson(req))
+
+        viewModel.geteMandateSelectOptionRequest(req).observe(this) { resources ->
+            when (resources.apiStatus) {
+                ApiStatus.SUCCESS -> {
+                    resources.data?.let { users ->
+                        if (users.isSuccessful) {
+                            users.body()?.let { response ->
+                                if (response.code == 200) {
+                                    val getdata = response.data
+                                    if (!getdata.isNullOrEmpty()) {
+                                        layout.visibility = View.VISIBLE
+                                        emandateSelectList.clear()
+                                        emandateSelectList.addAll(listOf(Pair(req.mode!!, getdata.filterNotNull()) as Pair<String, List<EmandateSelectDataItem>>?))
+
+                                        val adapter = EmandateOptionAdapter(emandateSelectList) { selectedOption ->
+                                            val option = selectedOption.second
+                                            selectedRegistrationID = option.registrationID ?: ""
+                                            selectedAuthType = option.apiName ?: ""
+                                            Log.d("SelectedMandateDialog", "$selectedRegistrationID $selectedAuthType")
+                                        }
+                                        rv.adapter = adapter
+                                        adapter.selectFirstOption()
+                                    } else {
+                                        layout.visibility = View.GONE
+                                    }
+                                } else {
+                                    layout.visibility = View.GONE
+                                    Toast.makeText(this, response.message, Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        } else {
+                            Toast.makeText(this, resources.message ?: "EMandate Options Error", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+                ApiStatus.ERROR -> {
+                    Toast.makeText(this, resources.message ?: "EMandate Options Error", Toast.LENGTH_SHORT).show()
+                }
+                ApiStatus.LOADING -> {}
+            }
         }
 
     }
@@ -793,6 +862,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
         var loanData = customerDataForShortCut.createLoanDetails
 
         if (LoanMode == ConstantClass.offline) {
+
             panViewModel.getEMandateRequestReq(request).observe(this) { resources ->
                 when (resources.apiStatus) {
                     ApiStatus.SUCCESS -> {
@@ -804,16 +874,12 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
 
                                     if (response.data?.customer != null) {
                                         webUrl = response.data.url
-                                        startActivity(
-                                            Intent(
-                                                this@CustomerListForCreatingShortCutLoanProcessPage,
-                                                RetailerEMandateVerifyPage::class.java
-                                            )
-                                        )
-                                    } else {
+                                        startActivity(Intent(this@CustomerListForCreatingShortCutLoanProcessPage, RetailerEMandateVerifyPage::class.java))
+                                    }
+                                    else
+                                    {
                                         isEnachCancelled = true
-                                        Toast.makeText(this, response.message, Toast.LENGTH_SHORT)
-                                            .show()
+                                        Toast.makeText(this, response.message, Toast.LENGTH_SHORT).show()
                                     }
 
                                     var verifiedStatus = "No"
@@ -831,7 +897,8 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
                                         retailerCode = customerData!!.retailerCode,
                                         loanCode = loanData!!.loanCode,
                                         emBankName = bankData.bankName,
-                                        emIfscCode = bankData.bankIFSCCode
+                                        emIfscCode = bankData.bankIFSCCode,
+                                        emumrn = ""
                                     )
 
                                     hitApiForUploadEnachMandateDataResponse(uploadReq)
@@ -874,81 +941,168 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
                     }
                 }
             }
-        } else {
-            panViewModel.getEMandateOnlineRequest(request).observe(this) { resources ->
-                when (resources.apiStatus) {
-                    ApiStatus.SUCCESS -> {
-                        ConstantClass.dialog.dismiss()
-                        resources.data?.let { users ->
-                            if (users.isSuccessful) {
-                                users.body()?.let { response ->
-                                    Log.d("eMandateOnlineRes", Gson().toJson(response))
+        }
+        else {
 
-                                    if (response.data?.customer != null) {
-                                        webUrl = response.data.url
-                                        startActivity(
-                                            Intent(
-                                                this@CustomerListForCreatingShortCutLoanProcessPage,
-                                                RetailerEMandateVerifyPage::class.java
-                                            )
-                                        )
-                                    } else {
-                                        isEnachCancelled = true
-                                        Toast.makeText(this, response.message, Toast.LENGTH_SHORT)
-                                            .show()
+            if(selectedAuthType!!.contains(ConstantClass.UPIAUTOPAY)){
+                var request = UPIMandateRequest(
+                    registrationID = request.registrationID
+                )
+                Log.d("UPIMandateReq", Gson().toJson(request))
+                panViewModel.getUpiMandateOnlineRequest(request).observe(this) { resources ->
+                    resources.let {
+                        when (it.apiStatus) {
+                            ApiStatus.SUCCESS -> {
+                                it.data.let { users ->
+
+                                    if(users!!.isSuccessful){
+                                        users!!.body().let { response ->
+                                            Log.d("eMandateUpiOnlineRes", Gson().toJson(response))
+
+                                            if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
+                                                ConstantClass.dialog.dismiss()
+                                            }
+
+                                            if (response!!.code=="200" ) {
+                                                webUrl = response!!.intentUrl
+                                                Log.d("webUrl", webUrl.toString())
+                                                startActivity(Intent(this@CustomerListForCreatingShortCutLoanProcessPage, RetailerEMandateVerifyPage::class.java))
+                                            }
+                                            else {
+                                                ConstantClass.dialog.dismiss()
+                                                isEmandateVerified= "No"
+                                                isEnachCancelled = true
+                                                Toast.makeText(this, response.errorMessage.toString(), Toast.LENGTH_SHORT).show()
+                                            }
+
+                                            if(!isEmandateVerified.isNullOrBlank()){
+                                                var request = EnachDateUploadReq(
+                                                    isEmandateVerified = isEmandateVerified,
+                                                    emAccountType = AccountType,
+                                                    isPannydropVerified = isPannydropVerified,
+                                                    emAccountNumber = AccountNumber,
+                                                    customerCode = CustomerCodeForEnach,
+                                                    retailerCode= RetailerCodeForEnach,
+                                                    loanCode= loaneCode,
+                                                    emBankName=BankName,
+                                                    emIfscCode =BankIFSCCode,
+                                                    emumrn = ""
+                                                )
+
+                                                hitApiForUploadEnachMandateDataResponse(request)
+                                            }
+
+                                        }
+
+                                    }
+                                    else {
+                                        Toast.makeText(this, resources.message ?: "Server error occurred", Toast.LENGTH_LONG).show()
                                     }
 
-                                    var verifiedStatus = "No"
-                                    if (response.data?.customer != null) {
-                                        verifiedStatus = "Yes"
-                                    }
-
-                                    val uploadReq = EnachDateUploadReq(
-                                        isEmandateVerified = verifiedStatus,
-                                        emAccountType = bankData!!.accountType,
-                                        isPannydropVerified = bankData.isPannydropVerified,
-                                        emAccountNumber = bankData.accountNumber,
-                                        customerCode = customerData!!.customerCode,
-                                        retailerCode = customerData.retailerCode,
-                                        loanCode = loanData!!.loanCode,
-                                        emBankName = bankData.bankName,
-                                        emIfscCode = bankData.bankIFSCCode
-                                    )
-
-                                    hitApiForUploadEnachMandateDataResponse(uploadReq)
                                 }
-                                val error = users.body()?.statusDesc ?: users.message()
-                                ?: "Something went wrong"
 
-                                Toast.makeText(this, error, Toast.LENGTH_LONG).show()
-                            } else {
-                                var error = resources.data.toString()
-                                Toast.makeText(
-                                    this@CustomerListForCreatingShortCutLoanProcessPage,
-                                    error,
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                            }
+
+                            ApiStatus.ERROR -> {
+                                ConstantClass.dialog.dismiss()
+                                // ✅ Print the full error details
+                                Log.e("API_ERROR", "Status: ERROR")
+                                Log.e("API_ERROR_CODE", resources.data?.code().toString())
+                                Log.e("API_ERROR_MSG", resources.message ?: "Unknown Error")
+
+                                Toast.makeText(this, "Server error occurred (Code: ${resources.data?.code() ?: "Unknown"})", Toast.LENGTH_LONG).show()
+
+                                // Optional: Handle specific 500 error
+                                if (resources.data?.code() == 500) {
+                                    Log.e("API_ERROR", "Internal Server Error from backend.")
+                                }
+
+                            }
+
+                            ApiStatus.LOADING -> {
+                                if(check){
+                                    ConstantClass.OpenPopUpForVeryfyOTP(this)
+                                }
+
                             }
 
                         }
+
                     }
 
-                    ApiStatus.ERROR -> {
-                        ConstantClass.dialog.dismiss()
-                        Toast.makeText(
-                            this,
-                            resources.message ?: "Server error occurred",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
+                }
+            }
+            else{
+                panViewModel.getEMandateOnlineRequest(request).observe(this) { resources ->
+                    when (resources.apiStatus) {
+                        ApiStatus.SUCCESS -> {
+                            ConstantClass.dialog.dismiss()
+                            resources.data?.let { users ->
+                                if (users.isSuccessful) {
+                                    users.body()?.let { response ->
+                                        Log.d("eMandateOnlineRes", Gson().toJson(response))
 
-                    ApiStatus.LOADING -> {
-                        if (check) {
-                            ConstantClass.OpenPopUpForVeryfyOTP(this)
+                                        if (response.data?.customer != null) {
+                                            webUrl = response.data.url
+                                            startActivity(Intent(this@CustomerListForCreatingShortCutLoanProcessPage, RetailerEMandateVerifyPage::class.java))
+                                        }
+                                        else {
+                                            isEnachCancelled = true
+                                            Toast.makeText(this, response.message, Toast.LENGTH_SHORT).show()
+                                        }
+
+                                        var verifiedStatus = "No"
+
+                                        if (response.data?.customer != null) {
+                                            verifiedStatus = "Yes"
+                                        }
+
+                                        val uploadReq = EnachDateUploadReq(
+                                            isEmandateVerified = verifiedStatus,
+                                            emAccountType = bankData!!.accountType,
+                                            isPannydropVerified = bankData.isPannydropVerified,
+                                            emAccountNumber = bankData.accountNumber,
+                                            customerCode = customerData!!.customerCode,
+                                            retailerCode = customerData.retailerCode,
+                                            loanCode = loanData!!.loanCode,
+                                            emBankName = bankData.bankName,
+                                            emIfscCode = bankData.bankIFSCCode,
+                                            emumrn = ""
+                                        )
+
+                                        hitApiForUploadEnachMandateDataResponse(uploadReq)
+                                    }
+
+                                    val error = users.body()?.statusDesc ?: users.message() ?: "Something went wrong"
+
+                                    Toast.makeText(this, error, Toast.LENGTH_LONG).show()
+                                }
+                                else {
+                                    var error = resources.data.toString()
+                                    Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage, error, Toast.LENGTH_SHORT).show()
+                                }
+
+                            }
+                        }
+
+                        ApiStatus.ERROR -> {
+                            ConstantClass.dialog.dismiss()
+                            Toast.makeText(
+                                this,
+                                resources.message ?: "Server error occurred",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+
+                        ApiStatus.LOADING -> {
+                            if (check) {
+                                ConstantClass.OpenPopUpForVeryfyOTP(this)
+                            }
                         }
                     }
                 }
             }
+
         }
     }
 

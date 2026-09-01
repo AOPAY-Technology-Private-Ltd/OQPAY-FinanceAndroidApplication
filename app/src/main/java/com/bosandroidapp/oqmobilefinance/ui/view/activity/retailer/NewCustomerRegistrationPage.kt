@@ -2,6 +2,7 @@ package com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -11,6 +12,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Environment
+import android.provider.MediaStore
 import android.text.Editable
 import android.text.Html
 import android.text.TextWatcher
@@ -35,8 +37,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.bos.payment.appName.network.ApiInterface
-import com.bos.payment.appName.network.RetrofitClient
+
+
 import com.chaos.view.PinView
 import com.bosandroidapp.bosmobilefinance.ui.slideshow.data.model.loginsignup.cibilscore.CibilScoreReq
 import com.bosandroidapp.bosmobilefinance.ui.slideshow.ui.view.activity.retailer.cibilreportsfragment.BureauScore.Companion.userScore
@@ -124,6 +126,8 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.saveImageToCache
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.scrollToView
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.uriToFile
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.validateLoginInput
+import com.bosandroidapp.oqmobilefinance.data.model.CustomerRegistrationData
+import com.bosandroidapp.oqmobilefinance.data.model.ManageCustomerStepWiseResponse
 import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
 import com.bosandroidapp.oqmobilefinance.data.model.UpdateCustomerUploadDataReq
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
@@ -137,12 +141,16 @@ import com.bosandroidapp.oqmobilefinance.data.repository.CibilRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CibilViewModelFactory
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
+import com.bosandroidapp.oqmobilefinance.network.ApiInterface
+import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.ui.slideshow.activity.DashBoard
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.CibilViewModel
+import com.bosandroidapp.oqmobilefinance.utils.ApiResponse
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.bumptech.glide.Glide
+import retrofit2.Response
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -150,6 +158,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
+import java.io.FileWriter
 import java.io.IOException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
@@ -892,6 +901,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                         }
 
                        // startActivity(Intent(this@NewCustomerRegistrationPage, MobileSelectionActivity::class.java))
+
                     }
                     else {
                         binding.alternatemobileNumber.error= "Please enter alternate mobile number ."
@@ -2568,17 +2578,22 @@ class NewCustomerRegistrationPage : BaseActivity() {
                        resources.data.let { user->
                            ConstantClass.dialog.dismiss()
                            if(user!!.isSuccessful){
-                               var getData = user.body()
-                               Log.d("CustomerListResp", Gson().toJson(getData))
-                               Toast.makeText(this, getData!!.message, Toast.LENGTH_SHORT).show()
+                               val responseBody = user.body()
+                               val status = responseBody?.success
+                               val errorCode = responseBody?.code
+                               val customerCode = responseBody?.data?.customerCode
 
-                               if(getData!!.statuss.toLowerCase().equals("false" , ignoreCase = true)){
-                                   binding.createaccount.isEnabled = true
-                                   preference.setStringValue(ConstantClass.CustomerCode, "")
+                               Log.d("CustomerListResp", Gson().toJson(responseBody))
+                               Toast.makeText(this, responseBody?.message, Toast.LENGTH_SHORT).show()
+
+                               if(status==true && customerCode!!.isNotEmpty()){
+                                   Log.d("CustomerCode" ,customerCode)
+                                   preference.setStringValue(ConstantClass.CustomerCode, customerCode)
+                                   startActivity(Intent(this@NewCustomerRegistrationPage, MobileSelectionActivity::class.java))
                                }
                                else{
-                                   preference.setStringValue(ConstantClass.CustomerCode, getData.customerCode)
-                                   startActivity(Intent(this@NewCustomerRegistrationPage, MobileSelectionActivity::class.java))
+                                   binding.createaccount.isEnabled = true
+                                   preference.setStringValue(ConstantClass.CustomerCode, "")
                                }
 
                            }
@@ -2589,8 +2604,8 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                Toast.makeText(this@NewCustomerRegistrationPage, errorbody?.string(), Toast.LENGTH_SHORT).show()
                                binding.createaccount.isEnabled = true
                            }
-                       }
 
+                       }
 
                    }
 
@@ -2628,8 +2643,9 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
                                 ConstantClass.dialog.dismiss()
 
-                                if(errorCode==200 && getdata!=null ){
+                                if(errorCode==200 && getdata!=null && getdata.customerCode!!.isNotEmpty() ){
                                     Toast.makeText(this@NewCustomerRegistrationPage, message, Toast.LENGTH_SHORT).show()
+                                    preference.setStringValue(ConstantClass.CustomerCode, getdata.customerCode.toString())
                                     startActivity(Intent(this@NewCustomerRegistrationPage, MobileSelectionActivity::class.java))
                                 }
                                 else {
@@ -2652,6 +2668,8 @@ class NewCustomerRegistrationPage : BaseActivity() {
         }
 
     }
+
+
 
 
 }

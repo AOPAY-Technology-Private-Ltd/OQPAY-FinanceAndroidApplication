@@ -11,7 +11,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewpager2.widget.ViewPager2
-import com.bos.payment.appName.network.RetrofitClient
+
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.LoginMobileorMailid
@@ -26,6 +26,7 @@ import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFa
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityCibilReportsDetailsPageBinding
 import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
+import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
 import com.bosandroidapp.oqmobilefinance.ui.view.adapter.CibilViewPagerAdapter
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel

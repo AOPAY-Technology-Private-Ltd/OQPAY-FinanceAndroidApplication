@@ -43,8 +43,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.bos.payment.appName.network.ApiInterface
-import com.bos.payment.appName.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityEmiLoanDetailPageBinding
@@ -101,6 +99,8 @@ import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFa
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.DikshifinsureOnlinePGModelFactory
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.PanViewModelFactory
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
+import com.bosandroidapp.oqmobilefinance.network.ApiInterface
+import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.ui.slideshow.activity.DashBoard
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.customer.PGWebViewActivity.Companion.EMIamountPG
@@ -605,6 +605,7 @@ class EmiLoanDetailPage : BaseActivity() {
                     }*/
 
                     lifecycleScope.launch {
+
                         selectedNoofEmi = binding.noOfEmi.selectedItem.toString().toInt()
                         // val file = saveImageToCache(this@EmiLoanDetailPage,receiptUri,"ReceiptPhoto")
                         // ConstantClass.OpenPopUpForVeryfyOTP(this@EmiLoanDetailPage)
@@ -659,6 +660,7 @@ class EmiLoanDetailPage : BaseActivity() {
                             )
                             hitApiForRequestPG(req)
                         }
+
                         else{
 
                             var req = PGOnlineRequestCall(
@@ -1538,6 +1540,8 @@ class EmiLoanDetailPage : BaseActivity() {
                                     ConstantClass.dialog.dismiss()
                                     val intent = Intent(this@EmiLoanDetailPage, PGWebViewActivity::class.java)
                                     intent.putExtra("pgurl", response.preparePOSTForm)
+                                    intent.putExtra("mode", ConstantClass.offline)
+                                    intent.putExtra("merchantid", "")
                                     startActivity(intent)
                                 }
                                 else {
@@ -1585,6 +1589,8 @@ class EmiLoanDetailPage : BaseActivity() {
                                     ConstantClass.dialog.dismiss()
                                     val intent = Intent(this@EmiLoanDetailPage, PGWebViewActivity::class.java)
                                     intent.putExtra("pgurl", response!!.intentUrl)
+                                    intent.putExtra("mode", ConstantClass.online)
+                                    intent.putExtra("merchantid", response.marchentOrderID)
                                     startActivity(intent)
                                 }
                                 else {

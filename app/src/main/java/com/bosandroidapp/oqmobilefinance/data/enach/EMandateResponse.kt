@@ -121,6 +121,9 @@ data class Customer(
 	@field:SerializedName("nupay_ref_no")
 	val nupayRefNo: String? = null,
 
+	@field:SerializedName("umrn")
+	val umrn: String? = null,
+
 	@field:SerializedName("seq_tp")
 	val seqTp: String? = null,
 

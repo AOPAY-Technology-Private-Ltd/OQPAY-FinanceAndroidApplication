@@ -1,13 +1,13 @@
 package com.bosandroidapp.oqmobilefinance.utils
 
-import android.accessibilityservice.AccessibilityService.MODE_PRIVATE
+import android.content.Context.MODE_PRIVATE
 import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.work.ListenableWorker
-import com.bos.payment.appName.network.RetrofitClient
+import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CheckCompleteEmiStatus
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.convertDate
@@ -19,15 +19,12 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.uploadDataOnFire
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerlocationUploadReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.CustomerDataItem
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.GetCustomerLoanDetailsReq
-import com.bosandroidapp.oqmobilefinance.kioskmode.imposeRestrictions
-import com.bosandroidapp.oqmobilefinance.kioskmode.isLocked
-import com.bosandroidapp.oqmobilefinance.kioskmode.removeRestrictions
 import com.bosandroidapp.oqmobilefinance.kioskmode.setEMICompleted
 import com.bosandroidapp.oqmobilefinance.kioskmode.setEMINotCompleted
-import com.bosandroidapp.oqmobilefinance.kioskmode.startInternetAlertSituation
 import com.bosandroidapp.oqmobilefinance.kioskmode.startLockSituation
-import com.bosandroidapp.oqmobilefinance.kioskmode.stopInternetAlertSituation
 import com.bosandroidapp.oqmobilefinance.kioskmode.stopLockSituation
+import com.bosandroidapp.oqmobilefinance.kioskmode.startInternetAlertSituation
+import com.bosandroidapp.oqmobilefinance.kioskmode.stopInternetAlertSituation
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
@@ -83,33 +80,40 @@ suspend fun Context.syncEmis() = withContext(Dispatchers.IO) {
     currentDate = SimpleDateFormat("d/M/yyyy", Locale.getDefault()).format(Date())
 
     if (hasDateChanged()) {
-        // Logger.d(ACCESSIBILITYTAG, "Date Changed")
-        val preference = SharedPreference(this@syncEmis)
-        var loanemireq = GetCustomerLoanDetailsReq(
-            loancode = "",
-            customercode = preference.getStringValue(ConstantClass.CustomerCode, "")
-        )
-        try {
-            // Logger.d(ACCESSIBILITYTAG, "Syncing EMIs")
-            Log.d("Loanreq",Gson().toJson(loanemireq))
-            val loanDetails = getCustomerLoanEmiDetailsReq(loanemireq)
-            currentDate = loanDetails?.body()?.indiaTimeIST!!.convertDate()
-            val list = loanDetails?.body()?.data?.toList()
-
-            list?.let { loans ->
-                val obj = loans.getLoansStringObject()
-                // Logger.d(ACCESSIBILITYTAG, obj)
-                sharedPref.edit().putString("LoanData", obj).apply()
-            }
-
-        }
-        catch (e: Exception) {
-            // Logger.d(ACCESSIBILITYTAG, e.localizedMessage ?: "")
-        }
-
+        fetchAndStoreEmis(sharedPref)
     }
 
     isEMIDue(sharedPref)
+}
+
+@RequiresApi(Build.VERSION_CODES.R)
+suspend fun Context.forceSyncEmis() = withContext(Dispatchers.IO) {
+    val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
+    currentDate = SimpleDateFormat("d/M/yyyy", Locale.getDefault()).format(Date())
+    
+    fetchAndStoreEmis(sharedPref)
+    isEMIDue(sharedPref)
+}
+
+private suspend fun Context.fetchAndStoreEmis(sharedPref: SharedPreferences) {
+    val preference = SharedPreference(this)
+    var loanemireq = GetCustomerLoanDetailsReq(
+        loancode = "",
+        customercode = preference.getStringValue(ConstantClass.CustomerCode, "")
+    )
+    try {
+        Log.d("Loanreq", Gson().toJson(loanemireq))
+        val loanDetails = getCustomerLoanEmiDetailsReq(loanemireq)
+        currentDate = loanDetails?.body()?.indiaTimeIST!!.convertDate()
+        val list = loanDetails?.body()?.data?.toList()
+
+        list?.let { loans ->
+            val obj = loans.getLoansStringObject()
+            sharedPref.edit().putString("LoanData", obj).apply()
+        }
+    } catch (e: Exception) {
+        Log.e(ACCESSIBILITYTAG, "Error fetching EMIs: ${e.localizedMessage}")
+    }
 }
 
 

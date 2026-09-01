@@ -3,6 +3,7 @@ package com.bosandroidapp.oqmobilefinance.constant
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -116,6 +117,17 @@ object ConstantClass {
          const val PENNYDROP_REGISTRATION_ID_OFFLINE = "AOP-5050"*/
 
 
+        // for enach option using registration id always use for bot uat and production ......................
+
+
+
+        // production merchant id online
+        const val Enach_Option_Online_REGISTRATION_ID = "AOP-5039"
+
+       // production merchant id offline
+        const val Enach_Option_Offline_REGISTRATION_ID = "AOP-5050"
+
+
        // UAT
        const val BASE_URL = "https://api.oqpay.co.in/"
        const val BASE_URL_IMAGE = "https://api.oqpay.co.in"
@@ -125,10 +137,10 @@ object ConstantClass {
       const val PAN_VERIFICATION_REGISTRATION_ID = "AOP-554"
       const val PENNYDROP_REGISTRATION_ID = "AOP-554"
 
+
       //  UAT merchant id offline
       const val PAN_VERIFICATION_REGISTRATION_ID_OFFLINE = "AOP-554"
       const val PENNYDROP_REGISTRATION_ID_OFFLINE = "AOP-554"
-
 
 
      const val SMS_BASE_URL = "http://web.adcruxmedia.in/"
@@ -146,6 +158,7 @@ object ConstantClass {
      const val EMILIST = "EmiList"
 
      const val FCMTOKEN = "fcmtoken"
+     const val UPIAUTOPAY = "UPI Autopay"
 
      const val DEVICEID = "deviceid"
      const val CHECKACCESSIBILITY = "checkAccessibility"
@@ -200,6 +213,9 @@ object ConstantClass {
      const val GENERATEKEY = "GenerateKey"
      const val GENERATE_KEY_COUNT = "generate_key_count"
      const val LAST_GENERATE_TIME = "last_generate_time"
+     const val LOAN_REJECT = "LOAN_REJECTED"
+     const val DISBURSMENT_REJECT = "DISBURSMENT_REJECTED"
+     const val UNLOCK = "UNLOCK"
 
      var PanFirstName : String= ""
      var PanMiddleName : String= ""
@@ -1319,6 +1335,35 @@ object ConstantClass {
     fun isValidGST(gstin: String): Boolean {
         val regex = Regex("^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$")
         return regex.matches(gstin.uppercase())
+    }
+
+     fun saveRequestToFile(json: String,context: Context) {
+        try {
+            val values = ContentValues().apply {
+                put(MediaStore.Downloads.DISPLAY_NAME, "OnlineCustomerReq.txt")
+                put(MediaStore.Downloads.MIME_TYPE, "text/plain")
+                put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+            }
+
+            val resolver = context.contentResolver
+            val uri = resolver.insert(
+                MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+                values
+            )
+
+            if (uri != null) {
+                resolver.openOutputStream(uri)?.use { output ->
+                    output.write(json.toByteArray())
+                }
+
+                Log.d("FileSave", "Saved to Downloads: $uri")
+            } else {
+                Log.e("FileSave", "Could not create file")
+            }
+
+        } catch (e: Exception) {
+            Log.e("FileSave", "Error saving request to file: ${e.message}")
+        }
     }
 
 

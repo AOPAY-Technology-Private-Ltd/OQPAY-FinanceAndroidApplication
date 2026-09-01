@@ -175,6 +175,7 @@
                         android:textColor="@color/black"
                         android:textSize="@dimen/_12ssp" />
                 </LinearLayout>
+
             </LinearLayout>
 
             <!-- Customer Status Card -->
@@ -290,6 +291,34 @@
                     android:textColor="@color/white"
                     android:textSize="@dimen/_13ssp" />
             </LinearLayout>
+
+          <!--  create option for selecte emandate option-->
+
+                <LinearLayout
+                    android:id="@+id/emandateOptionLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/_10sdp"
+                        android:fontFamily="@font/inter_bold"
+                        android:text="Select E-Mandate Service"/>
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/selectOptionForeMandate"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginTop="@dimen/_5sdp"
+                        tools:listitem="@layout/emandate_option_item_layout"
+                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
+
+                </LinearLayout>
+
 
         </LinearLayout>
 

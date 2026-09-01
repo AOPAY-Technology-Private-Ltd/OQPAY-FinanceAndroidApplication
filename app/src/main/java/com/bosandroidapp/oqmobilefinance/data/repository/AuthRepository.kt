@@ -1,6 +1,6 @@
 package com.bosandroidapp.oqmobilefinance.data.repository
 
-import com.bos.payment.appName.network.ApiInterface
+import com.bosandroidapp.oqmobilefinance.network.ApiInterface
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.createMultipartFromUri
 import com.bosandroidapp.oqmobilefinance.data.enach.EnachDateUploadReq
 import com.bosandroidapp.oqmobilefinance.data.gst.GstRequest
@@ -9,10 +9,12 @@ import com.bosandroidapp.oqmobilefinance.data.model.CustomerEmiStatusReq
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerSearchForShortCutLoanRequest
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerlocationUploadReq
 import com.bosandroidapp.oqmobilefinance.data.model.DueOverdueRequest
+import com.bosandroidapp.oqmobilefinance.data.model.EmandateOptionSelectetionReq
 import com.bosandroidapp.oqmobilefinance.data.model.GenerateAccessTokenRequest
 import com.bosandroidapp.oqmobilefinance.data.model.GetRetailerLedgerReq
 import com.bosandroidapp.oqmobilefinance.data.model.HoldAmountWithdrawReq
 import com.bosandroidapp.oqmobilefinance.data.model.LowCibilCustomerReportReq
+import com.bosandroidapp.oqmobilefinance.data.model.ManageCustomerStepWiseResponse
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerLoginOtpRequest
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerLoginOtpResendRequest
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerPerCustomerListShortCutForLoanReq
@@ -252,6 +254,9 @@ class AuthRepository(private val apiInterface: ApiInterface) {
   suspend fun UpdateEmandateDetails(req: EnachDateUploadReq) = apiInterface.UpdateEmandateDetails(req)
 
 
+  suspend fun geteMandateSelectOptionRequest(req: EmandateOptionSelectetionReq) = apiInterface.geteMandateSelectOptionRequest(req)
+
+
   suspend fun sendTokenViaNotificationReq(req: NotificationSendTokenRequest) = apiInterface.sendTokenViaNotificationReq(req)
 
 
@@ -276,7 +281,7 @@ class AuthRepository(private val apiInterface: ApiInterface) {
   suspend fun getCustomerDataForSearch(req: CustomerSearchForShortCutLoanRequest) = apiInterface.getCustomerDataForSearch(req)
 
 
-  suspend fun getCustomShortCutDataRequest(req: ManageCustomerStepWiseReq): Response<RegisterCustomerResp> {
+  suspend fun getCustomShortCutDataRequest(req: ManageCustomerStepWiseReq): Response<ManageCustomerStepWiseResponse> {
     val mode = req.mode.toRequestBody("text/plain".toMediaTypeOrNull())
     val step = req.step.toRequestBody("text/plain".toMediaTypeOrNull())
     val rid = req.rid.toRequestBody("text/plain".toMediaTypeOrNull())

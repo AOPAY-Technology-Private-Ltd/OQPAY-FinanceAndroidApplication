@@ -26,23 +26,28 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
-import com.bos.payment.appName.network.RetrofitClient
+
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.Customer
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.getCurrentUtcTimestamp
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isPgClosing
+import com.bosandroidapp.oqmobilefinance.data.model.GetOrderStatusOnlinePGRequest
 import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.CustomerLoanEmiReceiveReq
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
+import com.bosandroidapp.oqmobilefinance.data.repository.DikshifinsureRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
+import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.DikshifinsureOnlinePGModelFactory
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityPgwebViewBinding
 import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
+import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.ui.slideshow.activity.DashBoard
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.customer.EmiLoanDetailPage.Companion.customerCode
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.customer.EmiLoanDetailPage.EmiData
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
+import com.bosandroidapp.oqmobilefinance.ui.viewmodel.DikshifinsureViewModel
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.google.gson.Gson
 
@@ -51,6 +56,9 @@ class PGWebViewActivity : BaseActivity() {
     lateinit var dialog: Dialog
     lateinit var preference : SharedPreference
     lateinit var viewModel: AuthenticationViewModel
+    lateinit var dikshifinsureOnlinePGModel: DikshifinsureViewModel
+    lateinit var mode : String
+    lateinit var merchantid : String
 
 
     companion object{
@@ -83,41 +91,58 @@ class PGWebViewActivity : BaseActivity() {
 
         preference = SharedPreference(this)
         viewModel = ViewModelProvider(this, CommonViewModelFactory(AuthRepository(RetrofitClient.apiInterface)))[AuthenticationViewModel::class.java]
+        dikshifinsureOnlinePGModel = ViewModelProvider(this, DikshifinsureOnlinePGModelFactory(DikshifinsureRepository(RetrofitClient.apiInterfaceOnlinePG)))[DikshifinsureViewModel::class.java]
 
         clearWebViewData(binding.pgwebview)
 
         launchPGOnWebView()
+
     }
+
 
     override fun onResume() {
         super.onResume()
         hitApiForLogin(preference.getStringValue(ConstantClass.CustomerCode,""))
     }
 
+
     fun launchPGOnWebView(){
         val pgUrl = intent.getStringExtra("pgurl")
+        if(intent.hasExtra("mode")&& intent.hasExtra("merchantid")){
+            mode = intent.getStringExtra("mode").toString()
+            merchantid = intent.getStringExtra("merchantid").toString()
+        }
+
         val finalHtml = """
-    <html>
-    <head>
+       <html>
+       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    </head>
-    <body>
+       </head>
+       <body>
         $pgUrl
-    </body>
-    </html>
-""".trimIndent()
+        </body>
+        </html> 
+        """.trimIndent()
 
         binding.pgwebview.settings.javaScriptEnabled = true
         binding.pgwebview.settings.domStorageEnabled = true
         binding.pgwebview.webViewClient = object : WebViewClient() {
+
             override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
+
+                if(mode.equals(ConstantClass.online) && !merchantid.isNullOrEmpty()){
+                    var req = GetOrderStatusOnlinePGRequest(
+                        orderId = merchantid
+                    )
+                    hitApiForPGStatus(req)
+                    return true
+                }
 
                 Log.d("URL", url.orEmpty())
 
                 if (url.isNullOrEmpty()) {
                     return true
                 }
-
                 return if (url.startsWith("http://") || url.startsWith("https://")) {
 
                     // Handle PayU response URLs
@@ -147,7 +172,8 @@ class PGWebViewActivity : BaseActivity() {
 
                     false // Let WebView load the URL itself
 
-                } else
+                }
+                else
                 {
                     try {
                         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
@@ -170,15 +196,15 @@ class PGWebViewActivity : BaseActivity() {
 
                     true
                 }
+
+
             }
         }
 
         binding.pgwebview.loadDataWithBaseURL("https://secure.payu.in/", finalHtml, "text/html", "UTF-8", null)
-
         binding.pgwebview.loadUrl(pgUrl!!)
+
     }
-
-
 
     fun HitApiForPayEmiAmount(emicount:Int,loopcount :Int,emiamount : String,fine:String?/*,imageFile:File*/,loanCode:String,utrNumber: String){
 
@@ -246,7 +272,6 @@ class PGWebViewActivity : BaseActivity() {
 
     }
 
-
     fun clearWebViewData(webView: WebView) {
         webView.clearCache(true)
         webView.clearHistory()
@@ -256,7 +281,6 @@ class PGWebViewActivity : BaseActivity() {
         CookieManager.getInstance().flush()
         WebStorage.getInstance().deleteAllData()
     }
-
 
     fun showingRejectionePGPopUp(){
         dialog = Dialog(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen)
@@ -297,7 +321,6 @@ class PGWebViewActivity : BaseActivity() {
         binding.pgwebview.destroy()
     }
 
-
     fun showingSuccessPopUp(utrNumber: String){
         dialog = Dialog(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -334,7 +357,6 @@ class PGWebViewActivity : BaseActivity() {
     }
 
 
-
     override fun onBackPressed() {
         showingRejectionePGPopUp()
     }
@@ -345,10 +367,12 @@ class PGWebViewActivity : BaseActivity() {
         Log.d("PG", "onDestroy")
     }
 
+
     override fun onPause() {
         super.onPause()
         Log.d("PG", "onPause")
     }
+
 
     override fun onStop() {
         super.onStop()
@@ -395,7 +419,53 @@ class PGWebViewActivity : BaseActivity() {
 
     }
 
+    fun hitApiForPGStatus(req : GetOrderStatusOnlinePGRequest){
 
+        dikshifinsureOnlinePGModel.getOrderOnlineStatusPgRequest(req).observe(this) { resources ->
+
+            resources.let {
+                when(it.apiStatus){
+                    ApiStatus.SUCCESS -> {
+                        it.data?.let { users ->
+                            if(users.isSuccessful){
+                                users.body()?.let { response ->
+                                    Log.d("PGStatus", Gson().toJson(response))
+
+                                    var status = response.state
+                                    var orderId = response.orderId
+                                    var merchantOrderId = response.merchantOrderId
+                                    val amount = response.amount?.toDouble()?.toString() ?: "0.0"
+                                    val utrNumber = response.paymentDetails!!.firstOrNull()?.rail?.utr ?: ""
+                                     //COMPLETED
+                                    if(status!!.toLowerCase().equals("completed",ignoreCase = true)){
+                                        showingSuccessPopUp(utrNumber!!)
+                                    }else {
+                                        showingRejectionePGPopUp()
+                                    }
+
+                                }
+                            }
+                            else{
+                                var getdata = users.errorBody()?.string()
+                                Log.d("PGStatus", "Error")
+                                Toast.makeText(this@PGWebViewActivity,getdata.toString(), Toast.LENGTH_SHORT).show()
+
+                            }
+
+                        }
+                    }
+                    ApiStatus.ERROR -> {
+
+                    }
+
+                    ApiStatus.LOADING ->{
+
+                    }
+                }
+            }
+        }
+
+    }
 
 
 }

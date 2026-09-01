@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 data class RetailerWalletReportResp(
 
 	@field:SerializedName("data")
-	val data: List<DataItem?>? = null,
+	val data: List<WalletReportDataItem?>? = null,
 
 	@field:SerializedName("message")
 	val message: String? = null,
@@ -14,7 +14,7 @@ data class RetailerWalletReportResp(
 	val status: String? = null
 )
 
-data class DataItem(
+data class WalletReportDataItem(
 
 	@field:SerializedName("amountType")
 	val amountType: String? = null,

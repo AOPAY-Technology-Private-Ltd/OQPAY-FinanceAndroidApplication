@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.google.gms.google.services)
 }
 
+
 android {
     namespace = "com.bosandroidapp.oqmobilefinance"
     compileSdk = 35
@@ -54,6 +55,7 @@ android {
             }
         }
     }
+
 
 }
 

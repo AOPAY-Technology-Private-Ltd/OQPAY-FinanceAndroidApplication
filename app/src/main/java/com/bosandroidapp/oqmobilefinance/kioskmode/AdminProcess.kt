@@ -1,6 +1,6 @@
 package com.bosandroidapp.oqmobilefinance.kioskmode
 
-import android.accessibilityservice.AccessibilityService.MODE_PRIVATE
+import android.content.Context.MODE_PRIVATE
 import android.accounts.Account
 import android.accounts.AccountManager
 import android.app.Activity
@@ -25,8 +25,8 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import java.security.SecureRandom
 
 fun Context.imposeRestrictions(){
-    dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
-    admin = ComponentName(this, KioskDeviceAdminReceiver::class.java)
+    val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+    val admin = ComponentName(this, KioskDeviceAdminReceiver::class.java)
     if (dpm.isDeviceOwnerApp(packageName)) {
         dpm.addUserRestriction(admin, UserManager.DISALLOW_FACTORY_RESET)
     }
@@ -35,8 +35,8 @@ fun Context.imposeRestrictions(){
 
 @RequiresApi(Build.VERSION_CODES.R)
 fun Context.removeRestrictions(){
-    dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
-    admin = ComponentName(this, KioskDeviceAdminReceiver::class.java)
+    val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+    val admin = ComponentName(this, KioskDeviceAdminReceiver::class.java)
     if (dpm.isDeviceOwnerApp(packageName)) {
         val policy = FactoryResetProtectionPolicy.Builder()
             .setFactoryResetProtectionAccounts(emptyList())
@@ -55,8 +55,8 @@ fun Context.removeRestrictions(){
 
 
 fun Activity.setKioskMode() {
-    dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
-    admin = ComponentName(this, KioskDeviceAdminReceiver::class.java)
+    val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+    val admin = ComponentName(this, KioskDeviceAdminReceiver::class.java)
 
 
     if (dpm.isDeviceOwnerApp(packageName)) {
@@ -137,6 +137,8 @@ fun Activity.addGoogleAccount() {
 
 
 fun Context.ensureKioskPolicies() {
+    val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+    val admin = ComponentName(this, KioskDeviceAdminReceiver::class.java)
     if (!dpm.isDeviceOwnerApp(packageName)) {
         Toast.makeText(this, "Not device owner. Lock task will require confirmation or may fail.", Toast.LENGTH_LONG).show()
         return
@@ -162,6 +164,7 @@ fun Context.ensureKioskPolicies() {
 
 
 fun Activity.startLockIfPermitted() {
+    val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
     val am = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
     val inLockTask = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         am.lockTaskModeState != ActivityManager.LOCK_TASK_MODE_NONE

@@ -1,4 +1,4 @@
-package com.bos.payment.appName.network
+package com.bosandroidapp.oqmobilefinance.network
 
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.google.gson.GsonBuilder

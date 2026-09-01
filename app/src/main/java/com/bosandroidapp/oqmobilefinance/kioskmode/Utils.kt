@@ -1,7 +1,7 @@
 package com.bosandroidapp.oqmobilefinance.kioskmode
 
 import android.Manifest
-import android.accessibilityservice.AccessibilityService.MODE_PRIVATE
+import android.content.Context.MODE_PRIVATE
 import android.app.Activity
 import android.app.ActivityManager
 import android.app.admin.DevicePolicyManager
@@ -44,7 +44,7 @@ fun Context.checkStandardPermissions(): Boolean {
 
 fun Context.checkAllPermissionsGranted(): Boolean {
     return checkStandardPermissions() &&
-            isOverLay() &&
+            this.isOverLay() &&
             isAccessibilityServiceEnabled(this, MyAccessibilityService::class.java)
 }
 
@@ -95,7 +95,7 @@ fun Context.isInternetAlertSituationCompleted(): Boolean {
 
 @RequiresApi(Build.VERSION_CODES.R)
 fun Context.setEMICompleted() {
-    removeRestrictions()
+    this.removeRestrictions()
     val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
     val editor = sharedPref.edit()
     editor.putBoolean("isEMIsCompleted", true) // key: isLoggedIn, value: true

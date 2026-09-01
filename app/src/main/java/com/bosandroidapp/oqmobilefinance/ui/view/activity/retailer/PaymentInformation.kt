@@ -34,8 +34,8 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.bos.payment.appName.network.ApiInterface
-import com.bos.payment.appName.network.RetrofitClient
+
+
 import com.bosandroidapp.bosmobilefinance.ui.slideshow.ui.view.activity.retailer.cibilreportsfragment.BureauScore.Companion.userScore
 import com.chaos.view.PinView
 import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
@@ -121,6 +121,8 @@ import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.repository.PanRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
+import com.bosandroidapp.oqmobilefinance.network.ApiInterface
+import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.ui.slideshow.activity.DashBoard
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.AadharCardReferenceWebViewDIGILockerPage.Companion.checkAdharForRef
@@ -572,7 +574,7 @@ class PaymentInformation : BaseActivity() {
                     }
                     else
                     {
-/*                        AccountNumber = binding.accountnumber.text.toString().trim()
+/*                      AccountNumber = binding.accountnumber.text.toString().trim()
                         BankIFSCCode = binding.ifsccode.text.toString().trim()
                         BankName =  binding.bankname.text.toString().trim()
                         AccountType = binding.acounttype.selectedItem.toString().trim()
@@ -1533,13 +1535,7 @@ class PaymentInformation : BaseActivity() {
     }
 
 
-    fun isReferenceValidOnlineForm(
-        referName: String,
-        referLast: String,
-        referRelation: String,
-        refMobile: String,
-        refAddress: String
-    ): Pair<Boolean, String?> {
+    fun isReferenceValidOnlineForm(referName: String, referLast: String, referRelation: String, refMobile: String, refAddress: String): Pair<Boolean, String?> {
 
         // First Name
         if (referName.isBlank())
@@ -1573,7 +1569,6 @@ class PaymentInformation : BaseActivity() {
 
         return Pair(true, null)
     }
-
 
 
     fun OpenAlertForExit(){
@@ -1791,6 +1786,7 @@ class PaymentInformation : BaseActivity() {
     }
 
 
+
     fun setselectionForSecondCard(){
         selectFirst = false
         selectThird = false
@@ -1812,6 +1808,7 @@ class PaymentInformation : BaseActivity() {
         binding.referenceDetailsLayout.visibility=View.GONE
 
     }
+
 
 
     fun setselectionForThirdCard(){
@@ -1841,6 +1838,7 @@ class PaymentInformation : BaseActivity() {
             binding.referenceKycChecked.visibility = View.GONE
         }
     }
+
 
 
     fun hitApiForAadharVerification() {
@@ -1898,6 +1896,7 @@ class PaymentInformation : BaseActivity() {
 
     }
 
+
     fun hitApiForUploadCustomerBankDataData(request : ManageCustomerStepWiseReq){
 
         viewModel.uploadCustomerListForShortCutLoanCreateProcess(request).observe(this) { resources ->
@@ -1907,16 +1906,18 @@ class PaymentInformation : BaseActivity() {
                         ConstantClass.dialog.dismiss()
                         if(user!!.isSuccessful){
                             var getData = user.body()
+                            var status = getData!!.success
+                            var errorCode = getData!!.code
+                            var customerCode = getData!!.data!!.customerCode
                             Log.d("PaymentInformationresponse", Gson().toJson(getData))
                             Toast.makeText(this, getData!!.message, Toast.LENGTH_SHORT).show()
 
-                            if(getData!!.statuss.toLowerCase().equals("false",ignoreCase = true)){
+                            if(status==true ){
+                                setselectionForSecondCard()
+                            }else{
 
                             }
-                            else{
-                                setselectionForSecondCard()
-                                //startActivity(Intent(this@PaymentInformation, PaymentInformation::class.java))
-                            }
+
 
                         }
                         else {
@@ -1943,6 +1944,7 @@ class PaymentInformation : BaseActivity() {
 
 
     }
+
 
     fun hitApiForUploadCustomerEMandateData(request : ManageCustomerStepWiseReq){
 
@@ -1953,15 +1955,18 @@ class PaymentInformation : BaseActivity() {
                         ConstantClass.dialog.dismiss()
                         if(user!!.isSuccessful){
                             var getData = user.body()
+                            var status = getData!!.success
+                            var errorCode = getData!!.code
+                            var customerCode = getData!!.data!!.customerCode
                             Log.d("PaymentInformationresponse", Gson().toJson(getData))
                             Toast.makeText(this, getData!!.message, Toast.LENGTH_SHORT).show()
 
-                            if(getData!!.statuss.toLowerCase().equals("false",ignoreCase = true)){
+                            if(status==true ){
+                                setselectionForThirdCard()
+                            }else{
 
                             }
-                            else{
-                                setselectionForThirdCard()
-                            }
+
 
                         }
                         else {
@@ -1989,6 +1994,7 @@ class PaymentInformation : BaseActivity() {
 
     }
 
+
     fun hitApiForUploadCustomerReferenceData(request : ManageCustomerStepWiseReq){
 
         viewModel.uploadCustomerListForShortCutLoanCreateProcess(request).observe(this) { resources ->
@@ -1998,14 +2004,17 @@ class PaymentInformation : BaseActivity() {
                         ConstantClass.dialog.dismiss()
                         if(user!!.isSuccessful){
                             var getData = user.body()
+                            var status = getData!!.success
+                            var errorCode = getData!!.code
+                            var customerCode = getData!!.data!!.customerCode
                             Log.d("PaymentInformationresponse", Gson().toJson(getData))
                             Toast.makeText(this, getData!!.message, Toast.LENGTH_SHORT).show()
 
-                            if(getData!!.statuss.toLowerCase().equals("false",ignoreCase = true)){
-
+                            if(status==true){
+                                startActivity(Intent(this@PaymentInformation, IMEIDetailsPage::class.java))
                             }
                             else{
-                                 startActivity(Intent(this@PaymentInformation, IMEIDetailsPage::class.java))
+
                             }
 
                         }
