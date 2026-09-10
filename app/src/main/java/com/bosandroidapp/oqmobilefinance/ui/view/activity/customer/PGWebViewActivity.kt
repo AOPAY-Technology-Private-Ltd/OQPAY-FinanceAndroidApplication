@@ -238,7 +238,6 @@ class PGWebViewActivity : BaseActivity() {
                     ApiStatus.SUCCESS -> {
                         it.data?.let { users ->
                             if(users.isSuccessful){
-                                dialog.dismiss()
                                 users.body()?.let { response ->
                                     Log.d("loanEmiReceiveResp", response.toString())
                                     if(loopcount==emicount){
@@ -286,6 +285,7 @@ class PGWebViewActivity : BaseActivity() {
 
     }
 
+
     fun clearWebViewData(webView: WebView) {
         webView.clearCache(true)
         webView.clearHistory()
@@ -295,6 +295,7 @@ class PGWebViewActivity : BaseActivity() {
         CookieManager.getInstance().flush()
         WebStorage.getInstance().deleteAllData()
     }
+
 
     fun showingRejectionePGPopUp(){
         dialog = Dialog(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen)
@@ -331,6 +332,7 @@ class PGWebViewActivity : BaseActivity() {
         dialog.show()
 
     }
+
 
     private fun closePg() {
         binding.pgwebview.stopLoading()
@@ -379,7 +381,6 @@ class PGWebViewActivity : BaseActivity() {
     override fun onBackPressed() {
         showingRejectionePGPopUp()
     }
-
 
 
     override fun onDestroy() {
@@ -459,7 +460,8 @@ class PGWebViewActivity : BaseActivity() {
                                      //COMPLETED
                                     if(status!!.toLowerCase().equals("completed",ignoreCase = true)){
                                         showingSuccessPopUp(utrNumber!!)
-                                    }else {
+                                    }
+                                    else {
                                         showingRejectionePGPopUp()
                                     }
 

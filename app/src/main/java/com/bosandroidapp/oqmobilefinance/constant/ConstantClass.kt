@@ -1329,19 +1329,17 @@ object ConstantClass {
     }
 
 
+    private val indianCurrencyFormatter: NumberFormat by lazy {
+        NumberFormat.getNumberInstance(Locale("en", "IN")).apply {
+            maximumFractionDigits = 0
+            minimumFractionDigits = 0
+        }
+    }
+
     fun formatIndianAmount(amount: String): String {
-
         return try {
-
             val number = amount.toDouble()
-
-            val formatter = NumberFormat.getNumberInstance(Locale("en", "IN"))
-
-            formatter.maximumFractionDigits = 0
-            formatter.minimumFractionDigits = 0
-
-            "₹${formatter.format(number)}"
-
+            "₹${indianCurrencyFormatter.format(number)}"
         } catch (e: Exception) {
             "₹0"
         }

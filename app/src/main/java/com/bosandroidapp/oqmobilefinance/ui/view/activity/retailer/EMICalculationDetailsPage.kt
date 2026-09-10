@@ -78,6 +78,7 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ToBePaidAmount
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isAggrementVerified
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.loginType
 import com.bosandroidapp.oqmobilefinance.data.model.ManageCustomerStepWiseResponse
+import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletAmountReq
 import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.DataItem
@@ -114,6 +115,7 @@ class EMICalculationDetailsPage : BaseActivity() {
     private val maxRetryCount = 3
 
     private var isApiRunning = false
+    private var sellingPriceValidate = true
 
 
     companion object {
@@ -362,7 +364,6 @@ class EMICalculationDetailsPage : BaseActivity() {
 
 
         var isclick = true
-        var sellingPriceValidate = true
         var lastSellingPrice: String? = null
 
         binding.sellingamount.isCursorVisible = true
@@ -426,95 +427,134 @@ class EMICalculationDetailsPage : BaseActivity() {
         })
 
         binding.nextbuttonlayout.setOnClickListener {
-
-            val loanAmount = ConstantClass.LoanAmount ?: 0.0
-            val maxHoldAmount = LoanSecurityHoldAmount.toDoubleOrNull() ?: 0.0
-
-            if (loanAmount < maxHoldAmount) {
-                    Toast.makeText(this@EMICalculationDetailsPage, "Your loan amount is below to the hold amount. Please contact Admin.", Toast.LENGTH_SHORT).show()
-                    return@setOnClickListener
-                }
-
             if (!ToBePaidAmount.isNullOrBlank() && sellingPriceValidate) {
-                checkKYC = false
-               // startActivity(Intent(this@EMICalculationDetailsPage, PaymentInformation::class.java))
-
-                var req = ManageCustomerStepWiseReq(
-                    mode = "UPDATE" ,
-                    step = "2",
-                    rid = "",
-                    firstName = CustFirstName,
-                    middleName= CustMiddleName,
-                    lastName=CustLastName,
-                    primaryMobileNumber = CustPrimaryMobileNumber,
-                    primaryOTP = CustPrimaryOTP,
-                    primaryMobileVerified = CustPrimaryMobileVerified,
-                    alternateMobileNumber = CustAlternateMobileNumber,
-                    alternateMobileOTP = "",
-                    pAlternateMobileVerified = "no",
-                    eMailID = CusteMailID,
-                    flatNo = CustFlatNo,
-                    aearSector = CustAreaSector,
-                    pinCode = CustPinCode,
-                    currentAddress = CustCurrentAddress,
-                    stateName= CustStateName,
-                    cityName= CustCityName,
-                    country= CustCountry!!,
-                    aadharNumber = AadharNumber,
-                    aadharNumberVerified = ConstantClass.AadharVerified,
-                    panNumber = PanNumber,
-                    panNumberVerified = PanNumberVerified,
-                    brandName=BrandName,
-                    modelName=ConstantClass.ModelName,
-                    modelVariant=ConstantClass.ModelVarient,
-                    color=ConstantClass.ModelColor,
-                    sellingPrice= ConstantClass.SellingPrice,
-                    downPayment= DownPayment,
-                    tenure=Tenure,
-                    emiAmount=EmiAmount,
-                    imeiNumber1="",
-                    imeiNumber2="",
-                    accountNumber="",
-                    bankIFSCCode="",
-                    bankName="",
-                    IsPannyDrop = ConstantClass.isPannydropVerified,
-                    accountType="",
-                    branchName="",
-                    refName="",
-                    refRelationShip="",
-                    refmobileNo="",
-                    refAddress="",
-                    debitOrCreditCard="",
-                    upiMandate= ConstantClass.UPIMandate,
-                    createdBy= CreatedByCustomerShortCut,
-                    membershipfees="",
-                    retailercode=preference.getStringValue(ConstantClass.RetailerCode,""),
-                    customerCode=preference.getStringValue(ConstantClass.CustomerCode,""),
-                    cibilScore= userScore.toString(),
-                    activeStatus = ConstantClass.CustomerActiveStatus,
-                    cibilApiResponse = CibilResponse,
-                    aadhaarApiResponse = AadhaarResponse,
-                    panApiResponse = PanResponse,
-                    isAggrementVerified= isAggrementVerified,
-                    isRetailerAggrementVerified="",
-                    custPhoto_File=null,
-                    imeiNumber1_SealPhotoPath = null,
-                    imeiNumber2_SealPhotoPath = null,
-                    imeiNumber_PhotoPath = null,
-                    invoive_Path = null,
-                    aadharFront_Path = null,
-                    aadharBack_Path = null,
-                    panFront_Path = null
-                )
-
-                Log.d("EMICalculationreq", Gson().toJson(req))
-                binding. nextbuttonlayout.isEnabled= false
-                hitApiForUploadCustomerData(req)
+                hitApiForRetailerWalletAmount()
             }
-
         }
 
     }
+
+
+    fun hitApiForRetailerWalletAmount() {
+        val retailerCode = preference.getStringValue(ConstantClass.RetailerCode, "")
+        val req = RetailerWalletAmountReq(
+            retailerID = retailerCode,
+            amountType = "CreditBalance"
+        )
+
+        viewModel.getRetailerWalletAmountReq(req).observe(this) { resources ->
+            when (resources.apiStatus) {
+                ApiStatus.SUCCESS -> {
+                    val response = resources.data?.body()
+                    if (response?.statuss == "True") {
+                        LoanSecurityHoldAmount = response.loanSecurityHoldAmount ?: "0.00"
+                        proceedWithUpload()
+                    } else {
+                        ConstantClass.dialog.dismiss()
+                        binding.nextbuttonlayout.isEnabled = true
+                        Toast.makeText(this, response?.message ?: "Failed to fetch wallet info", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                ApiStatus.ERROR -> {
+                    ConstantClass.dialog.dismiss()
+                    binding.nextbuttonlayout.isEnabled = true
+                    Toast.makeText(this, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
+                }
+                ApiStatus.LOADING -> {
+                    ConstantClass.OpenPopUpForVeryfyOTP(this)
+                }
+            }
+        }
+    }
+
+
+
+    private fun proceedWithUpload() {
+        val loanAmount = ConstantClass.LoanAmount ?: 0.0
+        val maxHoldAmount = LoanSecurityHoldAmount.toDoubleOrNull() ?: 0.0
+
+        if (loanAmount < maxHoldAmount) {
+            ConstantClass.dialog.dismiss()
+            binding.nextbuttonlayout.isEnabled = true
+            Toast.makeText(this@EMICalculationDetailsPage, "Your loan amount is below to the hold amount. Please contact Admin.", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        checkKYC = false
+
+        val req = ManageCustomerStepWiseReq(
+            mode = "UPDATE",
+            step = "2",
+            rid = "",
+            firstName = CustFirstName,
+            middleName = CustMiddleName,
+            lastName = CustLastName,
+            primaryMobileNumber = CustPrimaryMobileNumber,
+            primaryOTP = CustPrimaryOTP,
+            primaryMobileVerified = CustPrimaryMobileVerified,
+            alternateMobileNumber = CustAlternateMobileNumber,
+            alternateMobileOTP = "",
+            pAlternateMobileVerified = "no",
+            eMailID = CusteMailID,
+            flatNo = CustFlatNo,
+            aearSector = CustAreaSector,
+            pinCode = CustPinCode,
+            currentAddress = CustCurrentAddress,
+            stateName = CustStateName,
+            cityName = CustCityName,
+            country = CustCountry!!,
+            aadharNumber = AadharNumber,
+            aadharNumberVerified = ConstantClass.AadharVerified,
+            panNumber = PanNumber,
+            panNumberVerified = PanNumberVerified,
+            brandName = BrandName,
+            modelName = ConstantClass.ModelName,
+            modelVariant = ConstantClass.ModelVarient,
+            color = ConstantClass.ModelColor,
+            sellingPrice = ConstantClass.SellingPrice,
+            downPayment = DownPayment,
+            tenure = Tenure,
+            emiAmount = EmiAmount,
+            imeiNumber1 = "",
+            imeiNumber2 = "",
+            accountNumber = "",
+            bankIFSCCode = "",
+            bankName = "",
+            IsPannyDrop = ConstantClass.isPannydropVerified,
+            accountType = "",
+            branchName = "",
+            refName = "",
+            refRelationShip = "",
+            refmobileNo = "",
+            refAddress = "",
+            debitOrCreditCard = "",
+            upiMandate = ConstantClass.UPIMandate,
+            createdBy = CreatedByCustomerShortCut,
+            membershipfees = "",
+            retailercode = preference.getStringValue(ConstantClass.RetailerCode, ""),
+            customerCode = preference.getStringValue(ConstantClass.CustomerCode, ""),
+            cibilScore = userScore.toString(),
+            activeStatus = ConstantClass.CustomerActiveStatus,
+            cibilApiResponse = CibilResponse,
+            aadhaarApiResponse = AadhaarResponse,
+            panApiResponse = PanResponse,
+            isAggrementVerified = isAggrementVerified,
+            isRetailerAggrementVerified = "",
+            custPhoto_File = null,
+            imeiNumber1_SealPhotoPath = null,
+            imeiNumber2_SealPhotoPath = null,
+            imeiNumber_PhotoPath = null,
+            invoive_Path = null,
+            aadharFront_Path = null,
+            aadharBack_Path = null,
+            panFront_Path = null
+        )
+
+        Log.d("EMICalculationreq", Gson().toJson(req))
+        binding.nextbuttonlayout.isEnabled = false
+        hitApiForUploadCustomerData(req)
+    }
+
 
 
     /* fun UpdateEmiCalculationOnSellingPrice(EmiDataList: List<DataItems>, SellingPrice: String) {

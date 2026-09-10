@@ -287,7 +287,6 @@ class PanCardVerificationPage : BaseActivity() {
         val firstName = preference.getStringValue(ConstantClass.FirstName, "").orEmpty()
         var panverificationreq = PanVerificationReq(
             panNumber = pannumber,
-           /* firstName = firstName,*/
             registrationId = ConstantClass.PAN_VERIFICATION_REGISTRATION_ID,
         )
         Log.d("PanVerificationreq", Gson().toJson(panverificationreq))
@@ -326,7 +325,6 @@ class PanCardVerificationPage : BaseActivity() {
                                     }
                                     else {
                                         PanNumber = response.result!!.pan!!
-                                        AlreadyCustomerCodeHaveEligiblity
                                         PanDOB = formattedApiDob
                                         PanFirstName = response.result!!.firstName!!
                                         PanMiddleName = response.result!!.middleName!!
@@ -431,6 +429,7 @@ class PanCardVerificationPage : BaseActivity() {
                                             hitApiForPanVerification(pannumber)
                                         }
                                     }
+
                                     else{
                                         AlreadyCustomerCodeHaveEligiblity=""
                                         if (CheckOnlineOrOffline.equals(ConstantClass.offline)) {

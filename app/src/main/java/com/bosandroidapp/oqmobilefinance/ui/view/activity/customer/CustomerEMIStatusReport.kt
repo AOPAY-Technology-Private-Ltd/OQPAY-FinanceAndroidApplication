@@ -58,6 +58,8 @@ class CustomerEMIStatusReport : BaseActivity() {
         preference = SharedPreference(this)
         viewModel = ViewModelProvider(this, CommonViewModelFactory(AuthRepository(RetrofitClient.apiInterface)))[AuthenticationViewModel::class.java]
 
+        binding.showingLoanList.setHasFixedSize(true)
+
         setonClickListner()
 
     }
@@ -69,6 +71,7 @@ class CustomerEMIStatusReport : BaseActivity() {
         }
 
     }
+
 
     override fun onResume() {
         super.onResume()
@@ -138,9 +141,12 @@ class CustomerEMIStatusReport : BaseActivity() {
 
 
     fun setDataOnView(customerLoanEmiDetailsList : MutableList<CustomerEMIDataItem?>?){
-        adapter = CustomerEmiStatusAdapter(this,customerLoanEmiDetailsList!!)
-        binding.showingLoanList.adapter = adapter
-        adapter.notifyDataSetChanged()
+        if (!::adapter.isInitialized) {
+            adapter = CustomerEmiStatusAdapter(this, customerLoanEmiDetailsList!!)
+            binding.showingLoanList.adapter = adapter
+        } else {
+            adapter.updateData(customerLoanEmiDetailsList!!)
+        }
     }
 
 

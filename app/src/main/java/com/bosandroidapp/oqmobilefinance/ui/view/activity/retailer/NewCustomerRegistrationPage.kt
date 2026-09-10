@@ -2190,7 +2190,8 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
                                                 hitApiForUpdateCustomerData(req)
 
-                                            } else {
+                                            }
+                                            else {
                                                 var req = ManageCustomerStepWiseReq(
                                                     mode = "INSERT",
                                                     step = "1",
@@ -2262,6 +2263,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                                 Log.d("OnlineCustomerReq", Gson().toJson(req))
                                                 hitApiForUploadCustomerData(req)
                                             }
+
                                         } else {
                                             GlobalScope.launch(Dispatchers.Main) {
                                                 hitApiForCustomerRegister("Your CIBIL score is below 500. Please contact your Admin for approval before applying for a loan.", "Low CIBIL Score")
