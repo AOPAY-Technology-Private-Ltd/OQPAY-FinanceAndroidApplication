@@ -84,7 +84,10 @@ suspend fun Context.syncEmis() = withContext(Dispatchers.IO) {
     }
 
     isEMIDue(sharedPref)
+
 }
+
+
 
 @RequiresApi(Build.VERSION_CODES.R)
 suspend fun Context.forceSyncEmis() = withContext(Dispatchers.IO) {
@@ -93,7 +96,9 @@ suspend fun Context.forceSyncEmis() = withContext(Dispatchers.IO) {
     
     fetchAndStoreEmis(sharedPref)
     isEMIDue(sharedPref)
+
 }
+
 
 private suspend fun Context.fetchAndStoreEmis(sharedPref: SharedPreferences) {
     val preference = SharedPreference(this)

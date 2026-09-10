@@ -132,12 +132,12 @@ class MyAccessibilityService : AccessibilityService() {
                 return
             }*/
 
-            if (ConstantClass.isPgClosing) {
+           /* if (ConstantClass.isPgClosing) {
                 Handler(Looper.getMainLooper()).postDelayed({
                     ConstantClass.isPgClosing = false
                 }, 1000)
                 return
-            }
+            }*/
 
             // Logger.d(ACCESSIBILITYTAG, "Phone Locked")
             isMyAppMinimizedOrRemoved(event)

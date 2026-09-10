@@ -20,12 +20,15 @@ fun Activity.initiateBlocking( checkEmiStatus: Boolean) {
         }
 
     }
+
     else if(checkEmiStatus){
 
-        /*if (!isStatsPermissionGranted()) {
+        /*
+
+        if (!isStatsPermissionGranted()) {
             askforUsagePermission()
             return
-        }*/
+        }
 
         if (!isBatteryOptimized()) {
             optimizeBatterry()
@@ -47,6 +50,8 @@ fun Activity.initiateBlocking( checkEmiStatus: Boolean) {
             setAppasAccessibility()
             return
         }
+
+        */
 
     }
 

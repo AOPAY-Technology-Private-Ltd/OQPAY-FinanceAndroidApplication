@@ -44,6 +44,8 @@ import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.ui.slideshow.activity.DashBoard
+import com.bosandroidapp.oqmobilefinance.kioskmode.KioskActivity
+import com.bosandroidapp.oqmobilefinance.kioskmode.isLocked
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.customer.EmiLoanDetailPage.Companion.customerCode
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.customer.EmiLoanDetailPage.EmiData
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
@@ -235,22 +237,34 @@ class PGWebViewActivity : BaseActivity() {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
                         it.data?.let { users ->
-                            users.body()?.let {
-                                    response ->
-                                Log.d("loanEmiReceiveResp", response.toString())
-                                if(loopcount==emicount){
-                                    if(ConstantClass.dialog!=null && ConstantClass.dialog.isShowing){
-                                        ConstantClass.dialog.dismiss()
+                            if(users.isSuccessful){
+                                dialog.dismiss()
+                                users.body()?.let { response ->
+                                    Log.d("loanEmiReceiveResp", response.toString())
+                                    if(loopcount==emicount){
+                                        if(ConstantClass.dialog!=null && ConstantClass.dialog.isShowing){
+                                            ConstantClass.dialog.dismiss()
+                                        }
+                                        emiList .clear()
+                                        EMIamountPG  =""
+                                        LoanCodePG  = ""
+                                        Toast.makeText(this@PGWebViewActivity,response.message,Toast.LENGTH_SHORT).show()
+                                        val intent = Intent(this@PGWebViewActivity, DashBoard::class.java)
+                                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                        startActivity(intent)
                                     }
-                                     emiList .clear()
-                                     EMIamountPG  =""
-                                     LoanCodePG  = ""
-                                    Toast.makeText(this@PGWebViewActivity,response.message,Toast.LENGTH_SHORT).show()
-                                    val intent = Intent(this@PGWebViewActivity, DashBoard::class.java)
-                                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                    startActivity(intent)
                                 }
                             }
+
+                            else{
+                                if(ConstantClass.dialog!=null && ConstantClass.dialog.isShowing){
+                                    ConstantClass.dialog.dismiss()
+                                }
+                                var getdata = users.errorBody()?.string()
+                                Toast.makeText(this@PGWebViewActivity,getdata.toString(),Toast.LENGTH_SHORT).show()
+
+                            }
+
                         }
 
                     }
@@ -302,6 +316,11 @@ class PGWebViewActivity : BaseActivity() {
             isPgClosing = true
             dialog.dismiss()
             closePg()
+            if (isLocked()) {
+                val intent = Intent(this, KioskActivity::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                startActivity(intent)
+            }
             window.decorView.post {
                 finish()
             }
@@ -320,6 +339,7 @@ class PGWebViewActivity : BaseActivity() {
         binding.pgwebview.removeAllViews()
         binding.pgwebview.destroy()
     }
+
 
     fun showingSuccessPopUp(utrNumber: String){
         dialog = Dialog(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen)
@@ -343,7 +363,6 @@ class PGWebViewActivity : BaseActivity() {
 
         Ok.setOnClickListener {
             if(emiList.size>0){
-                dialog.dismiss()
                 for(i in 0 until emiList.size){
                     HitApiForPayEmiAmount(emiList[i].selectedNoofEmi, emiList[i].emiNo, emiList[i].emiAmount,emiList[i].lateFine,emiList[i].loancode,utrNumber )
                 }
@@ -360,6 +379,7 @@ class PGWebViewActivity : BaseActivity() {
     override fun onBackPressed() {
         showingRejectionePGPopUp()
     }
+
 
 
     override fun onDestroy() {
@@ -448,6 +468,7 @@ class PGWebViewActivity : BaseActivity() {
                             else{
                                 var getdata = users.errorBody()?.string()
                                 Log.d("PGStatus", "Error")
+                                showingRejectionePGPopUp()
                                 Toast.makeText(this@PGWebViewActivity,getdata.toString(), Toast.LENGTH_SHORT).show()
 
                             }
@@ -455,7 +476,7 @@ class PGWebViewActivity : BaseActivity() {
                         }
                     }
                     ApiStatus.ERROR -> {
-
+                        showingRejectionePGPopUp()
                     }
 
                     ApiStatus.LOADING ->{

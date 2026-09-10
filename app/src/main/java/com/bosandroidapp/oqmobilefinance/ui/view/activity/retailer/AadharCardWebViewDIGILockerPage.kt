@@ -3,7 +3,9 @@ package com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.webkit.CookieManager
 import android.webkit.JavascriptInterface
+import android.webkit.WebStorage
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
@@ -68,6 +70,8 @@ class AadharCardWebViewDIGILockerPage : BaseActivity() {
         viewCibilModel = ViewModelProvider(this, CibilViewModelFactory(CibilRepository(RetrofitClient.apiInterfacePAN)))[CibilViewModel::class.java]
         preference = SharedPreference(this)
 
+        clearWebViewData( binding.webview)
+
         setDataInWebView()
 
     }
@@ -79,6 +83,15 @@ class AadharCardWebViewDIGILockerPage : BaseActivity() {
         hitApiForLogin()
     }
 
+    fun clearWebViewData(webView: WebView) {
+        webView.clearCache(true)
+        webView.clearHistory()
+        webView.clearFormData()
+
+        CookieManager.getInstance().removeAllCookies(null)
+        CookieManager.getInstance().flush()
+        WebStorage.getInstance().deleteAllData()
+    }
 
     fun setDataInWebView() {
 

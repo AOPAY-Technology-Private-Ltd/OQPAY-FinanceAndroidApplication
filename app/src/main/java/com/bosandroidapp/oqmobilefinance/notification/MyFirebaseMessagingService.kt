@@ -29,6 +29,7 @@ import kotlinx.coroutines.runBlocking
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
+
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
         val notificationCode = remoteMessage.data["NotificationCode"] ?: ""
@@ -62,6 +63,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
             }
 
+
             ConstantClass.DISBURSMENT_REJECT-> {
 
                 if (dpm.isDeviceOwnerApp(packageName)) {
@@ -81,9 +83,10 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
             }
 
-            ConstantClass.UNLOCK -> {
 
+            ConstantClass.UNLOCK -> {
                 Log.d("FCM_UNLOCK", "Unlock notification received")
+
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     runBlocking {
                         applicationContext.forceSyncEmis()
@@ -96,6 +99,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
             }
 
+
         }
 
     }
@@ -104,5 +108,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         super.onNewToken(token)
     }
+
+
 
 }

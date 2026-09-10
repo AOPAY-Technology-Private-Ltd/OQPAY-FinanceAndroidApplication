@@ -7,15 +7,16 @@ plugins {
 
 android {
     namespace = "com.bosandroidapp.oqmobilefinance"
-    compileSdk = 35
+    compileSdk = 36
+
 
 
     defaultConfig {
         applicationId = "com.bosandroidapp.oqmobilefinance"
         minSdk = 27
-        targetSdk = 35
-        versionCode = 6
-        versionName = "1.0.6" // pro 1.0.7
+        targetSdk = 36
+        versionCode = 9
+        versionName = "1.0.9" // pro 1.0.7
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -99,6 +100,7 @@ dependencies {
     // for qrcode...................................
     implementation(libs.core)
 
+
     // google map..................................
     implementation(libs.play.services.maps)
     implementation(libs.maps.ktx)
@@ -106,9 +108,9 @@ dependencies {
 
     // firebase ...................................
     implementation(libs.firebase.messaging)
-    // ✅ Firebase BOM MUST be platform()
+    // Firebase BOM MUST be platform()
     implementation(platform(libs.firebase.bom))
-    // ✅ Firestore KTX
+    //  Firestore KTX
     implementation(libs.firebase.firestore.ktx)
     // (optional)
     implementation(libs.firebase.storage)
@@ -116,8 +118,25 @@ dependencies {
 
     implementation(libs.googleid)
     implementation(libs.play.services.location)
+
+    implementation(libs.androidx.webkit)
+
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+
+    val stacker = "com.github.jatinsinghsatija.Stacker"
+    val stackerVersion = "v0.2.0"
+
+    debugImplementation("$stacker:stacker_inspector_debug:$stackerVersion")
+    debugImplementation("$stacker:flutter_debug:$stackerVersion")
+
+    releaseImplementation("$stacker:stacker_inspector_release:$stackerVersion")
+    releaseImplementation("$stacker:flutter_release:$stackerVersion")
+
+
+
 
 }

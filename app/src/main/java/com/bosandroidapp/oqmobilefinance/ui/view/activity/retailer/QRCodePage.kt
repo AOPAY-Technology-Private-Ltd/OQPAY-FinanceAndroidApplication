@@ -3,16 +3,12 @@ package com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Intent
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
-import android.media.Image
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.text.InputFilter
-import android.text.InputType
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -20,19 +16,13 @@ import android.view.Window
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.RadioButton
-import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.postDelayed
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.transition.Visibility
 
 
 import com.bosandroidapp.bosmobilefinance.ui.slideshow.ui.view.activity.retailer.cibilreportsfragment.BureauScore.Companion.userScore
@@ -125,26 +115,24 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isEmandateVerifi
 
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isInternetAvailable
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isPannydropVerified
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.uploadDataOnFirebaseConsole
 import com.bosandroidapp.oqmobilefinance.data.enach.EMandateRequest
-import com.bosandroidapp.oqmobilefinance.data.enach.ENachStatusReq
 import com.bosandroidapp.oqmobilefinance.data.enach.EnachDateUploadReq
 import com.bosandroidapp.oqmobilefinance.data.loancharge.LoanChargeReq
-import com.bosandroidapp.oqmobilefinance.data.model.CustomerShortCutDataItem
 import com.bosandroidapp.oqmobilefinance.data.model.EmandateOptionSelectetionReq
 import com.bosandroidapp.oqmobilefinance.data.model.EmandateSelectDataItem
 import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
-import com.bosandroidapp.oqmobilefinance.data.model.UPIMandateRequest
-import com.bosandroidapp.oqmobilefinance.data.model.ValidateAccessKeyReq
+import com.bosandroidapp.oqmobilefinance.data.upiautomandate.UPIMandateRequest
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.GetIsEligibleLoanReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LoanCreatedReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LogoutReq
-import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.RegisterCustomerResp
+import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.ManageCustomerStepWiseReq
 import com.bosandroidapp.oqmobilefinance.data.pennydrop.BankListReq
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
+import com.bosandroidapp.oqmobilefinance.data.repository.DikshifinsureRepository
 import com.bosandroidapp.oqmobilefinance.data.repository.PanRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
+import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.DikshifinsureOnlinePGModelFactory
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.network.ApiInterface
 import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
@@ -154,6 +142,7 @@ import com.bosandroidapp.oqmobilefinance.ui.view.adapter.EmandateOptionAdapter
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.AppScanInstallPage.Companion.LoanMode
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.RetailerEMandateVerifyPage.Companion.webUrl
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
+import com.bosandroidapp.oqmobilefinance.ui.viewmodel.DikshifinsureViewModel
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.PanViewModel
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.google.gson.Gson
@@ -162,10 +151,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
-import okhttp3.Response
 import kotlin.math.roundToInt
-import kotlin.text.trim
-import kotlin.time.Duration.Companion.milliseconds
 
 
 class QRCodePage : BaseActivity() {
@@ -182,6 +168,7 @@ class QRCodePage : BaseActivity() {
     var selectedAuthType: String = ""
 
     var emandateSelectList : MutableList<Pair<String, List<EmandateSelectDataItem>>?>  = mutableListOf()
+    lateinit var dikshifinsureOnlinePGModel: DikshifinsureViewModel
 
 
 
@@ -218,10 +205,12 @@ class QRCodePage : BaseActivity() {
         api = RetrofitClient.apiInterface
         viewModel = ViewModelProvider(this, CommonViewModelFactory(AuthRepository(RetrofitClient.apiInterface)))[AuthenticationViewModel::class.java]
         panViewModel = ViewModelProvider(this, com.bosandroidapp.oqmobilefinance.data.viewModelFactory.PanViewModelFactory(PanRepository(RetrofitClient.apiInterfacePAN)))[PanViewModel::class.java]
+        dikshifinsureOnlinePGModel = ViewModelProvider(this, DikshifinsureOnlinePGModelFactory(DikshifinsureRepository(RetrofitClient.apiInterfaceOnlinePG)))[DikshifinsureViewModel::class.java]
 
 
         if(preference.getStringValue(ConstantClass.CustomerCode,"").isNotEmpty()&& ! ConstantClass.ClickOnCardLowCibilScore.equals(CardType)){
             updateLoanRequest(true)
+
         }
         else{
             binding.LoanCreatelayout.visibility = View.GONE
@@ -343,6 +332,7 @@ class QRCodePage : BaseActivity() {
     }
 
 
+
     @RequiresApi(Build.VERSION_CODES.O)
     private fun updateLoanRequest(showPopup: Boolean) {
         val startDate = getCurrentStartDate()
@@ -382,7 +372,8 @@ class QRCodePage : BaseActivity() {
                 loanMode = ConstantClass.offline
             )
             LoanMode = ConstantClass.offline
-        } else {
+        }
+        else {
             loancreatedreq = LoanCreatedReq(
                 modetype = "INSERT",
                 rid = 0,
@@ -426,6 +417,55 @@ class QRCodePage : BaseActivity() {
         binding.LoanCreatelayout.visibility = View.VISIBLE
         binding.nextlayout.visibility = View.GONE
     }
+
+
+    fun hitApiForUploadCustomerLoanData(request : ManageCustomerStepWiseReq){
+
+        viewModel.uploadCustomerListForShortCutLoanCreateProcess(request).observe(this) { resources ->
+            when (resources.apiStatus) {
+                ApiStatus.SUCCESS ->{
+                    resources.data.let { user->
+                        //ConstantClass.dialog.dismiss()
+                        if(user!!.isSuccessful){
+                            val responseBody = user.body()
+                            val status = responseBody?.success
+                            val errorCode = responseBody?.code
+                            val customerCode = responseBody?.data?.customerCode
+                            Log.d("LoanCheckReq", Gson().toJson(responseBody))
+
+                            if(status == true ){
+
+                            }
+                            else{
+                                Toast.makeText(this, responseBody?.message, Toast.LENGTH_SHORT).show()
+                            }
+
+                        }
+                        else {
+                            var errorbody = user.errorBody()
+                            Log.e("API_ERROR", errorbody?.string() ?: "Unknown error")
+                            Toast.makeText(this@QRCodePage, errorbody?.string(), Toast.LENGTH_SHORT).show()
+
+                        }
+                    }
+
+                }
+
+                ApiStatus.ERROR -> {
+                   // ConstantClass.dialog.dismiss()
+                    Toast.makeText(this@QRCodePage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
+                }
+
+                ApiStatus.LOADING -> {
+                    //ConstantClass.OpenPopUpForVeryfyOTP(this)
+                }
+
+            }
+        }
+
+
+    }
+
 
 
     override fun onStart() {
@@ -501,6 +541,7 @@ class QRCodePage : BaseActivity() {
 
 
     }
+
 
 
     override fun onResume() {
@@ -879,6 +920,7 @@ class QRCodePage : BaseActivity() {
                                     Toast.makeText(this@QRCodePage, body.message, Toast.LENGTH_SHORT).show()
                                 }
                                 else {
+
                                     val safecustomerCode = if (!customerCode.isNullOrBlank() && customerCode != "null") customerCode else ""
                                     if(safecustomerCode.isNullOrBlank()){
                                         if (ConstantClass.dialog?.isShowing == true) {
@@ -1583,7 +1625,7 @@ class QRCodePage : BaseActivity() {
 
                                         if (response.status?.toLowerCase().equals(ConstantClass.LoanSuccessStatus)) {
                                             binding.LoanCreatelayout.isEnabled = false
-                                           loaneCode = response.data!!.loanCode!!
+                                            loaneCode = response.data!!.loanCode!!
                                             ConstantClass.LoanRID = response.data!!.rid!!
                                             FirstName = CustFirstName
                                             MiddleName = CustMiddleName
@@ -1605,6 +1647,24 @@ class QRCodePage : BaseActivity() {
                                             LoanEndDate = response.data.endDate!!
 
                                             fetchEmandateOptions()
+                                            var req = ManageCustomerStepWiseReq(
+                                                mode = "UPDATE" ,
+                                                step = "7",
+                                                rid = "",
+                                                membershipfees= membershipAmt,
+                                                retailercode=preference.getStringValue(ConstantClass.RetailerCode,""),
+                                                customerCode=preference.getStringValue(ConstantClass.CustomerCode,""),
+                                                custPhoto_File=null,
+                                                imeiNumber1_SealPhotoPath = null,
+                                                imeiNumber2_SealPhotoPath = null,
+                                                imeiNumber_PhotoPath = null,
+                                                invoive_Path = null,
+                                                aadharFront_Path = null,
+                                                aadharBack_Path = null,
+                                                panFront_Path = null
+                                            )
+                                            Log.d("IMEIDetailsreq", Gson().toJson(req))
+                                            hitApiForUploadCustomerLoanData(req)
 
                                         }
                                         else {
@@ -1693,7 +1753,6 @@ class QRCodePage : BaseActivity() {
     }
 
 
-
     fun String.toRequestBody(): RequestBody = RequestBody.create("text/plain".toMediaTypeOrNull(), this)
 
 
@@ -1759,7 +1818,6 @@ class QRCodePage : BaseActivity() {
 
 
     }
-
 
 
     fun hitApiForMemberShipFee() {
@@ -2088,10 +2146,12 @@ class QRCodePage : BaseActivity() {
                    registrationID = request.registrationID
                 )
                 Log.d("UPIMandateReq", Gson().toJson(request))
-                panViewModel.getUpiMandateOnlineRequest(request).observe(this) { resources ->
+                dikshifinsureOnlinePGModel.getUpiMandateOnlineRequest(request).observe(this) { resources ->
                     resources.let {
                         when (it.apiStatus) {
+
                             ApiStatus.SUCCESS -> {
+
                                 it.data.let { users ->
 
                                     if(users!!.isSuccessful){
@@ -2106,7 +2166,11 @@ class QRCodePage : BaseActivity() {
 
                                             if (response!!.code=="200" ) {
                                                 webUrl = response!!.intentUrl
-                                                startActivity(Intent(this@QRCodePage, RetailerEMandateVerifyPage::class.java))
+                                                var MarchentOrderID = response.marchentOrderID
+                                                var intent = Intent(this@QRCodePage, RetailerEMandateVerifyPage::class.java)
+                                                intent.putExtra(ConstantClass.MarchentOrderID_UPIAUTOPAY,MarchentOrderID)
+                                                intent.putExtra(ConstantClass.RegistrationID_UPIAUTOPAY,request.registrationID)
+                                                startActivity(intent)
                                             }
                                             else {
                                                 ConstantClass.dialog.dismiss()

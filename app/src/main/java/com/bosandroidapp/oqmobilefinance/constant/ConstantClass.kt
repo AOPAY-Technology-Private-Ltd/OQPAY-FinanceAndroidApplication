@@ -103,8 +103,9 @@ object ConstantClass {
 
          // Production
 
-        /* const val BASE_URL = "https://api.oqpay.in/"
-         const val BASE_URL_IMAGE = "https://api.oqpay.in"
+      /*   const val BASE_URL = "https://api.oqpay.in/"
+           const val BASE_URL_IMAGE = "https://api.oqpay.in"
+           const val BASE_URL_IMAGE_PRODCUT = "https://admin.oqpay.in"
 
 
          // production merchant id online
@@ -130,7 +131,10 @@ object ConstantClass {
 
        // UAT
        const val BASE_URL = "https://api.oqpay.co.in/"
+
+       const val BASE_URL_IMAGE_PRODCUT = "https://admin.oqpay.co.in"
        const val BASE_URL_IMAGE = "https://api.oqpay.co.in"
+
 
 
      // UAT merchant id online
@@ -138,14 +142,17 @@ object ConstantClass {
       const val PENNYDROP_REGISTRATION_ID = "AOP-554"
 
 
+
       //  UAT merchant id offline
       const val PAN_VERIFICATION_REGISTRATION_ID_OFFLINE = "AOP-554"
       const val PENNYDROP_REGISTRATION_ID_OFFLINE = "AOP-554"
 
 
+
      const val SMS_BASE_URL = "http://web.adcruxmedia.in/"
      const val PAN_BASE_URL = "https://api.aopay.in/"
      const val ONLINE_PG = "https://api.dikshifinsure.com/"
+
 
      const val SMS_API_KEY = "KBSxc26XqjoiR7SA"
      const val SMS_SENDER_ID = "BOSCNT"
@@ -174,6 +181,10 @@ object ConstantClass {
      const val LoginMobileorMailid = "loginMobileorMail"
 
      const val Loginpassword = "loginPassword"
+
+    // for online emandate auto pay
+     const val MarchentOrderID_UPIAUTOPAY = "marchentOrderid"
+     const val RegistrationID_UPIAUTOPAY = "registrationid"
      var gpsSettingsOpened = false
      var internetSettingsOpened = false
      var CheckCompleteEmiStatus = false
@@ -230,21 +241,25 @@ object ConstantClass {
      var PanAddress : String= ""
      var PanDOB : String= ""
      var AadhaarDOB : String= ""
-    var AadhaarName : String= ""
-    var AadharHouse : String= ""
-    var AadharStreet : String= ""
-    var AadharLoc : String= ""
-    var Aadhardist : String= ""
-    var AadharPin : String= ""
-    var AadharState : String= ""
-    var AadharCountry : String= ""
-    var AadharImage : String= ""
-    var AadharDOB : String= ""
-    var PanResponse : String = ""
-    var AadhaarResponse : String = ""
-    var CibilResponse : String = ""
-    var CreatedByCustomerShortCut : String = ""
-    var UPIMandate : String = ""
+     var AadhaarName : String= ""
+     var AadharHouse : String= ""
+     var AadharStreet : String= ""
+     var AadharLoc : String= ""
+     var Aadhardist : String= ""
+      var AadharPin : String= ""
+     var AadharState : String= ""
+     var AadharCountry : String= ""
+     var AadharImage : String= ""
+     var AadharDOB : String= ""
+
+     var PanResponse : String = ""
+
+     var AadhaarResponse : String = ""
+
+     var CibilResponse : String = ""
+     var CreatedByCustomerShortCut : String = ""
+
+     var UPIMandate : String = ""
      var CustomerActiveStatus : String = "" // for shortcut loan process
      var ENTEREDCUSTOMERDOB : String = ""
      var WalletBalance : String = ""
@@ -297,6 +312,7 @@ object ConstantClass {
      var PanFrontImageUri: Uri? = null
      var AadharVerified : String = ""
      var CustPhotoPath : Uri? = null
+     var CustAdhaarPhotoUri : Uri? = null
      var CustFirstName : String = ""
      var CustMiddleName : String = ""
      var CustLastName : String = ""

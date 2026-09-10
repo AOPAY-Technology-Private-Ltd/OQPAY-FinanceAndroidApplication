@@ -281,12 +281,13 @@ class RetailerCustomerReportsPage : BaseActivity() {
                                 else{
                                     binding.showreports.visibility= View.GONE
                                     binding.notfoundimage.visibility=View.VISIBLE
+                                    binding.reportcount.text = "Total records : ${0}"
                                 }
                             }
                         }
 
                         else{
-
+                            binding.reportcount.text = "Total records : ${0}"
                             val errorBody = users.errorBody()?.string()
 
                             Log.e("API_RESPONSE_ERROR", errorBody ?: "Unknown error")

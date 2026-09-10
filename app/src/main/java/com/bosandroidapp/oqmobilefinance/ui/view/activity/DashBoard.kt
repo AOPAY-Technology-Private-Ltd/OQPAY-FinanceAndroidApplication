@@ -138,6 +138,7 @@ class DashBoard : BaseActivity() {
     private var countDownTimer: android.os.CountDownTimer? = null
 
 
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -278,7 +279,6 @@ class DashBoard : BaseActivity() {
                 message = "Hello",
                 notificationCode = "EMI_OVERDUE"
             )
-
             sendDataOnServerForFeatureActivate(request)
         }
 

@@ -28,5 +28,6 @@ data class UpdateCustomerUploadDataReq (
     var retailerCode: String = "",
     var activeStatus: String = "",
     var custPhoto_path: String = "",
-    var custPhoto_File: File? = null
+    var custPhoto_File: File? = null,
+    var CustAdhaarProfilePhoto_File: File? = null
 )

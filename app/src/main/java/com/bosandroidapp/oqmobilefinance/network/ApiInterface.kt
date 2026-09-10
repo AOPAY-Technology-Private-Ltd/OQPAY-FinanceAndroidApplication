@@ -48,8 +48,8 @@ import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
 import com.bosandroidapp.oqmobilefinance.data.model.SessionOutResponse
 import com.bosandroidapp.oqmobilefinance.data.model.ShortCutCustomerRequest
 import com.bosandroidapp.oqmobilefinance.data.model.ShortCutCustomerResponse
-import com.bosandroidapp.oqmobilefinance.data.model.UPIMandateRequest
-import com.bosandroidapp.oqmobilefinance.data.model.UPIMandateResponse
+import com.bosandroidapp.oqmobilefinance.data.upiautomandate.UPIMandateRequest
+import com.bosandroidapp.oqmobilefinance.data.upiautomandate.UPIMandateResponse
 import com.bosandroidapp.oqmobilefinance.data.model.UpdateCustomerDataIfAlreadyExistResponse
 import com.bosandroidapp.oqmobilefinance.data.model.UploadDeviceInfoReq
 import com.bosandroidapp.oqmobilefinance.data.model.UploadDeviceInfoResp
@@ -112,6 +112,10 @@ import com.bosandroidapp.oqmobilefinance.data.pg.PGOnlineRequestCall
 import com.bosandroidapp.oqmobilefinance.data.pg.PGOnlineResponseCall
 import com.bosandroidapp.oqmobilefinance.data.pg.PGRequestCall
 import com.bosandroidapp.oqmobilefinance.data.pg.PGRequestResponse
+import com.bosandroidapp.oqmobilefinance.data.upiautomandate.UpiAutoOrderStatusRequest
+import com.bosandroidapp.oqmobilefinance.data.upiautomandate.UpiAutoOrderStatusResponse
+import com.bosandroidapp.oqmobilefinance.data.upiautomandate.UpiAutoTransactionRequest
+import com.bosandroidapp.oqmobilefinance.data.upiautomandate.UpiAutoTransactionResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
@@ -430,6 +434,7 @@ interface ApiInterface {
         @Part("IsAggrementVerified") isAggrementVerified: RequestBody,
         @Part("IsRetailerAggrementVerified") IsRetailerAggrementVerified: RequestBody,
         @Part custPhoto_File: MultipartBody.Part?,
+        @Part CustAdhaarProfilePhoto_File: MultipartBody.Part?,
         @Part imeiNumber1_SealPhotoPath: MultipartBody.Part?,
         @Part imeiNumber2_SealPhotoPath: MultipartBody.Part?,
         @Part imeiNumber_PhotoPath: MultipartBody.Part?,
@@ -759,13 +764,22 @@ interface ApiInterface {
     @POST("api/OQPay/Enach/V1/eMandate")
     suspend fun geteMandateOnlineRequest(@Body req: EMandateRequest): Response<EMandateResponse>?
 
+    @POST("api/OQPay/Enach/V1/eMandate/getStatus")
+    suspend fun geteMandateOnlineSatusRequest(@Body req: ENachStatusReq): Response<ENachStatusResp>?
 
-    // for UPI Mandate Api ....................................................................
+
+
+    // for UPI Auto Mandate Api ....................................................................
     @POST("api/OQPay/Finance/V1/SetupSubscription/Pennydrop")
     suspend fun getUpiMandateOnlineRequest(@Body req: UPIMandateRequest): Response<UPIMandateResponse>?
 
-    @POST("api/OQPay/Enach/V1/eMandate/getStatus")
-    suspend fun geteMandateOnlineSatusRequest(@Body req: ENachStatusReq): Response<ENachStatusResp>?
+
+    @POST("api/OQPay/Finance/V1/SetupSubscription/Order/Status")
+    suspend fun getUpiAutoMandateOrderStatusRequest(@Body req: UpiAutoOrderStatusRequest): Response<UpiAutoOrderStatusResponse>?
+
+
+    @POST("api/OQPay/Finance/V1/SetupSubscription/Transaction")
+    suspend fun getUpiAutoMandateTransactionRequest(@Body req: UpiAutoTransactionRequest): Response<UpiAutoTransactionResponse>?
 
 
     //............................................................................................
@@ -840,11 +854,9 @@ interface ApiInterface {
     suspend fun getCustomerDataForSearch(@Body req : CustomerSearchForShortCutLoanRequest) : Response<CustomerSearchForShortCutLoanResponse>?
 
 
+
     @POST("api/V1/OQFinance/GetCustomerByRetailerSummary")
     suspend fun getCustomerDataForSummary(@Body req : ShortCutCustomerRequest) : Response<ShortCutCustomerResponse>?
-
-
-
 
 
 }

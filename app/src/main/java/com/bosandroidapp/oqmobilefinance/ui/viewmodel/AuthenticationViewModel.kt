@@ -182,6 +182,7 @@ class AuthenticationViewModel (private val repository: AuthRepository):ViewModel
         }
     }
 
+
     fun getRetailerLoanCreatedReq(req: LoanCreatedReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {

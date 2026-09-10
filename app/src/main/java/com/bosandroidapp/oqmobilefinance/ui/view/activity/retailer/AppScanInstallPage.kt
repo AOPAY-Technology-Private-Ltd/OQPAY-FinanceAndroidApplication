@@ -112,6 +112,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.ValidateAccessKeyReq
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LoanCreatedReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LogoutReq
+import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.ManageCustomerStepWiseReq
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityAppScanInstallPageBinding
@@ -199,6 +200,9 @@ class AppScanInstallPage : BaseActivity() {
 
         binding.validatekeylayout.visibility = View.GONE
 
+        if (LoanMode.isNullOrBlank()) {
+            LoanMode = ConstantClass.CheckOnlineOrOffline
+        }
 
         setOnClickListner()
         setDataOnUi()
@@ -532,7 +536,6 @@ class AppScanInstallPage : BaseActivity() {
                                 Log.d("customerres", Gson().toJson(response))
 
                                 if (response.status?.toLowerCase().equals(ConstantClass.LoanSuccessStatus)) {
-                                    LoanMode=""
                                     loaneCode = response.data!!.loanCode!!
                                     FirstName = CustFirstName
                                     MiddleName = CustMiddleName
@@ -545,9 +548,25 @@ class AppScanInstallPage : BaseActivity() {
                                     LoanEndDate = response.data.endDate!!
                                     CustomerPhotoPath=""
 
-                                    startActivity(Intent(this@AppScanInstallPage, CongratulationPage::class.java))
-                                    clearData()
-                                    finish()
+                                    // app verified..............................................................................
+                                    var req = ManageCustomerStepWiseReq(
+                                        mode = "UPDATE" ,
+                                        step = "8",
+                                        rid = "",
+                                        retailercode=preference.getStringValue(ConstantClass.RetailerCode,""),
+                                        customerCode=preference.getStringValue(ConstantClass.CustomerCode,""),
+                                        custPhoto_File=null,
+                                        imeiNumber1_SealPhotoPath = null,
+                                        imeiNumber2_SealPhotoPath = null,
+                                        imeiNumber_PhotoPath = null,
+                                        invoive_Path = null,
+                                        aadharFront_Path = null,
+                                        aadharBack_Path = null,
+                                        panFront_Path = null
+                                    )
+                                    Log.d("VerifiedKeyreq", Gson().toJson(req))
+
+                                    hitApiForUploadCustomerLoanData(req)
 
                                 }
                                 else {
@@ -590,6 +609,55 @@ class AppScanInstallPage : BaseActivity() {
                 }
             }
         }
+
+    }
+
+
+    fun hitApiForUploadCustomerLoanData(request : ManageCustomerStepWiseReq){
+
+        viewModel.uploadCustomerListForShortCutLoanCreateProcess(request).observe(this) { resources ->
+            when (resources.apiStatus) {
+                ApiStatus.SUCCESS ->{
+                    resources.data.let { user->
+                        ConstantClass.dialog.dismiss()
+                        if(user!!.isSuccessful){
+                            val responseBody = user.body()
+                            val status = responseBody?.success
+                            val errorCode = responseBody?.code
+                            val customerCode = responseBody?.data?.customerCode
+                            Log.d("VerifiedReq", Gson().toJson(responseBody))
+
+                            if(status == true ){
+                                 startActivity(Intent(this@AppScanInstallPage, CongratulationPage::class.java))
+                                 clearData()
+                                 finish()
+                            }
+                            else{
+                                Toast.makeText(this, responseBody?.message, Toast.LENGTH_SHORT).show()
+                            }
+
+                        }
+                        else {
+                            var errorbody = user.errorBody()
+                            Log.e("API_ERROR", errorbody?.string() ?: "Unknown error")
+                            Toast.makeText(this@AppScanInstallPage, errorbody?.string(), Toast.LENGTH_SHORT).show()
+
+                        }
+                    }
+
+                }
+
+                ApiStatus.ERROR -> {
+                    ConstantClass.dialog.dismiss()
+                    Toast.makeText(this@AppScanInstallPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
+                }
+
+                ApiStatus.LOADING -> {
+                }
+
+            }
+        }
+
 
     }
 

@@ -53,7 +53,6 @@ fun Context.removeRestrictions(){
 }
 
 
-
 fun Activity.setKioskMode() {
     val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
     val admin = ComponentName(this, KioskDeviceAdminReceiver::class.java)

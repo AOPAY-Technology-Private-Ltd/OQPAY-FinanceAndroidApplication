@@ -199,7 +199,7 @@ class KioskActivity : BaseActivity() {
 
                                 PGWebViewActivity.LoanCodePG = loanCode
 
-                                if(loanmode!!.toLowerCase().equals("offline",ignoreCase = true)){
+                                if(loanmode!!.toLowerCase().equals("offline",ignoreCase = true)|| loanmode.isNullOrEmpty()){
                                     var req = PGRequestCall(
                                         payCustomerPhoneNo = preference.getStringValue(ConstantClass.CustomerMobileNumber, ""),
                                         customerEmailID = email,
@@ -287,7 +287,7 @@ class KioskActivity : BaseActivity() {
 
     override fun onPause() {
         super.onPause()
-        if(isLocked()) finish()
+        // if(isLocked()) finish()
     }
 
 

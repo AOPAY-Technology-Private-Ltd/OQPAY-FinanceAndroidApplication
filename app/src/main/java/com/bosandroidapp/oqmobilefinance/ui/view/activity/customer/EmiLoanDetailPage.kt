@@ -647,7 +647,7 @@ class EmiLoanDetailPage : BaseActivity() {
                         val emiNumbers=  (1..selectedNoofEmi).joinToString("")
                         PGWebViewActivity.LoanCodePG = loanCode
 
-                        if(loanmode!!.toLowerCase().equals("offline",ignoreCase = true)){
+                        if(loanmode!!.toLowerCase().equals("offline",ignoreCase = true)||loanmode.isNullOrBlank()){
                             var req = PGRequestCall(
                                 payCustomerPhoneNo = preference.getStringValue(ConstantClass.CustomerMobileNumber, ""),
                                 customerEmailID = email,

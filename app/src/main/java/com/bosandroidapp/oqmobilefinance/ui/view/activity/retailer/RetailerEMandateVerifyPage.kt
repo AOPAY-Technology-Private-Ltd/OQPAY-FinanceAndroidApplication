@@ -1,10 +1,13 @@
 package com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer
 
+import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
+import android.net.http.SslError
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -13,6 +16,9 @@ import android.view.Window
 import android.view.WindowManager
 import android.webkit.CookieManager
 import android.webkit.JavascriptInterface
+import android.webkit.SslErrorHandler
+import android.webkit.WebChromeClient
+import android.webkit.WebSettings
 import android.webkit.WebStorage
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -21,9 +27,12 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.webkit.WebSettingsCompat
+import androidx.webkit.WebViewFeature
 
 import com.bosandroidapp.bosmobilefinance.ui.slideshow.ui.view.activity.retailer.cibilreportsfragment.BureauScore.Companion.userScore
 import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
@@ -91,20 +100,31 @@ import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.QRCodePage.Co
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.PanViewModel
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
+import com.bosandroidapp.oqmobilefinance.data.repository.DikshifinsureRepository
+import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.DikshifinsureOnlinePGModelFactory
+import com.bosandroidapp.oqmobilefinance.data.upiautomandate.UpiAutoOrderStatusRequest
+import com.bosandroidapp.oqmobilefinance.data.upiautomandate.UpiAutoTransactionRequest
+import com.bosandroidapp.oqmobilefinance.ui.viewmodel.DikshifinsureViewModel
 import com.google.gson.Gson
+import kotlin.math.roundToInt
 
 class RetailerEMandateVerifyPage : BaseActivity() {
     lateinit var binding : ActivityRetailerEmandateVerifyPageBinding
     var isEmandateVerified : String= ""
     var isPannydropVerified : String= "Yes"
+    var merchandId : String= ""
+    var registrationId : String= ""
+    private var isStatusCheckInProgress = false
     lateinit var viewModel: AuthenticationViewModel
     lateinit var panViewModel: PanViewModel
+    lateinit var dikshifinsureViewModel: DikshifinsureViewModel
     lateinit var dialog: Dialog
 
 
     companion object{
         var webUrl: String? = ""
     }
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -120,14 +140,22 @@ class RetailerEMandateVerifyPage : BaseActivity() {
         }
 
         viewModel = ViewModelProvider(this, CommonViewModelFactory(AuthRepository(RetrofitClient.apiInterface)))[AuthenticationViewModel::class.java]
-        panViewModel = ViewModelProvider(this,
-            PanViewModelFactory(PanRepository(RetrofitClient.apiInterfacePAN))
-        )[PanViewModel::class.java]
+        panViewModel = ViewModelProvider(this, PanViewModelFactory(PanRepository(RetrofitClient.apiInterfacePAN)))[PanViewModel::class.java]
+        dikshifinsureViewModel = ViewModelProvider(this, DikshifinsureOnlinePGModelFactory(DikshifinsureRepository(RetrofitClient.apiInterfaceOnlinePG)))[DikshifinsureViewModel::class.java]
+
+
+
+        if(intent.hasExtra(ConstantClass.MarchentOrderID_UPIAUTOPAY)&& intent.hasExtra(ConstantClass.RegistrationID_UPIAUTOPAY))
+        {
+            merchandId = intent.getStringExtra(ConstantClass.MarchentOrderID_UPIAUTOPAY).toString()
+            registrationId = intent.getStringExtra(ConstantClass.RegistrationID_UPIAUTOPAY).toString()
+        }
 
         setDataInWebView()
         setonclicklistner()
 
     }
+
 
 
     fun setonclicklistner(){
@@ -138,10 +166,51 @@ class RetailerEMandateVerifyPage : BaseActivity() {
 
     }
 
+
+    @SuppressLint("SetJavaScriptEnabled")
     fun setDataInWebView() {
+
+        clearWebView(binding.eMandatewebview)
 
         binding.eMandatewebview.settings.javaScriptEnabled = true
         binding.eMandatewebview.settings.domStorageEnabled = true
+        binding.eMandatewebview.settings.databaseEnabled = true
+        binding.eMandatewebview.settings.loadsImagesAutomatically  = true
+        binding.eMandatewebview.settings.javaScriptCanOpenWindowsAutomatically  = true
+        binding.eMandatewebview.settings.setSupportMultipleWindows(true)
+        binding.eMandatewebview.settings.allowFileAccess = true
+        binding.eMandatewebview.settings.allowContentAccess = true
+        binding.eMandatewebview.settings.mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+
+        // Important for payment-related WebView flows
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.PAYMENT_REQUEST)) {
+
+            WebSettingsCompat.setPaymentRequestEnabled(binding.eMandatewebview.settings, true)
+            WebSettingsCompat.setHasEnrolledInstrumentEnabled(binding.eMandatewebview.settings, true)
+        }
+
+        Log.d("PHONEPE_WEBVIEW", "Payment Request supported = ${
+                WebViewFeature.isFeatureSupported(
+                    WebViewFeature.PAYMENT_REQUEST
+                )
+            }"
+        )
+
+        Log.d(
+            "PHONEPE_WEBVIEW",
+            "WebView version = ${
+                WebView.getCurrentWebViewPackage()?.versionName
+            }"
+        )
+
+        binding.eMandatewebview.settings.cacheMode = WebSettings.LOAD_DEFAULT
+
+        binding.eMandatewebview.settings.userAgentString = WebSettings.getDefaultUserAgent(this)
+        val cookieManager = CookieManager.getInstance()
+
+        cookieManager.setAcceptCookie(true)
+        cookieManager.setAcceptThirdPartyCookies(binding.eMandatewebview, true)
+
 
         binding.eMandatewebview.addJavascriptInterface(object {
 
@@ -151,26 +220,70 @@ class RetailerEMandateVerifyPage : BaseActivity() {
                 try {
                     val uri = Uri.parse(url)
 
-                    // Get query parameter
-                    val transactionId = uri.getQueryParameter("c")
+                    if (!merchandId.isNullOrEmpty() && !registrationId.isNullOrEmpty()) {
+                        doUpdateUpiAutoMandateStatus()
+                    }
+                    else {
+                        // Get query parameter
+                        val transactionId = uri.getQueryParameter("c")
 
-                    Log.d("TRANSACTION_ID", transactionId ?: "null")
+                        Log.d("TRANSACTION_ID", transactionId ?: "null")
 
-                    if (!transactionId.isNullOrEmpty()) {
-                        // Call verify API here
-                        doUpdateEMandateStatus(transactionId)
+                        if (!transactionId.isNullOrEmpty()) {
+                            // Call verify API here
+                            doUpdateEMandateStatus(transactionId)
+                        }
                     }
 
-                } catch (e: Exception) {
+                }
+                catch (e: Exception) {
                     e.printStackTrace()
                 }
 
-                
             }
         }, "Android")
 
 
         binding.eMandatewebview.webViewClient = object : WebViewClient() {
+
+            override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
+                Log.d("WEBVIEW_OVERRIDE", "URL: $url")
+                if (url == null) return false
+
+                if (url.startsWith("http://") || url.startsWith("https://")) {
+                    return false // Let WebView load regular URLs
+                }
+
+                // Handle custom schemes (upi://, intent://, etc.)
+                try {
+                    val intent = Intent.parseUri(url, Intent.URI_INTENT_SCHEME)
+                    if (intent != null) {
+                        view?.context?.startActivity(intent)
+                        return true
+                    }
+                } catch (e: Exception) {
+                    Log.e("WEBVIEW_ERROR", "Error parsing URI: $url", e)
+                    try {
+                        val fallbackIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                        view?.context?.startActivity(fallbackIntent)
+                        return true
+                    } catch (anfe: ActivityNotFoundException) {
+                        Log.e("WEBVIEW_ERROR", "No app found to handle URL: $url")
+                        Toast.makeText(view?.context, "No app found to handle this action", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                return true
+            }
+
+            override fun onReceivedSslError(view: WebView?, handler: SslErrorHandler?, error: SslError?) {
+                // IMPORTANT: For production, you should be more restrictive. 
+                // Allowing mercury-t2 for UAT/Testing.
+                if (error?.url?.contains("phonepe.com") == true) {
+                    handler?.proceed()
+                } else {
+                    super.onReceivedSslError(view, handler, error)
+                }
+            }
 
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
@@ -181,9 +294,28 @@ class RetailerEMandateVerifyPage : BaseActivity() {
             }
         }
 
-        clearWebView(binding.eMandatewebview)
+        binding.eMandatewebview.webChromeClient = object : WebChromeClient() {
+            override fun onCreateWindow(view: WebView?, isDialog: Boolean, isUserGesture: Boolean, resultMsg: android.os.Message?): Boolean {
+                val newWebView = WebView(this@RetailerEMandateVerifyPage)
+                newWebView.webViewClient = view?.webViewClient ?: WebViewClient()
+                val transport = resultMsg?.obj as? WebView.WebViewTransport
+                transport?.webView = newWebView
+                resultMsg?.sendToTarget()
+                return true
+            }
+        }
+
         binding.eMandatewebview.loadUrl(webUrl!!)
+
+
+/*        val uri = Uri.parse(webUrl)
+
+        val customTabsIntent = CustomTabsIntent.Builder()
+            .build()
+
+        customTabsIntent.launchUrl(this, uri)*/
     }
+
 
     fun clearWebView(webView: WebView) {
 
@@ -200,32 +332,190 @@ class RetailerEMandateVerifyPage : BaseActivity() {
         }
     }
 
+
     fun injectJs(webView: WebView?) {
-        webView?.evaluateJavascript("""
-        (function() {
+        webView?.evaluateJavascript(
+            """
+    (function() {
 
-            function notify() {
+        // -----------------------------
+        // URL CHANGE LISTENER
+        // -----------------------------
+
+        function notify() {
+            try {
                 Android.onUrlChange(window.location.href);
+            } catch (e) {
+                console.log("Android.onUrlChange error:", e);
             }
+        }
 
-            var pushState = history.pushState;
-            history.pushState = function() {
-                pushState.apply(history, arguments);
-                notify();
-            };
+        var pushState = history.pushState;
 
-            var replaceState = history.replaceState;
-            history.replaceState = function() {
-                replaceState.apply(history, arguments);
-                notify();
-            };
+        history.pushState = function() {
+            pushState.apply(history, arguments);
+            notify();
+        };
 
-            window.addEventListener('popstate', notify);
+        var replaceState = history.replaceState;
 
-            notify(); // initial trigger
-        })();
-    """.trimIndent(), null)
+        history.replaceState = function() {
+            replaceState.apply(history, arguments);
+            notify();
+        };
+
+        window.addEventListener('popstate', notify);
+
+
+        // -----------------------------
+        // PAYMENT REQUEST CHECK
+        // -----------------------------
+
+        console.log(
+            "PaymentRequest available:",
+            typeof window.PaymentRequest !== "undefined"
+        );
+
+        console.log(
+            "PaymentRequest:",
+            window.PaymentRequest
+        );
+
+
+        // -----------------------------
+        // INITIAL URL TRIGGER
+        // -----------------------------
+
+        notify();
+
+    })();
+    """.trimIndent(),
+            null
+        )
     }
+
+
+
+    // hit api for  online emandate auto pay
+
+    fun doUpdateUpiAutoMandateStatus() {
+        if (isStatusCheckInProgress) return
+        isStatusCheckInProgress = true
+        (this@RetailerEMandateVerifyPage).runOnUiThread {
+            hitApiForUpiAutoMandateOrderStatus(registrationId, merchandId)
+        }
+    }
+
+
+    fun hitApiForUpiAutoMandateOrderStatus(registrationId: String, merchandId: String) {
+        val request = UpiAutoOrderStatusRequest(
+            registrationID = registrationId, 
+            merchantOrderId = merchandId
+        )
+        Log.d("UpiAutoStatusReq", Gson().toJson(request))
+
+        dikshifinsureViewModel.getUpiAutoMandateOrderStatusRequest(request).observe(this) { resources ->
+            when (resources.apiStatus) {
+                ApiStatus.SUCCESS -> {
+                    isStatusCheckInProgress = false
+                    ConstantClass.dialog.dismiss()
+                    val response = resources.data?.body()
+                    Log.d("UpiAutoStatusRes", Gson().toJson(response))
+
+                    if(response?.state!!.toLowerCase().equals("failed",ignoreCase = true)){
+                        isEmandateVerified= "No"
+                        showingRejectioneMandatePopUp(response.paymentDetails?.filterNotNull()?.firstOrNull()?.rail?.umn ?: "")
+                        return@observe
+                    }
+
+                    if (response?.state?.toLowerCase().equals("completed", ignoreCase = true) == true) {
+
+                        if (response!!.paymentDetails.isNullOrEmpty()) {
+                            // First completed: mandate created, now trigger transaction
+                            hitApiForUpiAutoMandateTransaction(registrationId)
+                        } 
+                        else {
+                            // Second completed: transaction done
+                            val umn = response.paymentDetails?.filterNotNull()?.firstOrNull()?.rail?.umn ?: ""
+
+                            isEmandateVerified = isMandate
+                            val uploadReq = EnachDateUploadReq(
+                                isEmandateVerified = isEmandateVerified,
+                                emAccountType = AccountType,
+                                isPannydropVerified = isPannydropVerified,
+                                emAccountNumber = AccountNumber,
+                                customerCode = CustomerCodeForEnach,
+                                retailerCode = RetailerCodeForEnach,
+                                loanCode = loaneCode,
+                                emBankName = BankName,
+                                emIfscCode = BankIFSCCode,
+                                emumrn = umn
+                            )
+                            hitApiForUploadEnachMandateDataResponse(uploadReq, isEmandateVerified)
+                        }
+                    }
+
+                }
+                ApiStatus.ERROR -> {
+                    isStatusCheckInProgress = false
+                    ConstantClass.dialog.dismiss()
+                    Toast.makeText(this, resources.message ?: "Status Check Failed", Toast.LENGTH_SHORT).show()
+                }
+                ApiStatus.LOADING -> {
+                    if (!ConstantClass.dialog.isShowing) {
+                        ConstantClass.OpenPopUpForVeryfyOTP(this)
+                    }
+                }
+            }
+        }
+
+    }
+
+
+    fun hitApiForUpiAutoMandateTransaction(registrationId: String) {
+        val emiNumbers = "1" // Defaulting to 1 for mandate creation flow
+        val amount = EmiAmount.toDouble().roundToInt()
+
+        val request = UpiAutoTransactionRequest(
+            registrationID = registrationId,
+            amount = amount,
+            eMINumbers = emiNumbers,
+            customerCode = CustomerCodeForEnach,
+            loanCode = loaneCode
+        )
+        Log.d("UpiAutoTransReq", Gson().toJson(request))
+
+        dikshifinsureViewModel.getUpiAutoMandateTransactionRequest(request).observe(this) { resources ->
+            when (resources.apiStatus) {
+                ApiStatus.SUCCESS -> {
+                    isStatusCheckInProgress = false
+                    ConstantClass.dialog.dismiss()
+                    val response = resources.data?.body()
+                    Log.d("UpiAutoTransRes", Gson().toJson(response))
+
+                    if (!response?.intentUrl.isNullOrEmpty()) {
+                        clearWebView(binding.eMandatewebview)
+                        merchandId = response?.marchentOrderID ?: ""
+                        binding.eMandatewebview.loadUrl(response?.intentUrl!!)
+                    }
+                    else {
+                        Toast.makeText(this, response?.errorMessage ?: "Transaction trigger failed", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                ApiStatus.ERROR -> {
+                    isStatusCheckInProgress = false
+                    ConstantClass.dialog.dismiss()
+                    Toast.makeText(this, resources.message ?: "Transaction Failed", Toast.LENGTH_SHORT).show()
+                }
+                ApiStatus.LOADING -> {
+                    if (!ConstantClass.dialog.isShowing) {
+                        ConstantClass.OpenPopUpForVeryfyOTP(this)
+                    }
+                }
+            }
+        }
+    }
+
 
     fun doUpdateEMandateStatus(eMandateID : String){
 
@@ -245,10 +535,11 @@ class RetailerEMandateVerifyPage : BaseActivity() {
 
     }
 
+    
     fun hitApiForEMandateStatus(request: ENachStatusReq) {
         Log.d("eManadateStatusReq", Gson().toJson(request))
 
-        if(LoanMode.equals(ConstantClass.offline)){
+        if(ConstantClass.CheckOnlineOrOffline.equals(ConstantClass.offline)){
             panViewModel.geteMandateSatusRequest(request).observe(this) { resources ->
                 resources.let {
                     when (it.apiStatus) {
@@ -414,6 +705,7 @@ class RetailerEMandateVerifyPage : BaseActivity() {
 
             }
         }
+
     }
 
 
@@ -467,6 +759,7 @@ class RetailerEMandateVerifyPage : BaseActivity() {
 
     }
 
+    
     fun showingRejectioneMandatePopUp(emumrn: String){
         dialog = Dialog(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)

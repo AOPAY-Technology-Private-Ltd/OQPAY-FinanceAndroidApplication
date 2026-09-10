@@ -61,6 +61,7 @@ data class ManageCustomerStepWiseReq(
     var isAggrementVerified: String = "",
     var isRetailerAggrementVerified: String = "",
     var custPhoto_File: File? = null,
+    var CustAdhaarProfilePhoto_File: File? = null,
     var imeiNumber1_SealPhotoPath: File? = null,
     var imeiNumber2_SealPhotoPath: File? = null,
     var imeiNumber_PhotoPath: File? = null,

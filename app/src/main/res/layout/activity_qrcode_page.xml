@@ -294,7 +294,7 @@
 
           <!--  create option for selecte emandate option-->
 
-                <LinearLayout
+            <LinearLayout
                     android:id="@+id/emandateOptionLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

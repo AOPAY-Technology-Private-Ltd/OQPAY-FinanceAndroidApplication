@@ -2,7 +2,6 @@ package com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.reports
 
 import android.app.Dialog
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -12,19 +11,15 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
-import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
@@ -58,7 +53,6 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustFirstName
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustFlatNo
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustLastName
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustMiddleName
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustPhotoPath
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustPinCode
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustPrimaryMobileNumber
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustPrimaryMobileVerified
@@ -66,7 +60,6 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustPrimaryOTP
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustStateName
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CusteMailID
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustomerCodeForEnach
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.DefaulterEmiDebitPending
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.DownPayment
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.EmiAmount
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ImeiNumber1
@@ -96,8 +89,6 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.SellingPrice
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.Tenure
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ToBePaidAmount
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.UPIMandate
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.cacheImageAndGetUri
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.cacheImageAndGetUriForShortCutLoan
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.downloadImageToTemp
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isAccessKeyVerified
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isAggrementVerified
@@ -108,15 +99,14 @@ import com.bosandroidapp.oqmobilefinance.data.enach.EnachDateUploadReq
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerSearchForShortCutLoanRequest
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerShortCutDataItem
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerStepDataItem
-import com.bosandroidapp.oqmobilefinance.data.model.RetailerPerCustomerListShortCutForLoanReq
 import com.bosandroidapp.oqmobilefinance.data.model.ShortCutCustomerRequest
-import com.bosandroidapp.oqmobilefinance.data.model.ShortCutCustomerResponse
-import com.bosandroidapp.oqmobilefinance.data.model.UPIMandateRequest
-import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.ManageCustomerStepWiseReq
+import com.bosandroidapp.oqmobilefinance.data.upiautomandate.UPIMandateRequest
 import com.bosandroidapp.oqmobilefinance.data.pennydrop.BankListReq
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
+import com.bosandroidapp.oqmobilefinance.data.repository.DikshifinsureRepository
 import com.bosandroidapp.oqmobilefinance.data.repository.PanRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
+import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.DikshifinsureOnlinePGModelFactory
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.PanViewModelFactory
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityCustomerListForCreatingShortCutLoanProcessPageBinding
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
@@ -135,6 +125,7 @@ import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.RetailerEMand
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.RetailerEMandateVerifyPage.Companion.webUrl
 import com.bosandroidapp.oqmobilefinance.ui.view.adapter.CustomerShortcutLoanAdapter
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
+import com.bosandroidapp.oqmobilefinance.ui.viewmodel.DikshifinsureViewModel
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.PanViewModel
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.google.gson.Gson
@@ -148,6 +139,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
     private lateinit var preference: SharedPreference
     private lateinit var viewModel: AuthenticationViewModel
     private lateinit var panViewModel: PanViewModel
+    lateinit var dikshifinsureViewModel: DikshifinsureViewModel
     var bankList = mutableListOf<Pair<String, Int>>()
     private var customerList: MutableList<CustomerStepDataItem> = mutableListOf()
 
@@ -177,9 +169,13 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this, CommonViewModelFactory(AuthRepository(RetrofitClient.apiInterface))
         )[AuthenticationViewModel::class.java]
+
         panViewModel = ViewModelProvider(this, PanViewModelFactory(PanRepository(RetrofitClient.apiInterfacePAN))
         )[PanViewModel::class.java]
         preference = SharedPreference(this)
+
+        dikshifinsureViewModel = ViewModelProvider(this, DikshifinsureOnlinePGModelFactory(DikshifinsureRepository(RetrofitClient.apiInterfaceOnlinePG)))[DikshifinsureViewModel::class.java]
+
 
         setonclickListner()
         setupRecyclerView()
@@ -187,7 +183,6 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
 
 
     }
-
 
 
     fun setonclickListner() {
@@ -312,8 +307,14 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
 
     private fun setupRecyclerView() {
         customerAdapter = CustomerShortcutLoanAdapter(customerList, this) { item ->
+
             var customer = item.customerCode
             var step = item.currentStep
+
+            if(step.equals("8")){
+                return@CustomerShortcutLoanAdapter
+            }
+
             hitApiForCustomerwiseDetails(customer,step)
         }
         binding.showCustomerreports.layoutManager = LinearLayoutManager(this)
@@ -322,6 +323,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
 
 
     private fun handleCustomerClick(item: CustomerShortCutDataItem,step : String?) {
+
         val customerDetails = item.customerDetails
         val productDetails = item.productDetails
         val bankDetails = item.bankDetails
@@ -331,10 +333,9 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
         val createLoanDetails = item.createLoanDetails
         val invoiceAndAppVerification = item.invoiceAndAppVerification
 
-        if (invoiceAndAppVerification?.isAccessKeyVerified.isNullOrBlank() || invoiceAndAppVerification?.isAccessKeyVerified.equals("no", ignoreCase = true)) {
+            customerDetails.let { customerDetails->
 
-            if (customerDetails != null) {
-                val image = ConstantClass.BASE_URL_IMAGE + customerDetails.custPhotoPath
+                val image = ConstantClass.BASE_URL_IMAGE + customerDetails!!.custPhotoPath
 
                 lifecycleScope.launch(Dispatchers.IO) {
 
@@ -436,7 +437,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
                 IsRetailerAggrementVerified = imeiDetails.isRetailerAggrementVerified!!
             }
 
-            if (createLoanDetails != null) {
+            if (createLoanDetails != null && createLoanDetails.loanCode!!.isNotEmpty()) {
                 LoanMode = createLoanDetails.loanMode!!
                 LoanStatus = createLoanDetails.loanStatus!!
                 LoanRID = createLoanDetails.loanRID?.takeIf { it.isNotBlank() }?.toIntOrNull() ?: 0
@@ -445,7 +446,8 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
                 if (createLoanDetails.loanStartDate != null && createLoanDetails.loanEndDate != null) {
                     LoanStartDate = createLoanDetails.loanStartDate!!
                     LoanEndDate = createLoanDetails.loanEndDate!!
-                } else {
+                }
+                else {
                     LoanStartDate = ""
                     LoanEndDate = ""
                 }
@@ -460,13 +462,18 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
             if (createLoanDetails?.loanCode.isNullOrBlank()) {
                 showOnlineOfflineDialog(item, step!!)
             }
+
             else {
-                proceedWithLoanLogic(item,step!!)
+                if(LoanMode.isNotEmpty()){
+                    proceedWithLoanLogic(item,step!!)
+                }else {
+                    Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage, "Loan mode not found", Toast.LENGTH_SHORT).show()
+                }
+
             }
 
-        }
-
     }
+
 
 
     private fun showOnlineOfflineDialog(item: CustomerShortCutDataItem,step : String) {
@@ -501,7 +508,8 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
 
             ConstantClass.CheckOnlineOrOffline = if (selectedId == R.id.rbOnline) {
                 ConstantClass.online
-            } else {
+            }
+            else {
                 ConstantClass.offline
             }
 
@@ -568,7 +576,9 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
                 Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage,"Customer ${customerDetails!!.customerCode} data is missing!!",
                     Toast.LENGTH_SHORT).show()
             }
+
         }
+
     }
 
 
@@ -665,6 +675,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
     }
 
 
+
     fun hitApiForBankList(item: CustomerShortCutDataItem) {
         bankList.clear()
 
@@ -733,18 +744,20 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
     }
 
 
+
     private fun proceedWithLoanLogic(item: CustomerShortCutDataItem,step: String) {
         var loanData = item.createLoanDetails
         var invoiceAppVerification = item.invoiceAndAppVerification
 
-        val isEmandateVerifiedStatus = loanData!!.isEmandateVerified.equals("yes", true)
-        val isAccessKeyVerifiedStatus = invoiceAppVerification!!.isAccessKeyVerified.equals("yes", true)
+        val isEmandateVerifiedStatus = loanData!!.isEmandateVerified!!.toLowerCase().equals("yes", true)
+        val isAccessKeyVerifiedStatus = invoiceAppVerification!!.isAccessKeyVerified!!.toLowerCase().equals("yes", true)
 
         if (!isEmandateVerifiedStatus) {
             // Step 7: E-Mandate Process (After Loan Created)
             showEmandateSelectionDialog(item)
 
-        } else if (!isAccessKeyVerifiedStatus ) {
+        } else
+            if (!isAccessKeyVerifiedStatus ) {
             // Step 8: App Install
             startActivity(Intent(this, AppScanInstallPage::class.java))
         }
@@ -753,6 +766,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
         }
 
     }
+
 
 
     private fun showEmandateSelectionDialog(item: CustomerShortCutDataItem) {
@@ -789,6 +803,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
         dialog.show()
 
     }
+
 
 
     private fun fetchEmandateOptionsForDialog(dialog: Dialog) {
@@ -949,7 +964,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
                     registrationID = request.registrationID
                 )
                 Log.d("UPIMandateReq", Gson().toJson(request))
-                panViewModel.getUpiMandateOnlineRequest(request).observe(this) { resources ->
+                dikshifinsureViewModel.getUpiMandateOnlineRequest(request).observe(this) { resources ->
                     resources.let {
                         when (it.apiStatus) {
                             ApiStatus.SUCCESS -> {
@@ -966,7 +981,11 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
                                             if (response!!.code=="200" ) {
                                                 webUrl = response!!.intentUrl
                                                 Log.d("webUrl", webUrl.toString())
-                                                startActivity(Intent(this@CustomerListForCreatingShortCutLoanProcessPage, RetailerEMandateVerifyPage::class.java))
+                                                var MarchentOrderID = response.marchentOrderID
+                                                var intent = Intent(this@CustomerListForCreatingShortCutLoanProcessPage, RetailerEMandateVerifyPage::class.java)
+                                                intent.putExtra(ConstantClass.MarchentOrderID_UPIAUTOPAY,MarchentOrderID)
+                                                intent.putExtra(ConstantClass.RegistrationID_UPIAUTOPAY,request.registrationID)
+                                                startActivity(intent)
                                             }
                                             else {
                                                 ConstantClass.dialog.dismiss()

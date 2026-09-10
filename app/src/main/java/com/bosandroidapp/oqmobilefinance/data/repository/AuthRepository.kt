@@ -344,6 +344,14 @@ class AuthRepository(private val apiInterface: ApiInterface) {
       val requestFile = it.asRequestBody("image/*".toMediaTypeOrNull())
       MultipartBody.Part.createFormData("CustPhoto_File", it.name, requestFile)
     }
+
+
+    val CustAdhaarProfilePhoto_File = req.CustAdhaarProfilePhoto_File?.let {
+      val requestFile = it.asRequestBody("image/*".toMediaTypeOrNull())
+      MultipartBody.Part.createFormData("CustAdhaarProfilePhoto_File", it.name, requestFile)
+    }
+
+
     val imeiNumber1_SealPhotoPath = req.imeiNumber1_SealPhotoPath?.let {
       val requestFile = it.asRequestBody("image/*".toMediaTypeOrNull())
       MultipartBody.Part.createFormData("IMEINumber1_SealPhotoFile", it.name, requestFile)
@@ -382,7 +390,7 @@ class AuthRepository(private val apiInterface: ApiInterface) {
       tenure, emiAmount, imeiNumber1, imeiNumber2, accountNumber, bankIFSCCode, bankName,IsPannyDrop,accountType,
       branchName, refName, refRelationShip, refmobileNo, refAddress, debitOrCreditCard, upiMandate,
       createdBy, membershipfees, retailercode, customerCode, cibilScore, activeStatus,cibilApiResponse, aadhaarApiresponse , panApiResponse,isAggrementVerified,
-      isRetailerAggrementVerified, custPhoto_File, imeiNumber1_SealPhotoPath, imeiNumber2_SealPhotoPath,
+      isRetailerAggrementVerified, custPhoto_File,CustAdhaarProfilePhoto_File,imeiNumber1_SealPhotoPath, imeiNumber2_SealPhotoPath,
       imeiNumber_PhotoPath, invoive_Path, aadharFront_Path, aadharBack_Path, panFront_Path
     )
 

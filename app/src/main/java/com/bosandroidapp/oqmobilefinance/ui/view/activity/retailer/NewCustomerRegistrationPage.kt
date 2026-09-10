@@ -93,6 +93,7 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustPrimaryMobil
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustPrimaryOTP
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustStateName
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CusteMailID
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.DownPayment
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ImeiNumber1SealPhotoPath
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ImeiNumber2SealPhotoPath
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ImeiNumberPhotoPath
@@ -113,6 +114,7 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanNumberVerifie
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanPinCode
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanResponse
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanState
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ToBePaidAmount
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.base64ToBitmap
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.bitmapToUri
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.createMultipartFromUri
@@ -132,6 +134,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
 import com.bosandroidapp.oqmobilefinance.data.model.UpdateCustomerUploadDataReq
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
 import com.bosandroidapp.oqmobilefinance.data.model.VerifyCustomerReq
+import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.GetIsEligibleLoanReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LogoutReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.ManageCustomerStepWiseReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.SendOtpReq
@@ -189,6 +192,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
     var clickemailId: Boolean = false
     var EmailId: String = ""
     var customerImagePath: String? = ""
+    var customerAadhaarImagePath: String? = ""
     var checkFirstName:Boolean = false
     var checkMiddleName:Boolean = false
     var checkLastName:Boolean = false
@@ -198,6 +202,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
     var checkcurrentaddress:Boolean = false
     var checkstatename:Boolean = false
     var checkcityName:Boolean = false
+    var membershipAmt: String = ""
 
     private var verifyCustomerRetryCount = 0
     private val MAX_RETRY_COUNT = 3
@@ -244,8 +249,61 @@ class NewCustomerRegistrationPage : BaseActivity() {
         api = RetrofitClient.apiInterfaceSMS
         registerCustomerApiHolder = RetrofitClient.apiInterface
         preference = SharedPreference(this)
+        hitApiForMemberShipFee()
         setOnClickListner()
         setDataInUI()
+
+    }
+
+
+  fun hitApiForMemberShipFee() {
+        val startTime = System.currentTimeMillis()
+        var req = GetIsEligibleLoanReq(
+            panNumber = PanNumber,
+            aadharNumber = ""
+        )
+
+        Log.d("checkMemberShipReq", Gson().toJson(req))
+
+        viewModel.getgetMemberShipReqeReq(req).observe(this) { resources ->
+            resources.let {
+                when (it.apiStatus) {
+                    ApiStatus.SUCCESS -> {
+                        it.data.let { users ->
+                            users!!.body().let { response ->
+                                Log.d("API_TIME", "Response Time: ${System.currentTimeMillis() - startTime} ms")
+                                val response = users?.body()
+                                if (response != null) {
+                                    Log.d("PanVerificationResp", Gson().toJson(response))
+                                    if (response!!.statuss.equals("True")) {
+                                        val membership = response.membershipFee?.toDouble() ?: 0.0
+                                        membershipAmt = "$membership"
+                                    } else {
+                                    }
+                                }
+                                else {
+
+                                    hitApiForMemberShipFee()
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                    ApiStatus.ERROR -> {
+                        ConstantClass.dialog.dismiss()
+                        Toast.makeText(this@NewCustomerRegistrationPage, resources.message ?: "Error getting membership fee", Toast.LENGTH_SHORT).show()
+                        Log.d("API_TIME", "Failed after: ${System.currentTimeMillis() - startTime} ms")
+                    }
+
+                    ApiStatus.LOADING -> {
+
+                    }
+                }
+            }
+        }
 
     }
 
@@ -427,6 +485,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
         })
 
+
         binding.cityname.addTextChangedListener(object :TextWatcher{
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
 
@@ -449,6 +508,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
             }
 
         })
+
 
         binding.mobileNumber.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -475,6 +535,8 @@ class NewCustomerRegistrationPage : BaseActivity() {
                 }
             }
         })
+
+
 
         binding.alternatemobileNumber.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -507,6 +569,8 @@ class NewCustomerRegistrationPage : BaseActivity() {
                 }
             }
         })
+
+
 
         binding.emailId.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -579,6 +643,8 @@ class NewCustomerRegistrationPage : BaseActivity() {
             }
 
         })
+
+
 
         binding.pincode.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -771,7 +837,8 @@ class NewCustomerRegistrationPage : BaseActivity() {
                 }
 
                 else{
-                    ConstantClass.OpenPopUpForVeryfyOTP(this)
+
+                     ConstantClass.OpenPopUpForVeryfyOTP(this)
                     
                       if(!CustAlternateMobileNumber.isNullOrBlank()){
                         userScore=0f
@@ -790,6 +857,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                         val aadharFrontPart = saveImageToCache(this, AadharFrontImageUri!!,  "AadharFrontImage")
                         val aadharBackPart = saveImageToCache(this, AadharBackImageUri!!,  "AadharBackImage")
                         val PanFrontPart = saveImageToCache(this, PanFrontImageUri!!,  "PanFrontImage")
+
 
                         if(AlreadyCustomerCodeHaveEligiblity.isNotEmpty()){
 
@@ -811,7 +879,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                 panNumber = PanNumber,
                                 panNumberVerified = PanNumberVerified,
                                 IsAggrementVerified = isAggrementVerified,
-                                memberShipFees="",
+                                memberShipFees=membershipAmt,
                                 panApiResponse = PanResponse,
                                 aadhaarApiResponse = AadhaarResponse,
                                 cibilApiResponse = CibilResponse,
@@ -876,7 +944,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                 debitOrCreditCard="",
                                 upiMandate= ConstantClass.UPIMandate,
                                 createdBy=createdBy,
-                                membershipfees="",
+                                membershipfees=membershipAmt,
                                 retailercode=preference.getStringValue(ConstantClass.RetailerCode,""),
                                 cibilScore=userScore.toString(),
                                 activeStatus = "Pending",
@@ -885,7 +953,8 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                 panApiResponse = PanResponse,
                                 isAggrementVerified=isAggrementVerified,
                                 isRetailerAggrementVerified="",
-                                custPhoto_File=customerImageFile,
+                                custPhoto_File= customerImageFile,
+                                CustAdhaarProfilePhoto_File = null,
                                 imeiNumber1_SealPhotoPath = null,
                                 imeiNumber2_SealPhotoPath = null,
                                 imeiNumber_PhotoPath = null,
@@ -1431,7 +1500,8 @@ class NewCustomerRegistrationPage : BaseActivity() {
             binding.mobileNumber.error= "Please verify your primary mobile number first."
             scrollToView(binding.detaillayout,  binding.mobileNumber)
             return Pair(false, "Please verify your primary mobile number first.")
-        }else{
+        }
+        else{
             binding.mobileNumber.error = null
         }
 
@@ -1757,6 +1827,8 @@ class NewCustomerRegistrationPage : BaseActivity() {
                 if(photoUri!=null){
                     val imageFile = uriToFile(photoUri!!, this)
                     customerImagePath = imageFile!!.absolutePath
+                    ConstantClass.CustAdhaarPhotoUri = photoUri
+                    CustPhotoPath = photoUri
                 }
             }
         }
@@ -1814,19 +1886,16 @@ class NewCustomerRegistrationPage : BaseActivity() {
                 binding.lockimage.visibility = View.GONE
                 binding.userimage.visibility = View.VISIBLE
 
-                Glide.with(this)
-                .load(CustomerImage)
-                .into( binding.userimage)
+                CustPhotoPath = Uri.parse(CustomerImage)
+
+                Glide.with(this).load(CustomerImage).into( binding.userimage)
 
             lifecycleScope.launch(Dispatchers.IO) {
-                val imageFile = downloadImageToTemp(
-                    this@NewCustomerRegistrationPage,
-                    CustomerImage
-                )
-
+                val imageFile = downloadImageToTemp(this@NewCustomerRegistrationPage, CustomerImage)
                 withContext(Dispatchers.Main) {
                     if (imageFile != null) {
                         customerImagePath = imageFile!!.absolutePath
+                        photoUri = Uri.fromFile(imageFile)
                         Log.d("IMAGE", "File saved: ${imageFile.absolutePath}")
                         Log.d("IMAGE", "Exists: ${imageFile.exists()}")
                     } else {
@@ -1834,6 +1903,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                     }
                 }
             }
+
 
         }
 
@@ -2058,19 +2128,24 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
                                 Log.d("cibilresp", Gson().toJson(response))
 
+
                                 if(response.status.toLowerCase().equals("false")&& !response.resultCode.equals("101")){
-                                    PopOpForCibileScoreRequestToAdmin(response.message.toString(), "Mismatch Details",false)
+                                    PopOpForCibileScoreRequestToAdmin(response.message.toString(), "Record Message",false)
                                     binding.createaccount.isEnabled = true
                                 }
 
+
                                 if (!response.httpResponseCode.isNullOrBlank() && response.httpResponseCode.equals("200")) {
-                                    if(response.result!=null){
+                                    Toast.makeText(this@NewCustomerRegistrationPage, response.message.toString(), Toast.LENGTH_SHORT).show()
+
+                                    if (response.result != null && response.result.resultJson != null) {
                                         var data = response.result.resultJson.inProfileResponse
                                         userScore = data.score.bureauScore?.toFloatOrNull() ?: 0f
                                         CibilResponse = Gson().toJson(response)
-                                        if(userScore >= 500f){
-                                            if(CustCountry.isNullOrBlank()){
-                                                CustCountry ="India"
+
+                                        if (userScore >= 500f) {
+                                            if (CustCountry.isNullOrBlank()) {
+                                                CustCountry = "India"
                                             }
                                             ConstantClass.OpenPopUpForVeryfyOTP(this)
 
@@ -2078,11 +2153,12 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                             val lastName = preference.getStringValue(ConstantClass.LastName, "").orEmpty()
                                             val safeLastName = if (!lastName.isNullOrBlank() && lastName != "null") lastName else ""
                                             var createdBy = firstName.plus(" ").plus(safeLastName)
-                                            CreatedByCustomerShortCut= createdBy
+                                            CreatedByCustomerShortCut = createdBy
 
-                                            val customerImageFile = saveImageToCache(this, CustPhotoPath!!, "CustomerPhoto" )
+                                            val customerImageFile = saveImageToCache(this, CustPhotoPath!!, "CustomerPhoto")
+                                            val customerAadhaarImagePath = saveImageToCache(this, ConstantClass.CustAdhaarPhotoUri!!, "CustomerAdhaarPhoto")
 
-                                            if(AlreadyCustomerCodeHaveEligiblity.isNotEmpty()){
+                                            if (AlreadyCustomerCodeHaveEligiblity.isNotEmpty()) {
                                                 var req = UpdateCustomerUploadDataReq(
                                                     customerCode = AlreadyCustomerCodeHaveEligiblity,
                                                     updatedBy = createdBy,
@@ -2093,15 +2169,15 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                                     primaryMobileVerified = CustPrimaryMobileVerified,
                                                     currentAddress = CustCurrentAddress,
                                                     pinCode = CustPinCode,
-                                                    country= CustCountry!!,
-                                                    stateName= CustStateName,
-                                                    cityName= CustCityName,
+                                                    country = CustCountry!!,
+                                                    stateName = CustStateName,
+                                                    cityName = CustCityName,
                                                     aadharNumber = AadharNumber,
                                                     aadharNumberVerified = ConstantClass.AadharVerified,
                                                     panNumber = PanNumber,
                                                     panNumberVerified = PanNumberVerified,
                                                     IsAggrementVerified = isAggrementVerified,
-                                                    memberShipFees="",
+                                                    memberShipFees = membershipAmt,
                                                     panApiResponse = PanResponse,
                                                     aadhaarApiResponse = AadhaarResponse,
                                                     cibilApiResponse = CibilResponse,
@@ -2114,15 +2190,14 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
                                                 hitApiForUpdateCustomerData(req)
 
-                                            }
-                                            else{
+                                            } else {
                                                 var req = ManageCustomerStepWiseReq(
-                                                    mode = "INSERT" ,
+                                                    mode = "INSERT",
                                                     step = "1",
                                                     rid = "",
                                                     firstName = CustFirstName,
-                                                    middleName= CustMiddleName,
-                                                    lastName=CustLastName,
+                                                    middleName = CustMiddleName,
+                                                    lastName = CustLastName,
                                                     primaryMobileNumber = CustPrimaryMobileNumber,
                                                     primaryOTP = CustPrimaryOTP,
                                                     primaryMobileVerified = CustPrimaryMobileVerified,
@@ -2134,47 +2209,48 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                                     aearSector = CustAreaSector,
                                                     pinCode = CustPinCode,
                                                     currentAddress = CustCurrentAddress,
-                                                    stateName= CustStateName,
-                                                    cityName= CustCityName,
-                                                    country= CustCountry!!,
+                                                    stateName = CustStateName,
+                                                    cityName = CustCityName,
+                                                    country = CustCountry!!,
                                                     aadharNumber = AadharNumber,
                                                     aadharNumberVerified = ConstantClass.AadharVerified,
                                                     panNumber = PanNumber,
                                                     panNumberVerified = PanNumberVerified,
-                                                    brandName="",
-                                                    modelName="",
-                                                    modelVariant="",
-                                                    color="",
-                                                    sellingPrice="",
-                                                    downPayment="",
-                                                    tenure="",
-                                                    emiAmount="",
-                                                    imeiNumber1="",
-                                                    imeiNumber2="",
-                                                    accountNumber="",
-                                                    bankIFSCCode="",
-                                                    bankName="",
-                                                    IsPannyDrop =ConstantClass.isPannydropVerified,
-                                                    accountType="",
-                                                    branchName="",
-                                                    refName="",
-                                                    refRelationShip="",
-                                                    refmobileNo="",
-                                                    refAddress="",
-                                                    debitOrCreditCard="",
-                                                    upiMandate= ConstantClass.UPIMandate,
-                                                    createdBy=createdBy,
-                                                    membershipfees="",
-                                                    retailercode=preference.getStringValue(ConstantClass.RetailerCode,""),
-                                                    customerCode="",
-                                                    cibilScore=userScore.toString(),
+                                                    brandName = "",
+                                                    modelName = "",
+                                                    modelVariant = "",
+                                                    color = "",
+                                                    sellingPrice = "",
+                                                    downPayment = "",
+                                                    tenure = "",
+                                                    emiAmount = "",
+                                                    imeiNumber1 = "",
+                                                    imeiNumber2 = "",
+                                                    accountNumber = "",
+                                                    bankIFSCCode = "",
+                                                    bankName = "",
+                                                    IsPannyDrop = ConstantClass.isPannydropVerified,
+                                                    accountType = "",
+                                                    branchName = "",
+                                                    refName = "",
+                                                    refRelationShip = "",
+                                                    refmobileNo = "",
+                                                    refAddress = "",
+                                                    debitOrCreditCard = "",
+                                                    upiMandate = ConstantClass.UPIMandate,
+                                                    createdBy = createdBy,
+                                                    membershipfees = membershipAmt,
+                                                    retailercode = preference.getStringValue(ConstantClass.RetailerCode, ""),
+                                                    customerCode = "",
+                                                    cibilScore = userScore.toString(),
                                                     activeStatus = "Pending",
                                                     cibilApiResponse = CibilResponse,
                                                     aadhaarApiResponse = AadhaarResponse,
                                                     panApiResponse = PanResponse,
-                                                    isAggrementVerified=isAggrementVerified,
-                                                    isRetailerAggrementVerified="",
-                                                    custPhoto_File=customerImageFile,
+                                                    isAggrementVerified = isAggrementVerified,
+                                                    isRetailerAggrementVerified = "",
+                                                    custPhoto_File = customerImageFile,
+                                                    CustAdhaarProfilePhoto_File = customerAadhaarImagePath,
                                                     imeiNumber1_SealPhotoPath = null,
                                                     imeiNumber2_SealPhotoPath = null,
                                                     imeiNumber_PhotoPath = null,
@@ -2186,23 +2262,23 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                                 Log.d("OnlineCustomerReq", Gson().toJson(req))
                                                 hitApiForUploadCustomerData(req)
                                             }
-
-                                            //startActivity(Intent(this@NewCustomerRegistrationPage, MobileSelectionActivity::class.java))
-                                        }
-                                        else{
+                                        } else {
                                             GlobalScope.launch(Dispatchers.Main) {
-                                                hitApiForCustomerRegister("Your CIBIL score is below 500. Please contact your Admin for approval before applying for a loan.","Low CIBIL Score")
+                                                hitApiForCustomerRegister("Your CIBIL score is below 500. Please contact your Admin for approval before applying for a loan.", "Low CIBIL Score")
                                             }
-
                                         }
                                     }
-
-                                    else{
-                                        PopOpForCibileScoreRequestToAdmin(response.message.toString(), "Mismatch Details",false)
+                                    else if (response.resultCode == "102") {
+                                        userScore = 0f
+                                        CibilResponse = Gson().toJson(response)
+                                        GlobalScope.launch(Dispatchers.Main) {
+                                            hitApiForCustomerRegister("Your CIBIL score is low or No Record Available. Please contact your Admin for approval before applying for a loan.", "Low CIBIL Score")
+                                        }
+                                    } else {
+                                        PopOpForCibileScoreRequestToAdmin(response.message.toString(), "Record Message", false)
                                         binding.createaccount.isEnabled = true
                                     }
-                                }
-                                else {
+                                } else {
                                     Toast.makeText(this@NewCustomerRegistrationPage, response.message, Toast.LENGTH_LONG).show()
                                     binding.createaccount.isEnabled = true
                                 }
@@ -2268,7 +2344,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                 panNumber = PanNumber,
                 panNumberVerified = PanNumberVerified,
                 IsAggrementVerified = isAggrementVerified,
-                memberShipFees="",
+                memberShipFees=membershipAmt,
                 panApiResponse = PanResponse,
                 aadhaarApiResponse = AadhaarResponse,
                 cibilApiResponse = userScore.toInt().toString(),
@@ -2498,6 +2574,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                 }
 
             }
+
         }
 
 
