@@ -161,7 +161,8 @@ class PGWebViewActivity : BaseActivity() {
                             Toast.makeText(this@PGWebViewActivity, "No UPI app found", Toast.LENGTH_SHORT).show()
                         }
 
-                    } catch (e: Exception) {
+                    }
+                    catch (e: Exception) {
                         Log.e("UPI", "Error launching app", e)
                         Toast.makeText(this@PGWebViewActivity, "No app found to handle this action", Toast.LENGTH_SHORT).show()
                     }
