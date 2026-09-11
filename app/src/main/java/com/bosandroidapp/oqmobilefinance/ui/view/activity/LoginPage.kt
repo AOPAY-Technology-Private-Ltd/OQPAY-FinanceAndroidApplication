@@ -136,7 +136,7 @@ class LoginPage : BaseActivity() {
                     )
 
                     if (keypadHeight > screenHeight * 0.20) {
-                        // ✅ Keyboard is open
+                        //  Keyboard is open
 
                         binding.scrollview.post {
                             binding.scrollview.smoothScrollTo(0, binding.scrollview.bottom)
@@ -282,6 +282,8 @@ class LoginPage : BaseActivity() {
                             val getData =  users.body()!!.data
                             val errorCode = users.body()!!.code
                             val message = users.body()!!.message
+                            val accessToken = users.body()!!.accessToken
+                            val refreshToken = users.body()!!.refreshToken
 
                             if (getData!=null && errorCode==200) {
                                 preference.setStringValue(ConstantClass.CustomerCode, getData.customerCode.toString())
@@ -290,6 +292,8 @@ class LoginPage : BaseActivity() {
                                 preference.setStringValue(ConstantClass.LastName, getData.lastName.toString())
                                 preference.setStringValue(ConstantClass.CustomerMobileNumber, getData.mobileNo.toString())
                                 preference.setStringValue(ConstantClass.CustomerEmailID, getData.emailID.toString())
+                                preference.setStringValue(ConstantClass.AccessToken, accessToken.toString())
+                                preference.setStringValue(ConstantClass.RefreshToken, refreshToken.toString())
                                 preference.setBooleanValue(ConstantClass.LoggedIn, true)
                                 preference.setStringValue(ConstantClass.LoginType, loginType)
                                 preference.setStringValue(ConstantClass.LoginMobileorMailid, emailOfMobile)
@@ -756,6 +760,8 @@ class LoginPage : BaseActivity() {
                                 users.body()?.let { response ->
                                     var errorCode = response.code
                                     var getData = response.data
+                                    val accessToken = users.body()!!.accessToken
+                                    val refreshToken = users.body()!!.refreshToken
 
                                     if(errorCode==200 && getData!=null){
 
@@ -767,6 +773,8 @@ class LoginPage : BaseActivity() {
                                         preference.setStringValue(ConstantClass.CustomerEmailID, getData.emailID.toString())
                                         preference.setBooleanValue(ConstantClass.LoggedIn, true)
                                         preference.setStringValue(ConstantClass.LoginType, loginType)
+                                        preference.setStringValue(ConstantClass.AccessToken, accessToken.toString())
+                                        preference.setStringValue(ConstantClass.RefreshToken, refreshToken.toString())
                                         preference.setStringValue(ConstantClass.LoginMobileorMailid, emailOfMobile)
                                         preference.setStringValue(ConstantClass.Loginpassword, password)
                                         preference.setStringValue(ConstantClass.ClientCode, "CMP0005")

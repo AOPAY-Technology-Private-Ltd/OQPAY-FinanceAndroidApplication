@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import com.bosandroidapp.oqmobilefinance.data.enach.EnachDateUploadReq
+import com.bosandroidapp.oqmobilefinance.data.generattoken.RefreshTokenRequest
 import com.bosandroidapp.oqmobilefinance.data.model.AddBankAccountReq
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerEmiStatusReq
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerSearchForShortCutLoanRequest
@@ -98,6 +99,23 @@ class AuthenticationViewModel (private val repository: AuthRepository):ViewModel
             emit(ApiResponse.error(data = null, message = e.message ?: "Unknown error occurred"))
         }
     }
+
+
+
+
+    fun generateRefreshToken(req: RefreshTokenRequest) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            emit(handleApiResponse(repository.generateRefreshToken(req), "Login"))
+        } catch (e: HttpException) {
+            emit(ApiResponse.error(data = null, message = "Server Error: ${e.code()}"))
+        } catch (e: IOException) {
+            emit(ApiResponse.error(data = null, message = "Network error! Please check your connection."))
+        } catch (e: Exception) {
+            emit(ApiResponse.error(data = null, message = e.message ?: "Unknown error occurred"))
+        }
+    }
+
 
 
     fun getRetailerLoginOTPRequest(req: RetailerLoginOtpRequest) = liveData(Dispatchers.IO) {

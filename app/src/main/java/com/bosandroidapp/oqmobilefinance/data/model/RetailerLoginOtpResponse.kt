@@ -14,7 +14,14 @@ data class RetailerLoginOtpResponse(
 	val success: Boolean? = null,
 
 	@field:SerializedName("message")
-	val message: String? = null
+	val message: String? = null,
+
+
+	@field:SerializedName("accessToken")
+	val accessToken: String? = null,
+
+	@field:SerializedName("refreshToken")
+	val refreshToken: String? = null
 )
 
 data class RetailerLoginData(

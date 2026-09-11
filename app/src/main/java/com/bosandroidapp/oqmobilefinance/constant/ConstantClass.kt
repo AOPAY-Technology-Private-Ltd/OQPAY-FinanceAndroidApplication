@@ -190,6 +190,8 @@ object ConstantClass {
      var CheckCompleteEmiStatus = false
      const val SETTINGS_PKG = "com.android.settings"
      const val CustomerMobileNumber = "mobileNumber"
+     const val AccessToken = "accessToken"
+     const val RefreshToken = "refreshToken"
      const val CustomerEmailID = "emailID"
      const val ServiceCharge = "serviceCharge"
      const val ServiceType = "serviceType"

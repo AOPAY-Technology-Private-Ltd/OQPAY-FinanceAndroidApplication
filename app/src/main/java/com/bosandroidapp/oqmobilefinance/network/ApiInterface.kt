@@ -7,6 +7,8 @@ import com.bosandroidapp.oqmobilefinance.data.enach.ENachStatusReq
 import com.bosandroidapp.oqmobilefinance.data.enach.ENachStatusResp
 import com.bosandroidapp.oqmobilefinance.data.enach.EnachDateUploadReq
 import com.bosandroidapp.oqmobilefinance.data.enach.EnachDateUploadResp
+import com.bosandroidapp.oqmobilefinance.data.generattoken.RefreshTokenRequest
+import com.bosandroidapp.oqmobilefinance.data.generattoken.RefreshTokenResponse
 import com.bosandroidapp.oqmobilefinance.data.gst.GstRequest
 import com.bosandroidapp.oqmobilefinance.data.gst.GstResponse
 import com.bosandroidapp.oqmobilefinance.data.loancharge.LoanChargeReq
@@ -193,6 +195,11 @@ interface ApiInterface {
 
     @POST("api/V1/OQFinance/Login")
     suspend fun login(@Body req: LoginReq): Response<LoginResponse>?
+
+
+    // access token generate................................................
+    @POST("api/V1/OQFinance/RefreshToken")
+    suspend fun generateRefreshToken(@Body req: RefreshTokenRequest): Response<RefreshTokenResponse>?
 
 
 

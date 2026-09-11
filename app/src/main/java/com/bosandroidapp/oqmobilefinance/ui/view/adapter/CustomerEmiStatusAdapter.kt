@@ -42,24 +42,27 @@ class CustomerEmiStatusAdapter(var context: Context, var ledgerReportList: List<
         val binding = holder.binding
 
         binding.tvReceiptNo.text = item.receiptNo
-        binding.tvPendingAmount.text = formatIndianAmount(item.pendingAmount.toString())
+       // binding.tvPendingAmount.text = /*formatIndianAmount(*/item.pendingAmount.toString()/*)*/
 
-        if (item.recordStatus?.equals("paid", ignoreCase = true) == true) {
+        if (item.recordStatus?.toLowerCase().equals("paid", ignoreCase = true) == true) {
             binding.doneimage.setImageResource(com.bosandroidapp.oqmobilefinance.R.drawable.doneicon)
             binding.amounttitle.text = context.getString(com.bosandroidapp.oqmobilefinance.R.string.paid_amount)
             binding.tvRecordStatus.setTextColor(ContextCompat.getColor(context, com.bosandroidapp.oqmobilefinance.R.color.green))
-        } else {
+            binding.tvPendingAmount.text = /*formatIndianAmount(*/item.emiAmount.toString()/*)*/
+        }
+        else {
             binding.amounttitle.text = context.getString(com.bosandroidapp.oqmobilefinance.R.string.due_amount)
             binding.tvRecordStatus.setTextColor(ContextCompat.getColor(context, com.bosandroidapp.oqmobilefinance.R.color.red))
             binding.doneimage.setImageResource(com.bosandroidapp.oqmobilefinance.R.drawable.crossicon)
+            binding.tvPendingAmount.text = /*formatIndianAmount(*/item.pendingAmount.toString()/*)*/
         }
 
-        binding.tvEmiAmount.text = formatIndianAmount(item.emiAmount?.toString().orEmpty())
-        binding.tvFineAmount.text = formatIndianAmount(item.fine?.toString().orEmpty())
-        binding.tvBounceAmount.text = formatIndianAmount(item.bouncingCharges?.toString().orEmpty())
-        binding.tvOtherAmount.text = formatIndianAmount(item.otherCharges?.toString().orEmpty())
-        binding.tvWaiveAmount.text = formatIndianAmount(item.waiveOffAmount?.toString().orEmpty())
-        binding.tvTotalChargesAmount.text = formatIndianAmount(item.totalCharges?.toString().orEmpty())
+        binding.tvEmiAmount.text = /*formatIndianAmount(*/item.emiAmount?.toString().orEmpty()/*)*/
+        binding.tvFineAmount.text = /*formatIndianAmount(*/item.fine?.toString().orEmpty()/*)*/
+        binding.tvBounceAmount.text = /*formatIndianAmount(*/item.bouncingCharges?.toString().orEmpty()/*)*/
+        binding.tvOtherAmount.text = /*formatIndianAmount(*/item.otherCharges?.toString().orEmpty()/*)*/
+        binding.tvWaiveAmount.text = /*formatIndianAmount(*/item.waiveOffAmount?.toString().orEmpty()/*)*/
+        binding.tvTotalChargesAmount.text = /*formatIndianAmount(*/item.totalCharges?.toString().orEmpty()/*)*/
 
         binding.tvPaymentMode.text = item.paymentMode
         binding.tvRecordStatus.text = item.recordStatus

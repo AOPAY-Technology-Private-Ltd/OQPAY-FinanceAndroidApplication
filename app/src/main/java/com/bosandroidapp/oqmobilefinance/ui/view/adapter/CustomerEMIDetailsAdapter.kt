@@ -42,7 +42,7 @@ class CustomerEMIDetailsAdapter( var context:Context,var customerLoanEmiDetailsL
         preference = SharedPreference(context)
         holder.brandName.text= customerLoanEmiDetailsList!![position]!!.brandName
         holder.loanid.text= customerLoanEmiDetailsList!![position]!!.loanCode
-        holder.emiamount.text= formatIndianAmount(customerLoanEmiDetailsList!![position]!!.emiAmount?.toString().takeIf { !it.isNullOrBlank() } ?: "0")
+        holder.emiamount.text= /*formatIndianAmount(*/customerLoanEmiDetailsList!![position]!!.emiAmount?.toString().takeIf { !it.isNullOrBlank() } ?: "0"/*)*/
         holder.customercode.text= preference.getStringValue(ConstantClass.CustomerCode,"")
         holder.customername.text= preference.getStringValue(ConstantClass.FirstName,"") .plus(" ") .plus(preference.getStringValue(
             ConstantClass.LastName,""))

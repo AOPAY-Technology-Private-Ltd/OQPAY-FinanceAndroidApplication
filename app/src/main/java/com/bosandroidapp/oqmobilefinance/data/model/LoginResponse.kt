@@ -15,6 +15,14 @@ data class LoginResponse(
 
 	@field:SerializedName("message")
 	val message: String? = null
+	,
+
+	@field:SerializedName("accessToken")
+	val accessToken: String? = null,
+
+	@field:SerializedName("refreshToken")
+	val refreshToken: String? = null
+
 )
 
 data class LoggedData(
