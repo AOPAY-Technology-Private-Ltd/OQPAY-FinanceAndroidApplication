@@ -77,7 +77,7 @@ class CustomerEMIStatusReport : BaseActivity() {
         super.onResume()
         if(isInternetAvailable(this@CustomerEMIStatusReport)) {
             HitApiForEmiList()
-            hitApiForLogin(preference.getStringValue(ConstantClass.CustomerCode,""))
+           // hitApiForLogin(preference.getStringValue(ConstantClass.CustomerCode,""))
         }
     }
 

@@ -40,10 +40,14 @@ class ApplicationClass : Application() {
 
     companion object {
         val isNetworkAvailable = MutableStateFlow(true)
+
+        lateinit var instance: ApplicationClass
+            private set
     }
 
     override fun onCreate() {
         super.onCreate()
+        instance = this
 
         StackerAndroid.enable(this)
 

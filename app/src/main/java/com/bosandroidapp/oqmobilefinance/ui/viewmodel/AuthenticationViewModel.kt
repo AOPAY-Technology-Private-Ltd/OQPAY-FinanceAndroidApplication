@@ -25,6 +25,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.ShortCutCustomerRequest
 import com.bosandroidapp.oqmobilefinance.data.model.UpdateCustomerUploadDataReq
 import com.bosandroidapp.oqmobilefinance.data.model.UploadDeviceInfoReq
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateAccessKeyReq
+import com.bosandroidapp.oqmobilefinance.data.model.ValidateCustomerAccessKeyRequest
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
 import com.bosandroidapp.oqmobilefinance.data.model.VerifyCustomerReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.CustomerLoanEmiReceiveReq
@@ -389,6 +390,17 @@ class AuthenticationViewModel (private val repository: AuthRepository):ViewModel
             emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
         }
     }
+
+
+    fun getCustomerValidateKeyReq(req: ValidateCustomerAccessKeyRequest) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            emit(handleApiResponse(repository.getCustomerValidateKeyReq(req), "Generate Access Key"))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
+        }
+    }
+
 
     fun getAccessKeyForValidateAPKReq(req: ValidateAccessKeyReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))

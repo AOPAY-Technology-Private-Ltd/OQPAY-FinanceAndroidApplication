@@ -35,6 +35,7 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustPrimaryMobil
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustPrimaryOTP
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustStateName
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CusteMailID
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustomerCodeForEnach
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanNumber
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanNumberVerified
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanResponse
@@ -126,6 +127,8 @@ class LowCibilScoreCustomerReportListAdapter(private val ReportsDataList: List<C
                 CusteMailID =  ReportsDataList[position]!!.eMailID!!.trim()
                 CustFlatNo = ReportsDataList[position]!!.flatNo!!.trim()
                 CustAreaSector = ReportsDataList[position]!!.aearSector!!.trim()
+                CustomerCodeForEnach = ReportsDataList[position]!!.customerCode!!
+                preference.setStringValue(ConstantClass.CustomerCode, ReportsDataList[position]!!.customerCode!!.trim())
                 CustCurrentAddress = ReportsDataList[position]!!.currentAddress!!.trim()
                 CustPinCode = ReportsDataList[position]!!.pinCode!!.trim()
                 CustStateName = ReportsDataList[position]!!.stateName!!.trim()

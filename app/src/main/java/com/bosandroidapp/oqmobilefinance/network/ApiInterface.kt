@@ -57,6 +57,8 @@ import com.bosandroidapp.oqmobilefinance.data.model.UploadDeviceInfoReq
 import com.bosandroidapp.oqmobilefinance.data.model.UploadDeviceInfoResp
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateAccessKeyReq
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateAccessKeyResp
+import com.bosandroidapp.oqmobilefinance.data.model.ValidateCustomerAccessKeyRequest
+import com.bosandroidapp.oqmobilefinance.data.model.ValidateCustomerAccessKeyResponse
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionResp
 import com.bosandroidapp.oqmobilefinance.data.model.VerifyCustomerReq
@@ -677,7 +679,6 @@ interface ApiInterface {
                                     @Query("message") message : String): Response<SmsResponse>?
 
 
-
     // for customer and retailer both showing reports
     @POST("api/V1/OQFinance/GetLoanDetailsRetailerWise")
     suspend fun getReports(@Body req : GetReportsReq): Response<ReportsResp>?
@@ -696,11 +697,9 @@ interface ApiInterface {
 
 
 
-
     // get customer location......................
     @POST("api/V1/OQFinance/managecustomerlocation")
     suspend fun uploadcustomerlocation(@Body req : CustomerlocationUploadReq): Response<CustomerlocationUploadResp>?
-
 
 
 
@@ -713,6 +712,12 @@ interface ApiInterface {
     // for customer generate token key
     @POST("api/V1/OQFinance/generatekey")
     suspend fun getAccessKeyForValidateAPKReq(@Body req : GenerateAccessTokenRequest): Response<GenerateAccessTokenResponse>?
+
+
+
+    // verify generated key customer side
+    @POST("api/V1/OQFinance/customervalidatekey")
+    suspend fun getCustomerValidateKeyReq(@Body req : ValidateCustomerAccessKeyRequest): Response<ValidateCustomerAccessKeyResponse>?
 
 
 

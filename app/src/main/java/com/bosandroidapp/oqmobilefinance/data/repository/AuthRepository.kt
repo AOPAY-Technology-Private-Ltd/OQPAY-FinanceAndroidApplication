@@ -28,6 +28,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.UpdateCustomerDataIfAlreadyE
 import com.bosandroidapp.oqmobilefinance.data.model.UpdateCustomerUploadDataReq
 import com.bosandroidapp.oqmobilefinance.data.model.UploadDeviceInfoReq
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateAccessKeyReq
+import com.bosandroidapp.oqmobilefinance.data.model.ValidateCustomerAccessKeyRequest
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
 import com.bosandroidapp.oqmobilefinance.data.model.VerifyCustomerReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.CustomerLoanEmiReceiveReq
@@ -242,6 +243,8 @@ class AuthRepository(private val apiInterface: ApiInterface) {
   suspend fun uploadcustomerlocation(req: CustomerlocationUploadReq) = apiInterface.uploadcustomerlocation(req)
 
   suspend fun getAccessKeyForValidateAPKReq(req: GenerateAccessTokenRequest) = apiInterface.getAccessKeyForValidateAPKReq(req)
+
+  suspend fun getCustomerValidateKeyReq(req: ValidateCustomerAccessKeyRequest) = apiInterface.getCustomerValidateKeyReq(req)
 
   suspend fun validateTokenFromRetailerReq(req: ValidateAccessKeyReq) = apiInterface.validateTokenFromRetailerReq(req)
 

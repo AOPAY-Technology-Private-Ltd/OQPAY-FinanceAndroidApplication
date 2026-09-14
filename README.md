@@ -222,3 +222,11 @@ git clone https://github.com/AOPAY-Technology-Private-Ltd/OQPAY-FinanceAndroidAp
 1. EMI Calculation update and interest calculate monthly
 2. Ledger report issue resolved.
 3. for customer make method for getting location.
+
+Manual Verification:
+•
+Once logged in, all subsequent API calls will now include the Bearer Token.
+•
+If the token expires (after 30 minutes), the app will transparently refresh it without interrupting the user's flow.
+•
+If the refresh token also expires or is invalid (403), the user will be safely logged out.

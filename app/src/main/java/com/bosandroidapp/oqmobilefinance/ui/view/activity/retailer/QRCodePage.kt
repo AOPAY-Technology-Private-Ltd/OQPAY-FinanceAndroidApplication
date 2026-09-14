@@ -208,15 +208,15 @@ class QRCodePage : BaseActivity() {
         dikshifinsureOnlinePGModel = ViewModelProvider(this, DikshifinsureOnlinePGModelFactory(DikshifinsureRepository(RetrofitClient.apiInterfaceOnlinePG)))[DikshifinsureViewModel::class.java]
 
 
-        if(preference.getStringValue(ConstantClass.CustomerCode,"").isNotEmpty()&& ! ConstantClass.ClickOnCardLowCibilScore.equals(CardType)){
+        if(preference.getStringValue(ConstantClass.CustomerCode,"").isNotEmpty()/*&& ! ConstantClass.ClickOnCardLowCibilScore.equals(CardType*/){
             updateLoanRequest(true)
 
-        }
+        }/*
         else{
             binding.LoanCreatelayout.visibility = View.GONE
             binding.nextlayout.visibility = View.VISIBLE
             updateUI(false)
-        }
+        }*/
 
         setOnClickListner()
         hitApiForMemberShipFee()

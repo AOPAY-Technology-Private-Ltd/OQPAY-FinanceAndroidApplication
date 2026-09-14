@@ -76,6 +76,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.GenerateAccessTokenRequest
 import com.bosandroidapp.oqmobilefinance.data.model.NavParentItem
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletAmountReq
 import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
+import com.bosandroidapp.oqmobilefinance.data.model.ValidateCustomerAccessKeyRequest
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.GetCustomerLoanDetailsReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LoginReq
@@ -224,10 +225,10 @@ class DashBoard : BaseActivity() {
         checkAndStartKeyTimer()
 
         if (logintype.equals(Customer)) {
-            hitApiForCustomerLogin(preference.getStringValue(ConstantClass.CustomerCode, ""))
+           // hitApiForCustomerLogin(preference.getStringValue(ConstantClass.CustomerCode, ""))
             HitApiForEmiList()
             hitApiForUploadLatLong()
-            // 🔁 Setup periodic once only
+            //  Setup periodic once only
             if(latitude > 0.0 && longitude > 0.0){
                 val lastLat = preference
                     .getStringValue(ConstantClass.CUREENTLAT, "")
@@ -340,6 +341,7 @@ class DashBoard : BaseActivity() {
             else{
                 binding.appBarDashBoard.deskdesign.customerGenerateKeyLayout.visibility = View.VISIBLE
                 binding.appBarDashBoard.deskdesign.customerdashboardItemlayout.visibility = View.GONE
+
                 if(generateKey.isNotEmpty()){
                     binding.appBarDashBoard.deskdesign.generatedkey.visibility = View.VISIBLE
                     binding.appBarDashBoard.deskdesign.clicktologin.visibility = View.VISIBLE
@@ -389,7 +391,8 @@ class DashBoard : BaseActivity() {
             var generateKey = preference.getStringValue(ConstantClass.GENERATEKEY, "")
 
             if (generateKey.isNotEmpty() && binding.appBarDashBoard.deskdesign.generatedkey.text != "Key Expired") {
-                showContinueDialog()
+               // showContinueDialog()
+                hitApiForValidateKey()
             }
             else {
 
@@ -412,7 +415,13 @@ class DashBoard : BaseActivity() {
             else{
                 showContinueDialog()
             }*/
-            showContinueDialog()
+
+           // showContinueDialog()
+            var generateKey = preference.getStringValue(ConstantClass.GENERATEKEY, "")
+            if(generateKey.isNotEmpty()){
+                hitApiForValidateKey()
+            }
+
         }
 
 
@@ -591,17 +600,16 @@ class DashBoard : BaseActivity() {
     }
     
 
-    private fun showContinueDialog() {
+    private fun showContinueDialog(isSuccess: Boolean) {
         AlertDialog.Builder(this)
-            .setTitle("Confirmation")
-            .setMessage("Are you sure you want to proceed to the dashboard?")
+            .setTitle(if (isSuccess) "Success" else "Failed")
+            .setMessage(if (isSuccess) "Key validated successfully" else "Key Validation Failed")
             .setPositiveButton("Ok") { dialog, _ ->
-                preference.setBooleanValue(ConstantClass.CustomerAccessKey, true)
-                binding.appBarDashBoard.deskdesign.customerGenerateKeyLayout.visibility = View.GONE
-                binding.appBarDashBoard.deskdesign.customerdashboardItemlayout.visibility = View.VISIBLE
-                dialog.dismiss()
-            }
-            .setNegativeButton("Cancel") { dialog, _ ->
+                if (isSuccess) {
+                    preference.setBooleanValue(ConstantClass.CustomerAccessKey, true)
+                    binding.appBarDashBoard.deskdesign.customerGenerateKeyLayout.visibility = View.GONE
+                    binding.appBarDashBoard.deskdesign.customerdashboardItemlayout.visibility = View.VISIBLE
+                }
                 dialog.dismiss()
             }
             .setCancelable(false)
@@ -609,15 +617,64 @@ class DashBoard : BaseActivity() {
     }
 
 
+    fun hitApiForValidateKey(){
+        val generateTokenReq = ValidateCustomerAccessKeyRequest(
+            apiacessKey  = preference.getStringValue(ConstantClass.GENERATEKEY, "")
+        )
+
+        Log.d("tokenreq", Gson().toJson(generateTokenReq))
+
+        viewModel.getCustomerValidateKeyReq(generateTokenReq).observe(this) { resources ->
+            when (resources.apiStatus) {
+
+                ApiStatus.SUCCESS -> {
+                    
+                    resources.data?.body()?.let { response ->
+
+                        Log.d("tokenresp", response.message ?: "")
+                        Log.d("tokenmessage", Gson().toJson(response))
+
+                        ConstantClass.dialog.dismiss()
+
+                        uploadDataOnFirebaseConsole(Gson().toJson(response), "CurrentLocation")
+                        var errorCode = response.statusCode
+
+                        if (response.success == true && errorCode == 200) {
+                            showContinueDialog(true)
+                        }
+                        else{
+                            showContinueDialog(false)
+                        }
+                    }
+                    
+                }
+
+                ApiStatus.ERROR -> {
+                    ConstantClass.dialog.dismiss()
+                    Toast.makeText(this@DashBoard, resources.message ?: "Error checking access token", Toast.LENGTH_SHORT).show()
+                }
+
+                ApiStatus.LOADING -> {
+                    ConstantClass.OpenPopUpForVeryfyOTP(this)
+                }
+            }
+        }
+    }
+
+
     fun hitApiForGetAndCheckAccessToken(){
 
         val token = if (preference.getStringValue(ConstantClass.FCMTOKEN, "").isNullOrBlank()) {
             Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
-        } else {
+        }
+        else {
             preference.getStringValue(ConstantClass.FCMTOKEN, "")
         }
 
-        val generateTokenReq = GenerateAccessTokenRequest(fcmToken = token)
+        val generateTokenReq = GenerateAccessTokenRequest(
+            fcmToken = token,
+            customerCode = preference.getStringValue(ConstantClass.CustomerCode,"")
+        )
 
         Log.d("tokenreq", Gson().toJson(generateTokenReq))
 
@@ -669,9 +726,9 @@ class DashBoard : BaseActivity() {
             }
         }
 
-
-
     }
+
+
 
 
     override fun onBackPressed() {

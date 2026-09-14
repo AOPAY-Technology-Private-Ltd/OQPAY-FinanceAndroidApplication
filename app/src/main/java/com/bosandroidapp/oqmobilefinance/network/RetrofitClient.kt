@@ -22,6 +22,8 @@ object RetrofitClient {
         val okHttpClient = OkHttpClient.Builder()
             .retryOnConnectionFailure(true)
             .addInterceptor(StackerOkHttpInterceptor())
+            .addInterceptor(AuthInterceptor())
+            .authenticator(AuthAuthenticator())
             .connectTimeout(60, TimeUnit.SECONDS) // Connection timeout
             .readTimeout(60, TimeUnit.SECONDS)    // Read timeout
             .writeTimeout(60, TimeUnit.SECONDS)   // Write timeout

@@ -74,6 +74,7 @@ private suspend fun getCustomerLoanEmiDetailsReq(req: GetCustomerLoanDetailsReq)
 
 
 
+
 @RequiresApi(Build.VERSION_CODES.R)
 suspend fun Context.syncEmis() = withContext(Dispatchers.IO) {
     val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
@@ -98,6 +99,7 @@ suspend fun Context.forceSyncEmis() = withContext(Dispatchers.IO) {
     isEMIDue(sharedPref)
 
 }
+
 
 
 private suspend fun Context.fetchAndStoreEmis(sharedPref: SharedPreferences) {

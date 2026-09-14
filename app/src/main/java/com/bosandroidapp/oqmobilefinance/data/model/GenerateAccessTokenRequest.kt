@@ -5,5 +5,7 @@ import com.google.gson.annotations.SerializedName
 data class GenerateAccessTokenRequest(
 
 	@field:SerializedName("fcmToken")
-	val fcmToken: String? = null
+	val fcmToken: String? = null,
+	@field:SerializedName("customerCode")
+	val customerCode: String? = null,
 )

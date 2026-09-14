@@ -159,9 +159,7 @@ class RetailerProfilePage : BaseActivity() {
         if (logintype.equals(Retailer)) {
             hitApiForLogin(preference.getStringValue(ConstantClass.RetailerCode, ""))
         }
-        else{
-            hitApiForCustomerLogin(preference.getStringValue(ConstantClass.CustomerCode, ""))
-        }
+
 
     }
 

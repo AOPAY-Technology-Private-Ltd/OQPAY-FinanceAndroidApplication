@@ -122,7 +122,7 @@ class CustomerReportsPage : BaseActivity() ,CustomerReportListAdapter.onClickLis
     override fun onResume() {
         super.onResume()
         hitApiForGetReports(binding.reporttype.selectedItem.toString())
-        hitApiForLogin(preference.getStringValue(ConstantClass.CustomerCode,""))
+
     }
 
 

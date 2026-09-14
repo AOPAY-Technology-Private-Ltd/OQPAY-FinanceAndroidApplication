@@ -239,10 +239,9 @@ class EmiLoanDetailPage : BaseActivity() {
         super.onResume()
         HitApiForEmiList()
         hitApiForRetailerWalletAmount()
+
         if(logintype.equals(Retailer)){
             hitApiForLogin(preference.getStringValue(ConstantClass.RetailerCode,""))
-        }else{
-            hitApiForLogin(preference.getStringValue(ConstantClass.CustomerCode,""))
         }
 
     }

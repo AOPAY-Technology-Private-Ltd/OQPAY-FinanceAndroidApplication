@@ -28,6 +28,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.ViewModelProvider
 
+
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityIdverificationPageBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
@@ -51,21 +52,26 @@ import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LoginReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LogoutReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.AadharVerificationReq
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
+import com.bosandroidapp.oqmobilefinance.data.repository.PanRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
+import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.PanViewModelFactory
 import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.AadharCardWebViewDIGILockerPage.Companion.digilockerLink
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
+import com.bosandroidapp.oqmobilefinance.ui.viewmodel.PanViewModel
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.google.gson.Gson
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import kotlin.jvm.java
 
 class IDVerificationPage : BaseActivity() {
     lateinit var binding: ActivityIdverificationPageBinding
+    lateinit var panViewModel: PanViewModel
     lateinit var viewModel: AuthenticationViewModel
     lateinit var preference: SharedPreference
     lateinit var dialog: Dialog
@@ -81,7 +87,14 @@ class IDVerificationPage : BaseActivity() {
             WindowInsetsCompat.CONSUMED
         }
 
-        viewModel = ViewModelProvider(this, CommonViewModelFactory(AuthRepository(RetrofitClient.apiInterfacePAN)))[AuthenticationViewModel::class.java]
+        viewModel = ViewModelProvider(this,
+            CommonViewModelFactory(AuthRepository(RetrofitClient.apiInterface))
+        )[AuthenticationViewModel::class.java]
+
+
+        panViewModel = ViewModelProvider(this,
+            PanViewModelFactory(PanRepository(RetrofitClient.apiInterfacePAN))
+        )[PanViewModel::class.java]
         preference = SharedPreference(this)
 
         setOnClickListner()
@@ -208,7 +221,7 @@ class IDVerificationPage : BaseActivity() {
 
         Log.d("AadharVerificationreq", Gson().toJson(aadharverificationreq))
 
-        viewModel.getAadharVerificationReq(aadharverificationreq).observe(this) { resources ->
+        panViewModel.getAadharVerificationReq(aadharverificationreq).observe(this) { resources ->
             resources.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {

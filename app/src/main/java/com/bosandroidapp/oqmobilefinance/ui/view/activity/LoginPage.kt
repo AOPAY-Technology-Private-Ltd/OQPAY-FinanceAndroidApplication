@@ -374,10 +374,14 @@ class LoginPage : BaseActivity() {
                     val getData = response!!.data
                     val errorCode = response!!.code
                     val message = response.message
+                    val accessToken = response!!.accessToken
+                    val refreshToken = response!!.refreshToken
 
                     Log.d("LoginResponse", Gson().toJson(response))
 
                     if (getData!=null && errorCode==200) {
+                        preference.setStringValue(ConstantClass.AccessToken, accessToken.toString())
+                        preference.setStringValue(ConstantClass.RefreshToken, refreshToken.toString())
                         OpenPopUpForVeryfyRetailerOTP(getData.retailerCode.toString(),emailOfMobile,password)
                     }
                     else {
@@ -535,6 +539,7 @@ class LoginPage : BaseActivity() {
             }
 
         }
+
 
         verifyButton.setOnClickListener {
             val enteredOTP = pinView.getText().toString()
@@ -760,8 +765,6 @@ class LoginPage : BaseActivity() {
                                 users.body()?.let { response ->
                                     var errorCode = response.code
                                     var getData = response.data
-                                    val accessToken = users.body()!!.accessToken
-                                    val refreshToken = users.body()!!.refreshToken
 
                                     if(errorCode==200 && getData!=null){
 
@@ -773,8 +776,6 @@ class LoginPage : BaseActivity() {
                                         preference.setStringValue(ConstantClass.CustomerEmailID, getData.emailID.toString())
                                         preference.setBooleanValue(ConstantClass.LoggedIn, true)
                                         preference.setStringValue(ConstantClass.LoginType, loginType)
-                                        preference.setStringValue(ConstantClass.AccessToken, accessToken.toString())
-                                        preference.setStringValue(ConstantClass.RefreshToken, refreshToken.toString())
                                         preference.setStringValue(ConstantClass.LoginMobileorMailid, emailOfMobile)
                                         preference.setStringValue(ConstantClass.Loginpassword, password)
                                         preference.setStringValue(ConstantClass.ClientCode, "CMP0005")

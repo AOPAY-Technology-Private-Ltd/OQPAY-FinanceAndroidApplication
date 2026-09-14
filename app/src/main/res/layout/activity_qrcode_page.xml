@@ -23,6 +23,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="@dimen/_10sdp"
             android:padding="@dimen/_5sdp"
+            android:visibility="invisible"
             android:src="@drawable/back"
             app:tint="@color/white" />
 

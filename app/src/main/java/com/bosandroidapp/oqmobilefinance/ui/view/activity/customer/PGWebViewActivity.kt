@@ -104,7 +104,7 @@ class PGWebViewActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        hitApiForLogin(preference.getStringValue(ConstantClass.CustomerCode,""))
+      //  hitApiForLogin(preference.getStringValue(ConstantClass.CustomerCode,""))
     }
 
 
