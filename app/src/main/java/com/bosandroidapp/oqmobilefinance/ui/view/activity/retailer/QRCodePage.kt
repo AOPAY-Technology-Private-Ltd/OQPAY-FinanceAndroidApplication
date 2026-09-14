@@ -587,6 +587,7 @@ class QRCodePage : BaseActivity() {
         }
 
         binding.LoanCreatelayout.setOnClickListener {
+
             if (loancreatedreq != null) {
                /* if (!loaneCode.isNullOrEmpty()) {
 
@@ -1647,6 +1648,7 @@ class QRCodePage : BaseActivity() {
                                             LoanEndDate = response.data.endDate!!
 
                                             fetchEmandateOptions()
+
                                             var req = ManageCustomerStepWiseReq(
                                                 mode = "UPDATE" ,
                                                 step = "7",
@@ -2374,7 +2376,7 @@ class QRCodePage : BaseActivity() {
                     }
 
                     ApiStatus.ERROR -> {
-                        // ✅ Print the full error details
+                        //  Print the full error details
                         Log.e("API_ERROR", "Status: ERROR")
                         binding.LoanCreatelayout.isEnabled= true
                         if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
