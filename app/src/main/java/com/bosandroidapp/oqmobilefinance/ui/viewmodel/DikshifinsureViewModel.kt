@@ -2,11 +2,9 @@ package com.bosandroidapp.oqmobilefinance.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
-import com.bosandroidapp.oqmobilefinance.data.model.GetOrderStatusOnlinePGRequest
-import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.PanVerificationReq
+import com.bosandroidapp.oqmobilefinance.data.pg.GetOrderStatusOnlinePGRequest
 import com.bosandroidapp.oqmobilefinance.data.pg.PGOnlineRequestCall
 import com.bosandroidapp.oqmobilefinance.data.repository.DikshifinsureRepository
-import com.bosandroidapp.oqmobilefinance.data.repository.PanRepository
 import com.bosandroidapp.oqmobilefinance.data.upiautomandate.UPIMandateRequest
 import com.bosandroidapp.oqmobilefinance.data.upiautomandate.UpiAutoOrderStatusRequest
 import com.bosandroidapp.oqmobilefinance.data.upiautomandate.UpiAutoTransactionRequest

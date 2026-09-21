@@ -143,6 +143,7 @@ object ConstantClass {
 
 
 
+
       //  UAT merchant id offline
       const val PAN_VERIFICATION_REGISTRATION_ID_OFFLINE = "AOP-554"
       const val PENNYDROP_REGISTRATION_ID_OFFLINE = "AOP-554"

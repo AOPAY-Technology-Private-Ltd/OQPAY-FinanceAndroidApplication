@@ -231,6 +231,7 @@
             -->
 
         </activity>
+
         <activity
             android:name=".provisioning.ProvisioningModeActivity"
             android:enabled="true"
@@ -242,6 +243,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".provisioning.AdminPolicyComplianceActivity"
             android:enabled="true"
@@ -253,30 +255,37 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".ui.view.activity.retailer.IMEIDetailsPage"
             android:exported="false"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".ui.view.activity.retailer.PaymentInformation"
             android:exported="false"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".ui.view.activity.retailer.NewCustomerRegistrationPage"
             android:exported="false"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".ui.view.activity.retailer.PanCardVerificationPage"
             android:exported="false"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".ui.view.activity.retailer.AadharCardVerificationPage"
             android:exported="false"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".ui.view.activity.retailer.IDVerificationPage"
             android:exported="false"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".ui.view.activity.retailer.ForgetPasswordPage"
             android:exported="false"

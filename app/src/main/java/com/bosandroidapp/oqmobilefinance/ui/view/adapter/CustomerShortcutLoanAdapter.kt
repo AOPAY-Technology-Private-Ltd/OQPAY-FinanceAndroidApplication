@@ -18,6 +18,7 @@ import com.bosandroidapp.oqmobilefinance.databinding.ItemCustomerShortcutLoanBin
 import com.bumptech.glide.Glide
 import kotlin.math.roundToInt
 
+
 class CustomerShortcutLoanAdapter(
     private var customerList: List<CustomerStepDataItem>,
     private val context: Context,
@@ -56,6 +57,7 @@ class CustomerShortcutLoanAdapter(
             onItemClick(item)
         }
     }
+
 
 
     private fun updateStatus(holder: ViewHolder, item: CustomerStepDataItem) {
@@ -114,6 +116,7 @@ class CustomerShortcutLoanAdapter(
         holder.binding.tvStatus.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, statusColor))
 
     }
+
 
 
     override fun getItemCount(): Int = customerList.size

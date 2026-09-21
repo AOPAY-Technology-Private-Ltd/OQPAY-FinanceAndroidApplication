@@ -2,7 +2,6 @@ package com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer
 
 import android.annotation.SuppressLint
 import android.app.Dialog
-import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -16,8 +15,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.Window
 import android.view.WindowManager
-import android.view.inputmethod.InputMethodManager
-import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
@@ -26,12 +23,9 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 
@@ -44,7 +38,6 @@ import com.bosandroidapp.oqmobilefinance.databinding.ActivityPaymentInformationB
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AadhaarResponse
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AadharNumber
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AadharTransactionIdNo
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AccountHolderName
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AccountNumber
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AccountType
@@ -57,8 +50,6 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.BrandName
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CibilResponse
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CreatedByCustomerShortCut
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustAlternateMobileNumber
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustAlternateMobileOTP
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustAlternateMobileVerified
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustAreaSector
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustCityName
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustCountry
@@ -74,26 +65,10 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustPrimaryOTP
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustStateName
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CusteMailID
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.DownPayment
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ENTEREDCUSTOMERDOB
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.EmiAmount
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.IsRetailerAggrementVerified
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.LoginMobileorMailid
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.Loginpassword
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanAddress
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanBuilding
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanCity
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanCountry
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanDOB
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanEmailId
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanFirstName
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanFrontImageUri
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanLastName
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanMiddleName
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanMobileNumber
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanNumber
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanNumberVerified
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanResponse
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanState
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.RefAadharTransactionIdNo
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.RefAddress
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.RefName
@@ -104,13 +79,11 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.Tenure
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.UPIMandate
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isAggrementVerified
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isInternetAvailable
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.loginType
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.validateLoginInput
 import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
-import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LoginReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LogoutReq
-import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.ManageCustomerStepWiseReq
+import com.bosandroidapp.oqmobilefinance.data.model.ManageCustomerStepWiseReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.VerifyOTPReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.AadharVerificationReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.SendOtpReq
@@ -125,16 +98,11 @@ import com.bosandroidapp.oqmobilefinance.network.ApiInterface
 import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.ui.slideshow.activity.DashBoard
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
-import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.AadharCardReferenceWebViewDIGILockerPage.Companion.checkAdharForRef
-import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.AadharCardWebViewDIGILockerPage.Companion.digilockerLink
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.PanViewModel
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 class PaymentInformation : BaseActivity() {
     lateinit var  binding : ActivityPaymentInformationBinding
@@ -1897,6 +1865,7 @@ class PaymentInformation : BaseActivity() {
     }
 
 
+
     fun hitApiForUploadCustomerBankDataData(request : ManageCustomerStepWiseReq){
 
         viewModel.uploadCustomerListForShortCutLoanCreateProcess(request).observe(this) { resources ->
@@ -2042,5 +2011,6 @@ class PaymentInformation : BaseActivity() {
 
 
     }
+
 
 }

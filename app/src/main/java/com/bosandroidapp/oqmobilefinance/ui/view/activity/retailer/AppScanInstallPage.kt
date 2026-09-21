@@ -23,18 +23,14 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
-import okhttp3.RequestBody.Companion.toRequestBody
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.createMultipartFromUri
 import com.bosandroidapp.bosmobilefinance.ui.slideshow.ui.view.activity.retailer.cibilreportsfragment.BureauScore.Companion.userScore
 import com.bosandroidapp.oqmobilefinance.R
@@ -43,10 +39,8 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AadharNumber
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AadharVerified
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AccountNumber
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AccountType
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.BankID
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.BankIFSCCode
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.BankName
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.BranchAddress
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.BranchName
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.BrandName
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CibilResponse
@@ -96,23 +90,16 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.RefRelationShip
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.RefmobileNo
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.RetailerCodeForEnach
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.Tenure
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CardType
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.DebitOrCreditCard
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.SellingPrice
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.UpiMandate
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.calculateEmiEndDateFromNow
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.dialog
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.getCurrentStartDate
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.iisAggrementVerified
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isInternetAvailable
-import com.bosandroidapp.oqmobilefinance.data.enach.EMandateRequest
-import com.bosandroidapp.oqmobilefinance.data.loancharge.LoanChargeReq
 import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateAccessKeyReq
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LoanCreatedReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LogoutReq
-import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.ManageCustomerStepWiseReq
+import com.bosandroidapp.oqmobilefinance.data.model.ManageCustomerStepWiseReq
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityAppScanInstallPageBinding
@@ -134,7 +121,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
-import kotlin.math.roundToInt
 import kotlin.toString
 
 class AppScanInstallPage : BaseActivity() {

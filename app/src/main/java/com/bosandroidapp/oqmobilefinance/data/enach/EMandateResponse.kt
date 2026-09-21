@@ -47,6 +47,7 @@ data class EMandateResponse(
 	val Value: String? = null,
 )
 
+
 data class Data(
 
 	@field:SerializedName("url")
@@ -59,16 +60,17 @@ data class Data(
 	val notice: String? = null
 )
 
+
 data class Customer(
 
 	@field:SerializedName("addnl5")
-	val addnl5: Any? = null,
+	val addnl5: String? = null,
 
 	@field:SerializedName("addnl3")
 	val addnl3: String? = null,
 
 	@field:SerializedName("addnl4")
-	val addnl4: Any? = null,
+	val addnl4: String? = null,
 
 	@field:SerializedName("loan_no")
 	val loanNo: String? = null,

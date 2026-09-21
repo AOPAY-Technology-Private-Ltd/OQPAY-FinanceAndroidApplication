@@ -10,7 +10,6 @@ android {
     compileSdk = 36
 
 
-
     defaultConfig {
         applicationId = "com.bosandroidapp.oqmobilefinance"
         minSdk = 27

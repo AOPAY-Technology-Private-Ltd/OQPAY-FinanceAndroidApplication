@@ -126,7 +126,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.GetIsEligibleLoanReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LoanCreatedReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LogoutReq
-import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.ManageCustomerStepWiseReq
+import com.bosandroidapp.oqmobilefinance.data.model.ManageCustomerStepWiseReq
 import com.bosandroidapp.oqmobilefinance.data.pennydrop.BankListReq
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.repository.DikshifinsureRepository
@@ -398,7 +398,8 @@ class QRCodePage : BaseActivity() {
                 recordStatus = LoanStatus,
                 creditScore = userScore.toString(),
                 validateKey = "",
-                defaultEmidebit = DefaulterEmiDebitAutoApproved,
+                defaultEmidebit = if(userScore >= 500f){ DefaulterEmiDebitAutoApproved}else{
+                    DefaulterEmiDebitPending },
                 sellingPrice = ConstantClass.SellingPrice.toDouble(),
                 loanMode = ConstantClass.online
             )

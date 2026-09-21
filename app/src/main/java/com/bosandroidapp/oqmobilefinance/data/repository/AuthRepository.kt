@@ -1,10 +1,8 @@
 package com.bosandroidapp.oqmobilefinance.data.repository
 
 import com.bosandroidapp.oqmobilefinance.network.ApiInterface
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.createMultipartFromUri
 import com.bosandroidapp.oqmobilefinance.data.enach.EnachDateUploadReq
 import com.bosandroidapp.oqmobilefinance.data.generattoken.RefreshTokenRequest
-import com.bosandroidapp.oqmobilefinance.data.gst.GstRequest
 import com.bosandroidapp.oqmobilefinance.data.model.AddBankAccountReq
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerEmiStatusReq
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerSearchForShortCutLoanRequest
@@ -40,8 +38,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.GetIsEligibleLoa
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LoanCreatedReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LoginReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LogoutReq
-import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.ManageCustomerStepWiseReq
-import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.RegisterCustomerResp
+import com.bosandroidapp.oqmobilefinance.data.model.ManageCustomerStepWiseReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.RegistrationReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.RegistrationRes
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.RetailerProfileReq
@@ -52,9 +49,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.reports.GetRepor
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.reports.LoanSettlementReportReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.reports.PayoutReportReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.reports.TransactionHistoryReq
-import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.AAdhaarDetailesReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.AadharVerificationReq
-import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.PanVerificationReq
 import com.bosandroidapp.oqmobilefinance.data.notification.NotificationSendTokenRequest
 import com.bosandroidapp.oqmobilefinance.data.notification.SendNotificationFeatureNameRequest
 import okhttp3.MediaType.Companion.toMediaTypeOrNull

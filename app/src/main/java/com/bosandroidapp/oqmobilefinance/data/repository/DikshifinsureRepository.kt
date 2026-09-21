@@ -1,7 +1,7 @@
 package com.bosandroidapp.oqmobilefinance.data.repository
 
 import com.bosandroidapp.oqmobilefinance.network.ApiInterface
-import com.bosandroidapp.oqmobilefinance.data.model.GetOrderStatusOnlinePGRequest
+import com.bosandroidapp.oqmobilefinance.data.pg.GetOrderStatusOnlinePGRequest
 import com.bosandroidapp.oqmobilefinance.data.pg.PGOnlineRequestCall
 import com.bosandroidapp.oqmobilefinance.data.upiautomandate.UPIMandateRequest
 import com.bosandroidapp.oqmobilefinance.data.upiautomandate.UpiAutoOrderStatusRequest

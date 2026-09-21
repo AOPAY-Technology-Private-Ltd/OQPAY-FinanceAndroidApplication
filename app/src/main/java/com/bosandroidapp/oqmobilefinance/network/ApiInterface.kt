@@ -26,8 +26,8 @@ import com.bosandroidapp.oqmobilefinance.data.model.EmandateOptionSelectetionReq
 import com.bosandroidapp.oqmobilefinance.data.model.EmandateOptionSelectetionResponse
 import com.bosandroidapp.oqmobilefinance.data.model.GenerateAccessTokenRequest
 import com.bosandroidapp.oqmobilefinance.data.model.GenerateAccessTokenResponse
-import com.bosandroidapp.oqmobilefinance.data.model.GetOrderStatusOnlinePGRequest
-import com.bosandroidapp.oqmobilefinance.data.model.GetOrderStatusOnlinePGResponse
+import com.bosandroidapp.oqmobilefinance.data.pg.GetOrderStatusOnlinePGRequest
+import com.bosandroidapp.oqmobilefinance.data.pg.GetOrderStatusOnlinePGResponse
 import com.bosandroidapp.oqmobilefinance.data.model.GetRetailerLedgerReq
 import com.bosandroidapp.oqmobilefinance.data.model.GetRetailerLedgerResponse
 import com.bosandroidapp.oqmobilefinance.data.model.HoldAmountWithdrawReq
@@ -771,10 +771,13 @@ interface ApiInterface {
     //............................................................................................
 
 
+
     //for online eNach Api .......................................................................
 
     @POST("api/OQPay/Enach/V1/eMandate")
     suspend fun geteMandateOnlineRequest(@Body req: EMandateRequest): Response<EMandateResponse>?
+
+
 
     @POST("api/OQPay/Enach/V1/eMandate/getStatus")
     suspend fun geteMandateOnlineSatusRequest(@Body req: ENachStatusReq): Response<ENachStatusResp>?
@@ -839,6 +842,7 @@ interface ApiInterface {
     // getStatus Of PG on callback
     @POST("api/OQPay/Finance/Online/GetOrderStatus")
     suspend fun getOrderOnlineStatusPgRequest(@Body req : GetOrderStatusOnlinePGRequest) : Response<GetOrderStatusOnlinePGResponse>?
+
 
 
     // upload invoice file...............

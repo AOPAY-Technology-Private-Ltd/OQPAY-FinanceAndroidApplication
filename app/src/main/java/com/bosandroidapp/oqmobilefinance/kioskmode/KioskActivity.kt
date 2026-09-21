@@ -143,6 +143,7 @@ class KioskActivity : BaseActivity() {
 
     fun setOnClickListner(){
         binding.submitpayment.setOnClickListener {
+
                 if(isInternetAvailable(this@KioskActivity)){
                     if(!binding.amount.text.toString().isNullOrBlank()){
                         emiamount = binding.amount.text.toString().replace("₹ ","").toDouble()

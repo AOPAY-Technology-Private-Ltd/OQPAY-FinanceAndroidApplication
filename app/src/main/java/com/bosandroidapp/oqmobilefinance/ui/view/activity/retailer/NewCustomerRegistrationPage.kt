@@ -2,7 +2,6 @@ package com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer
 
 import android.annotation.SuppressLint
 import android.app.Dialog
-import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -12,7 +11,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Environment
-import android.provider.MediaStore
 import android.text.Editable
 import android.text.Html
 import android.text.TextWatcher
@@ -29,7 +27,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -93,7 +90,6 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustPrimaryMobil
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustPrimaryOTP
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustStateName
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CusteMailID
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.DownPayment
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ImeiNumber1SealPhotoPath
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ImeiNumber2SealPhotoPath
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ImeiNumberPhotoPath
@@ -114,7 +110,6 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanNumberVerifie
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanPinCode
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanResponse
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanState
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ToBePaidAmount
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.base64ToBitmap
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.bitmapToUri
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.createMultipartFromUri
@@ -128,15 +123,13 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.saveImageToCache
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.scrollToView
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.uriToFile
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.validateLoginInput
-import com.bosandroidapp.oqmobilefinance.data.model.CustomerRegistrationData
-import com.bosandroidapp.oqmobilefinance.data.model.ManageCustomerStepWiseResponse
 import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
 import com.bosandroidapp.oqmobilefinance.data.model.UpdateCustomerUploadDataReq
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
 import com.bosandroidapp.oqmobilefinance.data.model.VerifyCustomerReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.GetIsEligibleLoanReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LogoutReq
-import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.ManageCustomerStepWiseReq
+import com.bosandroidapp.oqmobilefinance.data.model.ManageCustomerStepWiseReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.SendOtpReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.VerifyOTPReq
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
@@ -150,10 +143,8 @@ import com.bosandroidapp.oqmobilefinance.ui.slideshow.activity.DashBoard
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.CibilViewModel
-import com.bosandroidapp.oqmobilefinance.utils.ApiResponse
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.bumptech.glide.Glide
-import retrofit2.Response
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -161,7 +152,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
-import java.io.FileWriter
 import java.io.IOException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
@@ -863,7 +853,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
                             var req = UpdateCustomerUploadDataReq(
                                 customerCode = AlreadyCustomerCodeHaveEligiblity,
-                                updatedBy = createdBy,
+                                updatedBy = preference.getStringValue(ConstantClass.RetailerCode, ""),
                                 firstName = CustFirstName,
                                 lastName = CustLastName,
                                 primaryMobileNumber = CustPrimaryMobileNumber,
@@ -885,7 +875,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                 cibilApiResponse = CibilResponse,
                                 cibilScore = userScore.toInt().toString(),
                                 retailerCode = preference.getStringValue(ConstantClass.RetailerCode, ""),
-                                activeStatus = "Pending",
+                                activeStatus = "Approved",
                                 custPhoto_path = "",
                                 custPhoto_File = customerImageFile
                             )
@@ -2161,7 +2151,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                             if (AlreadyCustomerCodeHaveEligiblity.isNotEmpty()) {
                                                 var req = UpdateCustomerUploadDataReq(
                                                     customerCode = AlreadyCustomerCodeHaveEligiblity,
-                                                    updatedBy = createdBy,
+                                                    updatedBy = preference.getStringValue(ConstantClass.RetailerCode, ""),
                                                     firstName = CustFirstName,
                                                     lastName = CustLastName,
                                                     primaryMobileNumber = CustPrimaryMobileNumber,
@@ -2183,7 +2173,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                                     cibilApiResponse = CibilResponse,
                                                     cibilScore = userScore.toInt().toString(),
                                                     retailerCode = preference.getStringValue(ConstantClass.RetailerCode, ""),
-                                                    activeStatus = "Pending",
+                                                    activeStatus = "Approved",
                                                     custPhoto_path = "",
                                                     custPhoto_File = customerImageFile
                                                 )
@@ -2280,7 +2270,8 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                         PopOpForCibileScoreRequestToAdmin(response.message.toString(), "Record Message", false)
                                         binding.createaccount.isEnabled = true
                                     }
-                                } else {
+                                }
+                                else {
                                     Toast.makeText(this@NewCustomerRegistrationPage, response.message, Toast.LENGTH_LONG).show()
                                     binding.createaccount.isEnabled = true
                                 }
@@ -2306,7 +2297,9 @@ class NewCustomerRegistrationPage : BaseActivity() {
     }
 
 
+
     fun hitApiForCustomerRegister(cibilScoremsg: String, title: String) {
+
         ConstantClass.OpenPopUpForVeryfyOTP(this)
 
         if(CustCountry.isNullOrBlank()){
@@ -2583,6 +2576,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
     }
 
 
+
     fun PopOpForCibileScoreRequestToAdmin(cibilScore : String,title:String,check:Boolean){
         dialog = Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -2648,6 +2642,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
     }
 
 
+
     // hit api for upload customer data
     fun hitApiForUploadCustomerData(request : ManageCustomerStepWiseReq){
 
@@ -2703,6 +2698,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
 
     }
+
 
 
     // hit api if already customer taken loan through retailer

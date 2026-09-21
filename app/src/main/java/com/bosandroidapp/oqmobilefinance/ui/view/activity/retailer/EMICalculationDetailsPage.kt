@@ -21,12 +21,8 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.ViewModelProvider
 
 import com.bosandroidapp.bosmobilefinance.ui.slideshow.ui.view.activity.retailer.cibilreportsfragment.BureauScore.Companion.userScore
@@ -61,10 +57,7 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.EmiAmount
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.InterestAmt
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.InterestRate
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.LoanSecurityHoldAmount
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.LoginMobileorMailid
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.Loginpassword
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.MRPPrice
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.MaxHoldingAmount
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ModelColor
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ModelName
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ModelVarient
@@ -76,18 +69,14 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.SellingPrice
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.Tenure
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ToBePaidAmount
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isAggrementVerified
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.loginType
-import com.bosandroidapp.oqmobilefinance.data.model.ManageCustomerStepWiseResponse
 import com.bosandroidapp.oqmobilefinance.data.model.RetailerWalletAmountReq
 import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.DataItem
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.DataItems
-import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.EmiSplitRes
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.GetEMISplitDetlailsReq
-import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LoginReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LogoutReq
-import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.ManageCustomerStepWiseReq
+import com.bosandroidapp.oqmobilefinance.data.model.ManageCustomerStepWiseReq
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
@@ -96,10 +85,8 @@ import com.bosandroidapp.oqmobilefinance.ui.slideshow.activity.DashBoard
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.PaymentInformation.Companion.checkKYC
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
-import com.bosandroidapp.oqmobilefinance.utils.ApiResponse
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.google.gson.Gson
-import retrofit2.Response
 
 class EMICalculationDetailsPage : BaseActivity() {
     lateinit var binding: ActivityEmicalculationDetailsPageBinding
@@ -508,10 +495,10 @@ class EMICalculationDetailsPage : BaseActivity() {
             panNumber = PanNumber,
             panNumberVerified = PanNumberVerified,
             brandName = BrandName,
-            modelName = ConstantClass.ModelName,
-            modelVariant = ConstantClass.ModelVarient,
-            color = ConstantClass.ModelColor,
-            sellingPrice = ConstantClass.SellingPrice,
+            modelName = ModelName,
+            modelVariant = ModelVarient,
+            color = ModelColor,
+            sellingPrice = SellingPrice,
             downPayment = DownPayment,
             tenure = Tenure,
             emiAmount = EmiAmount,

@@ -2,7 +2,6 @@ package com.bosandroidapp.oqmobilefinance.ui.view.activity.customer
 
 import android.app.Dialog
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.Uri
@@ -17,11 +16,8 @@ import android.webkit.CookieManager
 import android.webkit.WebStorage
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -29,10 +25,9 @@ import androidx.lifecycle.ViewModelProvider
 
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.Customer
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.getCurrentUtcTimestamp
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isPgClosing
-import com.bosandroidapp.oqmobilefinance.data.model.GetOrderStatusOnlinePGRequest
+import com.bosandroidapp.oqmobilefinance.data.pg.GetOrderStatusOnlinePGRequest
 import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.CustomerLoanEmiReceiveReq
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
@@ -46,7 +41,6 @@ import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.ui.slideshow.activity.DashBoard
 import com.bosandroidapp.oqmobilefinance.kioskmode.KioskActivity
 import com.bosandroidapp.oqmobilefinance.kioskmode.isLocked
-import com.bosandroidapp.oqmobilefinance.ui.view.activity.customer.EmiLoanDetailPage.Companion.customerCode
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.customer.EmiLoanDetailPage.EmiData
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.DikshifinsureViewModel
@@ -108,8 +102,11 @@ class PGWebViewActivity : BaseActivity() {
     }
 
 
+
     fun launchPGOnWebView(){
+
         val pgUrl = intent.getStringExtra("pgurl")
+
         if(intent.hasExtra("mode")&& intent.hasExtra("merchantid")){
             mode = intent.getStringExtra("mode").toString()
             merchantid = intent.getStringExtra("merchantid").toString()
@@ -128,6 +125,7 @@ class PGWebViewActivity : BaseActivity() {
 
         binding.pgwebview.settings.javaScriptEnabled = true
         binding.pgwebview.settings.domStorageEnabled = true
+
         binding.pgwebview.webViewClient = object : WebViewClient() {
 
             override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
@@ -207,6 +205,7 @@ class PGWebViewActivity : BaseActivity() {
         binding.pgwebview.loadUrl(pgUrl!!)
 
     }
+
 
     fun HitApiForPayEmiAmount(emicount:Int,loopcount :Int,emiamount : String,fine:String?/*,imageFile:File*/,loanCode:String,utrNumber: String){
 
@@ -341,7 +340,6 @@ class PGWebViewActivity : BaseActivity() {
         binding.pgwebview.removeAllViews()
         binding.pgwebview.destroy()
     }
-
 
     fun showingSuccessPopUp(utrNumber: String){
         dialog = Dialog(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen)

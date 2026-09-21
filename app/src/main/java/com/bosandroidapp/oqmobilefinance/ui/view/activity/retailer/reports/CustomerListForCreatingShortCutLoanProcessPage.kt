@@ -531,6 +531,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
             "0"-> {
                 startActivity(Intent(this, NewCustomerRegistrationPage::class.java))
             }
+
             // Step 1: Mobile Selection (Brand/EMI)
             "1" -> {
                 startActivity(Intent(this, MobileSelectionActivity::class.java))

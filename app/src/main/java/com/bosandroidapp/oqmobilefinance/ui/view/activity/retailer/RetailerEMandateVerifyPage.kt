@@ -121,6 +121,7 @@ class RetailerEMandateVerifyPage : BaseActivity() {
     lateinit var dialog: Dialog
 
 
+
     companion object{
         var webUrl: String? = ""
     }
@@ -144,15 +145,16 @@ class RetailerEMandateVerifyPage : BaseActivity() {
         dikshifinsureViewModel = ViewModelProvider(this, DikshifinsureOnlinePGModelFactory(DikshifinsureRepository(RetrofitClient.apiInterfaceOnlinePG)))[DikshifinsureViewModel::class.java]
 
 
-
         if(intent.hasExtra(ConstantClass.MarchentOrderID_UPIAUTOPAY)&& intent.hasExtra(ConstantClass.RegistrationID_UPIAUTOPAY))
         {
             merchandId = intent.getStringExtra(ConstantClass.MarchentOrderID_UPIAUTOPAY).toString()
             registrationId = intent.getStringExtra(ConstantClass.RegistrationID_UPIAUTOPAY).toString()
         }
 
+
         setDataInWebView()
         setonclicklistner()
+
 
     }
 
@@ -165,6 +167,7 @@ class RetailerEMandateVerifyPage : BaseActivity() {
         }
 
     }
+
 
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -193,15 +196,9 @@ class RetailerEMandateVerifyPage : BaseActivity() {
                 WebViewFeature.isFeatureSupported(
                     WebViewFeature.PAYMENT_REQUEST
                 )
-            }"
-        )
+            }")
 
-        Log.d(
-            "PHONEPE_WEBVIEW",
-            "WebView version = ${
-                WebView.getCurrentWebViewPackage()?.versionName
-            }"
-        )
+        Log.d("PHONEPE_WEBVIEW", "WebView version = ${WebView.getCurrentWebViewPackage()?.versionName}")
 
         binding.eMandatewebview.settings.cacheMode = WebSettings.LOAD_DEFAULT
 
@@ -294,6 +291,7 @@ class RetailerEMandateVerifyPage : BaseActivity() {
             }
         }
 
+
         binding.eMandatewebview.webChromeClient = object : WebChromeClient() {
             override fun onCreateWindow(view: WebView?, isDialog: Boolean, isUserGesture: Boolean, resultMsg: android.os.Message?): Boolean {
                 val newWebView = WebView(this@RetailerEMandateVerifyPage)
@@ -305,16 +303,20 @@ class RetailerEMandateVerifyPage : BaseActivity() {
             }
         }
 
+
         binding.eMandatewebview.loadUrl(webUrl!!)
 
 
-/*        val uri = Uri.parse(webUrl)
+       /* val uri = Uri.parse(webUrl)
 
-        val customTabsIntent = CustomTabsIntent.Builder()
-            .build()
+        val customTabsIntent = CustomTabsIntent.Builder().build()
 
-        customTabsIntent.launchUrl(this, uri)*/
+        customTabsIntent.launchUrl(this, uri)
+
+        */
+
     }
+
 
 
     fun clearWebView(webView: WebView) {
@@ -331,6 +333,7 @@ class RetailerEMandateVerifyPage : BaseActivity() {
             WebStorage.getInstance().deleteAllData()
         }
     }
+
 
 
     fun injectJs(webView: WebView?) {
@@ -515,6 +518,7 @@ class RetailerEMandateVerifyPage : BaseActivity() {
             }
         }
     }
+
 
 
     fun doUpdateEMandateStatus(eMandateID : String){

@@ -21,14 +21,11 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.ViewModelProvider
 
 import com.bosandroidapp.bosmobilefinance.ui.slideshow.ui.view.activity.retailer.cibilreportsfragment.BureauScore.Companion.userScore
@@ -68,11 +65,7 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ImeiNumber1SealP
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ImeiNumber2
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ImeiNumber2SealPhotoPath
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ImeiNumberPhotoPath
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.Invoive_Path
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.IsRetailerAggrementVerified
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.LastName
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.LoginMobileorMailid
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.Loginpassword
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ModelName
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanNumber
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanNumberVerified
@@ -83,17 +76,13 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.RefRelationShip
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.RefmobileNo
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.Tenure
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.UPIMandate
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.createMultipartFromUri
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.iisAggrementVerified
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isAggrementVerified
-import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.loginType
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.saveImageToCache
-import com.bosandroidapp.oqmobilefinance.data.model.ManageCustomerStepWiseResponse
 import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
 import com.bosandroidapp.oqmobilefinance.data.model.ValidateSessionRequest
-import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LoginReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LogoutReq
-import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.ManageCustomerStepWiseReq
+import com.bosandroidapp.oqmobilefinance.data.model.ManageCustomerStepWiseReq
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.CommonViewModelFactory
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
@@ -101,11 +90,9 @@ import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.ui.slideshow.activity.DashBoard
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
-import com.bosandroidapp.oqmobilefinance.utils.ApiResponse
 import com.bosandroidapp.oqmobilefinance.utils.ApiStatus
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
-import retrofit2.Response
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -471,7 +458,7 @@ class IMEIDetailsPage : BaseActivity() {
                 panNumber = PanNumber,
                 panNumberVerified = PanNumberVerified,
                 brandName=BrandName,
-                modelName=ConstantClass.ModelName,
+                modelName= ModelName,
                 modelVariant=ConstantClass.ModelVarient,
                 color=ConstantClass.ModelColor,
                 sellingPrice= ConstantClass.SellingPrice,

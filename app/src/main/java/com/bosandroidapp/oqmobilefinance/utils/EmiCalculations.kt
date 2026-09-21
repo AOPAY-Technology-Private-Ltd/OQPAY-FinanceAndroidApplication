@@ -102,6 +102,7 @@ suspend fun Context.forceSyncEmis() = withContext(Dispatchers.IO) {
 
 
 
+
 private suspend fun Context.fetchAndStoreEmis(sharedPref: SharedPreferences) {
     val preference = SharedPreference(this)
     var loanemireq = GetCustomerLoanDetailsReq(

@@ -36,7 +36,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.GetIsEligibleLoa
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LoanCreatedReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LoginReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LogoutReq
-import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.ManageCustomerStepWiseReq
+import com.bosandroidapp.oqmobilefinance.data.model.ManageCustomerStepWiseReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.RegistrationReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.RetailerProfileReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.RetailerWalletPayoutReq
