@@ -1,17 +1,19 @@
-name: Android APK Build
+name:  APK Build
 
 on:
   push:
     branches:
       - DEV
+
   workflow_dispatch:
 
 jobs:
   build:
-    name: Build Android APK
+    name: Build APK
     runs-on: ubuntu-latest
 
     steps:
+
       # 1. Checkout source code
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -32,11 +34,16 @@ jobs:
       - name: Build APK
         run: ./gradlew assembleDebug
 
-      # 5. Upload APK as GitHub Artifact
+      # 5. Prepare APK for Artifact
+      - name: Prepare APK
+        run: |
+          mkdir -p artifact
+          cp app/build/outputs/apk/debug/app.apk artifact/OQPAYUAT.apk
+
+      # 6. Upload APK Artifact
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Android-APK
-          path: |
-            **/build/outputs/apk/**/*.apk
+          name: OQPAYUAT
+          path: artifact/OQPAYUAT.apk
           retention-days: 7
