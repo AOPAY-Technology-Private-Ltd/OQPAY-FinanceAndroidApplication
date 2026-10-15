@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardBackgroundColor="@color/white"
+    android:layout_margin="@dimen/_5sdp"
+    app:cardCornerRadius="@dimen/_8sdp"
+    app:cardElevation="@dimen/_2sdp"
+    app:strokeWidth="0dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/_12sdp">
+
+        <!-- Header Section -->
+        <TextView
+            android:id="@+id/tvReceiptLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Receipt No: "
+            android:textColor="@color/black"
+            android:textSize="@dimen/_12ssp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvReceiptNo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="LER0013"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_12ssp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/tvReceiptLabel"
+            app:layout_constraintStart_toEndOf="@id/tvReceiptLabel"
+            app:layout_constraintTop_toTopOf="@id/tvReceiptLabel" />
+
+        <ImageView
+            android:id="@+id/ivCalendar"
+            android:layout_width="@dimen/_14sdp"
+            android:layout_height="@dimen/_14sdp"
+            android:layout_marginTop="@dimen/_4sdp"
+            android:src="@drawable/baseline_calendar_month_24"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvReceiptLabel"
+            app:tint="@color/darkpurple" />
+
+        <TextView
+            android:id="@+id/tvDueDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_4sdp"
+            android:text="Due Date: 05 Jul 2026"
+            android:textColor="@color/grey"
+            android:textSize="@dimen/_10ssp"
+            app:layout_constraintBottom_toBottomOf="@id/ivCalendar"
+            app:layout_constraintStart_toEndOf="@id/ivCalendar"
+            app:layout_constraintTop_toTopOf="@id/ivCalendar" />
+
+        <!-- Amount and Status Indicator -->
+        <TextView
+            android:id="@+id/amounttitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/paid_amount"
+            android:textColor="@color/grey"
+            android:textSize="@dimen/_9ssp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tvPendingAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="₹7,872"
+            android:textColor="@color/green"
+            android:textSize="@dimen/_16ssp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/amounttitle" />
+
+        <View
+            android:id="@+id/divider1"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/_12sdp"
+            android:background="#F0F0F0"
+            app:layout_constraintTop_toBottomOf="@id/tvDueDate" />
+
+        <!-- EMI and Payment Date Grid -->
+        <ImageView
+            android:id="@+id/ivWallet"
+            android:layout_width="@dimen/_24sdp"
+            android:layout_height="@dimen/_24sdp"
+            android:layout_marginTop="@dimen/_12sdp"
+            android:background="@drawable/bg_light_blue_rounded"
+            android:padding="@dimen/_5sdp"
+            android:src="@drawable/wallet"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider1"
+            app:tint="@color/darkpurple" />
+
+        <TextView
+            android:id="@+id/tvEmiLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:text="EMI Amount"
+            android:textColor="@color/grey"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintStart_toEndOf="@id/ivWallet"
+            app:layout_constraintTop_toTopOf="@id/ivWallet" />
+
+        <TextView
+            android:id="@+id/tvEmiAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="₹7,400"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_12ssp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@id/tvEmiLabel"
+            app:layout_constraintTop_toBottomOf="@id/tvEmiLabel" />
+
+        <ImageView
+            android:id="@+id/ivPaymentCalendar"
+            android:layout_width="@dimen/_24sdp"
+            android:layout_height="@dimen/_24sdp"
+            android:background="@drawable/bg_light_blue_rounded"
+            android:padding="@dimen/_5sdp"
+            android:src="@drawable/baseline_calendar_month_24"
+            app:layout_constraintEnd_toStartOf="@+id/guideline"
+            app:layout_constraintTop_toTopOf="@id/ivWallet"
+            app:tint="@color/pink" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.6" />
+
+        <TextView
+            android:id="@+id/tvPaymentDateLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_8sdp"
+            android:text="Payment Date"
+            android:textColor="@color/grey"
+            android:textSize="@dimen/_8ssp"
+            app:layout_constraintStart_toEndOf="@id/ivPaymentCalendar"
+            app:layout_constraintTop_toTopOf="@id/ivPaymentCalendar" />
+
+        <TextView
+            android:id="@+id/tvPaymentDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="25 May 2026"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_12ssp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="@id/tvPaymentDateLabel"
+            app:layout_constraintTop_toBottomOf="@id/tvPaymentDateLabel" />
+
+        <View
+            android:id="@+id/divider2"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/_12sdp"
+            android:background="@drawable/bg_dashed_line"
+            app:layout_constraintTop_toBottomOf="@id/tvEmiAmount" />
+
+        <!-- Charges Summary (Simplified for performance) -->
+        <TextView
+            android:id="@+id/tvChargesLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:text="Breakdown:"
+            android:textColor="@color/grey"
+            android:textSize="@dimen/_9ssp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider2" />
+
+        <TextView
+            android:id="@+id/tvFineLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_4sdp"
+            android:text="Fine:"
+            android:textColor="@color/grey"
+            android:textSize="@dimen/_10ssp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvChargesLabel" />
+
+        <TextView
+            android:id="@+id/tvFineAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="₹0"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_10ssp"
+            app:layout_constraintBottom_toBottomOf="@id/tvFineLabel"
+            app:layout_constraintStart_toEndOf="@id/tvFineLabel"
+            android:layout_marginStart="@dimen/_4sdp"/>
+
+        <TextView
+            android:id="@+id/tvBounceLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bounce:"
+            android:textColor="@color/grey"
+            android:textSize="@dimen/_10ssp"
+            app:layout_constraintEnd_toStartOf="@+id/tvBounceAmount"
+            app:layout_constraintTop_toTopOf="@id/tvFineLabel"
+            android:layout_marginEnd="@dimen/_4sdp"/>
+
+        <TextView
+            android:id="@+id/tvBounceAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="₹472"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_10ssp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tvFineLabel" />
+
+        <TextView
+            android:id="@+id/tvTotalLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:text="Total Charges"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_11ssp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/tvFineLabel" />
+
+        <TextView
+            android:id="@+id/tvTotalChargesAmount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="₹472"
+            android:textColor="@color/orange"
+            android:textSize="@dimen/_12ssp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/tvTotalLabel"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tvTotalLabel" />
+
+        <View
+            android:id="@+id/divider3"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/_12sdp"
+            android:background="#F0F0F0"
+            app:layout_constraintTop_toBottomOf="@id/tvTotalLabel" />
+
+        <!-- Bottom Status Section -->
+        <ImageView
+            android:id="@+id/ivPaymentMode"
+            android:layout_width="@dimen/_16sdp"
+            android:layout_height="@dimen/_16sdp"
+            android:layout_marginTop="@dimen/_8sdp"
+            android:src="@drawable/paymentmode"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/divider3"
+            app:tint="@color/blue" />
+
+        <TextView
+            android:id="@+id/tvPaymentMode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/_4sdp"
+            android:text="Cash"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_10ssp"
+            app:layout_constraintBottom_toBottomOf="@id/ivPaymentMode"
+            app:layout_constraintStart_toEndOf="@id/ivPaymentMode"
+            app:layout_constraintTop_toTopOf="@id/ivPaymentMode" />
+
+        <ImageView
+            android:id="@+id/doneimage"
+            android:layout_width="@dimen/_16sdp"
+            android:layout_height="@dimen/_16sdp"
+            android:src="@drawable/doneicon"
+            app:layout_constraintBottom_toBottomOf="@id/ivPaymentMode"
+            app:layout_constraintEnd_toStartOf="@+id/tvRecordStatus"
+            android:layout_marginEnd="@dimen/_4sdp"/>
+
+        <TextView
+            android:id="@+id/tvRecordStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Paid"
+            android:textColor="@color/green"
+            android:textSize="@dimen/_10ssp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/doneimage"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/doneimage" />
+
+        <!-- Hidden fields for compatibility with existing adapter binding if needed, though better to remove unused -->
+        <TextView android:id="@+id/tvOtherAmount" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone" app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"/>
+        <TextView android:id="@+id/tvWaiveAmount" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone" app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

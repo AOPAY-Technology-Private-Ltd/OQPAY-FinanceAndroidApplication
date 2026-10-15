@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "577596770762",
+    "project_id": "oqpay-75700",
+    "storage_bucket": "oqpay-75700.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:577596770762:android:721cd342e393049f86e733",
+        "android_client_info": {
+          "package_name": "com.bosandroidapp.oqmobilefinance"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDl5XEtitoUUAOiuV15n9zPRxwcGsEncBs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

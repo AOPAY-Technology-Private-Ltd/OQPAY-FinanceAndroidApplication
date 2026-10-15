@@ -1,0 +1,662 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/headlayout"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/_100sdp"
+        android:background="@drawable/signuptopback"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/back"
+            android:layout_width="@dimen/_30sdp"
+            android:layout_height="@dimen/_25sdp"
+            android:src="@drawable/back"
+            app:tint="@color/white"
+            android:layout_alignTop="@id/titlelayout"
+            android:layout_alignBottom="@id/titlelayout"
+            android:layout_marginLeft="@dimen/_10sdp" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/titlelayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/qrcode"
+                android:textColor="@color/white"
+                android:textSize="@dimen/_18ssp"
+                android:fontFamily="@font/inter_bold"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <ImageView
+            android:id="@+id/home"
+            android:layout_width="@dimen/_50sdp"
+            android:layout_height="@dimen/_50sdp"
+            android:src="@drawable/homeicon"
+            app:tint="@color/white"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@id/titlelayout"
+            android:layout_alignBottom="@id/titlelayout" />
+
+    </RelativeLayout>
+
+    <!-- Scrollable Body -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/_16sdp"
+        app:layout_constraintTop_toBottomOf="@+id/headlayout"
+        app:layout_constraintBottom_toTopOf="@+id/footer">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:paddingHorizontal="@dimen/_12sdp"
+            android:paddingTop="@dimen/_8sdp">
+
+            <!-- FRP Email Banner Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="@dimen/_12sdp"
+                app:cardElevation="@dimen/_3sdp"
+                app:cardUseCompatPadding="true"
+                app:cardBackgroundColor="@color/white">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="@dimen/_12sdp">
+
+                    <!-- Mail Icon Container -->
+                    <FrameLayout
+                        android:layout_width="@dimen/_36sdp"
+                        android:layout_height="@dimen/_36sdp"
+                        android:background="@drawable/bg_circle_light_blue">
+
+                        <ImageView
+                            android:layout_width="@dimen/_20sdp"
+                            android:layout_height="@dimen/_20sdp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/emailicon"
+                            app:tint="#0073C2" />
+
+                    </FrameLayout>
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="@dimen/_24sdp"
+                        android:layout_marginStart="@dimen/_12sdp"
+                        android:background="#E2E8F0" />
+
+                    <!-- FRP Mail Info -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/_12sdp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="FRP Mail ID"
+                            android:textColor="#64748B"
+                            android:textSize="@dimen/_11ssp"
+                            android:fontFamily="@font/inter_medium" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/_2sdp"
+                            android:text="info@aopay.in"
+                            android:textColor="#0073C2"
+                            android:textSize="@dimen/_14ssp"
+                            android:fontFamily="@font/inter_bold" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Download & Provision DPC App Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="@dimen/_12sdp"
+                app:cardElevation="@dimen/_3sdp"
+                app:cardUseCompatPadding="true"
+                app:cardBackgroundColor="@color/white">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/_16sdp">
+
+                    <!-- Heading Title -->
+                    <TextView
+                        android:id="@+id/clicktoopenqralert"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Download &amp; Provision DPC App"
+                        android:textColor="#0F172A"
+                        android:textSize="@dimen/_14ssp"
+                        android:fontFamily="@font/inter_bold"
+                        android:lineSpacingExtra="@dimen/_2sdp" />
+
+                    <!-- Download Illustration -->
+                    <ImageView
+                        android:id="@+id/downloadIcon"
+                        android:layout_width="@dimen/_110sdp"
+                        android:layout_height="@dimen/_110sdp"
+                        android:layout_gravity="center"
+                        android:layout_marginVertical="@dimen/_12sdp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_customer_app_install" />
+
+                    <!-- Start Provisioning Button -->
+                    <LinearLayout
+                        android:id="@+id/startProvisioning"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_44sdp"
+                        android:background="@drawable/bg_rounded_blue_button"
+                        android:gravity="center"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Start Provisioning"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/_14ssp"
+                            android:fontFamily="@font/inter_bold" />
+
+                        <ImageView
+                            android:layout_width="@dimen/_18sdp"
+                            android:layout_height="@dimen/_18sdp"
+                            android:layout_marginStart="@dimen/_8sdp"
+                            android:src="@drawable/ic_arrow_forward"
+                            app:tint="@color/white" />
+
+                    </LinearLayout>
+
+                    <!-- QR Code (Hidden) -->
+                    <ImageView
+                        android:id="@+id/qrImage"
+                        android:layout_width="@dimen/_160sdp"
+                        android:layout_height="@dimen/_160sdp"
+                        android:layout_marginTop="@dimen/_10sdp"
+                        android:padding="@dimen/_4sdp"
+                        android:visibility="gone"
+                        android:src="@drawable/testdpcqr" />
+
+                    <!-- Bottom Text / Action (Hidden) -->
+                    <LinearLayout
+                        android:id="@+id/clicktoopenappqr"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_40sdp"
+                        android:layout_marginTop="@dimen/_12sdp"
+                        android:background="@drawable/searchbutton"
+                        android:gravity="center"
+                        android:visibility="gone"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Click to open Next QR"
+                            android:textColor="@color/white"
+                            android:textSize="@dimen/_13ssp"
+                            android:fontFamily="@font/inter_bold" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Provisioning Steps Guide Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="@dimen/_12sdp"
+                app:cardElevation="@dimen/_3sdp"
+                app:cardUseCompatPadding="true"
+                app:cardBackgroundColor="@color/white">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/_16sdp">
+
+                    <!-- Header Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <FrameLayout
+                            android:layout_width="@dimen/_32sdp"
+                            android:layout_height="@dimen/_32sdp"
+                            android:background="@drawable/bg_circle_light_blue">
+
+                            <ImageView
+                                android:layout_width="@dimen/_18sdp"
+                                android:layout_height="@dimen/_18sdp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/menuicon"
+                                app:tint="#0073C2" />
+
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="@dimen/_10sdp"
+                            android:text="Provisioning Steps"
+                            android:textColor="#0F172A"
+                            android:textSize="@dimen/_15ssp"
+                            android:fontFamily="@font/inter_bold" />
+
+                    </LinearLayout>
+
+                    <!-- Step Progress Bar Indicator -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:visibility="invisible"
+                        android:layout_marginBottom="@dimen/_16sdp"
+                        android:paddingHorizontal="@dimen/_16sdp">
+
+                        <!-- Step 1 Circle (Active) -->
+                        <FrameLayout
+                            android:layout_width="@dimen/_18sdp"
+                            android:layout_height="@dimen/_18sdp"
+                            android:background="@drawable/bg_circle_light_blue"
+                            android:backgroundTint="#0073C2">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:text="1"
+                                android:textColor="@color/white"
+                                android:textSize="@dimen/_10ssp"
+                                android:fontFamily="@font/inter_bold" />
+
+                        </FrameLayout>
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="2dp"
+                            android:layout_weight="1"
+                            android:layout_marginHorizontal="@dimen/_4sdp"
+                            android:background="#E2E8F0" />
+
+                        <!-- Step 2 Circle -->
+                        <FrameLayout
+                            android:layout_width="@dimen/_18sdp"
+                            android:layout_height="@dimen/_18sdp"
+                            android:background="@drawable/bg_circle_light_blue"
+                            android:backgroundTint="#E2E8F0">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:text="2"
+                                android:textColor="#64748B"
+                                android:textSize="@dimen/_10ssp"
+                                android:fontFamily="@font/inter_bold" />
+
+                        </FrameLayout>
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="2dp"
+                            android:layout_weight="1"
+                            android:layout_marginHorizontal="@dimen/_4sdp"
+                            android:background="#E2E8F0" />
+
+                        <!-- Step 3 Circle -->
+                        <FrameLayout
+                            android:layout_width="@dimen/_18sdp"
+                            android:layout_height="@dimen/_18sdp"
+                            android:background="@drawable/bg_circle_light_blue"
+                            android:backgroundTint="#E2E8F0">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:text="3"
+                                android:textColor="#64748B"
+                                android:textSize="@dimen/_10ssp"
+                                android:fontFamily="@font/inter_bold" />
+
+                        </FrameLayout>
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="2dp"
+                            android:layout_weight="1"
+                            android:layout_marginHorizontal="@dimen/_4sdp"
+                            android:background="#E2E8F0" />
+
+                        <!-- Step 4 Circle -->
+                        <FrameLayout
+                            android:layout_width="@dimen/_18sdp"
+                            android:layout_height="@dimen/_18sdp"
+                            android:background="@drawable/bg_circle_light_blue"
+                            android:backgroundTint="#E2E8F0">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:text="4"
+                                android:textColor="#64748B"
+                                android:textSize="@dimen/_10ssp"
+                                android:fontFamily="@font/inter_bold" />
+
+                        </FrameLayout>
+
+                    </LinearLayout>
+
+                    <!-- Step 1 Details -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="@dimen/_14sdp">
+
+                        <FrameLayout
+                            android:layout_width="@dimen/_32sdp"
+                            android:layout_height="@dimen/_32sdp"
+                            android:background="@drawable/bg_circle_light_blue">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:text="1"
+                                android:textColor="#0073C2"
+                                android:textSize="@dimen/_14ssp"
+                                android:fontFamily="@font/inter_bold" />
+
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="@dimen/_12sdp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Enable Wireless Debugging on Customer Device:"
+                                android:textColor="#0F172A"
+                                android:textSize="@dimen/_12ssp"
+                                android:fontFamily="@font/inter_bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/_2sdp"
+                                android:text="Go to Settings > Developer Options and enable Wireless Debugging."
+                                android:textColor="#64748B"
+                                android:textSize="@dimen/_11ssp"
+                                android:fontFamily="@font/inter_medium"
+                                android:lineSpacingExtra="@dimen/_2sdp" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#F1F5F9"
+                        android:layout_marginBottom="@dimen/_14sdp" />
+
+                    <!-- Step 2 Details -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="@dimen/_14sdp">
+
+                        <FrameLayout
+                            android:layout_width="@dimen/_32sdp"
+                            android:layout_height="@dimen/_32sdp"
+                            android:background="@drawable/bg_circle_light_blue">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:text="2"
+                                android:textColor="#0073C2"
+                                android:textSize="@dimen/_14ssp"
+                                android:fontFamily="@font/inter_bold" />
+
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="@dimen/_12sdp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Connect to Same Wi-Fi Network:"
+                                android:textColor="#0F172A"
+                                android:textSize="@dimen/_12ssp"
+                                android:fontFamily="@font/inter_bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/_2sdp"
+                                android:text="Connect both Retailer and Customer devices to the same Wi-Fi network. Also enable Wireless Debugging on both devices."
+                                android:textColor="#64748B"
+                                android:textSize="@dimen/_11ssp"
+                                android:fontFamily="@font/inter_medium"
+                                android:lineSpacingExtra="@dimen/_2sdp" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#F1F5F9"
+                        android:layout_marginBottom="@dimen/_14sdp" />
+
+                    <!-- Step 3 Details -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="@dimen/_14sdp">
+
+                        <FrameLayout
+                            android:layout_width="@dimen/_32sdp"
+                            android:layout_height="@dimen/_32sdp"
+                            android:background="@drawable/bg_circle_light_blue">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:text="3"
+                                android:textColor="#0073C2"
+                                android:textSize="@dimen/_14ssp"
+                                android:fontFamily="@font/inter_bold" />
+
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="@dimen/_12sdp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="View Connected Customer Devices:"
+                                android:textColor="#0F172A"
+                                android:textSize="@dimen/_12ssp"
+                                android:fontFamily="@font/inter_bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/_2sdp"
+                                android:text="Once connected, a list of customer devices will be displayed in the Retailer app along with each device's Serial Number."
+                                android:textColor="#64748B"
+                                android:textSize="@dimen/_11ssp"
+                                android:fontFamily="@font/inter_medium"
+                                android:lineSpacingExtra="@dimen/_2sdp" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#F1F5F9"
+                        android:layout_marginBottom="@dimen/_14sdp" />
+
+                    <!-- Step 4 Details -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <FrameLayout
+                            android:layout_width="@dimen/_32sdp"
+                            android:layout_height="@dimen/_32sdp"
+                            android:background="@drawable/bg_circle_light_blue">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:text="4"
+                                android:textColor="#0073C2"
+                                android:textSize="@dimen/_14ssp"
+                                android:fontFamily="@font/inter_bold" />
+
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="@dimen/_12sdp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Select Device, Pair &amp; Connect:"
+                                android:textColor="#0F172A"
+                                android:textSize="@dimen/_12ssp"
+                                android:fontFamily="@font/inter_bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="@dimen/_2sdp"
+                                android:text="Click on the customer device from the list, select the app for pairing, enter the Pair Code, and click Connect."
+                                android:textColor="#64748B"
+                                android:textSize="@dimen/_11ssp"
+                                android:fontFamily="@font/inter_medium"
+                                android:lineSpacingExtra="@dimen/_2sdp" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+
+    <LinearLayout
+        android:id="@+id/footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ImageView
+            android:layout_width="@dimen/_10sdp"
+            android:layout_height="wrap_content"
+            android:src="@drawable/imagea" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/_4sdp"
+            android:fontFamily="@font/inter_bold"
+            android:text="@string/aopay_technology_ltd"
+            android:textColor="@color/black"
+            android:textSize="@dimen/_10ssp" />
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

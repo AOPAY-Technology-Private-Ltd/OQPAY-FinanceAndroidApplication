@@ -1,0 +1,9 @@
+package com.bosandroidapp.oqmobilefinance.data.generattoken
+
+import com.google.gson.annotations.SerializedName
+
+data class RefreshTokenRequest(
+
+	@field:SerializedName("refreshToken")
+	val refreshToken: String? = null
+)
