@@ -101,7 +101,7 @@ import java.util.concurrent.TimeUnit
 
 object ConstantClass {
 
-         // Production
+    /*     // Production
 
           const val BASE_URL = "https://api.oqpay.in/"
           const val BASE_URL_IMAGE = "https://api.oqpay.in"
@@ -117,8 +117,7 @@ object ConstantClass {
          const val PAN_VERIFICATION_REGISTRATION_ID_OFFLINE = "AOP-5050"
          const val PENNYDROP_REGISTRATION_ID_OFFLINE = "AOP-5050"
 
-         const val CUSTOMERPPURLLINK= BASE_URL +"api/V1/OQFinance/download"
-
+         const val CUSTOMERPPURLLINK= BASE_URL +"api/V1/OQFinance/download"*/
 
 
         // for enach option using registration id always use for bot uat and production ......................
@@ -132,7 +131,7 @@ object ConstantClass {
 
 
        // UAT
-      /* const val BASE_URL = "https://api.oqpay.co.in/"
+       const val BASE_URL = "https://api.oqpay.co.in/"
        const val BASE_URL_IMAGE_PRODCUT = "https://admin.oqpay.co.in"
        const val BASE_URL_IMAGE = "https://api.oqpay.co.in"
       // const val CUSTOMERPPURLLINK= BASE_URL +"api/V1/OQFinance/download"
@@ -144,11 +143,9 @@ object ConstantClass {
       const val PENNYDROP_REGISTRATION_ID = "AOP-554"
 
 
-
       //  UAT merchant id offline
       const val PAN_VERIFICATION_REGISTRATION_ID_OFFLINE = "AOP-554"
       const val PENNYDROP_REGISTRATION_ID_OFFLINE = "AOP-554"
-*/
 
 
      const val SMS_BASE_URL = "http://web.adcruxmedia.in/"

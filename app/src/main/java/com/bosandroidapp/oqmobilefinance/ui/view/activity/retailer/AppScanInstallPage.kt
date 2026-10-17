@@ -151,7 +151,6 @@ class AppScanInstallPage : BaseActivity() {
     private lateinit var callback : ProvisionerJattListener
 
 
-
     companion object{
         var LoanMode=""
         var CustomerPhotoPath=""
@@ -177,6 +176,7 @@ class AppScanInstallPage : BaseActivity() {
         }
 
     }
+
 
     private val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted: Boolean ->
         if (isGranted) {

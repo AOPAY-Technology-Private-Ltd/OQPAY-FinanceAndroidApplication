@@ -128,6 +128,7 @@ class EMICalculationDetailsPage : BaseActivity() {
 
     override fun onStart() {
         super.onStart()
+
         preference = SharedPreference(this)
         viewModel = ViewModelProvider(this, CommonViewModelFactory(AuthRepository(RetrofitClient.apiInterface)))[AuthenticationViewModel::class.java]
 
@@ -152,6 +153,7 @@ class EMICalculationDetailsPage : BaseActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityEmicalculationDetailsPageBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { view, insets ->
             val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
 
@@ -864,8 +866,9 @@ class EMICalculationDetailsPage : BaseActivity() {
                             Log.d("EMICalculationresponse", Gson().toJson(getData))
                             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 
-                            if(errorCode==200 ){
+                            if(errorCode==200 || errorCode==400){
                                 startActivity(Intent(this@EMICalculationDetailsPage, PaymentInformation::class.java))
+                                binding.nextbuttonlayout.isEnabled = true
                             }
                             else{
                                 binding.nextbuttonlayout.isEnabled = true
@@ -893,9 +896,10 @@ class EMICalculationDetailsPage : BaseActivity() {
 
                 }
 
-            }
-        }
 
+            }
+
+        }
 
     }
 

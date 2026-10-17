@@ -697,7 +697,7 @@ class IMEIDetailsPage : BaseActivity() {
                             Log.d("IMEIDetailsresponse", Gson().toJson(responseBody))
                             Toast.makeText(this, responseBody?.message, Toast.LENGTH_SHORT).show()
 
-                            if(status == true ){
+                            if(status == true || errorCode== 400 ){
                                 startActivity(Intent(this@IMEIDetailsPage, QRCodePage::class.java))
                             }
                             else{

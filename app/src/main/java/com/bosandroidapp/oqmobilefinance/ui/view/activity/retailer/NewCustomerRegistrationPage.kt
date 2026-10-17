@@ -167,6 +167,7 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import java.text.SimpleDateFormat
 import java.util.Locale
+import kotlin.code
 
 
 class NewCustomerRegistrationPage : BaseActivity() {
@@ -2029,6 +2030,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
         }
         else {
             Toast.makeText(this@NewCustomerRegistrationPage, "Please check your internet connection.", Toast.LENGTH_SHORT).show()
+            binding.createaccount.isEnabled = true
         }
 
     }
@@ -2550,7 +2552,8 @@ class NewCustomerRegistrationPage : BaseActivity() {
                         binding.createaccount.isEnabled = true
                     }
 
-                } catch (e: UnknownHostException) {
+                }
+                catch (e: UnknownHostException) {
 
                     withContext(Dispatchers.Main) {
                         ConstantClass.dialog?.dismiss()
@@ -2558,7 +2561,8 @@ class NewCustomerRegistrationPage : BaseActivity() {
                         binding.createaccount.isEnabled = true
                     }
 
-                } catch (e: IOException) {
+                }
+                catch (e: IOException) {
 
                     withContext(Dispatchers.Main) {
                         ConstantClass.dialog?.dismiss()
@@ -2566,7 +2570,8 @@ class NewCustomerRegistrationPage : BaseActivity() {
                         binding.createaccount.isEnabled = true
                     }
 
-                } catch (e: Exception) {
+                }
+                catch (e: Exception) {
                     withContext(Dispatchers.Main) {
                         ConstantClass.dialog?.dismiss()
                         PopOpForCibileScoreRequestToAdmin(e.message ?: "Something went wrong", "Error", false)
@@ -2665,9 +2670,10 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                Log.d("CustomerListResp", Gson().toJson(responseBody))
                                Toast.makeText(this, responseBody?.message, Toast.LENGTH_SHORT).show()
 
-                               if(status==true && customerCode!!.isNotEmpty()){
-                                   Log.d("CustomerCode" ,customerCode)
-                                   preference.setStringValue(ConstantClass.CustomerCode, customerCode)
+                               if(status==true && customerCode!!.isNotEmpty() || errorCode==400){
+                                   Log.d("CustomerCode" ,customerCode!!)
+                                   binding.createaccount.isEnabled = true
+                                   preference.setStringValue(ConstantClass.CustomerCode, customerCode!!)
                                    startActivity(Intent(this@NewCustomerRegistrationPage, MobileSelectionActivity::class.java))
                                }
                                else{
@@ -2720,13 +2726,15 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                 var errorCode = response.code
                                 var message = response.message
 
-                                ConstantClass.dialog.dismiss()
+                                ConstantClass.dialog!!.dismiss()
 
-                                if(errorCode==200 && getdata!=null && getdata.customerCode!!.isNotEmpty() ){
+                                if(errorCode==200 && getdata!=null && getdata.customerCode!!.isNotEmpty() || errorCode==400){
+                                    binding.createaccount.isEnabled = true
                                     Toast.makeText(this@NewCustomerRegistrationPage, message, Toast.LENGTH_SHORT).show()
-                                    preference.setStringValue(ConstantClass.CustomerCode, getdata.customerCode.toString())
+                                    preference.setStringValue(ConstantClass.CustomerCode, getdata!!.customerCode.toString())
                                     startActivity(Intent(this@NewCustomerRegistrationPage, MobileSelectionActivity::class.java))
                                 }
+
                                 else {
                                     Toast.makeText(this@NewCustomerRegistrationPage, message, Toast.LENGTH_SHORT).show()
                                 }
@@ -2740,9 +2748,10 @@ class NewCustomerRegistrationPage : BaseActivity() {
                     }
 
                     ApiStatus.ERROR -> {
+                        binding.createaccount.isEnabled = true
                         Toast.makeText(this@NewCustomerRegistrationPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()}
-                     }
                 }
+            }
 
         }
 

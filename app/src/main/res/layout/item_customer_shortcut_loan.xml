@@ -27,6 +27,7 @@
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
                 android:src="@drawable/userimagee" />
+
         </androidx.cardview.widget.CardView>
 
         <TextView
@@ -35,6 +36,8 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/_10sdp"
             android:fontFamily="@font/inter_bold"
+            android:maxLines="2"
+            android:ellipsize="end"
             android:text="Customer Name"
             android:textColor="@color/black"
             android:textSize="@dimen/_14ssp"
@@ -48,6 +51,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_4sdp"
             android:fontFamily="@font/inter_medium"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:text="Mobile: 1234567890"
             android:textColor="@color/darkgrey"
             android:textSize="@dimen/_12ssp"
@@ -61,6 +66,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/_2sdp"
             android:fontFamily="@font/inter_medium"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:text="Code: FQ0000"
             android:textColor="@color/darkgrey"
             android:textSize="@dimen/_12ssp"
@@ -68,25 +75,34 @@
             app:layout_constraintStart_toStartOf="@id/tvName"
             app:layout_constraintTop_toBottomOf="@id/tvMobile" />
 
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrierHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="cvImage,tvCode" />
+
         <View
             android:id="@+id/divider"
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="@dimen/_10sdp"
             android:background="@color/lightgrey"
-            app:layout_constraintTop_toBottomOf="@id/cvImage" />
+            app:layout_constraintTop_toBottomOf="@id/barrierHeader" />
 
         <TextView
             android:id="@+id/tvActiveStatus"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_8sdp"
+            android:layout_marginEnd="@dimen/_8sdp"
             android:fontFamily="@font/inter_bold"
             android:text="Active Status"
             android:textColor="@color/black"
             android:textSize="@dimen/_12ssp"
+            app:layout_constraintBottom_toBottomOf="@id/tvStatus"
+            app:layout_constraintEnd_toStartOf="@id/tvStatus"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/divider" />
+            app:layout_constraintTop_toTopOf="@id/tvStatus" />
 
         <TextView
             android:id="@+id/tvStatus"

@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 data class MembershipFeeResp(
 
 	@field:SerializedName("membershipFee")
-	val membershipFee: Int? = null,
+	val membershipFee: Double? = null,
 
 	@field:SerializedName("message")
 	val message: String? = null,

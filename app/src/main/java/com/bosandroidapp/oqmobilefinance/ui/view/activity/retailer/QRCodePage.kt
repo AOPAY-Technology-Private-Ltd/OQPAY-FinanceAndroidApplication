@@ -1850,9 +1850,7 @@ class QRCodePage : BaseActivity() {
             panNumber = PanNumber,
             aadharNumber = ""
         )
-
         Log.d("checkMemberShipReq", Gson().toJson(req))
-
         viewModel.getgetMemberShipReqeReq(req).observe(this) { resources ->
             resources.let {
                 when (it.apiStatus) {
@@ -1911,7 +1909,6 @@ class QRCodePage : BaseActivity() {
                 }
             }
         }
-
     }
 
 
