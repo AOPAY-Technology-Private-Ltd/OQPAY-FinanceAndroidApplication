@@ -36,15 +36,15 @@ class AuthInterceptor : Interceptor {
 
         if (response.code == 403) {
             Log.e("AuthInterceptor", "403 Forbidden - Redirecting to login")
-            
-            val preference = SharedPreference(ApplicationClass.instance)
-            preference.setBooleanValue(ConstantClass.LoggedIn, false)
-            preference.setStringValue(ConstantClass.AccessToken, "")
-            preference.setStringValue(ConstantClass.RefreshToken, "")
 
-            val intent = Intent(ApplicationClass.instance, ChooseYourRolePage::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            ApplicationClass.instance.startActivity(intent)
+              val preference = SharedPreference(ApplicationClass.instance)
+              preference.setBooleanValue(ConstantClass.LoggedIn, false)
+              preference.setStringValue(ConstantClass.AccessToken, "")
+              preference.setStringValue(ConstantClass.RefreshToken, "")
+
+              val intent = Intent(ApplicationClass.instance, ChooseYourRolePage::class.java)
+              intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+              ApplicationClass.instance.startActivity(intent)
         }
 
         return response

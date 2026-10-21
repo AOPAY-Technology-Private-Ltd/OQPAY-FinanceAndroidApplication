@@ -98,6 +98,7 @@ import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.text.clear
 
 class SignupPage : BaseActivity() {
     lateinit var binding : ActivitySignupPageBinding
@@ -270,31 +271,59 @@ class SignupPage : BaseActivity() {
             when (currentCaptureMode) {
 
                 "PROFILE" -> {
-                    profilePhotoUri=null
+                    profilePhotoUri = null
+                    customerImagePath = ""
+                    Glide.with(this).clear(binding.profileimage)
+                    binding.profileimage.visibility = View.GONE
+                    binding.lockimage.visibility = View.VISIBLE
                 }
 
                 "AADHAAR_FRONT" -> {
-                    aadhaarFronthotoUri=null
+                    aadhaarFronthotoUri = null
+                    aadhaarFrontImagePath = ""
+                    Glide.with(this).clear(binding.aadhaarfront)
+                    binding.aadhaarfront.visibility = View.GONE
+                    binding.aadhaarfronticon.visibility = View.VISIBLE
                 }
 
                 "AADHAAR_BACK" -> {
                     aadhaarBackhotoUri = null
+                    aadhaarBackImagePath = ""
+                    Glide.with(this).clear(binding.aadhaarback)
+                    binding.aadhaarback.visibility = View.GONE
+                    binding.aadhaarbackicon.visibility = View.VISIBLE
                 }
 
                 "PANCARD" -> {
                     pancardphotoUri = null
+                    panImagePath = ""
+                    Glide.with(this).clear(binding.pancardPhoto)
+                    binding.pancardPhoto.visibility = View.GONE
+                    binding.pancardicon.visibility = View.VISIBLE
                 }
 
                 "STORE" -> {
                     storePhotoUri = null
+                    storeImagePath = ""
+                    Glide.with(this).clear(binding.storePhoto)
+                    binding.storePhoto.visibility = View.GONE
+                    binding.storeicon.visibility = View.VISIBLE
                 }
 
                 "COMPANYDOCUMENT" -> {
                     companyCodePhotoUri = null
+                    companydocImagePath = ""
+                    Glide.with(this).clear(binding.companydocumentPhoto)
+                    binding.companydocumentPhoto.visibility = View.GONE
+                    binding.companydocumenticon.visibility = View.VISIBLE
                 }
 
                 "CANCELCHEQUE" -> {
-                    chequePhotoUri= null
+                    chequePhotoUri = null
+                    cancelChequeImagePath = ""
+                    Glide.with(this).clear(binding.cancelchequePhoto)
+                    binding.cancelchequePhoto.visibility = View.GONE
+                    binding.cancelchequeicon.visibility = View.VISIBLE
                 }
 
             }
@@ -1457,6 +1486,7 @@ class SignupPage : BaseActivity() {
 
     fun emptyAboveField(){
         clearReferenceAadhaarData()
+        clearAllImages()
         binding.profileimage.visibility = View.GONE
         binding.lockimage.visibility = View.VISIBLE
         binding.firstName.text!!.clear()
@@ -1511,6 +1541,51 @@ class SignupPage : BaseActivity() {
 
     }
 
+    private fun clearAllImages() {
+        // Clear image URIs
+        profilePhotoUri = null
+        aadhaarFronthotoUri = null
+        aadhaarBackhotoUri = null
+        pancardphotoUri = null
+        storePhotoUri = null
+        companyCodePhotoUri = null
+        chequePhotoUri = null
+
+        // Clear image paths
+        customerImagePath = ""
+        aadhaarFrontImagePath = ""
+        aadhaarBackImagePath = ""
+        panImagePath = ""
+        storeImagePath = ""
+        companydocImagePath = ""
+        cancelChequeImagePath = ""
+
+        // Clear Glide requests and hide image views
+        val imageViews = listOf(
+            binding.profileimage,
+            binding.aadhaarfront,
+            binding.aadhaarback,
+            binding.pancardPhoto,
+            binding.storePhoto,
+            binding.companydocumentPhoto,
+            binding.cancelchequePhoto
+        )
+
+        imageViews.forEach { imageView ->
+            Glide.with(this).clear(imageView)
+            imageView.visibility = View.GONE
+        }
+
+        // Show default icons
+        binding.lockimage.visibility = View.VISIBLE
+        binding.aadhaarfronticon.visibility = View.VISIBLE
+        binding.aadhaarbackicon.visibility = View.VISIBLE
+        binding.pancardicon.visibility = View.VISIBLE
+        binding.storeicon.visibility = View.VISIBLE
+        binding.companydocumenticon.visibility = View.VISIBLE
+        binding.cancelchequeicon.visibility = View.VISIBLE
+    }
+
 
     fun containsEmoji(text: String): Boolean {
         for (char in text) {
@@ -1521,6 +1596,7 @@ class SignupPage : BaseActivity() {
         }
         return false
     }
+
 
     fun scrollToView(scrollView: NestedScrollView, targetView: View) {
         scrollView.post {
@@ -1536,6 +1612,7 @@ class SignupPage : BaseActivity() {
             scrollView.smoothScrollBy(0, y)
         }
     }
+
 
 
     override fun onBackPressed() {

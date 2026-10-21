@@ -142,6 +142,10 @@ class PanCardVerificationPage : BaseActivity() {
             }
             else{
                 photoFrontUri=null
+                binding.frontcardimage.visibility = View.GONE
+                binding.frontcardicon.visibility = View.VISIBLE
+                binding.frontcardimage.setImageDrawable(null)
+                binding.uploadtextfront.setText(R.string.clickdocument)
             }
 
 

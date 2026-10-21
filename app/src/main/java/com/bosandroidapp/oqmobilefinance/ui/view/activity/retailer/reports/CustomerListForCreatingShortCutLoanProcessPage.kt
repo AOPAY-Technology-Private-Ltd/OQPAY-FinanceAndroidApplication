@@ -534,6 +534,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
             }
             // Step 1: Mobile Selection (Brand/EMI)
             "1" -> {
+                ConstantClass.ClickOnCardDashboard = "Customer"
                 startActivity(Intent(this, MobileSelectionActivity::class.java))
             }
 

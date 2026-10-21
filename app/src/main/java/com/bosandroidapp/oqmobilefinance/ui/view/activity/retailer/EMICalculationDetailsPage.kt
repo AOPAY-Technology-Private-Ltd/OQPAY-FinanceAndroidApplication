@@ -117,6 +117,9 @@ class EMICalculationDetailsPage : BaseActivity() {
     private var isApiRunning = false
     private var sellingPriceValidate = true
 
+    var isclick = true
+    var lastSellingPrice: String = ""
+
 
     companion object {
         var EmiSplitDataModel: MutableList<DataItems>? = mutableListOf()
@@ -321,6 +324,7 @@ class EMICalculationDetailsPage : BaseActivity() {
                     binding.processingfees.text = "₹ ${data.processingFees}"
                     // 💰 Get selling price
                     SellingPrice = data.sellingPrice
+                    lastSellingPrice = SellingPrice
                     // 🔢 Perform your EMI calculation
                     UpdateEmiCalculationOnSellingPrice(selectedVariantData, SellingPrice)
                 } else {
@@ -352,6 +356,7 @@ class EMICalculationDetailsPage : BaseActivity() {
 
         }
 
+
         binding.home.setOnClickListener {
             val intent = Intent(this, DashBoard::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -364,9 +369,6 @@ class EMICalculationDetailsPage : BaseActivity() {
             OpenPopUpForVAlert()
         }
 
-
-        var isclick = true
-        var lastSellingPrice: String? = null
 
         binding.sellingamount.isCursorVisible = true
         binding.sellingamount.requestFocus()
@@ -513,7 +515,7 @@ class EMICalculationDetailsPage : BaseActivity() {
             modelName = ConstantClass.ModelName,
             modelVariant = ConstantClass.ModelVarient,
             color = ConstantClass.ModelColor,
-            sellingPrice = ConstantClass.SellingPrice,
+            sellingPrice = lastSellingPrice!!,
             downPayment = DownPayment,
             tenure = Tenure,
             emiAmount = EmiAmount,
@@ -867,6 +869,7 @@ class EMICalculationDetailsPage : BaseActivity() {
                             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
 
                             if(errorCode==200 || errorCode==400){
+                                ConstantClass.SellingPrice = lastSellingPrice!!
                                 startActivity(Intent(this@EMICalculationDetailsPage, PaymentInformation::class.java))
                                 binding.nextbuttonlayout.isEnabled = true
                             }

@@ -1655,8 +1655,7 @@ class QRCodePage : BaseActivity() {
                                             LastName = CustLastName
 
                                             if(response.data!!.customerCode.isNullOrBlank()){
-                                                Toast.makeText(this@QRCodePage,"Customer code not found after loan creation",
-                                                    Toast.LENGTH_SHORT).show()
+                                                Toast.makeText(this@QRCodePage,"Customer code not found after loan creation", Toast.LENGTH_SHORT).show()
                                                 CustomerCodeForEnach=""
                                             }
                                             else{
@@ -2073,6 +2072,7 @@ class QRCodePage : BaseActivity() {
 
 
         if(mode.equals(ConstantClass.offline)) {
+
             panViewModel.getEMandateRequestReq(request).observe(this) { resources ->
                 resources.let {
                     when (it.apiStatus) {
@@ -2158,6 +2158,7 @@ class QRCodePage : BaseActivity() {
                 }
 
             }
+
         }
 
         else{

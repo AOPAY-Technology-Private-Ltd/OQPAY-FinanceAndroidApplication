@@ -70,6 +70,7 @@ class DuesEMIPage : BaseActivity() {
 
 
     private fun setOnClickListner(){
+
         binding.back.setOnClickListener {
             finish()
         }

@@ -180,7 +180,7 @@
 
                         <ImageView
                             android:id="@+id/custMobCopied"
-                            android:layout_width="@dimen/_25sdp"
+                            android:layout_width="@dimen/_30sdp"
                             android:layout_height="@dimen/_25sdp"
                             android:layout_toRightOf="@id/custMob"
                             android:src="@drawable/copyicon"
@@ -221,7 +221,7 @@
 
                         <ImageView
                             android:id="@+id/alterMobCopied"
-                            android:layout_width="@dimen/_25sdp"
+                            android:layout_width="@dimen/_30sdp"
                             android:layout_height="@dimen/_25sdp"
                             android:layout_toRightOf="@id/custalterMob"
                             android:src="@drawable/copyicon"
@@ -262,7 +262,7 @@
 
                         <ImageView
                             android:id="@+id/refMobCopied"
-                            android:layout_width="@dimen/_25sdp"
+                            android:layout_width="@dimen/_30sdp"
                             android:layout_height="@dimen/_25sdp"
                             android:layout_toRightOf="@id/cusRefMob"
                             android:src="@drawable/copyicon"

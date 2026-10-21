@@ -56,6 +56,7 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanFirstName
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanLastName
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanMiddleName
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanMobileNumber
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanNumber
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanPinCode
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.PanState
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.Retailer
@@ -504,6 +505,8 @@ class DashBoard : BaseActivity() {
 
         binding.appBarDashBoard.deskdesign.customer.setOnClickListener {
             ConstantClass.ClickOnCardDashboard = "Customer"
+            ConstantClass.CheckOnlineOrOffline=""
+            PanNumber=""
             startActivity(Intent(this@DashBoard, IDVerificationPage::class.java))
         }
 
@@ -535,6 +538,7 @@ class DashBoard : BaseActivity() {
 
 
     }
+
 
     private fun canGenerateKey(): Boolean {
         val currentCount = preference.getIntValue(ConstantClass.GENERATE_KEY_COUNT, 0)
@@ -854,7 +858,7 @@ class DashBoard : BaseActivity() {
                                     MaxHoldingAmount = String.format("%.2f", maxholdAmount)
                                     MinHoldingAmount = String.format("%.2f", minholdAmount)
                                     LoanSecurityHoldAmount = String.format("%.2f", loanSecurityHoldAmount)
-                                    binding.appBarDashBoard.deskdesign.walletamount.text = formatIndianAmount(myWalletAmountStr)
+                                    binding.appBarDashBoard.deskdesign.walletamount.text = myWalletAmountStr
 
                                 }
                             }

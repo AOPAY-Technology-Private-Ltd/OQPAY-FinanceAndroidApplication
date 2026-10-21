@@ -110,6 +110,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.text.clear
 
 class IMEIDetailsPage : BaseActivity() {
     lateinit var binding : ActivityImeidetailsPageBinding
@@ -189,15 +190,27 @@ class IMEIDetailsPage : BaseActivity() {
         else{
             if(imei1photo){
                 imei1photoUri= null
+                Glide.with(this).clear(binding.imei1photo)
+                binding.imei1photo.visibility = View.GONE
+                binding.imei1photoicon.visibility = View.VISIBLE
+                binding.clicktosealphoto1.text = "Click to upload"
             }
-
             else if(imei2photo){
                 imei2photoUri=null
+                Glide.with(this).clear(binding.imei2photo)
+                binding.imei2photo.visibility = View.GONE
+                binding.imei2photoicon.visibility = View.VISIBLE
+                binding.clicktosealphoto2.text = "Click to upload"
             }
-
             else if(ImeiPhoto){
                 ImeiPhotoUri= null
+                Glide.with(this).clear(binding.ImeiPhoto)
+                binding.ImeiPhoto.visibility = View.GONE
+                binding.imeiicon.visibility = View.VISIBLE
+                binding.clicktoimeiphoto.text = "Click to upload"
             }
+
+            resetFlag()
 
             /*else if(invoicePhoto){
                 invoicePhotoUri=null
