@@ -348,7 +348,7 @@ class KioskActivity : BaseActivity() {
 
     private val unlockReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent?.action == "com.bosandroidapp.aopayfinance.ACTION_UNLOCK_KIOSK") {
+            if (intent?.action == "com.bosandroidapp.oqmobilefinance.ACTION_UNLOCK_KIOSK") {
                 try {
                     stopLockIfRunning()
                 } catch (_: Exception) {
@@ -361,9 +361,10 @@ class KioskActivity : BaseActivity() {
         }
     }
 
+
     private fun registerUnlockReceiver() {
         try {
-            val filter = IntentFilter("com.bosandroidapp.aopayfinance.ACTION_UNLOCK_KIOSK")
+            val filter = IntentFilter("com.bosandroidapp.oqmobilefinance.ACTION_UNLOCK_KIOSK")
             ContextCompat.registerReceiver(this, unlockReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
         } catch (e: Exception) {
             Log.e("KioskActivity", "Error registering unlock receiver", e)
