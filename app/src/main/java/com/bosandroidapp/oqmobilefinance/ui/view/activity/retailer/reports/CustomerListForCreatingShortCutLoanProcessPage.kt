@@ -1,6 +1,7 @@
 package com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.reports
 
 import android.app.Dialog
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -11,14 +12,19 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RadioGroup
+import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -100,8 +106,11 @@ import com.bosandroidapp.oqmobilefinance.data.model.CustomerSearchForShortCutLoa
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerShortCutDataItem
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerStepDataItem
 import com.bosandroidapp.oqmobilefinance.data.model.ShortCutCustomerRequest
+import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.ManageCustomerStepWiseReq
 import com.bosandroidapp.oqmobilefinance.data.upiautomandate.UPIMandateRequest
 import com.bosandroidapp.oqmobilefinance.data.pennydrop.BankListReq
+import com.bosandroidapp.oqmobilefinance.data.pennydrop.PennyDropCheckStatusRequest
+import com.bosandroidapp.oqmobilefinance.data.pennydrop.PennyDropRequest
 import com.bosandroidapp.oqmobilefinance.data.repository.AuthRepository
 import com.bosandroidapp.oqmobilefinance.data.repository.DikshifinsureRepository
 import com.bosandroidapp.oqmobilefinance.data.repository.PanRepository
@@ -151,6 +160,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
     private var selectedRegistrationID: String = ""
     private var selectedAuthType: String = ""
     private var emandateSelectList: MutableList<Pair<String, List<EmandateSelectDataItem>>?> = mutableListOf()
+    var bankName = mutableListOf<String>()
 
     lateinit var dialog: Dialog
 
@@ -467,7 +477,8 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
             else {
                 if(LoanMode.isNotEmpty()){
                     proceedWithLoanLogic(item,step!!)
-                }else {
+                }
+                else {
                     Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage, "Loan mode not found", Toast.LENGTH_SHORT).show()
                 }
 
@@ -585,7 +596,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
 
 
 
-    private fun ShowPopUpForEnachProcess(item: CustomerShortCutDataItem) {
+   /* private fun ShowPopUpForEnachProcess(item: CustomerShortCutDataItem) {
         val dialog = Dialog(this, R.style.FullScreenDialog)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.dialog_enach_process)
@@ -674,12 +685,389 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
         }
 
         dialog.show()
+    }*/
+
+
+    private fun ShowPopUpForEnachProcess(item: CustomerShortCutDataItem) {
+        val dialog = Dialog(this, com.bosandroidapp.oqmobilefinance.R.style.FullScreenDialog)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setContentView(com.bosandroidapp.oqmobilefinance.R.layout.dialog_enach_process)
+
+        dialog.window?.apply {
+            setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        }
+        dialog.setCanceledOnTouchOutside(false)
+
+        val nextLayout = dialog.findViewById<LinearLayout>(com.bosandroidapp.oqmobilefinance.R.id.nextlayout)
+        val accountnumber = dialog.findViewById<EditText>(com.bosandroidapp.oqmobilefinance.R.id.accountnumber)
+        val banificeryName = dialog.findViewById<EditText>(com.bosandroidapp.oqmobilefinance.R.id.banificeryName)
+        val ifsccode = dialog.findViewById<EditText>(com.bosandroidapp.oqmobilefinance.R.id.ifsccode)
+        val bankname = dialog.findViewById<AutoCompleteTextView>(com.bosandroidapp.oqmobilefinance.R.id.bankname)
+        val branchname = dialog.findViewById<EditText>(com.bosandroidapp.oqmobilefinance.R.id.branchname)
+        val branchaddress = dialog.findViewById<EditText>(com.bosandroidapp.oqmobilefinance.R.id.branchaddress)
+        val clickbuttonforedit = dialog.findViewById<TextView>(com.bosandroidapp.oqmobilefinance.R.id.clickbuttonforedit)
+        val acounttype = dialog.findViewById<Spinner>(com.bosandroidapp.oqmobilefinance.R.id.acounttype)
+        val back = dialog.findViewById<ImageView>(com.bosandroidapp.oqmobilefinance.R.id.back)
+
+        var isDataEditedByUser = false
+
+        clickbuttonforedit.visibility = View.VISIBLE
+
+        // Disable all fields by default
+        accountnumber.isEnabled = false
+        banificeryName.isEnabled = false
+        ifsccode.isEnabled = false
+        bankname.isEnabled = false
+        branchname.isEnabled = false
+        branchaddress.isEnabled = false
+        acounttype.isEnabled = false
+
+
+        val adapter = ArrayAdapter.createFromResource(dialog.context, com.bosandroidapp.oqmobilefinance.R.array.accounttype, com.bosandroidapp.oqmobilefinance.R.layout.mobilenamelayout)
+        adapter.setDropDownViewResource(com.bosandroidapp.oqmobilefinance.R.layout.spinner_dropdown_item)
+        acounttype.adapter = adapter
+
+
+        if(bankName.isNotEmpty()){
+            val bankadapter = ArrayAdapter(dialog.context, com.bosandroidapp.oqmobilefinance.R.layout.spinner_dropdown_item, bankName)
+            bankname.setAdapter(bankadapter)
+        }
+
+
+        accountnumber.setText(AccountNumber)
+        banificeryName.setText("${CustFirstName} ${CustLastName}")
+        ifsccode.setText(BankIFSCCode)
+        bankname.setText(BankName)
+        branchname.setText(BranchName)
+        branchaddress.setText(BranchAddress)
+
+
+        val position = adapter.getPosition(AccountType)
+        if (position >= 0) {
+            acounttype.setSelection(position)
+        }
+
+        if (bankList.isNotEmpty()) {
+            BankID = bankList.find { it.first == BankName }?.second ?: BankID
+            Log.d("FetchBankList", Gson().toJson(bankList))
+        }
+
+        val customerDetails = item.customerDetails
+        val productDetails = item.productDetails
+        val bankDetails = item.bankDetails
+        val eMandateDetails = item.eMandateDetails
+        val referenceDetails = item.referenceDetails
+        val imeiDetails = item.imeiDetails
+        val createLoanDetails = item.createLoanDetails
+
+        bankname.setOnClickListener {
+            bankname.showDropDown()
+        }
+
+        clickbuttonforedit.setOnClickListener {
+            AlertDialog.Builder(this@CustomerListForCreatingShortCutLoanProcessPage)
+                .setTitle("Confirmation")
+                .setMessage("Are you sure you want to edit bank details?")
+                .setPositiveButton("Yes") { dialogInterface, _ ->
+                    dialogInterface.dismiss()
+                    isDataEditedByUser = true
+                    accountnumber.isEnabled = true
+                    banificeryName.isEnabled = true
+                    ifsccode.isEnabled = true
+                    bankname.isEnabled = true
+                    branchname.isEnabled = true
+                    branchaddress.isEnabled = true
+                    acounttype.isEnabled = true
+
+                    accountnumber.requestFocus()
+                    accountnumber.setSelection(accountnumber.text.length)
+                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                    imm?.showSoftInput(accountnumber, InputMethodManager.SHOW_IMPLICIT)
+
+                    Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage, "Fields are now editable", Toast.LENGTH_SHORT).show()
+                }
+                .setNegativeButton("No") { dialogInterface, _ ->
+
+                    dialogInterface.dismiss()
+                    isDataEditedByUser = false
+                    accountnumber.isEnabled = false
+                    banificeryName.isEnabled = false
+                    ifsccode.isEnabled = false
+                    bankname.isEnabled = false
+                    branchname.isEnabled = false
+                    branchaddress.isEnabled = false
+                    acounttype.isEnabled = false
+                }
+                .show()
+        }
+
+        nextLayout.setOnClickListener {
+            val editedAccNum = accountnumber.text.toString().trim()
+            val editedBenName = banificeryName.text.toString().trim()
+            val editedIfsc = ifsccode.text.toString().trim()
+            val editedBankName = bankname.text.toString().trim()
+            val editedBranchName = branchname.text.toString().trim()
+            val editedBranchAddr = branchaddress.text.toString().trim()
+            val editedAccType = acounttype.selectedItem.toString().trim()
+
+            if (editedBenName.isEmpty()) {
+                Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage, "Please enter beneficiary name", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (editedAccNum.isEmpty()) {
+                Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage, "Please enter account number", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            if (editedIfsc.isEmpty()) {
+                Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage, "Please enter IFSC code", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            val hasBankDetailsChanged = isDataEditedByUser && (
+                    editedAccNum != AccountNumber ||
+                            editedIfsc != BankIFSCCode ||
+                            editedBankName != BankName ||
+                            editedAccType != AccountType ||
+                            editedBenName != "${customerDetails!!.firstName} ${customerDetails.lastName}"
+                    )
+
+            val startDate = ConstantClass.formatToYYYYMMDD(LoanStartDate)
+            val endDate = ConstantClass.formatToYYYYMMDD(LoanEndDate)
+            val emiAmountVal = productDetails!!.emiAmount?.toDoubleOrNull()?.roundToInt()?: 0
+
+            if (hasBankDetailsChanged) {
+                // Penny drop flow when bank data is edited
+                nextLayout.isEnabled = false
+                val pennyDropReq = PennyDropRequest(
+                    bankName = editedBankName,
+                    benificiaryName = editedBenName,
+                    address = editedBranchAddr,
+                    paymentMode = ConstantClass.ModeOfPayment,
+                    iFSCCode = editedIfsc,
+                    registrationID = if (ConstantClass.CheckOnlineOrOffline == ConstantClass.online) {
+                        ConstantClass.PENNYDROP_REGISTRATION_ID
+                    } else {
+                        ConstantClass.PENNYDROP_REGISTRATION_ID_OFFLINE
+                    },
+                    refID = "",
+                    accountNumber = editedAccNum
+                )
+
+                Log.d("PennyDropReqShortcut", Gson().toJson(pennyDropReq))
+                ConstantClass.OpenPopUpForVeryfyOTP(this@CustomerListForCreatingShortCutLoanProcessPage)
+
+                panViewModel.getpennyDropReq(pennyDropReq).observe(this@CustomerListForCreatingShortCutLoanProcessPage) { resources ->
+                    resources?.let { res ->
+                        when (res.apiStatus) {
+                            ApiStatus.SUCCESS -> {
+                                res.data?.body()?.let { response ->
+                                    Log.d("PennyDropResShortcut", Gson().toJson(response))
+                                    if (response.model?.status.equals(ConstantClass.SUCCESS)) {
+                                        val refID = response.model?.clientRefNum ?: ""
+                                        if (refID.isNotEmpty()) {
+                                            val checkStatusReq = PennyDropCheckStatusRequest(
+                                                registrationID = ConstantClass.PENNYDROP_REGISTRATION_ID,
+                                                refID = refID
+                                            )
+                                            panViewModel.getpennyDropCheckStatusReq(checkStatusReq).observe(this@CustomerListForCreatingShortCutLoanProcessPage) { checkRes ->
+                                                checkRes?.let { cRes ->
+                                                    when (cRes.apiStatus) {
+                                                        ApiStatus.SUCCESS -> {
+                                                            cRes.data?.body()?.let { statusResp ->
+                                                                ConstantClass.dialog?.dismiss()
+                                                                if (statusResp.model?.status.equals(ConstantClass.SUCCESS)) {
+                                                                    // Update global variables
+                                                                    AccountNumber = editedAccNum
+                                                                    BankIFSCCode = editedIfsc
+                                                                    BankName = editedBankName
+                                                                    AccountType = editedAccType
+                                                                    BranchName = editedBranchName
+                                                                    AccountHolderName = editedBenName
+                                                                    BranchAddress = editedBranchAddr
+                                                                    ConstantClass.isPannydropVerified = "Yes"
+
+                                                                    if (bankList.isNotEmpty()) {
+                                                                        bankList.find { it.first == BankName }?.second?.let {
+                                                                            BankID = it
+                                                                        }
+                                                                    }
+
+                                                                    // Update Step 3
+                                                                    val stepReq = ManageCustomerStepWiseReq(
+                                                                            mode = "UPDATE",
+                                                                            step = "3",
+                                                                            rid = "",
+                                                                            accountNumber = AccountNumber,
+                                                                            bankIFSCCode = BankIFSCCode,
+                                                                            bankName = BankName,
+                                                                            IsPannyDrop = isPannydropVerified,
+                                                                            accountType = AccountType,
+                                                                            branchName = BranchName,
+                                                                            retailercode=preference.getStringValue(ConstantClass.RetailerCode,""),
+                                                                            customerCode = preference.getStringValue(ConstantClass.CustomerCode, "")
+                                                                        )
+
+                                                                    Log.d("Step3UpdateReq", Gson().toJson(stepReq))
+
+                                                                    viewModel.uploadCustomerListForShortCutLoanCreateProcess(stepReq).observe(this@CustomerListForCreatingShortCutLoanProcessPage) { stepRes ->
+                                                                        when (stepRes.apiStatus) {
+                                                                            ApiStatus.SUCCESS -> {
+                                                                                stepRes.data?.let { response ->
+                                                                                    if (response.isSuccessful) {
+                                                                                        val body = response.body()
+                                                                                        Log.d("Step3UpdateRes", Gson().toJson(body))
+                                                                                        if (body != null && body.success == true && body.code == 200) {
+
+                                                                                            Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage, body.message ?: "Bank details updated successfully", Toast.LENGTH_SHORT).show()
+
+                                                                                            // Proceed to eMandate flow
+                                                                                           /* val startDate = LoanStartDate
+                                                                                            val endDate = LoanEndDate
+                                                                                            val emiAmountVal = productDetails!!.emiAmount?.toDoubleOrNull()?.roundToInt() ?: 0*/
+
+                                                                                            val request = EMandateRequest(
+                                                                                                categoryID = 7,
+                                                                                                collectionAmount = emiAmountVal,
+                                                                                                collectCollectionUntilCancle = false,
+                                                                                                seqType = "RCUR",
+                                                                                                iFSCCode = bankDetails!!.bankIFSCCode,
+                                                                                                frequncy = "MNTH",
+                                                                                                registrationID = if (LoanMode == ConstantClass.online) {
+                                                                                                    ConstantClass.PAN_VERIFICATION_REGISTRATION_ID
+                                                                                                }
+                                                                                                else {
+                                                                                                    ConstantClass.PAN_VERIFICATION_REGISTRATION_ID_OFFLINE
+                                                                                                },
+                                                                                                accountHolderName = "${customerDetails!!.firstName} ${customerDetails.lastName}",
+                                                                                                finalCollectionDate = endDate,
+                                                                                                loanNo = createLoanDetails!!.loanCode,
+                                                                                                accountType = bankDetails!!.accountType,
+                                                                                                emailAddress = customerDetails.eMailID ?: CusteMailID,
+                                                                                                firstCollectionDate = startDate,
+                                                                                                mobileNumber = customerDetails.primaryMobileNumber,
+                                                                                                bankAccountNumberConfirmation = bankDetails.accountNumber,
+                                                                                                addIn2 = BranchAddress,
+                                                                                                addIn3 = "",
+                                                                                                debitType = true,
+                                                                                                teleNumber = "",
+                                                                                                authType = "",
+                                                                                                bankID = BankID,
+                                                                                                bankAccountNumber = bankDetails.accountNumber
+                                                                                            )
+                                                                                            hitApiForEnach(request, item, true)
+                                                                                        } else {
+                                                                                            ConstantClass.dialog?.dismiss()
+                                                                                            nextLayout.isEnabled = true
+                                                                                            Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage, body?.message ?: "Failed to update bank details", Toast.LENGTH_LONG).show()
+                                                                                        }
+                                                                                    } else {
+                                                                                        ConstantClass.dialog?.dismiss()
+                                                                                        nextLayout.isEnabled = true
+                                                                                        val errorStr = response.message()
+                                                                                        Log.e("Step3UpdateResError", errorStr)
+                                                                                        Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage, "Error: $errorStr", Toast.LENGTH_SHORT).show()
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                            ApiStatus.ERROR -> {
+                                                                                ConstantClass.dialog?.dismiss()
+                                                                                nextLayout.isEnabled = true
+                                                                                Log.e("Step3UpdateError", stepRes.message ?: "Unknown error")
+                                                                                Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage, stepRes.message ?: "Failed to update bank details", Toast.LENGTH_SHORT).show()
+                                                                            }
+                                                                            ApiStatus.LOADING -> {}
+                                                                        }
+                                                                    }
+
+                                                                } else {
+                                                                    nextLayout.isEnabled = true
+                                                                    Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage, statusResp.message ?: "Penny drop check failed", Toast.LENGTH_LONG).show()
+                                                                }
+                                                            }
+                                                        }
+                                                        ApiStatus.ERROR -> {
+                                                            nextLayout.isEnabled = true
+                                                            ConstantClass.dialog?.dismiss()
+                                                            Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage, cRes.message ?: "Error checking penny drop status", Toast.LENGTH_SHORT).show()
+                                                        }
+                                                        ApiStatus.LOADING -> {}
+                                                    }
+                                                }
+                                            }
+                                        } else {
+                                            ConstantClass.dialog?.dismiss()
+                                            nextLayout.isEnabled = true
+                                            Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage, "Ref ID empty", Toast.LENGTH_SHORT).show()
+                                        }
+                                    } else {
+                                        ConstantClass.dialog?.dismiss()
+                                        nextLayout.isEnabled = true
+                                        Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage, response.message ?: "Penny drop failed", Toast.LENGTH_LONG).show()
+                                    }
+                                }
+                            }
+                            ApiStatus.ERROR -> {
+                                nextLayout.isEnabled = true
+                                ConstantClass.dialog?.dismiss()
+                                Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage, res.message ?: "Penny drop error", Toast.LENGTH_SHORT).show()
+                            }
+                            ApiStatus.LOADING -> {}
+                        }
+                    }
+                }
+            }
+            else {
+                // Existing unchanged flow
+               /* val startDate = LoanStartDate
+                val endDate = LoanEndDate
+                val emiAmountVal = productDetails!!.emiAmount?.toDoubleOrNull()?.roundToInt() ?: 0*/
+
+                val request = EMandateRequest(
+                    categoryID = 7,
+                    collectionAmount = emiAmountVal,
+                    collectCollectionUntilCancle = false,
+                    seqType = "RCUR",
+                    iFSCCode = bankDetails!!.bankIFSCCode,
+                    frequncy = "MNTH",
+                    registrationID = if (LoanMode == ConstantClass.online) {
+                        ConstantClass.PAN_VERIFICATION_REGISTRATION_ID
+                    }
+                    else {
+                        ConstantClass.PAN_VERIFICATION_REGISTRATION_ID_OFFLINE
+                    },
+                    accountHolderName = "${customerDetails!!.firstName} ${customerDetails.lastName}",
+                    finalCollectionDate = endDate,
+                    loanNo = createLoanDetails!!.loanCode,
+                    accountType = bankDetails!!.accountType,
+                    emailAddress = customerDetails.eMailID ?: CusteMailID,
+                    firstCollectionDate = startDate,
+                    mobileNumber = customerDetails.primaryMobileNumber,
+                    bankAccountNumberConfirmation = bankDetails.accountNumber,
+                    addIn2 = BranchAddress,
+                    addIn3 = "",
+                    debitType = true,
+                    teleNumber = "",
+                    authType = "",
+                    bankID = BankID,
+                    bankAccountNumber = bankDetails.accountNumber
+                )
+                hitApiForEnach(request, item, true)
+            }
+        }
+
+        back.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
 
 
     fun hitApiForBankList(item: CustomerShortCutDataItem) {
         bankList.clear()
+        bankName.clear()
 
         var req = BankListReq(
             registrationID = if (ConstantClass.CheckOnlineOrOffline == ConstantClass.online) {
@@ -708,6 +1096,8 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
 
                                 response?.data?.banks?.forEach {
                                     bankList.add(Pair(it!!.name!!, it.id) as Pair<String, Int>)
+                                    bankName.add(it!!.name!!)
+                                    bankName.sort()
                                 }
 
                                 if (bankList.isNotEmpty()) {
@@ -879,7 +1269,6 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
         var loanData = customerDataForShortCut.createLoanDetails
 
         if (LoanMode == ConstantClass.offline) {
-
             panViewModel.getEMandateRequestReq(request).observe(this) { resources ->
                 when (resources.apiStatus) {
                     ApiStatus.SUCCESS -> {
@@ -902,7 +1291,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
                                     var verifiedStatus = "No"
 
                                     if (response.data?.customer != null) {
-                                        verifiedStatus = "Yes"
+                                        verifiedStatus = "No"
                                     }
 
                                     val uploadReq = EnachDateUploadReq(
@@ -1075,7 +1464,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
                                         var verifiedStatus = "No"
 
                                         if (response.data?.customer != null) {
-                                            verifiedStatus = "Yes"
+                                            verifiedStatus = "No"
                                         }
 
                                         val uploadReq = EnachDateUploadReq(

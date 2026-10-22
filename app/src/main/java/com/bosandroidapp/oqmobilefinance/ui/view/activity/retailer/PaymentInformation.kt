@@ -492,6 +492,10 @@ class PaymentInformation : BaseActivity() {
     }
 
 
+    override fun onBackPressed() {
+
+    }
+
     fun setOnClickListner(){
 
         binding.home.setOnClickListener {

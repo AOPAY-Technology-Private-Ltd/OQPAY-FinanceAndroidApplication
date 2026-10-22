@@ -2736,6 +2736,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                 }
 
                                 else {
+                                    binding.createaccount.isEnabled = true
                                     Toast.makeText(this@NewCustomerRegistrationPage, message, Toast.LENGTH_SHORT).show()
                                 }
 

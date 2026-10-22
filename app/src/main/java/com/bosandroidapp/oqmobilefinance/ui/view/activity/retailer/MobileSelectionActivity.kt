@@ -94,12 +94,17 @@ class MobileSelectionActivity : BaseActivity() {
 
 
 
+
+
     override fun onResume() {
         super.onResume()
 
         hitApiForLogin()
     }
 
+    override fun onBackPressed() {
+
+    }
 
     fun setClickListner(){
 

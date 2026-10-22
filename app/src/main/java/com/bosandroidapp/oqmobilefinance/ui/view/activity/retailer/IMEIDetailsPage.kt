@@ -226,6 +226,11 @@ class IMEIDetailsPage : BaseActivity() {
     }
 
 
+    override fun onBackPressed() {
+
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 

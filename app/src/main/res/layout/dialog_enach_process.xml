@@ -24,7 +24,8 @@
             android:layout_alignBottom="@id/titlelayout"
             android:layout_marginLeft="@dimen/_10sdp"
             android:src="@drawable/back"
-            app:tint="@color/white" />
+            app:tint="@color/white"
+            android:visibility="invisible"/>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/titlelayout"
@@ -63,14 +64,27 @@
             android:orientation="vertical"
             android:paddingBottom="@dimen/_20sdp">
 
+            <TextView
+                android:id="@+id/clickbuttonforedit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:visibility="gone"
+                android:layout_gravity="right"
+                android:textColor="@color/pink"
+                android:padding="@dimen/_10sdp"
+                android:textSize="@dimen/_14ssp"
+                android:layout_marginRight="@dimen/_10sdp"
+                android:text="Edit Bank Details"/>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/_10sdp"
-                android:layout_marginTop="@dimen/_20sdp"
+                android:layout_marginTop="@dimen/_10sdp"
                 android:background="@drawable/bg_black_border">
 
-                <TextView
+                <EditText
                     android:id="@+id/accountnumber"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -91,13 +105,13 @@
                 android:layout_marginTop="@dimen/_10sdp"
                 android:background="@drawable/bg_black_border">
 
-                <TextView
+                <EditText
                     android:id="@+id/banificeryName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@null"
                     android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZasdfghjklpoiuytrewqzxcvbnm "
-                    android:hint="Enter benificiary name"
+                    android:hint="Enter beneficiary name"
                     android:imeOptions="actionNext"
                     android:inputType="text"
                     android:padding="@dimen/_8sdp"
@@ -113,7 +127,7 @@
                 android:layout_marginTop="@dimen/_10sdp"
                 android:background="@drawable/bg_black_border">
 
-                <TextView
+                <EditText
                     android:id="@+id/ifsccode"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -134,17 +148,17 @@
                 android:layout_marginTop="@dimen/_10sdp"
                 android:background="@drawable/bg_black_border">
 
-                <TextView
+                <AutoCompleteTextView
                     android:id="@+id/bankname"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:hint="Select Bank"
+                    android:imeOptions="actionNext"
                     android:inputType="text"
                     android:padding="@dimen/_8sdp"
-                    android:hint="Enter bank name"
                     android:textColor="@color/edt_color"
-                    android:textSize="@dimen/_14ssp"
-                    />
-
+                    android:textSize="@dimen/_14ssp" />
 
             </RelativeLayout>
 
@@ -155,16 +169,13 @@
                 android:layout_marginTop="@dimen/_10sdp"
                 android:background="@drawable/bg_black_border">
 
-                <TextView
+                <Spinner
                     android:id="@+id/acounttype"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="text"
                     android:padding="@dimen/_8sdp"
-                    android:hint="Enter account type"
-                    android:textColor="@color/edt_color"
-                    android:textSize="@dimen/_14ssp"
-                     />
+                    android:textSize="16sp"
+                    android:spinnerMode="dropdown" />
 
 
             </RelativeLayout>
@@ -176,7 +187,7 @@
                 android:layout_marginTop="@dimen/_10sdp"
                 android:background="@drawable/bg_black_border">
 
-                <TextView
+                <EditText
                     android:id="@+id/branchname"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -189,7 +200,6 @@
                     android:textColor="@color/edt_color"
                     android:textSize="@dimen/_14ssp" />
 
-
             </RelativeLayout>
 
             <RelativeLayout
@@ -199,7 +209,7 @@
                 android:layout_marginTop="@dimen/_10sdp"
                 android:background="@drawable/bg_black_border">
 
-                <TextView
+                <EditText
                     android:id="@+id/branchaddress"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

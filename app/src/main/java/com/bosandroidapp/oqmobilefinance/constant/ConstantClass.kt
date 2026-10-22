@@ -836,7 +836,6 @@ object ConstantClass {
     }
 
 
-
     fun createMultipartFromUri(context: Context, uri: Uri?, partName: String, filename:String): MultipartBody.Part? {
         return uri?.let {
             val cacheFile = saveImageToCache(context, it, filename )
@@ -845,6 +844,40 @@ object ConstantClass {
                 MultipartBody.Part.createFormData(partName, file.name, requestFile)
             }
         }
+    }
+
+
+    // for emandate request date format
+    fun formatToYYYYMMDD(inputDate: String?): String {
+        if (inputDate.isNullOrBlank()) return ""
+
+        val inputFormats = arrayOf(
+            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+            "yyyy-MM-dd'T'HH:mm:ss.SS",
+            "yyyy-MM-dd'T'HH:mm:ss",
+            "dd/MM/yyyy",
+            "yyyy-MM-dd",
+            "MM/dd/yyyy",
+            "d/M/yyyy"
+        )
+
+        val outputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+
+        for (format in inputFormats) {
+            try {
+                val sdf = SimpleDateFormat(format, Locale.getDefault())
+                if (format.contains("'Z'")) {
+                    sdf.timeZone = TimeZone.getTimeZone("UTC")
+                }
+                val date = sdf.parse(inputDate)
+                if (date != null) {
+                    return outputFormat.format(date)
+                }
+            } catch (e: Exception) {
+                // Try next format
+            }
+        }
+        return inputDate // Return original if all fail
     }
 
 

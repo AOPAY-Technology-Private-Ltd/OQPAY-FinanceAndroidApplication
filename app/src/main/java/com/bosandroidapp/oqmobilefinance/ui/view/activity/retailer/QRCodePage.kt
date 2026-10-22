@@ -267,7 +267,9 @@ class QRCodePage : BaseActivity() {
                                                selectedAuthType = option.apiName ?: ""
                                                Log.d("SelectedMandate", " $selectedAuthType")
 
-                                               val emiAmount = EmiAmount.toDouble().roundToInt()
+                                               val emiAmount = EmiAmount.toDoubleOrNull()?.roundToInt() ?: 0
+                                               val startDate = ConstantClass.formatToYYYYMMDD(LoanStartDate)
+                                               val endDate = ConstantClass.formatToYYYYMMDD(LoanEndDate)
 
                                                val request = EMandateRequest(
                                                    categoryID = 7,
@@ -283,11 +285,11 @@ class QRCodePage : BaseActivity() {
                                                            ConstantClass.PAN_VERIFICATION_REGISTRATION_ID_OFFLINE
                                                         },
                                                    accountHolderName = ConstantClass.AccountHolderName,
-                                                   finalCollectionDate = LoanEndDate,
+                                                   finalCollectionDate = endDate,
                                                    loanNo = loaneCode,
                                                    accountType = AccountType,
                                                    emailAddress = CusteMailID,
-                                                   firstCollectionDate = LoanStartDate,
+                                                   firstCollectionDate = startDate,
                                                    mobileNumber = CustPrimaryMobileNumber,
                                                    bankAccountNumberConfirmation = AccountNumber,
                                                    addIn2 = BranchAddress,
@@ -551,6 +553,11 @@ class QRCodePage : BaseActivity() {
         super.onResume()
 
         hitApiForLogin()
+
+    }
+
+
+    override fun onBackPressed() {
 
     }
 
