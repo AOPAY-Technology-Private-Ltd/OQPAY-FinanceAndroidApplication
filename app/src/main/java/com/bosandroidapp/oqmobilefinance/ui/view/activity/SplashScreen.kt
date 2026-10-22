@@ -57,6 +57,15 @@ class SplashScreen : AppCompatActivity() {
         }
 
 
+
+        if (ConstantClass.CURRENT_ENVIRONMENT != ConstantClass.AppEnvironment.PRODUCTION) {
+            binding.uattext.text = ConstantClass.CURRENT_ENVIRONMENT.envName
+            binding.uattext.visibility = View.VISIBLE
+        } else {
+            binding.uattext.visibility = View.GONE
+        }
+
+
         Handler(Looper.getMainLooper()).postDelayed({
             if (!isInternetAvailable(this)) {
                 Snackbar.make(findViewById(android.R.id.content),

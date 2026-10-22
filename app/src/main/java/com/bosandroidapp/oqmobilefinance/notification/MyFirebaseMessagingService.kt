@@ -39,11 +39,14 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
 
 
+
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
         val notificationCode = remoteMessage.data["NotificationCode"] ?: ""
 
         passNotificationCode(notificationCode)
+
+        Log.d("notificationcode", notificationCode)
 
         Log.e("FCM_TEST", "onMessageReceived called")
 
@@ -55,43 +58,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         val admin = ComponentName(applicationContext, KioskDeviceAdminReceiver::class.java)
 
         when(notificationCode){
-
-           /* ConstantClass.LOAN_REJECT ->{
-
-                if (dpm.isDeviceOwnerApp(packageName)) {
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                        val policy = FactoryResetProtectionPolicy.Builder()
-                            .setFactoryResetProtectionAccounts(emptyList())
-                            .build()
-                        dpm.setFactoryResetProtectionPolicy(admin, policy)
-                    }
-                    dpm.clearUserRestriction(admin, UserManager.DISALLOW_FACTORY_RESET)
-                    dpm.clearDeviceOwnerApp(getPackageName())
-                    dpm.removeActiveAdmin(admin)
-                }
-
-            }
-
-
-            ConstantClass.DISBURSMENT_REJECT-> {
-
-                if (dpm.isDeviceOwnerApp(packageName)) {
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                        val policy = FactoryResetProtectionPolicy.Builder()
-                            .setFactoryResetProtectionAccounts(emptyList())
-                            .build()
-                        dpm.setFactoryResetProtectionPolicy(admin, policy)
-                    }
-
-                    dpm.clearUserRestriction(admin, UserManager.DISALLOW_FACTORY_RESET)
-                    dpm.clearDeviceOwnerApp(getPackageName())
-                    dpm.removeActiveAdmin(admin)
-
-                }
-
-            }*/
 
             ConstantClass.LOAN_REJECT , ConstantClass.DISBURSMENT_REJECT , ConstantClass.UNINSTALLED->{
 
@@ -119,7 +85,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                     dpm.clearUserRestriction(admin, UserManager.DISALLOW_DEBUGGING_FEATURES)
                     dpm.clearDeviceOwnerApp(getPackageName())
                     dpm.removeActiveAdmin(admin)
-                    hitApiForDeviceLockStatus(true)
+                    hitApiForDeviceLockStatus(true, "CUSTOMER_UNINSTALLED")
                 }
 
                 // 4. Open App Info settings screen easily
@@ -144,6 +110,9 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     runBlocking {
                         applicationContext.forceSyncEmis()
+                        if(ConstantClass.UNLOCK==notificationCode){
+                            hitApiForDeviceLockStatus(true,"CUSTOMER_UNLOCKED")
+                        }
                     }
                 }
                 else {
@@ -158,7 +127,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     }
 
-    fun hitApiForDeviceLockStatus(status: Boolean) {
+    fun hitApiForDeviceLockStatus(status: Boolean, actionName: String) {
         val preference = SharedPreference(this)
 
         val req = CustomerDeviceLockStatusReq(
@@ -174,7 +143,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             manufacturer = Build.MANUFACTURER,
             performedAt = ConstantClass.getCurrentUtcTimestamp(),
             appPackageName = packageName,
-            actionName = "CUSTOMER_UNINSTALLED"
+            actionName = actionName
         )
 
         Log.d("DeviceUninstallReq", Gson().toJson(req))

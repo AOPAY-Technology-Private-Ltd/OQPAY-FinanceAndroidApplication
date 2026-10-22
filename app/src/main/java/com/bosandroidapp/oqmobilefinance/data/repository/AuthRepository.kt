@@ -1,5 +1,6 @@
 package com.bosandroidapp.oqmobilefinance.data.repository
 
+import com.bosandroidapp.aopayfinance.data.model.customerreq.CustomerDeviceLockStatusReq
 import com.bosandroidapp.oqmobilefinance.network.ApiInterface
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.createMultipartFromUri
 import com.bosandroidapp.oqmobilefinance.data.enach.EnachDateUploadReq
@@ -447,6 +448,9 @@ class AuthRepository(private val apiInterface: ApiInterface) {
 
 
   }
+
+
+  suspend fun uploadDeviceLockStatusReq(req: CustomerDeviceLockStatusReq) = apiInterface.uploadDeviceLockStatusReq(req)
 
 
 }

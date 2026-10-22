@@ -31,7 +31,7 @@ class MyAccessibilityService : AccessibilityService() {
 
 
     companion object {
-        var instance: com.bosandroidapp.oqmobilefinance.kioskmode.MyAccessibilityService? = null
+        var instance:MyAccessibilityService? = null
 
         fun stopService() {
             instance?.disableSelf()
@@ -58,7 +58,7 @@ class MyAccessibilityService : AccessibilityService() {
 
     override fun onCreate() {
         super.onCreate()
-        com.bosandroidapp.oqmobilefinance.kioskmode.MyAccessibilityService.Companion.instance = this
+        instance = this
     }
 
 
@@ -165,12 +165,12 @@ class MyAccessibilityService : AccessibilityService() {
                 return
             }*/
 
-           /* if (ConstantClass.isPgClosing) {
+            if (ConstantClass.isPgClosing) {
                 Handler(Looper.getMainLooper()).postDelayed({
                     ConstantClass.isPgClosing = false
                 }, 1000)
                 return
-            }*/
+            }
 
             // Logger.d(ACCESSIBILITYTAG, "Phone Locked")
             isMyAppMinimizedOrRemoved(event)
@@ -183,6 +183,7 @@ class MyAccessibilityService : AccessibilityService() {
 
     override fun onServiceConnected() {
         super.onServiceConnected()
+        instance = this
         val info = getServiceInfo()
 
         // Fetch all installed packages on the device
@@ -195,6 +196,10 @@ class MyAccessibilityService : AccessibilityService() {
         // Explicitly map them to the service info
         info.packageNames = packageNames
         setServiceInfo(info)
+
+        // Start periodic sync check
+        syncHandler.removeCallbacks(syncRunnable)
+        syncHandler.post(syncRunnable)
     }
 
 

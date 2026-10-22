@@ -68,6 +68,508 @@ suspend fun String.getCurrentLastPaidDueDate(context: Context?, paidMonths: Long
 }
 
 
+private suspend fun getCustomerLoanEmiDetailsReq(req: GetCustomerLoanDetailsReq) =
+    RetrofitClient.apiInterface.getCustomerLoanDetailsList(req)
+
+
+suspend fun Context.syncEmis() = withContext(Dispatchers.IO) {
+    val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
+    currentDate = SimpleDateFormat("d/M/yyyy", Locale.getDefault()).format(Date())
+
+    if (hasDateChanged()) {
+        Logger.d(ACCESSIBILITYTAG, "Date Changed or 24 hours passed, syncing EMIs...")
+        val preference = SharedPreference(this@syncEmis)
+
+        val loanemireq = GetCustomerLoanDetailsReq(
+            loancode = "",
+            customercode = preference.getStringValue(ConstantClass.CustomerCode, "")
+        )
+        try {
+            Logger.d(ACCESSIBILITYTAG, "Syncing EMIs")
+            Log.d("Loanreq", Gson().toJson(loanemireq))
+            val loanDetails = getCustomerLoanEmiDetailsReq(loanemireq)
+            if (loanDetails != null && loanDetails.isSuccessful) {
+                currentDate = loanDetails.body()?.indiaTimeIST?.convertDate() ?: currentDate
+                val list = loanDetails.body()?.data?.toList()
+
+                list?.let { loans ->
+                    val obj = loans.getLoansStringObject()
+                    Logger.d(ACCESSIBILITYTAG, obj)
+                    sharedPref.edit()
+                        .putString("LoanData", obj)
+                        .putString("LoanSyncDate", currentDate)
+                        .putLong("LoanSyncTimestamp", System.currentTimeMillis())
+                        .apply()
+                }
+
+                Logger.d(ACCESSIBILITYTAG, "Loan data synced for date: ${currentDate}")
+            }
+        }
+        catch (e: Exception) {
+            Logger.d(ACCESSIBILITYTAG, e.localizedMessage ?: "")
+        }
+
+    }
+
+    isEMIDue(sharedPref)
+
+}
+
+
+
+suspend fun Context.forceSyncEmis() = withContext(Dispatchers.IO) {
+    val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
+    currentDate = SimpleDateFormat("d/M/yyyy", Locale.getDefault()).format(Date())
+    fetchAndStoreEmis(sharedPref)
+
+}
+
+
+private suspend fun Context.fetchAndStoreEmis(sharedPref: SharedPreferences) {
+    val preference = SharedPreference(this)
+    val loanemireq = GetCustomerLoanDetailsReq(
+        loancode = "",
+        customercode = preference.getStringValue(ConstantClass.CustomerCode, "")
+    )
+    try {
+        Logger.d(ACCESSIBILITYTAG, "Force Syncing EMIs...")
+        Log.d("Loanreq", Gson().toJson(loanemireq))
+        val loanDetails = getCustomerLoanEmiDetailsReq(loanemireq)
+        if (loanDetails != null && loanDetails.isSuccessful) {
+            currentDate = loanDetails.body()?.indiaTimeIST?.convertDate() ?: currentDate
+            val list = loanDetails.body()?.data?.toList()
+
+            list?.let { loans ->
+                val obj = loans.getLoansStringObject()
+                Logger.d(ACCESSIBILITYTAG, obj)
+                sharedPref.edit()
+                    .putString("LoanData", obj)
+                    .putString("LoanSyncDate", currentDate)
+                    .putLong("LoanSyncTimestamp", System.currentTimeMillis())
+                    .apply()
+            }
+
+            Logger.d(ACCESSIBILITYTAG, "Loan data force synced for date: ${currentDate}")
+        }
+    } catch (e: Exception) {
+        Log.e(ACCESSIBILITYTAG, "Error force fetching EMIs: ${e.localizedMessage}")
+    }
+
+    isEMIDue(sharedPref)
+
+}
+
+
+
+
+private suspend fun Context.isEMIDue(sharedPref: SharedPreferences) = withContext(Dispatchers.IO) {
+    var emiDues = 0
+    var lateEMIs = 0
+
+    try {
+        val loanDetails = sharedPref.getString("LoanData", "")
+        val list = loanDetails?.toFormattedList()
+
+        uploadDataOnFirebaseConsole(Gson().toJson(list), "LoanList")
+
+        if (currentDate.isNullOrEmpty()) {
+            currentDate = SimpleDateFormat("d/M/yyyy", Locale.getDefault()).format(Date())
+        }
+
+        list?.let { loans ->
+            loans.forEach { loan ->
+                val leftMonths = loan.duesEmi.toLongOrNull() ?: 0L
+                val paidMonths = loan.paidEmi.toLongOrNull() ?: 0L
+                val loanStatus = loan.loanStatus.toString()
+                val allGrossPeriod = if (loan.grossPeriod.isEmpty()) 0 else loan.grossPeriod.toIntOrNull() ?: 0
+                val customerGrossPeriod = if (loan.customergrossPeriod.isEmpty()) 0 else loan.customergrossPeriod.toIntOrNull() ?: 0
+                val grossPeriod = allGrossPeriod + customerGrossPeriod
+
+                Log.d(ACCESSIBILITYTAG, "Loan Details: ${loan.startDate.toFormattedDate()}-->$leftMonths == $paidMonths")
+
+                if (leftMonths > 0L || !loanStatus.equals(ConstantClass.LOANCLOSE, ignoreCase = true)) {
+                    CheckCompleteEmiStatus = true
+                    emiDues++
+
+                    Log.d("currentDate", currentDate ?: "")
+                    uploadDataOnFirebaseConsole("${currentDate}", "currentDate")
+
+                    val grossDue = loan.startDate.toFormattedDate()
+                        .getJumpedDate(paidMonths)
+                        .getGrossDate(grossPeriod)
+
+                    Log.d("grossDueDate", grossDue)
+
+                    if (grossDue.isLateFeesApplicable(currentDate)) {
+                        lateEMIs++
+                    }
+
+                    Log.d("printlateemiGrossDue", "$lateEMIs $grossDue")
+                    uploadDataOnFirebaseConsole("$lateEMIs $grossDue", "LateEmi'sGrossDue")
+                }
+            }
+        }
+
+
+        if (emiDues == 0) {
+            CheckCompleteEmiStatus = false
+        }
+
+        Logger.d(ACCESSIBILITYTAG, "EMIDUES: $emiDues, LATE_EMIS: $lateEMIs")
+
+        if (emiDues > 0) {
+            this@isEMIDue.setEMINotCompleted()
+            this@isEMIDue.startInternetAlertSituation()
+        } else {
+            this@isEMIDue.setEMICompleted()
+            this@isEMIDue.stopInternetAlertSituation()
+        }
+
+        if (lateEMIs > 0) {
+            Logger.d(ACCESSIBILITYTAG, "Late EMIs Count: $lateEMIs")
+            this@isEMIDue.startLockSituation()
+        } else {
+            this@isEMIDue.stopLockSituation()
+        }
+
+    } catch (e: Exception) {
+        Logger.d(ACCESSIBILITYTAG, e.localizedMessage ?: "")
+    }
+
+}
+
+
+
+fun String.toFormattedDate(): String {
+    return try {
+        val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val outputFormat = SimpleDateFormat("d/M/yyyy", Locale.getDefault())
+        val date = inputFormat.parse(this)
+        date?.let { outputFormat.format(it) } ?: this
+    } catch (e: Exception) {
+        this // return original if parsing fails
+    }
+}
+
+
+private fun String.getJumpedDate(paidMonths: Long): String {
+    val splitDate = this.trim().split("/")
+    if (splitDate.size < 3) return this
+    val day = splitDate[0]
+    val startMonth = splitDate[1].toLongOrNull() ?: return this
+    val startYear = splitDate[2].toLongOrNull() ?: return this
+
+    val zeroBasedMonth = (startMonth - 1) + paidMonths
+    val addedYears = zeroBasedMonth / 12
+    val month = (zeroBasedMonth % 12) + 1
+
+    return "$day/$month/${startYear + addedYears}"
+}
+
+
+fun String.getCurrentMonthDue(totalEmis: Long, grossPeriod: Int): String {
+
+    val sdf = SimpleDateFormat("d/M/yyyy", Locale.getDefault())
+    sdf.isLenient = false
+
+    val fixedDate = sdf.parse(this)
+
+    val cal1 = Calendar.getInstance()
+    cal1.time = sdf.parse(currentDate ?: "") ?: Date()
+
+    val cal2 = Calendar.getInstance()
+    cal2.time = fixedDate ?: Date()
+    val lastDueDate =
+        this.getJumpedDate(totalEmis + 1).getValidOrLastDate().getGrossDate(grossPeriod)
+    val cal3 = Calendar.getInstance()
+    cal3.time = sdf.parse(lastDueDate) ?: Date()
+
+    if (cal3.before(cal1)) {
+        return lastDueDate
+    } else {
+        val yearDiff = cal1.get(Calendar.YEAR) - cal2.get(Calendar.YEAR)
+        val monthDiff = cal1.get(Calendar.MONTH) - cal2.get(Calendar.MONTH)
+
+        val difference = (yearDiff * 12) + monthDiff
+        val dd = this.getJumpedDate(difference.toLong()).getValidOrLastDate()
+        val cal4 = Calendar.getInstance()
+        cal4.time = sdf.parse(dd) ?: Date()
+        if (cal1.before(cal4)) {
+            return dd
+        } else {
+            val ddd = this.getJumpedDate((difference + 1).toLong()).getValidOrLastDate()
+            return ddd
+        }
+    }
+
+}
+
+
+fun String.getCurrentMonthGross(totalEmis: Long, grossPeriod: Int): String {
+    val sdf = SimpleDateFormat("d/M/yyyy", Locale.getDefault())
+    sdf.isLenient = false
+
+    val fixedDate = sdf.parse(this)
+
+    val cal1 = Calendar.getInstance()
+    cal1.time = sdf.parse(currentDate ?: "") ?: Date()
+
+    val cal2 = Calendar.getInstance()
+    cal2.time = fixedDate ?: Date()
+    val lastDueDate =
+        this.getJumpedDate(totalEmis + 1).getValidOrLastDate().getGrossDate(grossPeriod)
+    val cal3 = Calendar.getInstance()
+    cal3.time = sdf.parse(lastDueDate) ?: Date()
+
+    if (cal3.before(cal1)) {
+        return lastDueDate
+    } else {
+        val yearDiff = cal1.get(Calendar.YEAR) - cal2.get(Calendar.YEAR)
+        val monthDiff = cal1.get(Calendar.MONTH) - cal2.get(Calendar.MONTH)
+
+        val difference = (yearDiff * 12) + monthDiff
+        val dd =
+            this.getJumpedDate(difference.toLong()).getValidOrLastDate().getGrossDate(grossPeriod)
+        val cal4 = Calendar.getInstance()
+        cal4.time = sdf.parse(dd) ?: Date()
+        if (cal1.before(cal4)) {
+            return dd
+        } else {
+            val ddd = this.getJumpedDate((difference + 1).toLong()).getValidOrLastDate().getGrossDate(grossPeriod)
+            return ddd
+        }
+    }
+
+}
+
+
+data class MonthsAndPayables(
+    val dueDate: String,
+    val dueDateWithGross: String,
+    val lateFeesApplied: Boolean
+)
+
+
+private fun String.furtherDueDates(months: Long, grossPeriod: Int): ArrayList<MonthsAndPayables> {
+    val list = arrayListOf<MonthsAndPayables>()
+    //var nextDue = this.getJumpedDate(1)
+    var nextDue = this
+    for (i in 1..months) {
+        //val validDue = nextDue.getValidOrLastDate()
+        val validDue = nextDue
+        val grossDue = validDue.getGrossDate(grossPeriod)
+        list.add(MonthsAndPayables(validDue, grossDue, grossDue.isLateFeesApplicable(currentDate)))
+        nextDue = nextDue.getJumpedDate(1)
+    }
+    return list
+}
+
+
+private fun String.getValidOrLastDate(): String {
+    val format = "d/M/yyyy"
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val formatter = DateTimeFormatter.ofPattern(format, Locale.getDefault())
+        return try {
+            LocalDate.parse(this, formatter).format(formatter)
+        } catch (e: DateTimeParseException) {
+            // Extract year & month from input
+            try {
+                val parts = this.split("-", " ", "/")
+                val day = parts[0].toIntOrNull() ?: 1
+                val month =
+                    parts[1].toIntOrNull()?.coerceIn(1, 12) ?: 1   // ensure month between 1–12
+                val year = parts.getOrNull(2)?.toIntOrNull() ?: LocalDate.now().year
+
+                val lastDayOfMonth = YearMonth.of(year, month).atEndOfMonth().dayOfMonth
+                val safeDay = day.coerceIn(1, lastDayOfMonth)
+
+                val safeDate = LocalDate.of(year, month, safeDay)
+                safeDate.format(formatter)
+
+            } catch (ex: Exception) {
+                "" // return blank instead of crash
+            }
+        }
+    }
+    else {
+        val sdf = SimpleDateFormat(format, Locale.getDefault())
+        sdf.isLenient = false  // strict parsing (rejects Feb 30, etc.)
+
+        return try {
+            sdf.parse(this)
+            this
+        } catch (e: Exception) {
+            val parts = this.split("-", " ", "/")
+            if (parts.size < 2) return this // fallback if format totally wrong
+
+            val year = parts[2].toIntOrNull() ?: return this
+            val month = parts[1].toIntOrNull()?.minus(1) ?: return this  // Calendar is 0-based
+
+            val cal = Calendar.getInstance()
+            cal.set(Calendar.YEAR, year)
+            cal.set(Calendar.MONTH, month)
+            val lastDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH)
+
+            // Return corrected last valid date
+            "%04d-%02d-%02d".format(year, month + 1, lastDay)
+        }
+    }
+}
+
+
+private fun String.getGrossDate(grossPeriod: Int): String {
+    val format = "d/M/yyyy"
+    val sdf = SimpleDateFormat(format, Locale.getDefault())
+    sdf.isLenient = false  // strict parsing
+
+    val validDate: Date? = try {
+        sdf.parse(this)
+    } catch (e: Exception) {
+        val parts = this.split("-", " ", "/")
+        if (parts.size < 2) return ""
+
+        val year = parts[2].toIntOrNull() ?: return ""
+        val month = parts[1].toIntOrNull()?.minus(1) ?: return ""
+
+        val cal = Calendar.getInstance()
+        cal.set(Calendar.YEAR, year)
+        cal.set(Calendar.MONTH, month)
+        val lastDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH)
+        sdf.parse("%02d/%02d/%04d".format(lastDay, month + 1, year))
+    }
+
+
+    return validDate?.let {
+        val cal = Calendar.getInstance()
+        cal.time = it
+        cal.add(Calendar.DAY_OF_MONTH, grossPeriod)
+        sdf.format(cal.time)
+    } ?: this
+
+}
+
+
+
+private fun String.isLateFeesApplicable(currentDateStr: String?): Boolean {
+
+    if (currentDateStr.isNullOrEmpty()) return false
+
+    return try {
+        val sdf = SimpleDateFormat("d/M/yyyy", Locale.getDefault())
+        sdf.isLenient = false
+
+        val current = sdf.parse(currentDateStr)
+        val due = sdf.parse(this)
+
+        Log.d("current dueDate", "$current $due")
+
+        uploadDataOnFirebaseConsole("$current $due", "current dueDate")
+
+        // LATE only if current date is AFTER due date
+        current != null && due != null && current.after(due)
+
+
+    } catch (e: Exception) {
+        false
+    }
+}
+
+
+fun Context.hasDateChanged(): Boolean {
+    val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
+    val lastSyncDate = sharedPref.getString("LoanSyncDate", "")
+    val lastSyncTime = sharedPref.getLong("LoanSyncTimestamp", 0L)
+    val currentTime = System.currentTimeMillis()
+    val twentyFourHoursInMillis = 24 * 60 * 60 * 1000L
+
+    return (lastSyncDate != currentDate) || (currentTime - lastSyncTime >= twentyFourHoursInMillis)
+}
+
+
+fun List<CustomerDataItem?>.getLoansStringObject(): String {
+    val arr = JSONArray()
+    this.forEach {
+        it?.let {
+            arr.put(JSONObject().apply {
+                this.put("startDate", it.startDate)
+                this.put("paidEMI", it.paidEMI)
+                this.put("duesEMI", it.duesEMI)
+                this.put("gracePeriod", it.gracePeriod)
+                this.put("customerGracePeriod", it.customerGracePeriod)
+                this.put("recordStatus", it.recordStatus)
+            })
+
+        }
+    }
+    Log.d("Loans Array", arr.toString())
+    return arr.toString()
+}
+
+
+
+data class LocalLoanData(
+    val startDate: String,
+    val paidEmi: String,
+    val duesEmi: String,
+    val grossPeriod: String,
+    val customergrossPeriod: String,
+    val loanStatus : String
+)
+
+
+fun String.toFormattedList(): List<LocalLoanData>? {
+    try {
+        val array = JSONArray(this)
+        return arrayListOf<LocalLoanData>().apply {
+            for (i in 0..(array.length() - 1)) {
+                this.add(
+                    LocalLoanData(
+                        array.getJSONObject(i).getString("startDate"),
+                        array.getJSONObject(i).getString("paidEMI"),
+                        array.getJSONObject(i).getString("duesEMI"),
+                        array.getJSONObject(i).getString("gracePeriod"),
+                        array.getJSONObject(i).getString("customerGracePeriod"),
+                        array.getJSONObject(i).getString("recordStatus"),
+                    )
+                )
+            }
+
+        }
+    } catch (e: Exception) {
+        return null
+    }
+
+}
+
+
+
+// old code for reference ............................................................................................................................................................
+
+
+/*
+
+suspend fun String.getCurrentLastPaidDueDate(context: Context?, paidMonths: Long, payableMonths: Long, AllgrossPeriod: Int, customergrossPeriod: Int, servercurrentDate:String): ArrayList<MonthsAndPayables> = withContext(Dispatchers.IO) {
+    val AllgrossPeriod = AllgrossPeriod
+    val customergrossPeriod = customergrossPeriod
+    val grossPeriod = AllgrossPeriod + customergrossPeriod
+    // generate your list
+    // val paidTill = this@getCurrentLastPaidDueDate.getJumpedDate(paidMonths)
+    val paidTill = this@getCurrentLastPaidDueDate
+    val list = paidTill.furtherDueDates(payableMonths, grossPeriod)
+    currentDate = servercurrentDate.convertDate()
+    val currentMonthDue = this@getCurrentLastPaidDueDate.getCurrentMonthDue(24, grossPeriod)
+    val currentMonthGrossDue = this@getCurrentLastPaidDueDate.getCurrentMonthGross(24, grossPeriod)
+    // log for debugging
+    Log.d("firstDueDate", paidTill)
+    Log.d("EmiList", list.toString())
+    Log.d("Current Due", currentMonthDue)
+    Log.d("Current Gross Due", currentMonthGrossDue)
+
+    // switch back automatically since return value will flow to caller
+    list // is showing all duedate list
+}
+
+
 
 private suspend fun getCustomerLoanEmiDetailsReq(req: GetCustomerLoanDetailsReq) =
     RetrofitClient.apiInterface.getCustomerLoanDetailsList(req)
@@ -209,6 +711,7 @@ private suspend fun Context.isEMIDue(sharedPref: SharedPreferences) = withContex
 
 
 
+*/
 /*private suspend fun Context.defaultedLoansList(sharedPref: SharedPreferences): List<LocalLoanData> = withContext(Dispatchers.IO) {
     val defaultedEmis= arrayListOf<LocalLoanData>()
     try {
@@ -240,7 +743,8 @@ private suspend fun Context.isEMIDue(sharedPref: SharedPreferences) = withContex
     }
     defaultedEmis
 
-}*/
+}*//*
+
 
 
 
@@ -452,6 +956,7 @@ private fun String.getGrossDate(grossPeriod: Int): String {
 
 
 
+*/
 /*private fun String.isLateFeesApplicable(): Boolean {
 
     val format = "d/M/yyyy"
@@ -468,7 +973,8 @@ private fun String.getGrossDate(grossPeriod: Int): String {
         }
     }
     return true
-}*/
+}*//*
+
 
 
 private fun String.isLateFeesApplicable(currentDateStr: String?): Boolean {
@@ -558,6 +1064,7 @@ fun String.toFormattedList(): List<LocalLoanData>? {
     }
 
 }
+*/
 
 
 

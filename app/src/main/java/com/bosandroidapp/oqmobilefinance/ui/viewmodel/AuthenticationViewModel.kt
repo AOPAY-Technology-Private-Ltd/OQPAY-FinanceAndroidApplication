@@ -551,7 +551,6 @@ class AuthenticationViewModel (private val repository: AuthRepository):ViewModel
 
 
 
-
     fun UpdateCustomerUploadDataReq(req: UpdateCustomerUploadDataReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
@@ -561,6 +560,15 @@ class AuthenticationViewModel (private val repository: AuthRepository):ViewModel
         }
     }
 
+
+    fun uploadDeviceLockStatusReq(req: com.bosandroidapp.aopayfinance.data.model.customerreq.CustomerDeviceLockStatusReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            emit(ApiResponse.success(data = repository.uploadDeviceLockStatusReq(req)))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
+        }
+    }
 
 
 

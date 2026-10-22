@@ -159,7 +159,6 @@ class ChooseYourRolePage : BaseActivity() {
         val mainIntent = Intent(this@ChooseYourRolePage, LoginPage::class.java)
         startActivity(mainIntent)
 
-
     }
 
 

@@ -25,6 +25,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bosandroidapp.aopayfinance.data.model.customerreq.CustomerDeviceLockStatusReq
+import com.bosandroidapp.oqmobilefinance.BuildConfig
 import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityKioskBinding
@@ -285,6 +287,15 @@ class KioskActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
 
+        // instant unlock activity .................
+        if (!isLocked()) {
+            try {
+                stopLockIfRunning()
+            } catch (_: Exception) {}
+            finish()
+            return
+        }
+
         if (!previousLoanData.isNullOrEmpty()) {
             setData(previousLoanData, previousCurrentDate)
         }
@@ -309,6 +320,7 @@ class KioskActivity : BaseActivity() {
                 if (!isLockTaskStarted &&activityManager.lockTaskModeState == ActivityManager.LOCK_TASK_MODE_NONE) {
                     startLockTask()
                     isLockTaskStarted = true
+                    hitApiForDeviceLockStatus(true)
                 }
             }
         } catch (e: Exception) {
@@ -325,11 +337,12 @@ class KioskActivity : BaseActivity() {
         if (!isLocked()) finish()
     }
 
+
     override fun onDestroy() {
         super.onDestroy()
         unregisterUnlockReceiver()
-        if (com.bosandroidapp.oqmobilefinance.kioskmode.KioskActivity.Companion.instance == this) {
-            com.bosandroidapp.oqmobilefinance.kioskmode.KioskActivity.Companion.instance = null
+        if (instance == this) {
+            instance = null
         }
     }
 
@@ -357,11 +370,13 @@ class KioskActivity : BaseActivity() {
         }
     }
 
+
     private fun unregisterUnlockReceiver() {
         try {
             unregisterReceiver(unlockReceiver)
         } catch (_: Exception) {}
     }
+
 
 
     override fun onStop() {
@@ -675,6 +690,47 @@ class KioskActivity : BaseActivity() {
 
             }
 
+        }
+
+    }
+
+
+    fun hitApiForDeviceLockStatus(status: Boolean) {
+
+        val req = CustomerDeviceLockStatusReq(
+            deviceModel = Build.MODEL,
+            status = status,
+            actionType = "DEVICE",
+            customerCode = preference.getStringValue(ConstantClass.CustomerCode, ""),
+            deviceId = preference.getStringValue(ConstantClass.DEVICEID, ""),
+            androidVersion = Build.VERSION.RELEASE,
+            retailerCode = preference.getStringValue(ConstantClass.RetailerCode, ""),
+            appVersion = BuildConfig.VERSION_NAME,
+            clientCode = preference.getStringValue(ConstantClass.ClientCode, ""),
+            manufacturer = Build.MANUFACTURER,
+            performedAt = ConstantClass.getCurrentUtcTimestamp(),
+            appPackageName = packageName,
+            actionName =  "PHONE_LOCK"
+        )
+
+        Log.d("DeviceLockStatusReq", Gson().toJson(req))
+
+        viewModel.uploadDeviceLockStatusReq(req).observe(this) { resources ->
+            when (resources.apiStatus) {
+
+                ApiStatus.SUCCESS -> {
+                    val response = resources.data?.body()
+                    Log.d("DeviceLockStatusRes", Gson().toJson(response))
+                }
+
+                ApiStatus.ERROR -> {
+                    Log.e("DeviceLockStatusError", resources.message ?: "Unknown error")
+                }
+
+                ApiStatus.LOADING -> {
+                }
+
+            }
         }
 
     }
