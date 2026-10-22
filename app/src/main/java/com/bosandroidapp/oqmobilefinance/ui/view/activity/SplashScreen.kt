@@ -56,6 +56,15 @@ class SplashScreen : AppCompatActivity() {
             WindowInsetsCompat.CONSUMED
         }
 
+        if (ConstantClass.CURRENT_ENVIRONMENT != ConstantClass.AppEnvironment.PRODUCTION) {
+            binding.uattext.text = ConstantClass.CURRENT_ENVIRONMENT.envName
+            binding.uattext.visibility = View.VISIBLE
+        }
+        else {
+            binding.uattext.visibility = View.GONE
+        }
+
+
 
         Handler(Looper.getMainLooper()).postDelayed({
             if (!isInternetAvailable(this)) {

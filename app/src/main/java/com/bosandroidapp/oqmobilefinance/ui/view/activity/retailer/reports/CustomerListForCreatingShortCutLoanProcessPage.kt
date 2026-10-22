@@ -819,6 +819,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
                 Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage, "Please enter account number", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
+
             if (editedIfsc.isEmpty()) {
                 Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage, "Please enter IFSC code", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener

@@ -101,7 +101,71 @@ import java.util.concurrent.TimeUnit
 
 object ConstantClass {
 
-    /*     // Production
+
+    // Environment Definition
+    enum class AppEnvironment(
+        val baseUrl: String,
+        val baseUrlImage: String,
+        val envName: String,
+        val panRegId: String,
+        val pennyDropRegId: String,
+        val panRegIdOffline: String,
+        val pennyDropRegIdOffline: String
+    ) {
+        RELEASE_UAT(
+            baseUrl = "https://uat.api.oqpay.in/",
+            baseUrlImage = "https://uat.api.oqpay.in",
+            envName = "RELEASE UAT",
+            panRegId = "AOP-554",
+            pennyDropRegId = "AOP-554",
+            panRegIdOffline = "AOP-554",
+            pennyDropRegIdOffline = "AOP-554"
+        ),
+        STAGING(
+            baseUrl = "https://api.oqpay.co.in/",
+            baseUrlImage = "https://api.oqpay.co.in",
+            envName = "STAGING",
+            panRegId = "AOP-554",
+            pennyDropRegId = "AOP-554",
+            panRegIdOffline = "AOP-554",
+            pennyDropRegIdOffline = "AOP-554"
+        ),
+        DEV(
+            baseUrl = "https://dev.api.oqpay.co.in/",
+            baseUrlImage = "https://dev.api.oqpay.co.in",
+            envName = "DEV",
+            panRegId = "AOP-554",
+            pennyDropRegId = "AOP-554",
+            panRegIdOffline = "AOP-554",
+            pennyDropRegIdOffline = "AOP-554"
+        ),
+        PRODUCTION(
+            baseUrl = "https://api.oqpay.in/",
+            baseUrlImage = "https://api.oqpay.in",
+            envName = "PRODUCTION",
+            panRegId = "AOP-5039",
+            pennyDropRegId = "AOP-5039",
+            panRegIdOffline = "AOP-5050",
+            pennyDropRegIdOffline = "AOP-5050"
+        )
+    }
+
+    // Change current environment here: RELEASE_UAT | STAGING | DEV | PRODUCTION
+    val CURRENT_ENVIRONMENT = AppEnvironment.STAGING
+
+    val BASE_URL = CURRENT_ENVIRONMENT.baseUrl
+    val BASE_URL_IMAGE = CURRENT_ENVIRONMENT.baseUrlImage
+
+    val CUSTOMERPPURLLINK= BASE_URL +"api/V1/OQFinance/download"
+
+
+    val PAN_VERIFICATION_REGISTRATION_ID = CURRENT_ENVIRONMENT.panRegId
+    val PENNYDROP_REGISTRATION_ID = CURRENT_ENVIRONMENT.pennyDropRegId
+    val PAN_VERIFICATION_REGISTRATION_ID_OFFLINE = CURRENT_ENVIRONMENT.panRegIdOffline
+    val PENNYDROP_REGISTRATION_ID_OFFLINE = CURRENT_ENVIRONMENT.pennyDropRegIdOffline
+
+
+      /*     // Production
 
           const val BASE_URL = "https://api.oqpay.in/"
           const val BASE_URL_IMAGE = "https://api.oqpay.in"
@@ -131,21 +195,22 @@ object ConstantClass {
 
 
        // UAT
-       const val BASE_URL = "https://api.oqpay.co.in/"
+     /*  const val BASE_URL = "https://api.oqpay.co.in/"
        const val BASE_URL_IMAGE_PRODCUT = "https://admin.oqpay.co.in"
-       const val BASE_URL_IMAGE = "https://api.oqpay.co.in"
-      // const val CUSTOMERPPURLLINK= BASE_URL +"api/V1/OQFinance/download"
-       const val CUSTOMERPPURLLINK= "https://github.com/BOS-CENTER-UAT/OQPAY-APK-UAT/releases/download/OQPAY_UAT_Customer_V.2.0.0/OQPAY_Customer_Uat.2.0.0.apk"
+       const val BASE_URL_IMAGE = "https://api.oqpay.co.in"*/
+      /* const val CUSTOMERPPURLLINK= BASE_URL +"api/V1/OQFinance/download"*/
+      // const val CUSTOMERPPURLLINK= "https://github.com/BOS-CENTER-UAT/OQPAY-APK-UAT/releases/download/OQPAY_UAT_Customer_V.2.0.0/OQPAY_Customer_Uat.2.0.0.apk"
 
 
-     // UAT merchant id online
+
+   /*  // UAT merchant id online
       const val PAN_VERIFICATION_REGISTRATION_ID = "AOP-554"
       const val PENNYDROP_REGISTRATION_ID = "AOP-554"
 
 
       //  UAT merchant id offline
       const val PAN_VERIFICATION_REGISTRATION_ID_OFFLINE = "AOP-554"
-      const val PENNYDROP_REGISTRATION_ID_OFFLINE = "AOP-554"
+      const val PENNYDROP_REGISTRATION_ID_OFFLINE = "AOP-554"*/
 
 
      const val SMS_BASE_URL = "http://web.adcruxmedia.in/"
