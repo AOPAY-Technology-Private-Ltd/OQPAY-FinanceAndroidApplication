@@ -8,10 +8,12 @@ import android.app.admin.DevicePolicyManager
 import android.app.usage.UsageStatsManager
 import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.os.UserManager
 import android.util.Base64
 import android.util.Log
 import android.widget.Toast
@@ -60,11 +62,31 @@ fun Context.stopLockSituation() {
     val editor = sharedPref.edit()
     editor.putBoolean("isLocked", false) // key: isLoggedIn, value: true
     editor.apply()
-    try {
-        (this as KioskActivity).finish()
-    }catch (e:Exception){
+
+    if (this is KioskActivity) {
+        try {
+            stopLockIfRunning()
+        } catch (_: Exception) {
+            try {
+                stopLockTask()
+            } catch (_: Exception) {}
+        }
+        finish()
     }
+
+    KioskActivity.finishKiosk()
+    try {
+        val intent = Intent("com.bosandroidapp.aopayfinance.ACTION_UNLOCK_KIOSK").apply {
+            setPackage(packageName)
+        }
+        sendBroadcast(intent)
+    }
+    catch (e: Exception) {
+        Log.e("stopLockSituation", "Error sending unlock broadcast", e)
+    }
+
 }
+
 
 fun Context.startLockSituation() {
     val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
@@ -72,6 +94,7 @@ fun Context.startLockSituation() {
     editor.putBoolean("isLocked", true) // key: isLoggedIn, value: true
     editor.apply()
 }
+
 
 fun Context.startInternetAlertSituation() {
     val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
@@ -93,13 +116,24 @@ fun Context.isInternetAlertSituationCompleted(): Boolean {
     return sharedPref.getBoolean("isInternet", true)
 }
 
-@RequiresApi(Build.VERSION_CODES.R)
 fun Context.setEMICompleted() {
-    this.removeRestrictions()
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        removeRestrictions()
+    } else {
+        val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+        val admin = ComponentName(this, KioskDeviceAdminReceiver::class.java)
+        if (dpm.isDeviceOwnerApp(packageName)) {
+            dpm.clearUserRestriction(admin, UserManager.DISALLOW_FACTORY_RESET)
+            dpm.clearUserRestriction(admin, UserManager.DISALLOW_DEBUGGING_FEATURES)
+            dpm.clearDeviceOwnerApp(packageName)
+            dpm.removeActiveAdmin(admin)
+        }
+    }
     val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
     val editor = sharedPref.edit()
     editor.putBoolean("isEMIsCompleted", true) // key: isLoggedIn, value: true
     editor.apply()
+    stopLockSituation()
 }
 
 fun Context.setEMINotCompleted() {
@@ -117,25 +151,15 @@ fun Context.showToast(message: String) {
 }
 
 fun Context.isAdmin():Boolean{
-    return try {
-        val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
-        val componentName = ComponentName(this, KioskDeviceAdminReceiver::class.java)
-        dpm.isAdminActive(componentName)
-    } catch (e: Exception) {
-        Log.e("Utils", "Error checking isAdmin: ${e.message}")
-        false
-    }
+    val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+    val componentName = ComponentName(this, KioskDeviceAdminReceiver::class.java)
+    return dpm.isAdminActive(componentName)
 }
 
 
 fun Context.isDeviceAdmin():Boolean{
-    return try {
-        val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
-        dpm.isDeviceOwnerApp(packageName)
-    } catch (e: Exception) {
-        Log.e("Utils", "Error checking isDeviceAdmin: ${e.message}")
-        false
-    }
+    val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+    return dpm.isDeviceOwnerApp(packageName)
 }
 
 fun Context.saveToken(data: ByteArray) {
@@ -176,8 +200,8 @@ fun String.isAllowedApp():Boolean{
 }
 
 
- fun Context.isPaymentAppRunning(): Boolean {
-     return getForegroundApp().isAllowedApp()
+fun Context.isPaymentAppRunning(): Boolean {
+    return getForegroundApp().isAllowedApp()
 }
 
 

@@ -27,6 +27,7 @@ class CustomerEMIDetailsAdapter( var context:Context,var customerLoanEmiDetailsL
         var emiamount = binding.emiamount
         var customercode = binding.customercode
         var customername = binding.customername
+        var recordStatus = binding.recordStatus
         var loanstatuscard = binding.loanstatuscard
     }
 
@@ -42,15 +43,31 @@ class CustomerEMIDetailsAdapter( var context:Context,var customerLoanEmiDetailsL
         preference = SharedPreference(context)
         holder.brandName.text= customerLoanEmiDetailsList!![position]!!.brandName
         holder.loanid.text= customerLoanEmiDetailsList!![position]!!.loanCode
+        holder.recordStatus.text= customerLoanEmiDetailsList!![position]!!?.recordStatus ?: ""
         holder.emiamount.text= /*formatIndianAmount(*/customerLoanEmiDetailsList!![position]!!.emiAmount?.toString().takeIf { !it.isNullOrBlank() } ?: "0"/*)*/
         holder.customercode.text= preference.getStringValue(ConstantClass.CustomerCode,"")
         holder.customername.text= preference.getStringValue(ConstantClass.FirstName,"") .plus(" ") .plus(preference.getStringValue(
             ConstantClass.LastName,""))
 
        holder.viewdetailscard.setOnClickListener {
+           val selectedLoanId = customerLoanEmiDetailsList!![position]!!.loanCode ?: ""
+           val selectedCustomerCode = customerLoanEmiDetailsList!![position]!!.customerCode ?: ""
+           val CustomerLoanStatus = customerLoanEmiDetailsList!![position]!!.recordStatus ?: ""
+           val paidEmi = customerLoanEmiDetailsList!![position]!!.paidEMI ?: ""
+           val tenure = customerLoanEmiDetailsList!![position]!!.tenure ?: 0
+
            LoanId= customerLoanEmiDetailsList!![position]!!.loanCode!!
            customerCode= customerLoanEmiDetailsList!![position]!!.customerCode!!
-           context.startActivity(Intent(context, EmiLoanDetailPage::class.java))
+
+          // context.startActivity(Intent(context, EmiLoanDetailPage::class.java))
+
+           if (CustomerLoanStatus.toLowerCase().equals(ConstantClass.Customer_LoanStatus, ignoreCase = true) || paidEmi == tenure.toString()) {
+               val intent = Intent(context, EmiLoanDetailPage::class.java).apply {
+                   putExtra("LoanId", selectedLoanId)
+                   putExtra("customerCode", selectedCustomerCode)
+               }
+               context.startActivity(intent)
+           }
 
        }
 

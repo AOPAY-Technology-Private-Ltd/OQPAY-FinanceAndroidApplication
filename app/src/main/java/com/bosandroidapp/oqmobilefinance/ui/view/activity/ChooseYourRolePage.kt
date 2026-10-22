@@ -22,6 +22,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.ViewModelProvider
+import com.bosandroidapp.oqmobilefinance.BuildConfig
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AppVersion
@@ -178,7 +179,7 @@ class ChooseYourRolePage : BaseActivity() {
         deviceModel= android.os.Build.MODEL
         DeviceBrand = android.os.Build.BRAND
         DeviceOSVersion = android.os.Build.VERSION.RELEASE
-        AppVersion = android.os.Build.VERSION.SDK_INT.toString()
+        AppVersion = BuildConfig.VERSION_NAME
         DeviceName = android.provider.Settings.Global.getString(contentResolver, android.provider.Settings.Global.DEVICE_NAME)
 
         Log.d("DeviceName", "$DeviceName")

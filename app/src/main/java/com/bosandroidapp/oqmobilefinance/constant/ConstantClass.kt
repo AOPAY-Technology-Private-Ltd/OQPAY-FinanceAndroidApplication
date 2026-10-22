@@ -166,6 +166,8 @@ object ConstantClass {
 
      const val FCMTOKEN = "fcmtoken"
      const val UPIAUTOPAY = "UPI Autopay"
+     const val OrganizationName = "Aopay Technology Private Limited"
+     const val Customer_LoanStatus = "disbursed"
 
      const val DEVICEID = "deviceid"
      const val CHECKACCESSIBILITY = "checkAccessibility"
@@ -228,6 +230,8 @@ object ConstantClass {
      const val LAST_GENERATE_TIME = "last_generate_time"
      const val LOAN_REJECT = "LOAN_REJECTED"
      const val DISBURSMENT_REJECT = "DISBURSMENT_REJECTED"
+
+     const val UNINSTALLED = "UNINSTALLED"
      const val UNLOCK = "UNLOCK"
 
      var PanFirstName : String= ""

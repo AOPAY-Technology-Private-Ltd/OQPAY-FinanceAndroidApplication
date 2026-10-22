@@ -15,6 +15,7 @@ object RetrofitClient {
     private var retrofit: Retrofit? = null
 
 
+
     private fun getAllInstance(): Retrofit {
         // Create OkHttpClient with 1-minute timeout settings
 

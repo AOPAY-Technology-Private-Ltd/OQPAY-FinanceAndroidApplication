@@ -214,6 +214,21 @@ class EmiLoanDetailPage : BaseActivity() {
         binding = ActivityEmiLoanDetailPageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+
+        if (savedInstanceState != null) {
+            LoanId = savedInstanceState.getString("LoanId", LoanId)
+            customerCode = savedInstanceState.getString("customerCode", customerCode)
+        } else {
+            intent?.let {
+                if (it.hasExtra("LoanId")) {
+                    LoanId = it.getStringExtra("LoanId") ?: ""
+                }
+                if (it.hasExtra("customerCode")) {
+                    customerCode = it.getStringExtra("customerCode") ?: ""
+                }
+            }
+        }
+
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { view, insets ->
             val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(systemBarsInsets.left, 0, systemBarsInsets.right, systemBarsInsets.bottom)
@@ -246,6 +261,14 @@ class EmiLoanDetailPage : BaseActivity() {
 
     }
 
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putString("LoanId", LoanId)
+        outState.putString("customerCode", customerCode)
+    }
+    
 
     fun hitApiForLogin(retailerOrCustomerCode: String) {
 

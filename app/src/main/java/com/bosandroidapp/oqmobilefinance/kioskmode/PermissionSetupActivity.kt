@@ -19,6 +19,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
+import com.bosandroidapp.oqmobilefinance.BuildConfig
 import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
@@ -203,7 +204,7 @@ class PermissionSetupActivity : AppCompatActivity() {
         deviceModel = android.os.Build.MODEL
         DeviceBrand = android.os.Build.BRAND
         DeviceOSVersion = android.os.Build.VERSION.RELEASE
-        AppVersion = android.os.Build.VERSION.SDK_INT.toString()
+        AppVersion = BuildConfig.VERSION_NAME
         try {
             DeviceName = android.provider.Settings.Global.getString(contentResolver, android.provider.Settings.Global.DEVICE_NAME) ?: "Android Device"
         } catch (e: Exception) {
@@ -221,13 +222,14 @@ class PermissionSetupActivity : AppCompatActivity() {
             deviceName = DeviceName,
             manufacturer = deviceManufacturer
         )
-
+        Log.d("DeviceInfoReq", Gson().toJson(request))
         viewModel.uploadDeviceInfo(request).observe(this) { it ->
             when (it.apiStatus) {
                 ApiStatus.LOADING -> ConstantClass.OpenPopUpForVeryfyOTP(this)
                 ApiStatus.SUCCESS -> {
                     ConstantClass.dialog.dismiss()
                     val response = it.data?.body()
+                    Log.d("DeviceInfoResponse", Gson().toJson(response))
                     if (response != null && response.status == "200") {
                         intentNextPage()
                     } else {

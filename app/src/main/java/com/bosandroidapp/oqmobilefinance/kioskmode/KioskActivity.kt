@@ -3,9 +3,11 @@ package com.bosandroidapp.oqmobilefinance.kioskmode
 import android.app.ActivityManager
 import android.app.ActivityOptions
 import android.app.admin.DevicePolicyManager
+import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -18,6 +20,7 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
@@ -93,8 +96,40 @@ class KioskActivity : BaseActivity() {
     lateinit var dikshifinsureOnlinePGModel: DikshifinsureViewModel
 
 
+    companion object {
+        var instance: com.bosandroidapp.oqmobilefinance.kioskmode.KioskActivity? = null
+        fun finishKiosk() {
+            instance?.let { activity ->
+                activity.runOnUiThread {
+                    try {
+                        activity.stopLockIfRunning()
+                    } catch (e: Exception) {
+                        try {
+                            activity.stopLockTask()
+                        } catch (_: Exception) {}
+                    }
+                    activity.finish()
+                }
+            }
+            instance = null
+        }
+
+    }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        com.bosandroidapp.oqmobilefinance.kioskmode.KioskActivity.Companion.instance = this
+        registerUnlockReceiver()
+
+        if (!isLocked()) {
+            try {
+                stopLockIfRunning()
+            } catch (_: Exception) {}
+            finish()
+            return
+        }
 
         window.exitTransition = null
         window.returnTransition = null
@@ -287,7 +322,45 @@ class KioskActivity : BaseActivity() {
 
     override fun onPause() {
         super.onPause()
-        // if(isLocked()) finish()
+        if (!isLocked()) finish()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterUnlockReceiver()
+        if (com.bosandroidapp.oqmobilefinance.kioskmode.KioskActivity.Companion.instance == this) {
+            com.bosandroidapp.oqmobilefinance.kioskmode.KioskActivity.Companion.instance = null
+        }
+    }
+
+    private val unlockReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == "com.bosandroidapp.aopayfinance.ACTION_UNLOCK_KIOSK") {
+                try {
+                    stopLockIfRunning()
+                } catch (_: Exception) {
+                    try {
+                        stopLockTask()
+                    } catch (_: Exception) {}
+                }
+                finish()
+            }
+        }
+    }
+
+    private fun registerUnlockReceiver() {
+        try {
+            val filter = IntentFilter("com.bosandroidapp.aopayfinance.ACTION_UNLOCK_KIOSK")
+            ContextCompat.registerReceiver(this, unlockReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
+        } catch (e: Exception) {
+            Log.e("KioskActivity", "Error registering unlock receiver", e)
+        }
+    }
+
+    private fun unregisterUnlockReceiver() {
+        try {
+            unregisterReceiver(unlockReceiver)
+        } catch (_: Exception) {}
     }
 
 

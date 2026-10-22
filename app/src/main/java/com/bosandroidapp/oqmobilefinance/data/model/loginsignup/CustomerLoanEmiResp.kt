@@ -114,5 +114,9 @@ data class CustomerDataItem(
 
 
 	@field:SerializedName("loanMode")
-	val loanmode: String? = null
+	val loanmode: String? = null,
+
+	@field:SerializedName("recordStatus")
+	val recordStatus: String? = null
+
 )

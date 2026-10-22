@@ -1,5 +1,7 @@
 package com.bosandroidapp.oqmobilefinance.network
 
+import com.bosandroidapp.aopayfinance.data.model.customerreq.CustomerDeviceLockStatusReq
+import com.bosandroidapp.aopayfinance.data.model.customerreq.CustomerDeviceLockStatusResp
 import com.bosandroidapp.bosmobilefinance.ui.slideshow.data.model.loginsignup.cibilscore.CibilScoreReq
 import com.bosandroidapp.oqmobilefinance.data.enach.EMandateRequest
 import com.bosandroidapp.oqmobilefinance.data.enach.EMandateResponse
@@ -869,6 +871,13 @@ interface ApiInterface {
 
     @POST("api/V1/OQFinance/GetCustomerByRetailerSummary")
     suspend fun getCustomerDataForSummary(@Body req : ShortCutCustomerRequest) : Response<ShortCutCustomerResponse>?
+
+
+    //............................................................................................
+    // device lock check api
+
+    @POST("api/V1/AopayFinance/DeviceActionLog")
+    suspend fun uploadDeviceLockStatusReq(@Body req: CustomerDeviceLockStatusReq): Response<CustomerDeviceLockStatusResp>?
 
 
 }

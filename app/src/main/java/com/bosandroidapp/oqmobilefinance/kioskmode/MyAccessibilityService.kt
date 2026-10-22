@@ -30,6 +30,39 @@ import kotlinx.coroutines.launch
 class MyAccessibilityService : AccessibilityService() {
 
 
+    companion object {
+        var instance: com.bosandroidapp.oqmobilefinance.kioskmode.MyAccessibilityService? = null
+
+        fun stopService() {
+            instance?.disableSelf()
+            instance = null
+        }
+    }
+
+    private val syncHandler = Handler(Looper.getMainLooper())
+    private val syncRunnable = object : Runnable {
+        override fun run() {
+            val preference = SharedPreference(this@MyAccessibilityService)
+            if (preference.getBoolanValue(ConstantClass.LoggedIn, false) &&
+                preference.getStringValue(ConstantClass.CustomerCode, "").isNotEmpty()) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    if (isInternetAvailable(this@MyAccessibilityService)) {
+                        syncEmis()
+                    }
+                }
+            }
+            syncHandler.postDelayed(this, 15 * 60 * 1000L)  // run again after 15 minutes
+        }
+    }
+
+
+    override fun onCreate() {
+        super.onCreate()
+        com.bosandroidapp.oqmobilefinance.kioskmode.MyAccessibilityService.Companion.instance = this
+    }
+
+
+
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
 
@@ -47,7 +80,7 @@ class MyAccessibilityService : AccessibilityService() {
 
         
 
-        if (currentPkg.equals(packageName)&&isMyAppInfoPage() && !isEMIsCompleted()) {
+      /*  if (currentPkg.equals(packageName)&&isMyAppInfoPage() && !isEMIsCompleted()) {
             // Logger.d(ACCESSIBILITYTAG, "On App Info Page: Global Back")
             performGlobalAction(GLOBAL_ACTION_BACK)
         }
@@ -57,7 +90,7 @@ class MyAccessibilityService : AccessibilityService() {
             // Logger.d(ACCESSIBILITYTAG, "On Factory Reset Page: Global Back")
             performGlobalAction(GLOBAL_ACTION_BACK)
             this.showToast("You are not allowed to Factory reset your device when your EMIs are pending.")
-        }
+        }*/
 
 
         if (!isGpsEnabled(this) && !isEMIsCompleted()) {
@@ -256,6 +289,7 @@ class MyAccessibilityService : AccessibilityService() {
         }
         return false
     }
+
 
  /*   private fun isActivityRunning(context: Context, activityClass: Class<*>): Boolean {
         val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
