@@ -1,7 +1,9 @@
 package com.bosandroidapp.oqmobilefinance.network
 
+import com.bosandroidapp.oqmobilefinance.BuildConfig
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.google.gson.GsonBuilder
+import okhttp3.Interceptor
 /*import com.stacker.stacker.StackerOkHttpInterceptor*/
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -14,13 +16,20 @@ object RetrofitClient {
 
     private var retrofit: Retrofit? = null
 
+    private val headerInterceptor = Interceptor { chain ->
+        val originalRequest = chain.request()
+        val requestWithHeaders = originalRequest.newBuilder()
+            .header("X-App-Version", BuildConfig.VERSION_NAME)
+            .build()
+        chain.proceed(requestWithHeaders)
+    }
 
     private fun getAllInstance(): Retrofit {
         // Create OkHttpClient with 1-minute timeout settings
 
-
         val okHttpClient = OkHttpClient.Builder()
             .retryOnConnectionFailure(true)
+            .addInterceptor(headerInterceptor)
             /*.addInterceptor(StackerOkHttpInterceptor())*/
             .addInterceptor(AuthInterceptor())
             .authenticator(AuthAuthenticator())
@@ -42,6 +51,7 @@ object RetrofitClient {
     private fun getAllInstanceSMS(): Retrofit{
         // Create OkHttpClient with 1-minute timeout settings
         val okHttpClient = OkHttpClient.Builder()
+            .addInterceptor(headerInterceptor)
            /* .addInterceptor(StackerOkHttpInterceptor())*/
             .connectTimeout(120, TimeUnit.SECONDS) // Connection timeout
             .readTimeout(120, TimeUnit.SECONDS)      // server response time
@@ -61,6 +71,7 @@ object RetrofitClient {
     private fun getAllInstancePAN(): Retrofit{
         // Create OkHttpClient with 1-minute timeout settings
         val okHttpClient = OkHttpClient.Builder()
+            .addInterceptor(headerInterceptor)
            /* .addInterceptor(StackerOkHttpInterceptor())*/
             .connectTimeout(60, TimeUnit.SECONDS) // Connection timeout
             .readTimeout(60, TimeUnit.SECONDS)    // Read timeout
@@ -80,6 +91,7 @@ object RetrofitClient {
     private fun getInstanceOnlinePG(): Retrofit{
         // Create OkHttpClient with 1-minute timeout settings
         val okHttpClient = OkHttpClient.Builder()
+            .addInterceptor(headerInterceptor)
           /*  .addInterceptor(StackerOkHttpInterceptor())*/
             .connectTimeout(60, TimeUnit.SECONDS) // Connection timeout
             .readTimeout(60, TimeUnit.SECONDS)    // Read timeout
@@ -94,8 +106,6 @@ object RetrofitClient {
             .addConverterFactory(GsonConverterFactory.create(GsonBuilder().setLenient().create()))
             .build()
     }
-
-
 
 
     val apiInterface: ApiInterface = getAllInstance().create(ApiInterface::class.java)

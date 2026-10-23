@@ -132,10 +132,18 @@ class AadharCardVerificationPage : BaseActivity() {
 
         }else{
             if(front){
-                photoFrontUri= null
+                photoFrontUri=null
+                binding.frontcardimage.visibility = View.GONE
+                binding.frontcardicon.visibility = View.VISIBLE
+                binding.frontcardimage.setImageDrawable(null)
+                binding.uploadtextfront.setText(R.string.clickdocument)
             }
             else{
-                photoBackUri = null
+                photoBackUri=null
+                binding.backcardimage.visibility = View.GONE
+                binding.camerabackicon.visibility = View.VISIBLE
+                binding.backcardimage.setImageDrawable(null)
+                binding.uploadtextback.setText(R.string.clickdocument)
             }
         }
 

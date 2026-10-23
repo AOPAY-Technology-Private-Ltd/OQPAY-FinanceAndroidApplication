@@ -85,14 +85,14 @@ class ApplicationClass : Application() {
         })
 
 
-      /*  ProvisionerJatt.initialize(
+        ProvisionerJatt.initialize(
             this,
             ProvisionerOptions(
                 pairingColors = PairingDialogColors(),
                 pairingWatermarkResId = com.bosandroidapp.oqmobilefinance.R.drawable.logosplash, // omit for none
                 showProvisionerDialog = true, // default; pass false to skip
             ),
-        )*/
+        )
 
     }
 

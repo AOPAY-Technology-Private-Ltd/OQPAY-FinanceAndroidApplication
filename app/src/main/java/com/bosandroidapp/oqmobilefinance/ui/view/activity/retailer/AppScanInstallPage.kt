@@ -34,6 +34,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
+import com.beastblocks.provisionerjattsdk.PairStatus
+import com.beastblocks.provisionerjattsdk.PairingModeSwitch
 import com.beastblocks.provisionerjattsdk.ProvisionerClient
 import com.beastblocks.provisionerjattsdk.ProvisionerJatt
 import com.beastblocks.provisionerjattsdk.ProvisionerJattListener
@@ -139,6 +141,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import kotlin.math.roundToInt
+import kotlin.text.clear
 import kotlin.toString
 
 class AppScanInstallPage : BaseActivity() {
@@ -149,6 +152,12 @@ class AppScanInstallPage : BaseActivity() {
     private  var invoicePhotoUri: Uri? = null
     private lateinit var client: ProvisionerClient
     private lateinit var callback : ProvisionerJattListener
+
+    private var pairStatus: PairStatus? = null
+    private var isDialogClosed: Boolean = false
+    private var isModeSwitching: Boolean = false
+
+    private val isPairConnected: Boolean get() = pairStatus != null
 
 
     companion object{
@@ -171,8 +180,11 @@ class AppScanInstallPage : BaseActivity() {
         }
         else{
             invoicePhotoUri = null
+            Invoive_Path = null
+            Glide.with(this).clear(binding.invoiceImage)
             binding.invoiceImage.visibility= View.GONE
             binding.btnUploadToServer.visibility = View.GONE
+            binding.tvUploadText.text = "Click to Upload Invoice"
         }
 
     }
@@ -297,6 +309,7 @@ class AppScanInstallPage : BaseActivity() {
                         Log.d("onProvisioningStatusUpdate", "${status}")
                         runOnUiThread {
                             // showAppInstalledSuccessPopUp()
+                            if (::client.isInitialized) client.detach(this@AppScanInstallPage)
                         }
                     }
                     else -> {
@@ -305,6 +318,87 @@ class AppScanInstallPage : BaseActivity() {
                 }
             }
 
+            override fun onQRDialogClosed() {
+                super.onQRDialogClosed()
+                Log.d("Dialog", "QR Closed")
+                if (isModeSwitching) {
+                    Log.d("Dialog", "QR Closed during mode switch: Not detaching")
+                    isModeSwitching = false
+                    return
+                }
+                isDialogClosed = true
+                if (!isPairConnected) {
+                    if (::client.isInitialized) client.detach(this@AppScanInstallPage)
+                    pairStatus = null
+                } else {
+                    Log.d("Dialog", "QR Closed: Not detaching because pairStatus is $pairStatus")
+                }
+            }
+
+
+            override fun onPairingDialogClosed() {
+                super.onPairingDialogClosed()
+                Log.d("Dialog", "Pair Closed")
+                if (isModeSwitching) {
+                    Log.d("Dialog", "Pair Closed during mode switch: Not detaching")
+                    isModeSwitching = false
+                    return
+                }
+                isDialogClosed = true
+                if (!isPairConnected) {
+                    if (::client.isInitialized) client.detach(this@AppScanInstallPage)
+                    pairStatus = null
+                } else {
+                    Log.d("Dialog", "Pair Closed: Not detaching because pairStatus is $pairStatus")
+                }
+            }
+
+
+            override fun onProvisioningDialogClosed() {
+                super.onProvisioningDialogClosed()
+                Log.d("Dialog", "Provisioning Closed")
+            }
+
+
+            override fun onQRDialogInvoked() {
+                super.onQRDialogInvoked()
+                Log.d("Dialog", "QRDialogInvoked")
+                isDialogClosed = false
+            }
+
+
+            override fun onPairingDialogInvoked() {
+                super.onPairingDialogInvoked()
+                Log.d("Dialog", "PairingDialogInvoked")
+                isDialogClosed = false
+            }
+
+
+            override fun onProvisioningDialogInvoked() {
+                super.onProvisioningDialogInvoked()
+                Log.d("Dialog", "ProvisioningDialogInvoked")
+            }
+
+
+            override fun onPairingModeSwitch(change: PairingModeSwitch) {
+                super.onPairingModeSwitch(change)
+                Log.d("Dialog", "PairingModeSwitch: $change")
+                isModeSwitching = true
+            }
+
+
+            override fun onPairStatusUpdate(status: PairStatus) {
+                super.onPairStatusUpdate(status)
+                pairStatus = status
+                Log.d("Dialog", "PairStatusUpdate: $status")
+            }
+
+
+            override fun onQRPairCodeStatusUpdate(status: PairStatus) {
+                super.onQRPairCodeStatusUpdate(status)
+                pairStatus = status
+                Log.d("Dialog", "QRPairCodeStatusUpdate: $status")
+            }
 
         }
 
@@ -316,9 +410,12 @@ class AppScanInstallPage : BaseActivity() {
     }
 
 
-
     fun startProvisioning(){
-        client.detach(this)
+        isDialogClosed = false
+        isModeSwitching = false
+        pairStatus = null
+        ProvisionerJatt.resetSession()
+        if (::client.isInitialized) client.detach(this)
         client.clearAutomationAndSerial()
         client.scanThenAutomateThenAttach(this, this, packageName, ConstantClass.CUSTOMERPPURLLINK, callback )
 
@@ -326,9 +423,21 @@ class AppScanInstallPage : BaseActivity() {
 
 
     override fun onDestroy() {
+        pairStatus = null
         if (::client.isInitialized) client.detach(this)
         super.onDestroy()
     }
+
+
+
+    override fun onPause() {
+        super.onPause()
+        if (!isModeSwitching && (isDialogClosed || !isPairConnected)) {
+            if (::client.isInitialized) client.detach(this)
+            pairStatus = null
+        }
+    }
+
 
 
 
@@ -397,7 +506,6 @@ class AppScanInstallPage : BaseActivity() {
             Toast.makeText(this, "Error processing invoice: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
-
 
 
 

@@ -168,6 +168,7 @@ import java.net.UnknownHostException
 import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlin.code
+import kotlin.text.clear
 
 
 class NewCustomerRegistrationPage : BaseActivity() {
@@ -223,7 +224,10 @@ class NewCustomerRegistrationPage : BaseActivity() {
             }
             else{
                 photoUri = null
-                customerImagePath=""
+                customerImagePath = ""
+                Glide.with(this).clear(binding.userimage)
+                binding.userimage.visibility = View.GONE
+                binding.lockimage.visibility = View.VISIBLE
             }
 
         }
