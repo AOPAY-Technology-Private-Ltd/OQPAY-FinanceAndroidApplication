@@ -272,7 +272,7 @@ class DashBoard : BaseActivity() {
 
             hitApiForLogin(preference.getStringValue(ConstantClass.RetailerCode, ""))
 
-            var request = SendNotificationFeatureNameRequest(
+          /*  var request = SendNotificationFeatureNameRequest(
                 clientCode = preference.getStringValue(ConstantClass.ClientCode,""),
                 customerCode =  preference.getStringValue(ConstantClass.CustomerCode,""),
                 retailerCode = preference.getStringValue(ConstantClass.RetailerCode,""),
@@ -280,7 +280,7 @@ class DashBoard : BaseActivity() {
                 message = "Hello",
                 notificationCode = "EMI_OVERDUE"
             )
-            sendDataOnServerForFeatureActivate(request)
+            sendDataOnServerForFeatureActivate(request)*/
         }
 
     }

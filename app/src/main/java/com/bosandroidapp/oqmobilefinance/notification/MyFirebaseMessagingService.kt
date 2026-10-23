@@ -53,6 +53,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
 
+
     fun passNotificationCode(notificationCode: String){
         val dpm = applicationContext.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
         val admin = ComponentName(applicationContext, KioskDeviceAdminReceiver::class.java)
@@ -85,7 +86,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                     dpm.clearUserRestriction(admin, UserManager.DISALLOW_DEBUGGING_FEATURES)
                     dpm.clearDeviceOwnerApp(getPackageName())
                     dpm.removeActiveAdmin(admin)
-                    hitApiForDeviceLockStatus(true, "CUSTOMER_UNINSTALLED")
+                    hitApiForDeviceLockStatus(true, "APP_UNINSTALLED")
                 }
 
                 // 4. Open App Info settings screen easily
@@ -104,14 +105,14 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             }
 
 
-            ConstantClass.UNLOCK -> {
+            ConstantClass.UNLOCK , ConstantClass.LOCK -> {
                 Log.d("FCM_UNLOCK", "Unlock notification received")
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                     runBlocking {
                         applicationContext.forceSyncEmis()
                         if(ConstantClass.UNLOCK==notificationCode){
-                            hitApiForDeviceLockStatus(true,"CUSTOMER_UNLOCKED")
+                            hitApiForDeviceLockStatus(true,"PHONE_UNLOCKED")
                         }
                     }
                 }
@@ -126,6 +127,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         }
 
     }
+
 
     fun hitApiForDeviceLockStatus(status: Boolean, actionName: String) {
         val preference = SharedPreference(this)
@@ -162,7 +164,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         super.onNewToken(token)
     }
-
 
 
 }

@@ -152,7 +152,7 @@ object ConstantClass {
 
 
     // Change current environment here: RELEASE_UAT | STAGING | DEV | PRODUCTION
-    val CURRENT_ENVIRONMENT = AppEnvironment.STAGING
+    val CURRENT_ENVIRONMENT = AppEnvironment.DEV
 
     val BASE_URL = CURRENT_ENVIRONMENT.baseUrl
     val BASE_URL_IMAGE = CURRENT_ENVIRONMENT.baseUrlImage
@@ -296,6 +296,7 @@ object ConstantClass {
 
      const val UNINSTALLED = "UNINSTALLED"
      const val UNLOCK = "UNLOCK"
+     const val LOCK = "LOCK"
      const val LOANCLOSE = "Close"
 
      var PanFirstName : String= ""

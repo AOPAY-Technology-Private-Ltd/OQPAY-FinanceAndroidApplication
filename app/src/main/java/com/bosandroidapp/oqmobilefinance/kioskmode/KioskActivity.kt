@@ -711,7 +711,7 @@ class KioskActivity : BaseActivity() {
             manufacturer = Build.MANUFACTURER,
             performedAt = ConstantClass.getCurrentUtcTimestamp(),
             appPackageName = packageName,
-            actionName =  "PHONE_LOCK"
+            actionName =  "PHONE_LOCKED"
         )
 
         Log.d("DeviceLockStatusReq", Gson().toJson(req))

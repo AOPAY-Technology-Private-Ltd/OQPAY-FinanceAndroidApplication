@@ -22,7 +22,8 @@ class AuthInterceptor : Interceptor {
                 path.contains("RefreshToken") || 
                 path.contains("ForgotPassword") || 
                 path.contains("SendOTP") ||
-                path.contains("VerifyOTP")
+                path.contains("VerifyOTP")||
+                path.contains("GetUpdateProfile")
 
         if (!isPublicEndpoint) {
             val preference = SharedPreference(ApplicationClass.instance)
@@ -37,14 +38,14 @@ class AuthInterceptor : Interceptor {
         if (response.code == 403) {
             Log.e("AuthInterceptor", "403 Forbidden - Redirecting to login $path")
             
-           /* val preference = SharedPreference(ApplicationClass.instance)
+            val preference = SharedPreference(ApplicationClass.instance)
             preference.setBooleanValue(ConstantClass.LoggedIn, false)
             preference.setStringValue(ConstantClass.AccessToken, "")
             preference.setStringValue(ConstantClass.RefreshToken, "")
 
             val intent = Intent(ApplicationClass.instance, ChooseYourRolePage::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-            ApplicationClass.instance.startActivity(intent)*/
+            ApplicationClass.instance.startActivity(intent)
         }
 
         return response
