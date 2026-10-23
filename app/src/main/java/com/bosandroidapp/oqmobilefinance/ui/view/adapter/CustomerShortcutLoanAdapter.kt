@@ -64,37 +64,37 @@ class CustomerShortcutLoanAdapter(
 
         when (item.currentStep){
             "0" -> {
-                statusText = "Pending Customer"
+                statusText = "Customer Pending"
                 statusColor = R.color.customerpendingcolor
             }
 
             "1"-> {
-                statusText = "Pending Product"
+                statusText = "Product Pending"
                 statusColor = R.color.colorPrimary
             }
 
             "2"->{
-                statusText = "Pending Bank"
+                statusText = "Bank Pending"
                 statusColor = R.color.orange
             }
 
             "3" -> {
-                statusText = "Pending UPIMandate"
+                statusText = "Mandate Pending"
                 statusColor = R.color.lightpink
             }
 
             "4"-> {
-                statusText = "Pending Reference"
+                statusText = "Reference Pending"
                 statusColor = R.color.yellow
             }
 
             "5"-> {
-                statusText = "Pending IMEIDetails"
+                statusText = "IMEIDetails Pending"
                 statusColor = R.color.blue
             }
 
             "6"->{
-                statusText = "Pending Loan"
+                statusText = "Loan Pending"
                 statusColor = R.color.red
             }
 
