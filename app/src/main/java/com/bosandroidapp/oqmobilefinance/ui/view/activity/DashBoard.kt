@@ -324,7 +324,8 @@ class DashBoard : BaseActivity() {
              binding.navAddaccount.visibility = View.VISIBLE
             binding.appBarDashBoard.deskdesign.subtitle.text = "One Tap to Your Next Loan"
 
-        } else {
+        }
+        else {
             binding.navWallet.visibility = View.GONE
             binding.navAddaccount.visibility = View.GONE
             binding.appBarDashBoard.deskdesign.retailersDashboard.visibility = View.GONE
@@ -333,8 +334,9 @@ class DashBoard : BaseActivity() {
 
             var accessKey = preference.getBoolanValue(ConstantClass.CustomerAccessKey,false)
             var generateKey = preference.getStringValue(ConstantClass.GENERATEKEY,"")
+            var alreadyCustomerLoggedIn = preference.getStringValue(ConstantClass.AlreadyCustomerLoggedIn,"")
 
-            if(accessKey){
+           /* if(accessKey){
                 binding.appBarDashBoard.deskdesign.customerGenerateKeyLayout.visibility = View.GONE
                 binding.appBarDashBoard.deskdesign.customerdashboardItemlayout.visibility = View.VISIBLE
             }
@@ -351,6 +353,15 @@ class DashBoard : BaseActivity() {
                     binding.appBarDashBoard.deskdesign.clicktologin.visibility = View.GONE
                 }
 
+            }*/
+
+            if(accessKey || alreadyCustomerLoggedIn.toLowerCase().equals("true",ignoreCase = true)){
+                binding.appBarDashBoard.deskdesign.customerGenerateKeyLayout.visibility = View.GONE
+                binding.appBarDashBoard.deskdesign.customerdashboardItemlayout.visibility = View.VISIBLE
+            }
+            else{
+                binding.appBarDashBoard.deskdesign.customerGenerateKeyLayout.visibility = View.VISIBLE
+                binding.appBarDashBoard.deskdesign.customerdashboardItemlayout.visibility = View.GONE
             }
 
 

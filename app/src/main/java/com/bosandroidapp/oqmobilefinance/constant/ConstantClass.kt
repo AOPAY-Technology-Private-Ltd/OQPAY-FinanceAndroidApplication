@@ -237,6 +237,7 @@ object ConstantClass {
      const val LoanSuccessStatus = "success"
      const val DeviceType = "Android"
      const val ClientCode = "clientcode"
+     const val AlreadyCustomerLoggedIn = "alreadycustomerloggedin"
      const val DefaulterEmiDebitAutoApproved ="admin"
      const val DefaulterEmiDebitPending ="retailer"
      var LoanStatus ="Pending"

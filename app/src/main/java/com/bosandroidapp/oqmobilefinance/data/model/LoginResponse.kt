@@ -61,5 +61,8 @@ data class LoggedData(
 	val mobileNo: String? = null,
 
 	@field:SerializedName("panNumber")
-	val panNumber: String? = null
+	val panNumber: String? = null,
+
+	@SerializedName("isCustomerLoggedIn")
+	val isCustomerLoggedIn: String? = ""
 )

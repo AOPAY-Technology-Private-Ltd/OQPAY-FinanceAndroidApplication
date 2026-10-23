@@ -193,7 +193,7 @@ class LoginPage : BaseActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
-        binding.loginlayout.setOnClickListener {
+/*        binding.loginlayout.setOnClickListener {
             var emailOfMobile = binding.emailormobilenumber.text.toString().trim()
             var password = binding.password.text.toString().trim()
 
@@ -210,7 +210,7 @@ class LoginPage : BaseActivity() {
                 }
             }
 
-        }
+        }*/
 
         binding.forgetpageLayout.setOnClickListener {
             val mainIntent = Intent(this@LoginPage, ForgetPasswordPage::class.java)
@@ -299,6 +299,7 @@ class LoginPage : BaseActivity() {
                                 preference.setStringValue(ConstantClass.LoginMobileorMailid, emailOfMobile)
                                 preference.setStringValue(ConstantClass.Loginpassword, password)
                                 preference.setStringValue(ConstantClass.ClientCode, "CMP0005")
+                                preference.setStringValue(ConstantClass.AlreadyCustomerLoggedIn, getData.isCustomerLoggedIn.toString())
 
                                 val req = NotificationSendTokenRequest(
                                     deviceType = ConstantClass.DeviceType,
@@ -307,6 +308,7 @@ class LoginPage : BaseActivity() {
                                     retailerCode = getData.retailerCode.toString(),
                                     fcmToken = FireBaseToken
                                 )
+
                                 sendDataOnServerForUploadToken(req)
 
                                 val  intent = Intent(this@LoginPage, DashBoard::class.java)
