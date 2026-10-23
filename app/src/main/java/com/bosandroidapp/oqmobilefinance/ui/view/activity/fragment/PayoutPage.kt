@@ -90,13 +90,9 @@ class PayoutPage : Fragment() {
         // Inflate the layout for this fragment
         binding = FragmentPayoutPageBinding.inflate(layoutInflater, container, false)
         preference = SharedPreference(requireContext())
-        viewModel = ViewModelProvider(
-            this,
-            CommonViewModelFactory(AuthRepository(RetrofitClient.apiInterface))
-        )[AuthenticationViewModel::class.java]
+        viewModel = ViewModelProvider(this, CommonViewModelFactory(AuthRepository(RetrofitClient.apiInterface)))[AuthenticationViewModel::class.java]
 
-        lifecycleScope.launch {
-            val date = withContext(Dispatchers.IO) {
+        lifecycleScope.launch { val date = withContext(Dispatchers.IO) {
                 getNetworkTime(context)
             }
             currentDate = formatToMMDDYYYY(date.first?.formatDate().orEmpty())
