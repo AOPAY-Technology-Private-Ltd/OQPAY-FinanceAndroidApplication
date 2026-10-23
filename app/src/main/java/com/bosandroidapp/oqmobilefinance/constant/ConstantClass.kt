@@ -152,7 +152,7 @@ object ConstantClass {
 
 
     // Change current environment here: RELEASE_UAT | STAGING | DEV | PRODUCTION
-    val CURRENT_ENVIRONMENT = AppEnvironment.DEV
+    val CURRENT_ENVIRONMENT = AppEnvironment.STAGING
 
     val BASE_URL = CURRENT_ENVIRONMENT.baseUrl
     val BASE_URL_IMAGE = CURRENT_ENVIRONMENT.baseUrlImage
@@ -1066,6 +1066,7 @@ object ConstantClass {
             }
         }
     }
+
 
     fun formatToMMDDYYYY(dateStr: String): String {
         val inputFormat = SimpleDateFormat("d/M/yyyy", Locale.getDefault())

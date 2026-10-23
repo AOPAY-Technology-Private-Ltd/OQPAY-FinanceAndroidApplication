@@ -49,7 +49,7 @@ class KioskDeviceAdminReceiver : DeviceAdminReceiver(){
             )
             dpm.addUserRestriction(admin, UserManager.DISALLOW_FACTORY_RESET)
             dpm.setOrganizationName(admin, ConstantClass.OrganizationName)
-            dpm.addUserRestriction(admin, UserManager.DISALLOW_DEBUGGING_FEATURES)
+            //dpm.addUserRestriction(admin, UserManager.DISALLOW_DEBUGGING_FEATURES)
             dpm.setPermittedAccessibilityServices(admin, Arrays.asList(context.packageName))
             dpm.setPermissionGrantState(admin, context.packageName, "android.permission.ACCESS_FINE_LOCATION", DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED)
             dpm.setPermissionGrantState(admin, context.packageName, "android.permission.ACCESS_BACKGROUND_LOCATION", DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED)
@@ -66,6 +66,7 @@ class KioskDeviceAdminReceiver : DeviceAdminReceiver(){
         context.startActivity(intent)
 
     }
+
 
     fun performDpcProvision(context: Context){
         //  This is where you set up kiosk mode

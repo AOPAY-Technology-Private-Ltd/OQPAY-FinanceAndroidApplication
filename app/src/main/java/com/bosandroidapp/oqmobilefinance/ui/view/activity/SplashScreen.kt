@@ -61,7 +61,8 @@ class SplashScreen : AppCompatActivity() {
         if (ConstantClass.CURRENT_ENVIRONMENT != ConstantClass.AppEnvironment.PRODUCTION) {
             binding.uattext.text = ConstantClass.CURRENT_ENVIRONMENT.envName
             binding.uattext.visibility = View.VISIBLE
-        } else {
+        }
+        else {
             binding.uattext.visibility = View.GONE
         }
 

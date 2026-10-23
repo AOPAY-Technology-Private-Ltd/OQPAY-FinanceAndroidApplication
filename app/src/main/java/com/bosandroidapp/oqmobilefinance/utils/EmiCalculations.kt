@@ -88,6 +88,7 @@ suspend fun Context.syncEmis() = withContext(Dispatchers.IO) {
             Logger.d(ACCESSIBILITYTAG, "Syncing EMIs")
             Log.d("Loanreq", Gson().toJson(loanemireq))
             val loanDetails = getCustomerLoanEmiDetailsReq(loanemireq)
+
             if (loanDetails != null && loanDetails.isSuccessful) {
                 currentDate = loanDetails.body()?.indiaTimeIST?.convertDate() ?: currentDate
                 val list = loanDetails.body()?.data?.toList()
@@ -240,7 +241,7 @@ private suspend fun Context.isEMIDue(sharedPref: SharedPreferences) = withContex
 
 
 
-fun String.toFormattedDate(): String {
+/*fun String.toFormattedDate(): String {
     return try {
         val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val outputFormat = SimpleDateFormat("d/M/yyyy", Locale.getDefault())
@@ -249,7 +250,47 @@ fun String.toFormattedDate(): String {
     } catch (e: Exception) {
         this // return original if parsing fails
     }
-}
+}*/
+
+
+fun String.toFormattedDate(): String {
+    val inputFormats = listOf(
+        "yyyy-MM-dd",
+        "yyyy/MM/dd",
+        "dd-MM-yyyy",
+        "dd/MM/yyyy",
+        "MM-dd-yyyy",
+        "MM/dd/yyyy",
+        "yyyy-MM-dd HH:mm:ss",
+        "yyyy/MM/dd HH:mm:ss",
+        "dd-MM-yyyy HH:mm:ss",
+        "dd/MM/yyyy HH:mm:ss",
+        "yyyy-MM-dd'T'HH:mm:ss",
+        "yyyy-MM-dd'T'HH:mm:ss.SSS",
+        "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+        "yyyy-MM-dd'T'HH:mm:ss'Z'",
+        "d/M/yyyy",
+        "d-M-yyyy",
+        "MMM dd, yyyy",
+        "dd MMM yyyy",
+        "MMMM dd, yyyy",
+        "EEE MMM dd HH:mm:ss zzz yyyy" )
+
+    val outputFormat = SimpleDateFormat("d/M/yyyy", Locale.getDefault())
+
+    for (format in inputFormats) {
+        try {
+            val inputFormat = SimpleDateFormat(format, Locale.ENGLISH).apply { isLenient = false }
+            val date = inputFormat.parse(this.trim())
+            if (date != null)
+            { return outputFormat.format(date) }
+        }  catch (_: Exception) {
+           // Try the next format
+         }
+        }
+       return this // Return original string if no format matches
+
+    }
 
 
 private fun String.getJumpedDate(paidMonths: Long): String {

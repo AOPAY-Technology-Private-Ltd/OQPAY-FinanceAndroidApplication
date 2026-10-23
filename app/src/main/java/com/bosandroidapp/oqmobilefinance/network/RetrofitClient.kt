@@ -24,6 +24,7 @@ object RetrofitClient {
         chain.proceed(requestWithHeaders)
     }
 
+
     private fun getAllInstance(): Retrofit {
         // Create OkHttpClient with 1-minute timeout settings
 
