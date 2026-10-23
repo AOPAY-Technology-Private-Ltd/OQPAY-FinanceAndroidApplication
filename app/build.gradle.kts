@@ -14,8 +14,8 @@ android {
         applicationId = "com.bosandroidapp.oqmobilefinance"
         minSdk = 27
         targetSdk = 36
-        versionCode = 10
-        versionName = "2.0.0" // pro 1.0.7
+        versionCode = 12
+        versionName = "2.0.2" // pro 1.0.7   // 2.0.1 uat
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -64,6 +64,7 @@ android {
 
 
 dependencies {
+
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
@@ -134,6 +135,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
 
 
    /* val stacker = "com.github.jatinsinghsatija.Stacker"
