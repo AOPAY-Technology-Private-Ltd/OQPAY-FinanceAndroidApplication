@@ -48,6 +48,8 @@ import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityCustomerReportsPageBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.formatDateToFullMonth
+import com.bosandroidapp.oqmobilefinance.data.model.CustomerReportDataItem
+import com.bosandroidapp.oqmobilefinance.data.model.CustomerReportsReq
 import com.bosandroidapp.oqmobilefinance.data.model.SessionOutReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.reports.GetReportsReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.reports.ReportsDataItem
@@ -71,7 +73,7 @@ class CustomerReportsPage : BaseActivity() ,CustomerReportListAdapter.onClickLis
     lateinit var binding: ActivityCustomerReportsPageBinding
     lateinit var preference: SharedPreference
     lateinit var viewModel: AuthenticationViewModel
-    var ReportDataList: MutableList<com.bosandroidapp.oqmobilefinance.data.model.loginsignup.reports.ReportsDataItem> = mutableListOf()
+    var ReportDataList: MutableList<CustomerReportDataItem> = mutableListOf()
     lateinit var reportAdapter: CustomerReportListAdapter
     private lateinit var htmlTemplate: String
     var webViewContentbitmap: Bitmap ?= null
@@ -142,12 +144,12 @@ class CustomerReportsPage : BaseActivity() ,CustomerReportListAdapter.onClickLis
                 }
                 val selectedItem = parent.getItemAtPosition(position).toString()
 
-                if (selectedItem.equals("Approved")) {
+                /*if (selectedItem.equals("Approved")) {
                     hitApiForGetReports("Disbursed")
                 } else {
                     hitApiForGetReports(selectedItem)
-                }
-
+                }*/
+                hitApiForGetReports(selectedItem)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {
@@ -174,35 +176,50 @@ class CustomerReportsPage : BaseActivity() ,CustomerReportListAdapter.onClickLis
         var customerCode = preference.getStringValue(ConstantClass.CustomerCode, "")
         var recordStatus = reporttype
 
-        var reportreq = GetReportsReq(
+       /* var reportreq = GetReportsReq(
             retailercode = "",
             recordStatus = recordStatus,
             customercode = customerCode,
             fromDate = null,
             toDate = null
+        )*/
+
+        var reportreq = CustomerReportsReq(
+            loanCode = "",
+            recordStatus = recordStatus,
+            customerCode = customerCode,
         )
         Log.d("ReportReq", Gson().toJson(reportreq))
-        viewModel.getReportsReq(reportreq).observe(this) { resources ->
+
+        viewModel.getCustomerReportsStatusReq(reportreq).observe(this) { resources ->
             resources.let {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
                         it.data?.let { users ->
-                            users.body()?.let { response ->
-                                ConstantClass.dialog.dismiss()
-                                ReportDataList = response.data!!.toMutableList()
-                                Log.d("ReportResponse", Gson().toJson(ReportDataList))
-                                if (ReportDataList.size > 0) {
-                                    binding.showreports.visibility = View.VISIBLE
-                                    binding.notfoundimage.visibility = View.GONE
-                                    reportAdapter = CustomerReportListAdapter(ReportDataList, this, ConstantClass.Customer,this)
-                                    binding.showreports.adapter = reportAdapter
-                                    reportAdapter.notifyDataSetChanged()
+                            if(users.isSuccessful){
+                                users.body()?.let { response ->
+                                    ConstantClass.dialog.dismiss()
+                                    ReportDataList = response.data!!.toMutableList() as MutableList<CustomerReportDataItem>
+                                    Log.d("ReportResponse", Gson().toJson(ReportDataList))
+                                    if (ReportDataList.size > 0) {
+                                        binding.showreports.visibility = View.VISIBLE
+                                        binding.notfoundimage.visibility = View.GONE
+                                        reportAdapter = CustomerReportListAdapter(ReportDataList, this, ConstantClass.Customer,this)
+                                        binding.showreports.adapter = reportAdapter
+                                        reportAdapter.notifyDataSetChanged()
 
-                                } else {
-                                    binding.showreports.visibility = View.GONE
-                                    binding.notfoundimage.visibility = View.VISIBLE
+                                    } else {
+                                        binding.showreports.visibility = View.GONE
+                                        binding.notfoundimage.visibility = View.VISIBLE
+                                    }
                                 }
                             }
+                            else{
+                                ConstantClass.dialog.dismiss()
+                                binding.showreports.visibility = View.GONE
+                                binding.notfoundimage.visibility = View.VISIBLE
+                            }
+
                         }
                     }
 
@@ -220,6 +237,47 @@ class CustomerReportsPage : BaseActivity() ,CustomerReportListAdapter.onClickLis
             }
 
         }
+
+        /*
+                viewModel.getReportsReq(reportreq).observe(this) { resources ->
+                    resources.let {
+                        when (it.apiStatus) {
+                            ApiStatus.SUCCESS -> {
+                                it.data?.let { users ->
+                                    users.body()?.let { response ->
+                                        ConstantClass.dialog.dismiss()
+                                        ReportDataList = response.data!!.toMutableList()
+                                        Log.d("ReportResponse", Gson().toJson(ReportDataList))
+                                        if (ReportDataList.size > 0) {
+                                            binding.showreports.visibility = View.VISIBLE
+                                            binding.notfoundimage.visibility = View.GONE
+                                            reportAdapter = CustomerReportListAdapter(ReportDataList, this, ConstantClass.Customer,this)
+                                            binding.showreports.adapter = reportAdapter
+                                            reportAdapter.notifyDataSetChanged()
+
+                                        } else {
+                                            binding.showreports.visibility = View.GONE
+                                            binding.notfoundimage.visibility = View.VISIBLE
+                                        }
+                                    }
+                                }
+                            }
+
+                            ApiStatus.ERROR -> {
+                                ConstantClass.dialog.dismiss()
+                                Toast.makeText(this@CustomerReportsPage, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
+                            }
+
+                            ApiStatus.LOADING -> {
+                                ConstantClass.OpenPopUpForVeryfyOTP(this)
+                            }
+
+                        }
+
+                    }
+
+                }
+        */
 
 
     }
@@ -248,14 +306,15 @@ class CustomerReportsPage : BaseActivity() ,CustomerReportListAdapter.onClickLis
         return "data:image/png;base64,$base64"
     }
 
-    override fun onClick(item: ReportsDataItem) {
-        Log.d("Date Time", formatDateToFullMonth(item.endDate))
-        val ref = "${ item.loanCode }${item.custerMob.takeLast(4)}${item.customerCode.takeLast(2)}"
+
+    override fun onClick(item: CustomerReportDataItem) {
+        Log.d("Date Time", formatDateToFullMonth(item.closureDate!!))
+        val ref = "${ item.loanCode }${item.custMobileNo!!.takeLast(4)}${item.customerCode!!.takeLast(2)}"
         var date=""
         if(!item.endDate.isNullOrEmpty()){
-            date = formatDateToFullMonth(item.endDate)
+            date = formatDateToFullMonth(item.closureDate)
         }else{
-            date = item.endDate
+            date = item.closureDate
         }
 
         val finalHtml = htmlTemplate
@@ -265,10 +324,10 @@ class CustomerReportsPage : BaseActivity() ,CustomerReportListAdapter.onClickLis
             .replace("{{STAMP_IMAGE}}", stampBase64)*/
             .replace("{{REF_NO}}", ref)
             .replace("{{DATE}}", date)
-            .replace("{{CUSTOMER_NAME}}", item.customerName)
-            .replace("{{MOBILE_NUMBER}}", item.custerMob)
-            .replace("{{LOAN_NUMBER}}", item.loanCode)
-            .replace("{{PRODUCT_NAME}}", item.productDetails)
+            .replace("{{CUSTOMER_NAME}}", item.customerName!!)
+            .replace("{{MOBILE_NUMBER}}", item.custMobileNo)
+            .replace("{{LOAN_NUMBER}}", item.loanCode!!)
+            .replace("{{PRODUCT_NAME}}", item.productDetails!!)
             .replace("{{LOAN_CLOSURE_DATE}}", date)
             .replace("{{AUTH_NAME}}", "Arjun")
             .replace("{{DESIGNATION}}", "Director")

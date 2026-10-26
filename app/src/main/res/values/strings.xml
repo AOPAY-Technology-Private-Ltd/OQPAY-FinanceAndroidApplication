@@ -74,11 +74,9 @@
     <string-array name="customerreporttype">
         <item>All</item>
         <item>Pending</item>
-        <item>Approved</item>
-        <item>Rejected</item>
+      <!--  <item>Approved</item>-->
+        <item>Disbursed</item>
         <item>Close</item>
-        <item>Foreclosure</item>
-        <item>Settled</item>
     </string-array>
 
     <string-array name="reporttype">

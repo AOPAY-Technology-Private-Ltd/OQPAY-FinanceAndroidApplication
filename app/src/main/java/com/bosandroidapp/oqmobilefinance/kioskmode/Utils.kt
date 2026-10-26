@@ -50,6 +50,7 @@ fun Context.checkAllPermissionsGranted(): Boolean {
             isAccessibilityServiceEnabled(this, MyAccessibilityService::class.java)
 }
 
+
 // for logout condition
 fun Context.isEMIsCompleted(): Boolean {
     val sharedPref = getSharedPreferences("MyPrefs", MODE_PRIVATE)
@@ -75,8 +76,9 @@ fun Context.stopLockSituation() {
     }
 
     KioskActivity.finishKiosk()
+
     try {
-        val intent = Intent("com.bosandroidapp.aopayfinance.ACTION_UNLOCK_KIOSK").apply {
+        val intent = Intent("com.bosandroidapp.oqmobilefinance.ACTION_UNLOCK_KIOSK").apply {
             setPackage(packageName)
         }
         sendBroadcast(intent)

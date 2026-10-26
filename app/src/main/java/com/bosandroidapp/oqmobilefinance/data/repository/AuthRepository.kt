@@ -1,6 +1,6 @@
 package com.bosandroidapp.oqmobilefinance.data.repository
 
-import com.bosandroidapp.aopayfinance.data.model.customerreq.CustomerDeviceLockStatusReq
+import com.bosandroidapp.oqmobilefinance.data.customerreq.CustomerDeviceLockStatusReq
 import com.bosandroidapp.oqmobilefinance.network.ApiInterface
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.createMultipartFromUri
 import com.bosandroidapp.oqmobilefinance.data.enach.EnachDateUploadReq
@@ -8,6 +8,7 @@ import com.bosandroidapp.oqmobilefinance.data.generattoken.RefreshTokenRequest
 import com.bosandroidapp.oqmobilefinance.data.gst.GstRequest
 import com.bosandroidapp.oqmobilefinance.data.model.AddBankAccountReq
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerEmiStatusReq
+import com.bosandroidapp.oqmobilefinance.data.model.CustomerReportsReq
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerSearchForShortCutLoanRequest
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerlocationUploadReq
 import com.bosandroidapp.oqmobilefinance.data.model.DueOverdueRequest
@@ -451,6 +452,8 @@ class AuthRepository(private val apiInterface: ApiInterface) {
 
 
   suspend fun uploadDeviceLockStatusReq(req: CustomerDeviceLockStatusReq) = apiInterface.uploadDeviceLockStatusReq(req)
+
+  suspend fun getCustomerReportsStatusReq(req: CustomerReportsReq) = apiInterface.getCustomerReportsStatusReq(req)
 
 
 }

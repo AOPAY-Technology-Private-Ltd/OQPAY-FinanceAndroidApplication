@@ -387,10 +387,10 @@
             </intent-filter>
         </service>
 
-        <service
+     <!--   <service
             android:name=".kioskmode.KioskPolicyService"
             android:exported="false"
-            android:foregroundServiceType="specialUse" />
+            android:foregroundServiceType="specialUse" />-->
 
         <receiver
             android:name=".phonestatereceiver.SimStateReceiver"

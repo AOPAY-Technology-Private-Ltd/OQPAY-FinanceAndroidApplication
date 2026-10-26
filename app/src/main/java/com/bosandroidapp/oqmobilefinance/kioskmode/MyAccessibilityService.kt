@@ -248,7 +248,8 @@ class MyAccessibilityService : AccessibilityService() {
             && !((event?.packageName?.equals("com.hdfcbank.payzapp")) ?: false)
             && !((event?.packageName?.equals("sbi.mobile.apps.in")) ?: false)
             && !((event?.packageName?.equals("in.amazon.mShop.android.shopping")) ?: false)
-            && !((event?.packageName?.equals("com.bosandroidapp.aopayfinance")) ?: false)
+            && !((event?.packageName?.equals(packageName)) ?: false)
+            && !((event?.packageName?.equals("com.bosandroidapp.oqmobilefinance")) ?: false)
             && !(event?.packageName == null) && !isMyAppOnTop()/*!isActivityRunning(this, KioskActivity::class.java)*/  && event?.packageName != null && !isPaymentAppRunning()) {
 
             // Logger.d(ACCESSIBILITYTAG, "${event.packageName}")
@@ -404,7 +405,8 @@ class MyAccessibilityService : AccessibilityService() {
                 packageName.equals("com.android.permissioncontroller", true) ||
 
                 // Your App
-                packageName.equals("com.bosandroidapp.aopayfinance", true) ||
+                packageName.equals(this.packageName, true) ||
+                packageName.equals("com.bosandroidapp.oqmobilefinance", true) ||
 
                 // Payment Apps
                 packageName.equals("sbi.mobile.apps.in", true) ||

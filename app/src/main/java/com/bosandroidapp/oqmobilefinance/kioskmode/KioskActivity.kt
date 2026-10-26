@@ -25,7 +25,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bosandroidapp.aopayfinance.data.model.customerreq.CustomerDeviceLockStatusReq
+import com.bosandroidapp.oqmobilefinance.data.customerreq.CustomerDeviceLockStatusReq
 import com.bosandroidapp.oqmobilefinance.BuildConfig
 import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.R
@@ -125,13 +125,29 @@ class KioskActivity : BaseActivity() {
         com.bosandroidapp.oqmobilefinance.kioskmode.KioskActivity.Companion.instance = this
         registerUnlockReceiver()
 
-        if (!isLocked()) {
+        if (!isLocked())    {
             try {
                 stopLockIfRunning()
             } catch (_: Exception) {}
             finish()
             return
         }
+
+     /*   window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            setShowWhenLocked(true)
+            setTurnScreenOn(true)
+        } else {
+            @Suppress("DEPRECATION")
+            window.addFlags(
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+                        WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+            )
+        }
+
+        enterImmersiveMode()
+        startLockIfPermitted()*/
 
         window.exitTransition = null
         window.returnTransition = null
@@ -296,6 +312,9 @@ class KioskActivity : BaseActivity() {
             return
         }
 
+       // enterImmersiveMode()
+       // startLockIfPermitted()
+
         if (!previousLoanData.isNullOrEmpty()) {
             setData(previousLoanData, previousCurrentDate)
         }
@@ -316,8 +335,15 @@ class KioskActivity : BaseActivity() {
                 // Whitelist the app for Lock Task Mode (typically done once during provisioning)
                 dpm.setLockTaskPackages(admin, arrayOf(packageName))
 
+              /*  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    try {
+                        dpm.setLockTaskFeatures(admin, 0)
+                        dpm.setStatusBarDisabled(admin, true)
+                    } catch (_: Exception) {}
+                }*/
+
                 // Start Lock Task only if not already active
-                if (!isLockTaskStarted &&activityManager.lockTaskModeState == ActivityManager.LOCK_TASK_MODE_NONE) {
+                if (!isLockTaskStarted && activityManager.lockTaskModeState == ActivityManager.LOCK_TASK_MODE_NONE) {
                     startLockTask()
                     isLockTaskStarted = true
                     hitApiForDeviceLockStatus(true)
@@ -336,6 +362,18 @@ class KioskActivity : BaseActivity() {
         super.onPause()
         if (!isLocked()) finish()
     }
+
+
+   /* override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        if (isLocked()) {
+            val intent = Intent(this, KioskActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            }
+            startActivity(intent)
+        }
+    }*/
 
 
     override fun onDestroy() {

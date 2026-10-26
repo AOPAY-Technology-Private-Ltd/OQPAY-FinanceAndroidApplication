@@ -3,10 +3,12 @@ package com.bosandroidapp.oqmobilefinance.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
+import com.bosandroidapp.oqmobilefinance.data.customerreq.CustomerDeviceLockStatusReq
 import com.bosandroidapp.oqmobilefinance.data.enach.EnachDateUploadReq
 import com.bosandroidapp.oqmobilefinance.data.generattoken.RefreshTokenRequest
 import com.bosandroidapp.oqmobilefinance.data.model.AddBankAccountReq
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerEmiStatusReq
+import com.bosandroidapp.oqmobilefinance.data.model.CustomerReportsReq
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerSearchForShortCutLoanRequest
 import com.bosandroidapp.oqmobilefinance.data.model.DueOverdueRequest
 import com.bosandroidapp.oqmobilefinance.data.model.EmandateOptionSelectetionReq
@@ -561,7 +563,7 @@ class AuthenticationViewModel (private val repository: AuthRepository):ViewModel
     }
 
 
-    fun uploadDeviceLockStatusReq(req: com.bosandroidapp.aopayfinance.data.model.customerreq.CustomerDeviceLockStatusReq) = liveData(Dispatchers.IO) {
+    fun uploadDeviceLockStatusReq(req: CustomerDeviceLockStatusReq) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
             emit(ApiResponse.success(data = repository.uploadDeviceLockStatusReq(req)))
@@ -571,5 +573,14 @@ class AuthenticationViewModel (private val repository: AuthRepository):ViewModel
     }
 
 
+
+    fun getCustomerReportsStatusReq(req: CustomerReportsReq) = liveData(Dispatchers.IO) {
+        emit(ApiResponse.loading(data = null))
+        try {
+            emit(ApiResponse.success(data = repository.getCustomerReportsStatusReq(req)))
+        } catch (exception: Exception) {
+            emit(ApiResponse.error(data = null, message = exception.message ?: "Error Occurred!"))
+        }
+    }
 
 }

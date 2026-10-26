@@ -13,7 +13,7 @@ import android.util.Base64
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import com.bosandroidapp.aopayfinance.data.model.customerreq.CustomerDeviceLockStatusReq
+import com.bosandroidapp.oqmobilefinance.data.customerreq.CustomerDeviceLockStatusReq
 import com.bosandroidapp.oqmobilefinance.BuildConfig
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.convertDate
@@ -39,7 +39,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
 
 
-
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
         val notificationCode = remoteMessage.data["NotificationCode"] ?: ""
@@ -51,7 +50,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         Log.e("FCM_TEST", "onMessageReceived called")
 
     }
-
 
 
     fun passNotificationCode(notificationCode: String){
@@ -127,6 +125,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         }
 
     }
+
 
 
     fun hitApiForDeviceLockStatus(status: Boolean, actionName: String) {

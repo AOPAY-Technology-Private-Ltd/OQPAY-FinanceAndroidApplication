@@ -1,7 +1,7 @@
 package com.bosandroidapp.oqmobilefinance.network
 
-import com.bosandroidapp.aopayfinance.data.model.customerreq.CustomerDeviceLockStatusReq
-import com.bosandroidapp.aopayfinance.data.model.customerreq.CustomerDeviceLockStatusResp
+import com.bosandroidapp.oqmobilefinance.data.customerreq.CustomerDeviceLockStatusReq
+import com.bosandroidapp.oqmobilefinance.data.customerreq.CustomerDeviceLockStatusResp
 import com.bosandroidapp.bosmobilefinance.ui.slideshow.data.model.loginsignup.cibilscore.CibilScoreReq
 import com.bosandroidapp.oqmobilefinance.data.enach.EMandateRequest
 import com.bosandroidapp.oqmobilefinance.data.enach.EMandateResponse
@@ -18,6 +18,8 @@ import com.bosandroidapp.oqmobilefinance.data.loancharge.LoanChargeResp
 import com.bosandroidapp.oqmobilefinance.data.model.AddedBankListResp
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerEmiStatusReq
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerEmiStatusResponse
+import com.bosandroidapp.oqmobilefinance.data.model.CustomerReportsReq
+import com.bosandroidapp.oqmobilefinance.data.model.CustomerReportsResponse
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerSearchForShortCutLoanRequest
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerSearchForShortCutLoanResponse
 import com.bosandroidapp.oqmobilefinance.data.model.CustomerlocationUploadReq
@@ -767,10 +769,12 @@ interface ApiInterface {
     suspend fun geteMandateRequest(@Body req: EMandateRequest): Response<EMandateResponse>?
 
 
+
     @POST("api/AOP/Enach/V1/eMandate/getStatus")
     suspend fun geteMandateSatusRequest(@Body req: ENachStatusReq): Response<ENachStatusResp>?
 
     //............................................................................................
+
 
 
     //for online eNach Api .......................................................................
@@ -778,9 +782,9 @@ interface ApiInterface {
     @POST("api/OQPay/Enach/V1/eMandate")
     suspend fun geteMandateOnlineRequest(@Body req: EMandateRequest): Response<EMandateResponse>?
 
+
     @POST("api/OQPay/Enach/V1/eMandate/getStatus")
     suspend fun geteMandateOnlineSatusRequest(@Body req: ENachStatusReq): Response<ENachStatusResp>?
-
 
 
     // for UPI Auto Mandate Api ....................................................................
@@ -873,11 +877,17 @@ interface ApiInterface {
     suspend fun getCustomerDataForSummary(@Body req : ShortCutCustomerRequest) : Response<ShortCutCustomerResponse>?
 
 
+
     //............................................................................................
     // device lock check api
 
     @POST("api/V1/OQFinance/DeviceActionLog")
     suspend fun uploadDeviceLockStatusReq(@Body req: CustomerDeviceLockStatusReq): Response<CustomerDeviceLockStatusResp>?
+
+    // for customer Reports
+
+    @POST("api/V1/OQFinance/GetLoanClosureDetails")
+    suspend fun getCustomerReportsStatusReq(@Body req: CustomerReportsReq): Response<CustomerReportsResponse>?
 
 
 }

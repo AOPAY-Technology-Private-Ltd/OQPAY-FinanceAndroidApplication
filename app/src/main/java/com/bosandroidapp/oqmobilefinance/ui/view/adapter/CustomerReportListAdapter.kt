@@ -16,7 +16,9 @@ import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.databinding.RetailersReportsLayoutBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.BASE_URL_IMAGE
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.formatDateToFullMonth
+import com.bosandroidapp.oqmobilefinance.data.model.CustomerReportDataItem
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.reports.ReportsDataItem
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.customer.EmiLoanDetailPage
@@ -24,7 +26,7 @@ import com.bosandroidapp.oqmobilefinance.ui.view.activity.customer.EmiLoanDetail
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.customer.EmiLoanDetailPage.Companion.customerCode
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.reports.RetailerCustomerReportsPage
 
-class CustomerReportListAdapter(private val ReportsDataList: MutableList<ReportsDataItem> = mutableListOf(),
+class CustomerReportListAdapter(private val ReportsDataList: MutableList<CustomerReportDataItem> = mutableListOf(),
                                 var context: Context,
                                 var loginType : String,
                                 var listner : onClickListner
@@ -77,14 +79,16 @@ class CustomerReportListAdapter(private val ReportsDataList: MutableList<Reports
         holder.reportstatuslayout.visibility= View.VISIBLE
 
         if(loginType.equals(ConstantClass.Customer)){
-            if(changeStatus.equals("Disbursed")){
+            /*if(changeStatus.equals("Disbursed")){
                 status = "Approved"
-            }else{
-                status = changeStatus
             }
+            else{
+                status = changeStatus!!
+            }*/
+            status = changeStatus!!
         }
         else{
-            status = changeStatus
+            status = changeStatus!!
         }
 
         holder.viewNOC.visibility=View.GONE
@@ -129,16 +133,17 @@ class CustomerReportListAdapter(private val ReportsDataList: MutableList<Reports
         holder.loanamount.text = "Loan amount : ₹ ".plus(ReportsDataList[position].loanAmount)
         holder.downpayment.text = "Down payment : ₹ ".plus(ReportsDataList[position].downPayment)
         holder.tenure.text = "Tenure : ".plus(ReportsDataList[position].tenure)
-        holder.paidemi.text = "Paid emi : ".plus(ReportsDataList[position].paidEmi)
-        holder.dueemi.text = "Due emi : ".plus(ReportsDataList[position].duesEmi)
+        holder.paidemi.text = "Paid emi : ".plus(ReportsDataList[position].paidEMI)
+        holder.dueemi.text = "Due emi : ".plus(ReportsDataList[position].duesEMI)
         holder.duedate.text = safeFormatDate(ReportsDataList[position].dueDate)
         holder.startdate.text = "Start Date : ${safeFormatDate(ReportsDataList[position].startDate)}"
         holder.enddate.text = "End Date : ${safeFormatDate(ReportsDataList[position].endDate)}"
-        holder.dueMob.text = ReportsDataList[position].custerMob
-        Glide.with(context).load(ReportsDataList[position].customerImage).into(holder.customerImage)
+        holder.dueMob.text = ReportsDataList[position].custMobileNo
+        var customerImagePath = BASE_URL_IMAGE + ReportsDataList[position].customerImagePath
+        Glide.with(context).load(customerImagePath).into(holder.customerImage)
 
 
-        if(ReportsDataList[position].paidEmi.equals(ReportsDataList[position].tenure)){
+        if(ReportsDataList[position].paidEMI!!.equals(ReportsDataList[position].tenure)){
             holder.duedatelayout.visibility = View.GONE
         }
         else {
@@ -152,7 +157,7 @@ class CustomerReportListAdapter(private val ReportsDataList: MutableList<Reports
         }
 
 
-        holder.itemView.setOnClickListener {
+     /*   holder.itemView.setOnClickListener {
 
             if (context is RetailerCustomerReportsPage) {
                 if (status.equals("Disbursed")) {
@@ -165,12 +170,10 @@ class CustomerReportListAdapter(private val ReportsDataList: MutableList<Reports
 
             }
 
-        }
+        }*/
 
 
     }
-
-
 
 
 
@@ -180,7 +183,7 @@ class CustomerReportListAdapter(private val ReportsDataList: MutableList<Reports
 
 
     interface onClickListner{
-        fun onClick(item: ReportsDataItem )
+        fun onClick(item: CustomerReportDataItem )
     }
 
 

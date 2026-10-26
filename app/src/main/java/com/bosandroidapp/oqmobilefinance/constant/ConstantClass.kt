@@ -86,6 +86,7 @@ import java.net.HttpURLConnection
 import java.net.NetworkInterface
 import java.net.URL
 import java.text.NumberFormat
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -152,7 +153,7 @@ object ConstantClass {
 
 
     // Change current environment here: RELEASE_UAT | STAGING | DEV | PRODUCTION
-    val CURRENT_ENVIRONMENT = AppEnvironment.STAGING
+    val CURRENT_ENVIRONMENT = AppEnvironment.DEV
 
     val BASE_URL = CURRENT_ENVIRONMENT.baseUrl
     val BASE_URL_IMAGE = CURRENT_ENVIRONMENT.baseUrlImage
@@ -1016,7 +1017,7 @@ object ConstantClass {
     }
 
 
-    fun formatDateToFullMonth(dateString: String): String {
+    /*fun formatDateToFullMonth(dateString: String): String {
         return try {
             val inputFormat = SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault())
             val outputFormat = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
@@ -1025,7 +1026,47 @@ object ConstantClass {
         } catch (e: Exception) {
             ""
         }
+    }*/
+
+    fun formatDateToFullMonth(dateString: String): String {
+        if (dateString.isBlank()) return ""
+
+        val inputFormats = listOf(
+            "dd-MM-yyyy HH:mm:ss",
+            "dd-MM-yyyy",
+            "yyyy-MM-dd HH:mm:ss",
+            "yyyy-MM-dd",
+            "yyyy-MM-dd'T'HH:mm:ss",
+            "yyyy-MM-dd'T'HH:mm:ss.SSS",
+            "yyyy-MM-dd'T'HH:mm:ss'Z'",
+            "dd/MM/yyyy",
+            "dd/MM/yyyy HH:mm:ss",
+            "MM/dd/yyyy",
+            "MM/dd/yyyy HH:mm:ss",
+            "dd MMM yyyy",
+            "dd MMMM yyyy"
+        )
+
+        for (format in inputFormats) {
+            try {
+                val inputFormat = SimpleDateFormat(format, Locale.getDefault())
+                inputFormat.isLenient = false
+
+                val date: Date = inputFormat.parse(dateString) ?: continue
+
+                val outputFormat = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
+                return outputFormat.format(date)
+
+            } catch (e: ParseException) {
+                // Try the next input format.
+            }
+        }
+
+        return ""
     }
+
+
+
 
     fun formatDateToReport(dateString: String): String {
         return try {
