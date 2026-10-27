@@ -262,13 +262,15 @@ class EmiLoanDetailPage : BaseActivity() {
     }
 
 
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
         outState.putString("LoanId", LoanId)
         outState.putString("customerCode", customerCode)
     }
-    
+
+
 
     fun hitApiForLogin(retailerOrCustomerCode: String) {
 
@@ -880,6 +882,7 @@ class EmiLoanDetailPage : BaseActivity() {
         else{
             createdBy = preference.getStringValue(ConstantClass.RetailerCode, "")
         }
+
 
         var customercode =  customerCode
         var retailercode =  preference.getStringValue(ConstantClass.RetailerCode, "")
