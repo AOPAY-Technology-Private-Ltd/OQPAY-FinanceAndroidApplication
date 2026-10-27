@@ -439,7 +439,7 @@ class QRCodePage : BaseActivity() {
                             Log.d("LoanCheckReq", Gson().toJson(responseBody))
 
                             if(status == true ){
-
+                                Toast.makeText(this, "Data uploaded successfully", Toast.LENGTH_SHORT).show()
                             }
                             else{
                                 Toast.makeText(this, responseBody?.message, Toast.LENGTH_SHORT).show()

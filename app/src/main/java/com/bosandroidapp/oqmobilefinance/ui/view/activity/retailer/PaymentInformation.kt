@@ -303,6 +303,7 @@ class PaymentInformation : BaseActivity() {
             }
         )
 
+        Log.d("BankListRequest", Gson().toJson(req))
         panViewModel.getBankListReq(req).observe(this) { resources ->
           resources.let {
               when (it.apiStatus) {
@@ -310,6 +311,8 @@ class PaymentInformation : BaseActivity() {
                       it.data.let { users ->
                           users!!.body().let { response ->
                               ConstantClass.dialog.dismiss()
+
+                              Log.d("BankListRsponse", Gson().toJson(response))
 
                               if(response!!.status!!.toLowerCase().equals("false")){
                                   Toast.makeText(this@PaymentInformation,response.message, Toast.LENGTH_SHORT).show()
@@ -1914,12 +1917,13 @@ class PaymentInformation : BaseActivity() {
                             var errorCode = getData!!.code
                             var customerCode = getData!!.data!!.customerCode
                             Log.d("PaymentInformationresponse", Gson().toJson(getData))
-                            Toast.makeText(this, getData!!.message, Toast.LENGTH_SHORT).show()
+
 
                             if(status==true ){
+                                Toast.makeText(this, "Data uploaded successfully", Toast.LENGTH_SHORT).show()
                                 setselectionForSecondCard()
                             }else{
-
+                                Toast.makeText(this, getData!!.message, Toast.LENGTH_SHORT).show()
                             }
 
 
@@ -1963,12 +1967,13 @@ class PaymentInformation : BaseActivity() {
                             var errorCode = getData!!.code
                             var customerCode = getData!!.data!!.customerCode
                             Log.d("PaymentInformationresponse", Gson().toJson(getData))
-                            Toast.makeText(this, getData!!.message, Toast.LENGTH_SHORT).show()
+
 
                             if(status==true ){
                                 setselectionForThirdCard()
+                                Toast.makeText(this, "Data uploaded successfully", Toast.LENGTH_SHORT).show()
                             }else{
-
+                                Toast.makeText(this, getData!!.message, Toast.LENGTH_SHORT).show()
                             }
 
 
@@ -2012,12 +2017,13 @@ class PaymentInformation : BaseActivity() {
                             var errorCode = getData!!.code
                             var customerCode = getData!!.data!!.customerCode
                             Log.d("PaymentInformationresponse", Gson().toJson(getData))
-                            Toast.makeText(this, getData!!.message, Toast.LENGTH_SHORT).show()
 
                             if(status==true){
+                                Toast.makeText(this, "Data uploaded successfully", Toast.LENGTH_SHORT).show()
                                 startActivity(Intent(this@PaymentInformation, IMEIDetailsPage::class.java))
                             }
                             else{
+                                Toast.makeText(this, getData!!.message, Toast.LENGTH_SHORT).show()
 
                             }
 

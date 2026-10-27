@@ -91,7 +91,9 @@ class WalletAccountDetails : BaseActivity() {
         }
         preference = SharedPreference(this)
         viewModel = ViewModelProvider(this, CommonViewModelFactory(AuthRepository(RetrofitClient.apiInterface)))[AuthenticationViewModel::class.java]
-        reportType= "Payout"
+
+       // reportType= "Payout"
+        reportType= "Holding"
 
 
         setView()
@@ -161,7 +163,7 @@ class WalletAccountDetails : BaseActivity() {
         }
 
 
-        binding.walletamounttxt.setOnClickListener{
+   /*     binding.walletamounttxt.setOnClickListener{
             binding.walletamountcard.setCardBackgroundColor(ContextCompat.getColor(this, R.color.purple))
             binding.holdamountcard.setCardBackgroundColor(ContextCompat.getColor(this, R.color.white))
             binding.walletamounttxt.setTextColor(resources.getColor(R.color.white))
@@ -170,7 +172,7 @@ class WalletAccountDetails : BaseActivity() {
             reportType= "Payout"
             setView()
 
-        }
+        }*/
 
 
         binding.holdamounttxt.setOnClickListener {

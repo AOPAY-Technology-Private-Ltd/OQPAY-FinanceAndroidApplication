@@ -866,14 +866,16 @@ class EMICalculationDetailsPage : BaseActivity() {
                             val getData = responseBody?.data
 
                             Log.d("EMICalculationresponse", Gson().toJson(getData))
-                            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+
 
                             if(errorCode==200 || errorCode==400){
+                                Toast.makeText(this, "Data uploaded successfully", Toast.LENGTH_SHORT).show()
                                 ConstantClass.SellingPrice = lastSellingPrice!!
                                 startActivity(Intent(this@EMICalculationDetailsPage, PaymentInformation::class.java))
                                 binding.nextbuttonlayout.isEnabled = true
                             }
                             else{
+                                Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
                                 binding.nextbuttonlayout.isEnabled = true
                             }
 

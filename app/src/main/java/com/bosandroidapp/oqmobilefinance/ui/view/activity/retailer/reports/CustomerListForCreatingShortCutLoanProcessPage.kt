@@ -920,7 +920,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
                                                                                         Log.d("Step3UpdateRes", Gson().toJson(body))
                                                                                         if (body != null && body.success == true && body.code == 200) {
 
-                                                                                            Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage, body.message ?: "Bank details updated successfully", Toast.LENGTH_SHORT).show()
+                                                                                            Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage,  "Bank details updated successfully", Toast.LENGTH_SHORT).show()
 
                                                                                             // Proceed to eMandate flow
                                                                                            /* val startDate = LoanStartDate
@@ -932,7 +932,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
                                                                                                 collectionAmount = emiAmountVal,
                                                                                                 collectCollectionUntilCancle = false,
                                                                                                 seqType = "RCUR",
-                                                                                                iFSCCode = bankDetails!!.bankIFSCCode,
+                                                                                                iFSCCode = BankIFSCCode,
                                                                                                 frequncy = "MNTH",
                                                                                                 registrationID = if (LoanMode == ConstantClass.online) {
                                                                                                     ConstantClass.PAN_VERIFICATION_REGISTRATION_ID
@@ -947,14 +947,14 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
                                                                                                 emailAddress = customerDetails.eMailID ?: CusteMailID,
                                                                                                 firstCollectionDate = startDate,
                                                                                                 mobileNumber = customerDetails.primaryMobileNumber,
-                                                                                                bankAccountNumberConfirmation = bankDetails.accountNumber,
+                                                                                                bankAccountNumberConfirmation = AccountNumber,
                                                                                                 addIn2 = BranchAddress,
                                                                                                 addIn3 = "",
                                                                                                 debitType = true,
                                                                                                 teleNumber = "",
                                                                                                 authType = "",
                                                                                                 bankID = BankID,
-                                                                                                bankAccountNumber = bankDetails.accountNumber
+                                                                                                bankAccountNumber = AccountNumber
                                                                                             )
                                                                                             hitApiForEnach(request, item, true)
                                                                                         } else {
@@ -1089,10 +1089,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
 
                                 if (response!!.status!!.toLowerCase().equals("false")) {
                                     ConstantClass.dialog.dismiss()
-                                    Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage,
-                                        response.message,
-                                        Toast.LENGTH_SHORT
-                                    ).show()
+                                    Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage, response.message, Toast.LENGTH_SHORT).show()
                                 }
 
                                 response?.data?.banks?.forEach {
@@ -1349,6 +1346,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
                 }
             }
         }
+
         else {
 
             if(selectedAuthType!!.contains(ConstantClass.UPIAUTOPAY)){

@@ -169,7 +169,6 @@ class CustomerReportsPage : BaseActivity() ,CustomerReportListAdapter.onClickLis
     }
 
 
-
     fun hitApiForGetReports(reporttype: String) {
         var customerCode = preference.getStringValue(ConstantClass.CustomerCode, "")
         var recordStatus = reporttype
