@@ -26,6 +26,7 @@ import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
 import com.bosandroidapp.oqmobilefinance.utils.forceSyncEmis
 import com.bosandroidapp.oqmobilefinance.utils.getLoansStringObject
 import com.bosandroidapp.oqmobilefinance.utils.hasDateChanged
+import com.bosandroidapp.oqmobilefinance.utils.AppUpdateManager
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.google.gson.Gson
@@ -33,6 +34,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.io.File
 
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
@@ -41,9 +43,14 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
+
+
+
         val notificationCode = remoteMessage.data["NotificationCode"] ?: ""
 
+
         passNotificationCode(notificationCode)
+
 
         Log.d("notificationcode", notificationCode)
 
@@ -121,10 +128,15 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
             }
 
+            ConstantClass.APP_UPDATE  -> {
+                installApkSilently()
+            }
+            
 
         }
 
     }
+
 
 
 
@@ -159,10 +171,22 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         }
     }
 
+    
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
     }
+
+    
+    fun installApkSilently() {
+        
+        CoroutineScope(Dispatchers.Main).launch {
+            AppUpdateManager.downloadAndInstallApk(applicationContext, ConstantClass.CUSTOMERPPURLLINK)
+        }
+        
+    }
+
+
 
 
 }

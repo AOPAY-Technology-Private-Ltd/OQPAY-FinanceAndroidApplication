@@ -221,7 +221,8 @@ private suspend fun Context.isEMIDue(sharedPref: SharedPreferences) = withContex
         if (emiDues > 0) {
             this@isEMIDue.setEMINotCompleted()
             this@isEMIDue.startInternetAlertSituation()
-        } else {
+        }
+        else {
             this@isEMIDue.setEMICompleted()
             this@isEMIDue.stopInternetAlertSituation()
         }

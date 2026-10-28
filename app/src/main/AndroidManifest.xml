@@ -330,6 +330,12 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
+       <!-- apk update flow-->
+
+        <receiver
+            android:name=".notification.ApkInstallReceiver"
+            android:exported="true" />
+
         <receiver
             android:name=".kioskmode.KioskDeviceAdminReceiver"
             android:description="@string/app_name"

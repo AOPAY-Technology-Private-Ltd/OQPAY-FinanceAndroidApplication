@@ -20,6 +20,7 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.bosandroidapp.oqmobilefinance.BuildConfig
 import com.bosandroidapp.oqmobilefinance.databinding.SplashMainBinding
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isDevModeEnabled
@@ -28,6 +29,8 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.showDevModeSnack
 import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
+import com.bosandroidapp.oqmobilefinance.ui.slideshow.activity.DashBoard
+import com.bosandroidapp.oqmobilefinance.utils.AppUpdateManager
 import com.bosandroidapp.oqmobilefinance.workmanager.EmiNotificationWorker
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
@@ -49,13 +52,23 @@ class SplashScreen : AppCompatActivity() {
         setContentView(binding.root)
         preference = SharedPreference(this)
 
+        val lastSavedVersion = preference.getStringValue("LAST_APP_VERSION", "")
+        val currentVersion = BuildConfig.VERSION_NAME
+
+        if (lastSavedVersion.isNotEmpty() && lastSavedVersion != currentVersion) {
+            preference.setStringValue("LAST_APP_VERSION", currentVersion)
+            AppUpdateManager.hitApiForDeviceLockStatus(this, true, "APP_UPDATED")
+        }
+        else if (lastSavedVersion.isEmpty()) {
+            preference.setStringValue("LAST_APP_VERSION", currentVersion)
+        }
+
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { view, insets ->
             val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(systemBarsInsets.left, 0, systemBarsInsets.right, systemBarsInsets.bottom)
             WindowInsetsCompat.CONSUMED
         }
-
 
 
         if (ConstantClass.CURRENT_ENVIRONMENT != ConstantClass.AppEnvironment.PRODUCTION) {
@@ -93,7 +106,6 @@ class SplashScreen : AppCompatActivity() {
             }
 
         }, 3000)
-
 
 
     }
