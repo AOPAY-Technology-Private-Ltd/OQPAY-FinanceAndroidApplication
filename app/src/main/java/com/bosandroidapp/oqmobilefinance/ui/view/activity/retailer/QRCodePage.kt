@@ -225,8 +225,6 @@ class QRCodePage : BaseActivity() {
     }
 
 
-
-
     private fun fetchEmandateOptions() {
         val req = EmandateOptionSelectetionReq(
             mode = ConstantClass.CheckOnlineOrOffline,
