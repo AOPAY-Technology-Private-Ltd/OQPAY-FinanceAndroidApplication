@@ -2268,6 +2268,7 @@ class QRCodePage : BaseActivity() {
             }
 
             else{
+
                 panViewModel.getEMandateOnlineRequest(request).observe(this) { resources ->
                     resources.let {
                         when (it.apiStatus) {

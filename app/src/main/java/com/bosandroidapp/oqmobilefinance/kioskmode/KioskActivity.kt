@@ -226,6 +226,7 @@ class KioskActivity : BaseActivity() {
 
                                 }
 
+
                             }
                         }
                     } else{

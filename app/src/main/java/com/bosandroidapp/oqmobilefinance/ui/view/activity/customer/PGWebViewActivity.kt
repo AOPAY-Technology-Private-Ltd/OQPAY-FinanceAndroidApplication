@@ -128,6 +128,7 @@ class PGWebViewActivity : BaseActivity() {
 
         binding.pgwebview.settings.javaScriptEnabled = true
         binding.pgwebview.settings.domStorageEnabled = true
+
         binding.pgwebview.webViewClient = object : WebViewClient() {
 
             override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {

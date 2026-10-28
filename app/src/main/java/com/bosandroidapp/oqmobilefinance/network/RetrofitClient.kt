@@ -47,7 +47,6 @@ object RetrofitClient {
             .build()
     }
 
-
     private fun getAllInstanceSMS(): Retrofit{
         // Create OkHttpClient with 1-minute timeout settings
         val okHttpClient = OkHttpClient.Builder()
@@ -67,7 +66,6 @@ object RetrofitClient {
             .build()
     }
 
-
     private fun getAllInstancePAN(): Retrofit{
         // Create OkHttpClient with 1-minute timeout settings
         val okHttpClient = OkHttpClient.Builder()
@@ -86,7 +84,6 @@ object RetrofitClient {
             .addConverterFactory(GsonConverterFactory.create(GsonBuilder().setLenient().create()))
             .build()
     }
-
 
     private fun getInstanceOnlinePG(): Retrofit{
         // Create OkHttpClient with 1-minute timeout settings
@@ -112,7 +109,7 @@ object RetrofitClient {
     val apiInterfaceSMS: ApiInterface = getAllInstanceSMS().create(ApiInterface::class.java)
 
     val apiInterfacePAN: ApiInterface = getAllInstancePAN().create(ApiInterface::class.java)
-
     val apiInterfaceOnlinePG: ApiInterface = getInstanceOnlinePG().create(ApiInterface::class.java)
+
 
 }

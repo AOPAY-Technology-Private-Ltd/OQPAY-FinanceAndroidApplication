@@ -759,6 +759,7 @@ interface ApiInterface {
     suspend fun geteMandateSelectOptionRequest(@Body req: EmandateOptionSelectetionReq): Response<EmandateOptionSelectetionResponse>?
 
 
+
     // for Offline eNach Api ..................................................................
     @POST("api/AOP/Enach/V1/eMandate")
     suspend fun geteMandateRequest(@Body req: EMandateRequest): Response<EMandateResponse>?
@@ -770,6 +771,7 @@ interface ApiInterface {
     //............................................................................................
 
 
+
      // Phonepesa eNach Api ..................................................................
     //for online eNach Api .......................................................................
 
@@ -778,6 +780,7 @@ interface ApiInterface {
 
     @POST("api/OQPay/Enach/V1/eMandate/getStatus")
     suspend fun geteMandateOnlineSatusRequest(@Body req: ENachStatusReq): Response<ENachStatusResp>?
+
 
 
 
