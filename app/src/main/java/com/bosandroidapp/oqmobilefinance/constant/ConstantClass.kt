@@ -153,16 +153,17 @@ object ConstantClass {
 
 
     // Change current environment here: RELEASE_UAT | STAGING | DEV | PRODUCTION
-    val CURRENT_ENVIRONMENT = AppEnvironment.DEV
+    val CURRENT_ENVIRONMENT = AppEnvironment.RELEASE_UAT
     val BASE_URL = CURRENT_ENVIRONMENT.baseUrl
     val BASE_URL_IMAGE = CURRENT_ENVIRONMENT.baseUrlImage
-    //val CUSTOMERPPURLLINK= BASE_URL +"api/V1/OQFinance/download"
-    val CUSTOMERPPURLLINK= "https://github.com/BOS-CENTER-UAT/OQPAY-APK-UAT/releases/download/OQPAYCUSTOMER_2.0.4/OQPAYCUSTOMER_2.0.4.apk"
+    val CUSTOMERPPURLLINK = BASE_URL +"api/V1/OQFinance/download"
+   // val CUSTOMERPPURLLINK= "https://github.com/BOS-CENTER-UAT/OQPAY-APK-UAT/releases/download/OQPAYCUSTOMER_2.0.4/OQPAYCUSTOMER_2.0.4.apk"
 
     val PAN_VERIFICATION_REGISTRATION_ID = CURRENT_ENVIRONMENT.panRegId
     val PENNYDROP_REGISTRATION_ID = CURRENT_ENVIRONMENT.pennyDropRegId
     val PAN_VERIFICATION_REGISTRATION_ID_OFFLINE = CURRENT_ENVIRONMENT.panRegIdOffline
     val PENNYDROP_REGISTRATION_ID_OFFLINE = CURRENT_ENVIRONMENT.pennyDropRegIdOffline
+
 
 
      // Production
@@ -214,8 +215,10 @@ object ConstantClass {
 
 
      const val SMS_BASE_URL = "http://web.adcruxmedia.in/"
-     const val PAN_BASE_URL = "https://api.aopay.in/"
-     const val ONLINE_PG = "https://api.dikshifinsure.com/"
+     //const val PAN_BASE_URL = "https://api.aopay.in/"
+     const val PAN_BASE_URL = "https://uat.api.aopay.in/"
+   // const val ONLINE_PG = "https://api.dikshifinsure.com/"
+    const val ONLINE_PG = "http://uat.api.dikshifinsure.com/"
 
 
      const val SMS_API_KEY = "KBSxc26XqjoiR7SA"
