@@ -59,7 +59,6 @@ class PGWebViewActivity : BaseActivity() {
     lateinit var preference : SharedPreference
     lateinit var viewModel: AuthenticationViewModel
     lateinit var dikshifinsureOnlinePGModel: DikshifinsureViewModel
-
     lateinit var mode : String
     lateinit var merchantid : String
 
