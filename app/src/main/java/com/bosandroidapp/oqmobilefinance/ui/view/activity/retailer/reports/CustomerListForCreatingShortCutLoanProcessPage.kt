@@ -256,6 +256,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
                                 users.body()?.let { response ->
                                     if (response.code == 200 && response.status == true) {
                                         var getCustomerData = response.data!![0]
+                                        Log.d("CustomerData", Gson().toJson(getCustomerData))
                                         handleCustomerClick(getCustomerData,step)
                                     }
                                     else {
@@ -1145,7 +1146,6 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
         if (!isEmandateVerifiedStatus) {
             // Step 7: E-Mandate Process (After Loan Created)
             showEmandateSelectionDialog(item)
-
         } else
             if (!isAccessKeyVerifiedStatus ) {
             // Step 8: App Install

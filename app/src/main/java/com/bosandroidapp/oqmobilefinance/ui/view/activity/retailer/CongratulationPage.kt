@@ -27,6 +27,7 @@ class CongratulationPage : BaseActivity() {
     lateinit var viewModel: AuthenticationViewModel
     lateinit var api: ApiInterface
 
+
     companion object{
         var loaneCode:String = ""
         var FirstName:String = ""
@@ -80,5 +81,6 @@ class CongratulationPage : BaseActivity() {
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
     }
+
 
 }
