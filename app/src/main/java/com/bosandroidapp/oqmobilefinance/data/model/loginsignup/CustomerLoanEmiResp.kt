@@ -122,6 +122,7 @@ data class CustomerDataItem(
 	val loanmode: String? = null
 )
 
+
 data class EmiDetailsItemCustomerEMI(
 
 	@field:SerializedName("emI_No")

@@ -480,7 +480,8 @@ class EmiLoanDetailPage : BaseActivity() {
                     val sumNetDueAmount = selectedEmiItems.sumOf { it.netDueAmount ?: 0.0 }
                     val sumLateFine = selectedEmiItems.sumOf { it.lateFine ?: 0.0 }
                     val sumBounceCharge = selectedEmiItems.sumOf { it.bouncingCharge ?: 0.0 }
-                    val sumMonthlyEmi = selectedEmiItems.sumOf { it.emiAmount ?: 0.0 }
+                   // val sumMonthlyEmi = selectedEmiItems.sumOf { it.emiAmount ?: 0.0 }
+                    val sumMonthlyEmi = selectedEmiItems.firstOrNull()?.emiAmount
 
                     binding.amount.text = "₹ %.2f".format(sumNetDueAmount)
                     EMIamountPG = "₹ %.2f".format(sumNetDueAmount)
@@ -589,7 +590,7 @@ class EmiLoanDetailPage : BaseActivity() {
                 }
 
                 Log.d("emiamount", " $emiamount $WalletBalance")
-                WalletBalance = "10" // for testing purpose
+               // WalletBalance = "10" // for testing purpose
 
                 if(emiamount <= WalletBalance.toDouble()) {
                     OpenAlertForEmiRequest(customerCode)

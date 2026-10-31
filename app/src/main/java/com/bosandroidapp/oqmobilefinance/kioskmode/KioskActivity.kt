@@ -449,7 +449,7 @@ class KioskActivity : BaseActivity() {
         isEmandateVerified = LoanEmiList!![0]!!.isEmandateVerified.toString()
         isPannydropVerified = LoanEmiList!![0]!!.isPannydropVerified.toString()
 
-        val gracePeriod = AllgracePeriod!!.toInt()+CustomergracePeriod!!.toInt()
+        val gracePeriod = AllgracePeriod!!.toInt() + CustomergracePeriod!!.toInt()
 
         lifecycleScope.launch {
             listOfDueWithGraceDate = formatDateToDDMMYYYY(LoanEmiList!![0]!!.startDate.toString()).getCurrentLastPaidDueDate(this@KioskActivity,LoanEmiList!![0]!!.paidEMI!!.toLong(),LoanEmiList!![0]!!.duesEMI!!.toLong(), AllgracePeriod!!.toInt(),CustomergracePeriod!!.toInt(),currentDate!!)
