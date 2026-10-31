@@ -20,6 +20,7 @@ import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatButton
@@ -94,6 +95,12 @@ class PGWebViewActivity : BaseActivity() {
         preference = SharedPreference(this)
         viewModel = ViewModelProvider(this, CommonViewModelFactory(AuthRepository(RetrofitClient.apiInterface)))[AuthenticationViewModel::class.java]
         dikshifinsureOnlinePGModel = ViewModelProvider(this, DikshifinsureOnlinePGModelFactory(DikshifinsureRepository(RetrofitClient.apiInterfaceOnlinePG)))[DikshifinsureViewModel::class.java]
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                showingRejectionePGPopUp()
+            }
+        })
 
         clearWebViewData(binding.pgwebview)
 
@@ -208,11 +215,11 @@ class PGWebViewActivity : BaseActivity() {
 
     }
 
-    fun HitApiForPayEmiAmount(emicount:Int,loopcount :Int,emiamount : String,fine:String?/*,imageFile:File*/,loanCode:String,utrNumber: String){
+    fun HitApiForPayEmiAmount(totalEmiCount: Int, currentIndex: Int, emiamount: String, fine: String?, loanCode: String, utrNumber: String) {
 
-        var createdBy = preference.getStringValue(ConstantClass.CustomerCode, "")
-        var customercode =  preference.getStringValue(ConstantClass.CustomerCode, "")
-        var retailercode =  preference.getStringValue(ConstantClass.RetailerCode, "")
+        val createdBy = preference.getStringValue(ConstantClass.CustomerCode, "")
+        val customercode = preference.getStringValue(ConstantClass.CustomerCode, "")
+        val retailercode = preference.getStringValue(ConstantClass.RetailerCode, "")
 
         val request = CustomerLoanEmiReceiveReq(
             mode = "UPDATE",
@@ -223,11 +230,10 @@ class PGWebViewActivity : BaseActivity() {
             remarks = "Payment",
             createdBy = createdBy,
             receiptNo = "",
-            customerCode =customercode,
+            customerCode = customercode,
             retailerCode = retailercode,
             bankName = "PG",
-            receiptImagePath = ""/*,
-            imageFile = imageFile*/
+            receiptImagePath = ""
         )
 
         Log.d("loanEmiReceiveReq", Gson().toJson(request))
@@ -237,52 +243,46 @@ class PGWebViewActivity : BaseActivity() {
                 when (it.apiStatus) {
                     ApiStatus.SUCCESS -> {
                         it.data?.let { users ->
-                            if(users.isSuccessful){
+                            if (users.isSuccessful) {
                                 users.body()?.let { response ->
                                     Log.d("loanEmiReceiveResp", response.toString())
-                                    if(loopcount==emicount){
-                                        if(ConstantClass.dialog!=null && ConstantClass.dialog.isShowing){
+                                    if (currentIndex == totalEmiCount) {
+                                        if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
                                             ConstantClass.dialog.dismiss()
                                         }
-                                        emiList .clear()
-                                        EMIamountPG  =""
-                                        LoanCodePG  = ""
-                                        Toast.makeText(this@PGWebViewActivity,response.message,Toast.LENGTH_SHORT).show()
+                                        emiList.clear()
+                                        EMIamountPG = ""
+                                        LoanCodePG = ""
+                                        Toast.makeText(this@PGWebViewActivity, response.message ?: "Payment processed successfully", Toast.LENGTH_SHORT).show()
                                         val intent = Intent(this@PGWebViewActivity, DashBoard::class.java)
                                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                         startActivity(intent)
+                                        finish()
                                     }
                                 }
-                            }
-
-                            else{
-                                if(ConstantClass.dialog!=null && ConstantClass.dialog.isShowing){
+                            } else {
+                                if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
                                     ConstantClass.dialog.dismiss()
                                 }
-                                var getdata = users.errorBody()?.string()
-                                Toast.makeText(this@PGWebViewActivity,getdata.toString(),Toast.LENGTH_SHORT).show()
-
+                                val getdata = users.errorBody()?.string()
+                                Toast.makeText(this@PGWebViewActivity, getdata.toString(), Toast.LENGTH_SHORT).show()
                             }
-
                         }
-
                     }
 
                     ApiStatus.ERROR -> {
-                        if(ConstantClass.dialog!=null && ConstantClass.dialog.isShowing){
+                        if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
                             ConstantClass.dialog.dismiss()
                         }
-
+                        Toast.makeText(this@PGWebViewActivity, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                     }
 
                     ApiStatus.LOADING -> {
                         ConstantClass.OpenPopUpForVeryfyOTP(this)
                     }
-
                 }
             }
         }
-
     }
 
 
@@ -364,10 +364,12 @@ class PGWebViewActivity : BaseActivity() {
         val message = "Your EMI payment of ${EMIamountPG} for Loan Code ${LoanCodePG} has been successfully processed."
         textmessage.text = message
 
+
         Ok.setOnClickListener {
-            if(emiList.size>0){
-                for(i in 0 until emiList.size){
-                    HitApiForPayEmiAmount(emiList[i].selectedNoofEmi, emiList[i].emiNo, emiList[i].emiAmount,emiList[i].lateFine,emiList[i].loancode,utrNumber )
+            if (emiList.size > 0) {
+                val totalCount = emiList.size
+                for (i in 0 until totalCount) {
+                    HitApiForPayEmiAmount(totalEmiCount = totalCount, currentIndex = i + 1, emiamount = emiList[i].emiAmount, fine = emiList[i].lateFine, loanCode = emiList[i].loancode, utrNumber = utrNumber)
                 }
             }
         }
@@ -376,12 +378,6 @@ class PGWebViewActivity : BaseActivity() {
 
         dialog.show()
 
-    }
-
-
-
-    override fun onBackPressed() {
-        showingRejectionePGPopUp()
     }
 
 

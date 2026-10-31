@@ -36,6 +36,7 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isInternetAvaila
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isLockTaskStarted
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isPgClosing
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.CustomerDataItem
+import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.EmiDetailsItemCustomerEMI
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.GetCustomerLoanDetailsReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.RetailerProfileReq
 import com.bosandroidapp.oqmobilefinance.data.pg.PGOnlineRequestCall
@@ -93,6 +94,7 @@ class KioskActivity : BaseActivity() {
     private var previousLoanData: List<CustomerDataItem?>? = null
     private var previousCurrentDate: String = ""
     private var LoanEmiList: List<CustomerDataItem?>? = null
+    private var unpaidEmiDetailsList: List<EmiDetailsItemCustomerEMI> = emptyList()
     private var isApiRunning = false
 
     lateinit var dikshifinsureOnlinePGModel: DikshifinsureViewModel
@@ -206,49 +208,76 @@ class KioskActivity : BaseActivity() {
                         }
                         else{
                             lifecycleScope.launch {
-                                selectedNoofEmi = binding.noOfEmi.selectedItem.toString().toInt()
-                                // val file = saveImageToCache(this@EmiLoanDetailPage,receiptUri,"ReceiptPhoto")
-                                // ConstantClass.OpenPopUpForVeryfyOTP(this@EmiLoanDetailPage)
-                                var ForServerlatefine:String ?= ""
+                                selectedNoofEmi = binding.noOfEmi.selectedItemPosition + 1
+                                var ForServerlatefine: String? = ""
                                 PGWebViewActivity.emiList.clear()
 
-                                for (j in 1..selectedNoofEmi) {
+                                if (unpaidEmiDetailsList.isNotEmpty()) {
+                                    val selectedEmiItems = unpaidEmiDetailsList.take(selectedNoofEmi)
+                                    for (j in 1..selectedEmiItems.size) {
+                                        val emiItem = selectedEmiItems[j - 1]
+                                        val itemEmiNo = emiItem.emINo ?: j
+                                        val itemNetDue = (emiItem.netDueAmount ?: 0.0).toString()
+                                        val itemLateFine = (emiItem.lateFine ?: 0.0).toString()
+                                        val itemBounceCharge = (emiItem.bouncingCharge ?: 0.0).toString()
 
-                                    val emiIndex = j - 1
+                                        Log.d("emiAmountWithFine", itemNetDue)
+                                        Log.d("EMIAmount", itemNetDue)
 
-                                    val emiAmountWithFine: String
+                                        emiList.add(
+                                            EmiLoanDetailPage.EmiData(
+                                                selectedNoofEmi = selectedEmiItems.size,
+                                                emiNo = itemEmiNo,
+                                                emiAmount = itemNetDue,
+                                                lateFine = itemLateFine,
+                                                bounceCharge = itemBounceCharge,
+                                                loancode = loanCode
+                                            )
+                                        )
+                                    }
+                                }
+                                /*else {
+                                    for (j in 1..selectedNoofEmi) {
+                                        val emiIndex = j - 1
+                                        val emiAmountWithFine: String
 
-                                    if (listOfDueWithGraceDate[emiIndex].lateFeesApplied) {
-                                        if(isEmandateVerified!!.toLowerCase().equals("yes",ignoreCase = true)){
-                                            emiAmountWithFine = (emiAmount.toDouble() + latefine!!.toDouble() + BounceCharge!!.toDouble() + Othercharges!!.toDouble() + WaiveOff!!.toDouble()).toString()
-                                            BounceChargeApplicable = BounceCharge
-                                        }
-                                        else{
-                                            emiAmountWithFine = (emiAmount.toDouble() + latefine!!.toDouble() + Othercharges!!.toDouble()).toString()
+                                        if (emiIndex < listOfDueWithGraceDate.size && listOfDueWithGraceDate[emiIndex].lateFeesApplied) {
+                                            if (isEmandateVerified?.lowercase() == "yes") {
+                                                emiAmountWithFine = ((emiAmount.toDoubleOrNull() ?: 0.0) + (latefine?.toDoubleOrNull() ?: 0.0) + (BounceCharge.toDoubleOrNull() ?: 0.0) + (Othercharges.toDoubleOrNull() ?: 0.0) + (WaiveOff.toDoubleOrNull() ?: 0.0)).toString()
+                                                BounceChargeApplicable = BounceCharge
+                                            } else {
+                                                emiAmountWithFine = ((emiAmount.toDoubleOrNull() ?: 0.0) + (latefine?.toDoubleOrNull() ?: 0.0) + (Othercharges.toDoubleOrNull() ?: 0.0)).toString()
+                                                BounceChargeApplicable = "0"
+                                            }
+                                            ForServerlatefine = latefine
+                                        } else {
+                                            emiAmountWithFine = emiAmount
+                                            ForServerlatefine = "0"
                                             BounceChargeApplicable = "0"
                                         }
-                                        ForServerlatefine = latefine
-                                    }
-                                    else {
-                                        emiAmountWithFine = emiAmount
-                                        ForServerlatefine = "0"
-                                        BounceChargeApplicable = "0"
-                                    }
 
-                                    Log.d("emiAmountWithFine", emiAmountWithFine)
-                                    Log.d("EMIAmount", emiAmountWithFine)
+                                        Log.d("emiAmountWithFine", emiAmountWithFine)
+                                        Log.d("EMIAmount", emiAmountWithFine)
 
-                                    emiList.add(EmiLoanDetailPage.EmiData(
-                                            selectedNoofEmi,
-                                            emiNo = j,
-                                            emiAmount = emiAmountWithFine,
-                                            lateFine = ForServerlatefine!!,
-                                            BounceChargeApplicable,
-                                            loanCode))
+                                        emiList.add(
+                                            EmiLoanDetailPage.EmiData(
+                                                selectedNoofEmi = selectedNoofEmi,
+                                                emiNo = j,
+                                                emiAmount = emiAmountWithFine,
+                                                lateFine = ForServerlatefine.orEmpty(),
+                                                bounceCharge = BounceChargeApplicable,
+                                                loancode = loanCode
+                                            )
+                                        )
+                                    }
+                                }*/
+
+                                val email = preference.getStringValue(ConstantClass.CustomerEmailID, "").ifEmpty { "bos.centerpvtltd@gmail.com" }
+                                val emiNumbers = if (unpaidEmiDetailsList.isNotEmpty()) {
+                                    unpaidEmiDetailsList.take(selectedNoofEmi).mapNotNull { it.emINo }.joinToString("")
+                                } else {
+                                    /*(1..selectedNoofEmi).joinToString("")*/
                                 }
-
-                                val email = preference.getStringValue(ConstantClass.CustomerEmailID, "") .ifEmpty { "bos.centerpvtltd@gmail.com" }
-                                val emiNumbers=  (1..selectedNoofEmi).joinToString("")
 
                                 PGWebViewActivity.LoanCodePG = loanCode
 
@@ -579,55 +608,75 @@ class KioskActivity : BaseActivity() {
         lifecycleScope.launch {
             listOfDueWithGraceDate = formatDateToDDMMYYYY(LoanEmiList!![0]!!.startDate.toString()).getCurrentLastPaidDueDate(this@KioskActivity,LoanEmiList!![0]!!.paidEMI!!.toLong(),LoanEmiList!![0]!!.duesEMI!!.toLong(), AllgracePeriod!!.toInt(),CustomergracePeriod!!.toInt(),currentDate!!)
             Log.d("DueList", "Data". plus(listOfDueWithGraceDate))
-            setDataInspinner(LoanEmiList!![0]!!.duesEMI!!.toInt(),LoanEmiList?.get(0)?.emiAmount?.toDoubleOrNull() ?: 0.0)
+            val emiDetails = LoanEmiList!![0]?.emiDetails?.filterNotNull()
+            setDataInspinner(LoanEmiList!![0]!!.duesEMI!!.toInt(), LoanEmiList?.get(0)?.emiAmount?.toDoubleOrNull() ?: 0.0, emiDetails)
         }
 
     }
 
 
-    fun setDataInspinner(tenure:Int,emiAmount:Double?){
-        val emiOptions = ConstantClass.generateEMIOptions(tenure)
-        val noOfEmiAdapter = ArrayAdapter(this, R.layout.mobilenamelayout, emiOptions )
-        noOfEmiAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.noOfEmi.adapter = noOfEmiAdapter
+    fun setDataInspinner(tenure: Int, emiAmount: Double?, emiDetailsList: List<EmiDetailsItemCustomerEMI>? = null) {
+        val unpaidEmiDetails = emiDetailsList?.filter { it.isPaid != true } ?: emptyList()
+        unpaidEmiDetailsList = unpaidEmiDetails
 
-        binding.noOfEmi.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        if (unpaidEmiDetails.isNotEmpty()) {
+            val emiOptions = unpaidEmiDetails.map { "${it.emINo}" }
+            val noOfEmiAdapter = ArrayAdapter(this, R.layout.mobilenamelayout, emiOptions)
+            noOfEmiAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            binding.noOfEmi.adapter = noOfEmiAdapter
 
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                val selectedItem = parent.getItemAtPosition(position).toString().toInt()
-                var totalEmiAmount = 0.0   // use Double for calculation
-                Log.d("ListDueGrace",":".plus(listOfDueWithGraceDate))
-                if(listOfDueWithGraceDate.isNotEmpty()){
+            binding.noOfEmi.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                    val selectedEmiItems = unpaidEmiDetails.take(position + 1)
 
-                    for (j in 1..selectedItem) {
-                        val emiIndex = j - 1
-                        val emiAmountWithFine = if (listOfDueWithGraceDate[emiIndex].lateFeesApplied) {
-                            if (isEmandateVerified!!.toLowerCase().equals("yes",ignoreCase = true)) {
-                                emiAmount!!.toDouble() + latefine!!.toDouble() + BounceCharge!!.toDouble() + Othercharges!!.toDouble() + WaiveOff!!.toDouble()
-                            }
-                            else {
-                                emiAmount!!.toDouble() + latefine!!.toDouble() + Othercharges!!.toDouble()
-                            }
-                        }
-                        else {
-                            emiAmount!!.toDouble()
-                        }
-                        Log.d("totalamount", emiAmountWithFine.toString())
-                        totalEmiAmount += emiAmountWithFine
-                    }
+                    val sumNetDueAmount = selectedEmiItems.sumOf { it.netDueAmount ?: 0.0 }
+                    val sumLateFine = selectedEmiItems.sumOf { it.lateFine ?: 0.0 }
+                    val sumBounceCharge = selectedEmiItems.sumOf { it.bouncingCharge ?: 0.0 }
 
-                    binding.amount.text = "₹ ${totalEmiAmount}"
+                    binding.amount.text = "₹ %.2f".format(sumNetDueAmount)
+                    emiamount = sumNetDueAmount
 
+                    latefine = "%.2f".format(sumLateFine)
+                    BounceCharge = "%.2f".format(sumBounceCharge)
                 }
 
+                override fun onNothingSelected(parent: AdapterView<*>) {}
             }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {
-                // Optional
-            }
-
         }
+      /*  else {
+            val emiOptions = ConstantClass.generateEMIOptions(tenure)
+            val noOfEmiAdapter = ArrayAdapter(this, R.layout.mobilenamelayout, emiOptions)
+            noOfEmiAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            binding.noOfEmi.adapter = noOfEmiAdapter
 
+            binding.noOfEmi.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                    val selectedItem = parent.getItemAtPosition(position).toString().filter { it.isDigit() }.toIntOrNull() ?: (position + 1)
+                    var totalEmiAmount = 0.0
+                    if (listOfDueWithGraceDate.isNotEmpty()) {
+                        for (j in 1..selectedItem) {
+                            val emiIndex = j - 1
+                            if (emiIndex < listOfDueWithGraceDate.size) {
+                                val emiAmountWithFine = if (listOfDueWithGraceDate[emiIndex].lateFeesApplied) {
+                                    if (isEmandateVerified?.lowercase() == "yes") {
+                                        (emiAmount ?: 0.0) + (latefine?.toDoubleOrNull() ?: 0.0) + (BounceCharge?.toDoubleOrNull() ?: 0.0) + (Othercharges?.toDoubleOrNull() ?: 0.0) + (WaiveOff?.toDoubleOrNull() ?: 0.0)
+                                    } else {
+                                        (emiAmount ?: 0.0) + (latefine?.toDoubleOrNull() ?: 0.0) + (Othercharges?.toDoubleOrNull() ?: 0.0)
+                                    }
+                                } else {
+                                    emiAmount ?: 0.0
+                                }
+                                totalEmiAmount += emiAmountWithFine
+                            }
+                        }
+                        binding.amount.text = "₹ %.2f".format(totalEmiAmount)
+                        emiamount = totalEmiAmount
+                    }
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>) {}
+            }
+        }*/
     }
 
 

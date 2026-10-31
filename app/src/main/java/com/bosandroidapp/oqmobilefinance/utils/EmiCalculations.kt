@@ -45,7 +45,6 @@ private var currentDate: String? = null
 const val ACCESSIBILITYTAG = "Accessibility Service"
 
 
-
 suspend fun String.getCurrentLastPaidDueDate(context: Context?, paidMonths: Long, payableMonths: Long, AllgrossPeriod: Int, customergrossPeriod: Int, servercurrentDate:String): ArrayList<MonthsAndPayables> = withContext(Dispatchers.IO) {
     val AllgrossPeriod = AllgrossPeriod
     val customergrossPeriod = customergrossPeriod
@@ -195,9 +194,7 @@ private suspend fun Context.isEMIDue(sharedPref: SharedPreferences) = withContex
                     Log.d("currentDate", currentDate ?: "")
                     uploadDataOnFirebaseConsole("${currentDate}", "currentDate")
 
-                    val grossDue = loan.startDate.toFormattedDate()
-                        .getJumpedDate(paidMonths)
-                        .getGrossDate(grossPeriod)
+                    val grossDue = loan.startDate.toFormattedDate().getGrossDate(grossPeriod)
 
                     Log.d("grossDueDate", grossDue)
 
@@ -466,7 +463,8 @@ private fun String.getGrossDate(grossPeriod: Int): String {
 
     val validDate: Date? = try {
         sdf.parse(this)
-    } catch (e: Exception) {
+    }
+    catch (e: Exception) {
         val parts = this.split("-", " ", "/")
         if (parts.size < 2) return ""
 

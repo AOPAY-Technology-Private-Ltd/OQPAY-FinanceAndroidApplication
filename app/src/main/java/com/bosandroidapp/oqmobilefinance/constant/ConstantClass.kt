@@ -153,7 +153,7 @@ object ConstantClass {
 
 
     // Change current environment here: RELEASE_UAT | STAGING | DEV | PRODUCTION
-    val CURRENT_ENVIRONMENT = AppEnvironment.RELEASE_UAT
+    val CURRENT_ENVIRONMENT = AppEnvironment.DEV
     val BASE_URL = CURRENT_ENVIRONMENT.baseUrl
     val BASE_URL_IMAGE = CURRENT_ENVIRONMENT.baseUrlImage
     val CUSTOMERPPURLLINK = BASE_URL +"api/V1/OQFinance/download"
@@ -184,8 +184,6 @@ object ConstantClass {
 
 
         // for enach option using registration id always use for bot uat and production ......................
-
-
 
         // production merchant id online
         const val Enach_Option_Online_REGISTRATION_ID = "AOP-5039"
