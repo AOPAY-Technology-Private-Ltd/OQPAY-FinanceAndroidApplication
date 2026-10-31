@@ -8,7 +8,7 @@ data class EMandateRequest(
 	val categoryID: Int? = null,
 
 	@field:SerializedName("CollectionAmount")
-	val collectionAmount: Int? = null,
+	val collectionAmount: Double? = null,
 
 	@field:SerializedName("CollectCollectionUntilCancle")
 	val collectCollectionUntilCancle: Boolean? = null,

@@ -122,7 +122,6 @@ data class CustomerDataItem(
 	val loanmode: String? = null
 )
 
-
 data class EmiDetailsItemCustomerEMI(
 
 	@field:SerializedName("emI_No")
@@ -159,7 +158,7 @@ data class EmiDetailsItemCustomerEMI(
 	val emiAmount: Double? = null,
 
 	@field:SerializedName("bouncingCharge")
-	val bouncingCharge: Int? = null,
+	val bouncingCharge: Double? = null,
 
 	@field:SerializedName("paidAmount")
 	val paidAmount: Double? = null,
@@ -168,6 +167,6 @@ data class EmiDetailsItemCustomerEMI(
 	val pendingAmount: Double? = null,
 
 	@field:SerializedName("lateFine")
-	val lateFine: Int? = null
+	val lateFine: Double? = null
 
 )

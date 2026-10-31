@@ -152,7 +152,7 @@ object ConstantClass {
 
 
     // Change current environment here: RELEASE_UAT | STAGING | DEV | PRODUCTION
-    val CURRENT_ENVIRONMENT = AppEnvironment.RELEASE_UAT
+    val CURRENT_ENVIRONMENT = AppEnvironment.DEV
 
     val BASE_URL = CURRENT_ENVIRONMENT.baseUrl
     val BASE_URL_IMAGE = CURRENT_ENVIRONMENT.baseUrlImage
@@ -263,6 +263,7 @@ object ConstantClass {
      const val ServiceType = "serviceType"
      const val FirstName = "firstName"
      const val LastName = "lastName"
+     const val Loanmode = "loanmode"
      const val LoggedIn = "logged"
      const val Retailer = "Retailer"
      const val Customer = "Customer"
@@ -339,7 +340,7 @@ object ConstantClass {
      lateinit var  dialog : Dialog
 
      var PanNumber : String = ""
-     var CheckOnlineOrOffline : String = "Offline"
+     var CheckOnlineOrOffline : String = ""
      var PanNumberVerified : String = "yes"
      var BrandName : String = ""
      var ModelName : String = ""

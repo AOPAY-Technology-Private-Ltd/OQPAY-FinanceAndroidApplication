@@ -451,6 +451,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
 
             if (createLoanDetails != null && createLoanDetails.loanCode!!.isNotEmpty()) {
                 LoanMode = createLoanDetails.loanMode!!
+                preference.setStringValue(ConstantClass.Loanmode,createLoanDetails.loanMode!! )
                 LoanStatus = createLoanDetails.loanStatus!!
                 LoanRID = createLoanDetails.loanRID?.takeIf { it.isNotBlank() }?.toIntOrNull() ?: 0
                 loaneCode = createLoanDetails.loanCode!!
@@ -827,7 +828,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
             }
 
             val hasBankDetailsChanged = isDataEditedByUser && (
-                    editedAccNum != AccountNumber ||
+                            editedAccNum != AccountNumber ||
                             editedIfsc != BankIFSCCode ||
                             editedBankName != BankName ||
                             editedAccType != AccountType ||
@@ -836,7 +837,8 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
 
             val startDate = ConstantClass.formatToYYYYMMDD(LoanStartDate)
             val endDate = ConstantClass.formatToYYYYMMDD(LoanEndDate)
-            val emiAmountVal = productDetails!!.emiAmount?.toDoubleOrNull()?.roundToInt()?: 0
+            val emiAmountVal = productDetails!!.emiAmount?.toDoubleOrNull()?: 0.0
+
 
             if (hasBankDetailsChanged) {
                 // Penny drop flow when bank data is edited
@@ -1021,9 +1023,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
             }
             else {
                 // Existing unchanged flow
-               /* val startDate = LoanStartDate
-                val endDate = LoanEndDate
-                val emiAmountVal = productDetails!!.emiAmount?.toDoubleOrNull()?.roundToInt() ?: 0*/
+
 
                 val request = EMandateRequest(
                     categoryID = 7,
@@ -1496,11 +1496,8 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
 
                         ApiStatus.ERROR -> {
                             ConstantClass.dialog.dismiss()
-                            Toast.makeText(
-                                this,
-                                resources.message ?: "Server error occurred",
-                                Toast.LENGTH_LONG
-                            ).show()
+                            Log.e("EmandateErrorOnline",resources.message ?: "Server error occurred")
+                            Toast.makeText(this, resources.message ?: "Server error occurred", Toast.LENGTH_LONG).show()
                         }
 
                         ApiStatus.LOADING -> {
@@ -1513,6 +1510,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
             }
 
         }
+
     }
 
 
