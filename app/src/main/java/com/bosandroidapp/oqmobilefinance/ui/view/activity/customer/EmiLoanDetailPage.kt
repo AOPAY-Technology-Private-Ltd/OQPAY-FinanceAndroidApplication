@@ -796,6 +796,7 @@ class EmiLoanDetailPage : BaseActivity() {
                     }
 
                     val LoanEmiList = response.data.firstOrNull()
+
                     if (LoanEmiList == null) {
                         Log.e("CustomerEMIDataError", "First EMI item is null")
                         Toast.makeText(this@EmiLoanDetailPage, "Invalid EMI details received.", Toast.LENGTH_SHORT).show()
@@ -887,6 +888,7 @@ class EmiLoanDetailPage : BaseActivity() {
                 }
             }
         }
+
     }
 
 
