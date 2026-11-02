@@ -621,12 +621,10 @@ class EmiLoanDetailPage : BaseActivity() {
 
         })
 
+
         binding.submitpayment.setOnClickListener {
-
-            emiamount = binding.amount.text.toString().replace("₹", "").trim().toDoubleOrNull() ?: 0.0
-
             if (isInternetAvailable(this@EmiLoanDetailPage)) {
-
+                emiamount = binding.amount.text.toString().replace("₹", "").trim().toDoubleOrNull() ?: 0.0
                 lifecycleScope.launch {
 
                     selectedNoofEmi = binding.noOfEmi.selectedItemPosition + 1
@@ -730,6 +728,9 @@ class EmiLoanDetailPage : BaseActivity() {
 
                 }
 
+            }
+            else{
+                Toast.makeText(this@EmiLoanDetailPage,"Please connect with internet", Toast.LENGTH_SHORT).show()
             }
 
             /*    if(binding.paymentmode.selectedItem.toString().equals("Cash")){

@@ -211,7 +211,8 @@ class QRCodePage : BaseActivity() {
         if(preference.getStringValue(ConstantClass.CustomerCode,"").isNotEmpty()/*&& ! ConstantClass.ClickOnCardLowCibilScore.equals(CardType*/){
             updateLoanRequest(true)
 
-        }/*
+        }
+        /*
         else{
             binding.LoanCreatelayout.visibility = View.GONE
             binding.nextlayout.visibility = View.VISIBLE
@@ -416,6 +417,7 @@ class QRCodePage : BaseActivity() {
 
         binding.LoanCreatelayout.visibility = View.VISIBLE
         binding.nextlayout.visibility = View.GONE
+
     }
 
 
