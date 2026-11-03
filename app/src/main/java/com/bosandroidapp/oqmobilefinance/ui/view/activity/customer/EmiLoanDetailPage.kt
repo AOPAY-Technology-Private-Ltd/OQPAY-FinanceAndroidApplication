@@ -953,6 +953,7 @@ class EmiLoanDetailPage : BaseActivity() {
                     val tenureCount = LoanEmiList.tenure ?: (paidEmiCount + duesEmiCount)
 
                     val amount = calculateEMIPaymentStatus(paidEmiCount, emiAmountVal, tenureCount)
+
                    // var amount = calculateEMIPaymentStatus(LoanEmiList!!.paidEMI!!.toInt(),LoanEmiList!!.emiAmount!!.toDouble(), LoanEmiList!!.tenure)
 
                     binding.paidamount.text = "₹ ${df.format(amount.first)}"
@@ -1167,7 +1168,7 @@ class EmiLoanDetailPage : BaseActivity() {
 
     fun calculateEMIPaymentStatus(paidEMI: Int, emiAmount: Double, tenure: Int?): Pair<Double, Double?> {
         val paidAmount = paidEMI * emiAmount
-        val remainingAmount = (tenure?.minus(paidEMI))?.times(emiAmount)
+        val remainingAmount = (tenure?.minus(paidEMI))?.times(emiAmount)   // (7-2)*100
         return Pair(paidAmount, remainingAmount)
     }
 
