@@ -22,7 +22,10 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.widget.AppCompatButton
 import androidx.lifecycle.ViewModelProvider
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AccountNumber
@@ -44,6 +47,9 @@ import com.bosandroidapp.oqmobilefinance.data.viewModelFactory.DikshifinsureOnli
 import com.bosandroidapp.oqmobilefinance.databinding.ActivityOnlineAutoUpiEmandateBinding
 import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
 import com.bosandroidapp.oqmobilefinance.network.RetrofitClient
+import com.bosandroidapp.oqmobilefinance.ui.view.activity.customer.PGWebViewActivity.Companion.EMIamountPG
+import com.bosandroidapp.oqmobilefinance.ui.view.activity.customer.PGWebViewActivity.Companion.LoanCodePG
+import com.bosandroidapp.oqmobilefinance.ui.view.activity.customer.PGWebViewActivity.Companion.emiList
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.CongratulationPage.Companion.loaneCode
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.DikshifinsureViewModel
@@ -63,6 +69,79 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
 
     lateinit var dialog: Dialog
 
+    private var isPaymentProcessed = false
+
+    fun handleUrlChange(url: String) {
+        if (isPaymentProcessed) return
+
+        try {
+            val uri = Uri.parse(url)
+            val status = (uri.getQueryParameter("Status") ?: uri.getQueryParameter("status"))?.uppercase()
+            val merchantOrderId = uri.getQueryParameter("MerchantOrderId")
+
+            Log.d("AUTOUPI_STATUS", "Payment Status: $status")
+            Log.d("AUTOUPI_UTR", "Merchant Order ID: $merchantOrderId")
+
+            when {
+                // Payment Success
+                status == "SUCCESS" || uri.path?.contains("/success", ignoreCase = true) == true -> {
+                    isPaymentProcessed = true
+                    Log.d("PAYU", "Payment Success: $url")
+
+                    runOnUiThread {
+                        binding.webview.stopLoading()
+                        isEmandateVerified = isMandate
+
+                        val uploadReq = EnachDateUploadReq(
+                            isEmandateVerified = isEmandateVerified,
+                            emAccountType = AccountType,
+                            isPannydropVerified = isPannydropVerified,
+                            emAccountNumber = AccountNumber,
+                            customerCode = CustomerCodeForEnach,
+                            retailerCode = RetailerCodeForEnach,
+                            loanCode = loaneCode,
+                            emBankName = BankName,
+                            emIfscCode = BankIFSCCode,
+                            emumrn = merchantOrderId
+                        )
+
+                        hitApiForUploadEnachMandateDataResponse(uploadReq, isEmandateVerified)
+                    }
+                }
+
+                // Payment Failed
+                status == "FAILURE" || uri.path?.contains("/failure", ignoreCase = true) == true -> {
+                    isPaymentProcessed = true
+                    Log.d("PAYU", "Payment Failed: $url")
+
+                    runOnUiThread {
+                        binding.webview.stopLoading()
+                        isEmandateVerified = "No"
+                        showingRejectioneMandatePopUp("",isEmandateVerified)
+                    }
+                }
+
+                // Payment Cancelled
+                status == "CANCEL" || status == "CANCELLED" || uri.path?.contains("/cancel", ignoreCase = true) == true || uri.getQueryParameter("action")?.equals("userCancel", ignoreCase = true) == true -> {
+                    isPaymentProcessed = true
+                    Log.d("PAYU", "Payment Cancelled: $url")
+
+                    runOnUiThread {
+                        binding.webview.stopLoading()
+                        isEmandateVerified = "No"
+                        showingRejectioneMandatePopUp("",isEmandateVerified)
+                    }
+                }
+
+                else -> {
+                    Log.d("PAYU", "Other URL: $url")
+                }
+            }
+
+        } catch (e: Exception) {
+            Log.e("AUTOUPI_JS_ERROR", "Error handling URL change", e)
+        }
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,8 +149,14 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
         binding = ActivityOnlineAutoUpiEmandateBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        viewModel = ViewModelProvider(this,
-            CommonViewModelFactory(AuthRepository(RetrofitClient.apiInterface))
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                isEmandateVerified = "No"
+                showingRejectioneMandatePopUp("",isEmandateVerified)
+            }
+        })
+
+        viewModel = ViewModelProvider(this, CommonViewModelFactory(AuthRepository(RetrofitClient.apiInterface))
         )[AuthenticationViewModel::class.java]
         dikshifinsureViewModel = ViewModelProvider(this,
             DikshifinsureOnlinePGModelFactory(DikshifinsureRepository(RetrofitClient.apiInterfaceOnlinePG))
@@ -112,17 +197,13 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
         cookieManager.setAcceptThirdPartyCookies(binding.webview, true)
 
         binding.webview.addJavascriptInterface(object {
+
             @JavascriptInterface
             fun onUrlChange(url: String) {
                 Log.d("AUTOUPI_JS_URL", "URL Changed: $url")
-                try {
-                    if (merchandId.isNotEmpty() && registrationId.isNotEmpty()) {
-                        doUpdateUpiAutoMandateStatus()
-                    }
-                } catch (e: Exception) {
-                    Log.e("AUTOUPI_JS_ERROR", "Error handling URL change", e)
-                }
+                handleUrlChange(url)
             }
+
         }, "Android")
 
         binding.webview.webViewClient = MerchantWebViewClient(this)
@@ -130,7 +211,8 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
         if (checkoutUrl.isNotEmpty()) {
             Log.d("AUTOUPI_FLOW", "Loading URL: $checkoutUrl")
             binding.webview.loadUrl(checkoutUrl)
-        } else {
+        }
+        else {
             Toast.makeText(this, "Invalid checkout URL", Toast.LENGTH_SHORT).show()
         }
 
@@ -150,7 +232,7 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
     }
 
 
-    fun injectJs(webView: WebView?) {
+     /*    fun injectJs(webView: WebView?) {
         webView?.evaluateJavascript("""
         (function() {
             function notify() {
@@ -170,10 +252,73 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
             notify(); 
         })();
     """.trimIndent(), null)
+    }*/
+
+
+    fun injectJs(webView: WebView?) {
+        webView?.evaluateJavascript(
+            """
+    (function() {
+
+        // -----------------------------
+        // URL CHANGE LISTENER
+        // -----------------------------
+
+        function notify() {
+            try {
+                Android.onUrlChange(window.location.href);
+            } catch (e) {
+                console.log("Android.onUrlChange error:", e);
+            }
+        }
+
+        var pushState = history.pushState;
+
+        history.pushState = function() {
+            pushState.apply(history, arguments);
+            notify();
+        };
+
+        var replaceState = history.replaceState;
+
+        history.replaceState = function() {
+            replaceState.apply(history, arguments);
+            notify();
+        };
+
+        window.addEventListener('popstate', notify);
+
+
+        // -----------------------------
+        // PAYMENT REQUEST CHECK
+        // -----------------------------
+
+        console.log(
+            "PaymentRequest available:",
+            typeof window.PaymentRequest !== "undefined"
+        );
+
+        console.log(
+            "PaymentRequest:",
+            window.PaymentRequest
+        );
+
+
+        // -----------------------------
+        // INITIAL URL TRIGGER
+        // -----------------------------
+
+        notify();
+
+    })();
+    """.trimIndent(),
+            null
+        )
     }
 
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+
+ /*   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == 2001) {
@@ -181,19 +326,19 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
             doUpdateUpiAutoMandateStatus()
         }
 
-    }
+    }*/
 
 
-    fun doUpdateUpiAutoMandateStatus() {
+  /*  fun doUpdateUpiAutoMandateStatus() {
         if (isStatusCheckInProgress) return
         isStatusCheckInProgress = true
         runOnUiThread {
             hitApiForUpiAutoMandateOrderStatus(registrationId, merchandId)
         }
-    }
+    }*/
 
 
-    fun hitApiForUpiAutoMandateOrderStatus(registrationId: String, merchandId: String) {
+    /*fun hitApiForUpiAutoMandateOrderStatus(registrationId: String, merchandId: String) {
         val request = UpiAutoOrderStatusRequest(
             registrationID = registrationId,
             merchantOrderId = merchandId
@@ -261,10 +406,10 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
 
             }
         }
-    }
+    }*/
 
 
-    fun hitApiForUpiAutoMandateTransaction(registrationId: String) {
+   /* fun hitApiForUpiAutoMandateTransaction(registrationId: String) {
         val emiNumbers = "1"
         val amount = EmiAmount.toDouble().roundToInt()
 
@@ -308,10 +453,12 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
                 }
             }
         }
-    }
+    }*/
 
 
     fun hitApiForUploadEnachMandateDataResponse(request: EnachDateUploadReq, isMandate: String) {
+
+        Log.d("UpiAutoTransReq", Gson().toJson(request))
 
         viewModel.UpdateEmandateDetails(request).observe(this) { resources ->
             when (resources.apiStatus) {
@@ -322,11 +469,22 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
                     if (::dialog.isInitialized && dialog.isShowing) {
                         dialog.dismiss()
                     }
-                    if (isMandate == ConstantClass.isMandate) {
-                        startActivity(Intent(this, AppScanInstallPage::class.java))
-                        finish()
+                    val response = resources.data?.body()
+
+                    Log.d("UpiAutoTransRes", Gson().toJson(response))
+
+                    if (response?.success!!.toLowerCase().equals("true", ignoreCase = true)|| response.code==200) {
+                        if (isMandate == ConstantClass.isMandate) {
+                            startActivity(Intent(this, AppScanInstallPage::class.java))
+                            finish()
+                        } else {
+                            QRCodePage.isEnachCancelled = true
+                            finish()
+                        }
                     } else {
-                        QRCodePage.isEnachCancelled = true
+                        val msg = response?.message ?: "Upload failed"
+                        Log.e("EmandateUploadError", "Response error: $msg")
+                        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
                         finish()
                     }
                 }
@@ -334,7 +492,12 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
                     if (ConstantClass.dialog?.isShowing == true) {
                         ConstantClass.dialog!!.dismiss()
                     }
-                    Toast.makeText(this, "Upload failed: ${resources.message}", Toast.LENGTH_SHORT).show()
+                    if (::dialog.isInitialized && dialog.isShowing) {
+                        dialog.dismiss()
+                    }
+                    val errorMsg = resources.message ?: "Network or API error occurred"
+                    Log.e("EmandateUploadError", "API Error: $errorMsg | Code: ${resources.data?.code()}")
+                    Toast.makeText(this, "Upload failed: $errorMsg", Toast.LENGTH_SHORT).show()
                 }
                 ApiStatus.LOADING -> {
                     if (ConstantClass.dialog?.isShowing != true) {
@@ -355,9 +518,34 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
             activity.injectJs(view)
         }
 
+
+        override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: android.webkit.WebResourceError?) {
+            super.onReceivedError(view, request, error)
+            Log.e("AUTOUPI_WEBVIEW", "WebView Error: ${error?.description} (${error?.errorCode})")
+        }
+
+
+        override fun onReceivedHttpError(view: WebView?, request: WebResourceRequest?, errorResponse: android.webkit.WebResourceResponse?) {
+            super.onReceivedHttpError(view, request, errorResponse)
+            Log.e("AUTOUPI_WEBVIEW", "WebView HTTP Error: ${errorResponse?.statusCode} - ${errorResponse?.reasonPhrase}")
+        }
+
+
         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
             val url = request.url.toString()
             Log.d("AUTOUPI", "URL Loading: $url")
+
+            val uri = request.url
+            val status = (uri.getQueryParameter("Status") ?: uri.getQueryParameter("status"))?.uppercase()
+
+            if (status == "SUCCESS" || uri.path?.contains("/success", ignoreCase = true) == true ||
+                status == "FAILURE" || uri.path?.contains("/failure", ignoreCase = true) == true ||
+                status == "CANCEL" || status == "CANCELLED" || uri.path?.contains("/cancel", ignoreCase = true) == true) {
+                view.stopLoading()
+                activity.handleUrlChange(url)
+                return true
+            }
+
 
             if (!url.startsWith("https") && !url.startsWith("http")) {
                 try {
@@ -369,19 +557,14 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
                 }
                 return true
             }
+
             return false
         }
 
     }
 
 
-    override fun onBackPressed() {
-        isEmandateVerified= "No"
-        showingRejectioneMandatePopUp("")
-    }
-
-
-    fun showingRejectioneMandatePopUp(emumrn: String){
+    fun showingRejectioneMandatePopUp(emumrn: String,isEmandateVerified: String){
         dialog = Dialog(this, R.style.Theme_Black_NoTitleBar_Fullscreen)
         dialog!!.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog!!.setContentView(com.bosandroidapp.oqmobilefinance.R.layout.enach_reject_alert)
@@ -418,8 +601,6 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
                 hitApiForUploadEnachMandateDataResponse(request,isEmandateVerified)
             }
 
-
-
         }
 
         dialog!!.setCanceledOnTouchOutside(false)
@@ -427,6 +608,9 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
         dialog!!.show()
 
     }
+
+
+
 
 
 }

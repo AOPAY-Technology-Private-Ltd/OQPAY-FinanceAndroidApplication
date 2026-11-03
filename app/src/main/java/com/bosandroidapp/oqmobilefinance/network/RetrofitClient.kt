@@ -3,6 +3,7 @@ package com.bosandroidapp.oqmobilefinance.network
 import com.bosandroidapp.oqmobilefinance.BuildConfig
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
 import com.google.gson.GsonBuilder
+import com.stacker.stacker.StackerOkHttpInterceptor
 import okhttp3.Interceptor
 /*import com.stacker.stacker.StackerOkHttpInterceptor*/
 import okhttp3.OkHttpClient
@@ -30,7 +31,7 @@ object RetrofitClient {
         val okHttpClient = OkHttpClient.Builder()
             .retryOnConnectionFailure(true)
             .addInterceptor(headerInterceptor)
-            /*.addInterceptor(StackerOkHttpInterceptor())*/
+            .addInterceptor(StackerOkHttpInterceptor())
             .addInterceptor(AuthInterceptor())
             .authenticator(AuthAuthenticator())
             .connectTimeout(60, TimeUnit.SECONDS) // Connection timeout
@@ -51,7 +52,7 @@ object RetrofitClient {
         // Create OkHttpClient with 1-minute timeout settings
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor(headerInterceptor)
-           /* .addInterceptor(StackerOkHttpInterceptor())*/
+            .addInterceptor(StackerOkHttpInterceptor())
             .connectTimeout(120, TimeUnit.SECONDS) // Connection timeout
             .readTimeout(120, TimeUnit.SECONDS)      // server response time
             .writeTimeout(120, TimeUnit.SECONDS)     // request send time
@@ -70,7 +71,7 @@ object RetrofitClient {
         // Create OkHttpClient with 1-minute timeout settings
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor(headerInterceptor)
-           /* .addInterceptor(StackerOkHttpInterceptor())*/
+            .addInterceptor(StackerOkHttpInterceptor())
             .connectTimeout(60, TimeUnit.SECONDS) // Connection timeout
             .readTimeout(60, TimeUnit.SECONDS)    // Read timeout
             .writeTimeout(60, TimeUnit.SECONDS)   // Write timeout
@@ -89,7 +90,7 @@ object RetrofitClient {
         // Create OkHttpClient with 1-minute timeout settings
         val okHttpClient = OkHttpClient.Builder()
             .addInterceptor(headerInterceptor)
-          /*  .addInterceptor(StackerOkHttpInterceptor())*/
+            .addInterceptor(StackerOkHttpInterceptor())
             .connectTimeout(60, TimeUnit.SECONDS) // Connection timeout
             .readTimeout(60, TimeUnit.SECONDS)    // Read timeout
             .writeTimeout(60, TimeUnit.SECONDS)   // Write timeout

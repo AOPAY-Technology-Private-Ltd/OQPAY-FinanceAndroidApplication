@@ -14,8 +14,8 @@ class DikshifinsureRepository (private val apiInterface: ApiInterface){
 
      suspend fun getUpiMandateOnlineRequest(req: UPIMandateRequest) = apiInterface.getUpiMandateOnlineRequest(req)
 
-     suspend fun getUpiAutoMandateOrderStatusRequest(req: UpiAutoOrderStatusRequest) = apiInterface.getUpiAutoMandateOrderStatusRequest(req)
+  /*   suspend fun getUpiAutoMandateOrderStatusRequest(req: UpiAutoOrderStatusRequest) = apiInterface.getUpiAutoMandateOrderStatusRequest(req)
 
-     suspend fun getUpiAutoMandateTransactionRequest(req: UpiAutoTransactionRequest) = apiInterface.getUpiAutoMandateTransactionRequest(req)
+     suspend fun getUpiAutoMandateTransactionRequest(req: UpiAutoTransactionRequest) = apiInterface.getUpiAutoMandateTransactionRequest(req)*/
 
 }

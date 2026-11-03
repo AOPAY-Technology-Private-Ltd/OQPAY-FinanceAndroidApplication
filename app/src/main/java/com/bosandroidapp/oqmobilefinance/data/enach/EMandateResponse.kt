@@ -89,7 +89,7 @@ data class Customer(
 	val fnlColltnDt: String? = null,
 
 	@field:SerializedName("colltn_amt")
-	val colltnAmt: Int? = null,
+	val colltnAmt: Double? = null,
 
 	@field:SerializedName("submitted_on")
 	val submittedOn: String? = null,

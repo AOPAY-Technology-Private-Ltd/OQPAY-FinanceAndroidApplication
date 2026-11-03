@@ -27,6 +27,7 @@ import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
 import com.google.gson.Gson
+import com.stacker.stacker.StackerAndroid
 /*import com.stacker.stacker.StackerAndroid*/
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -52,7 +53,7 @@ class ApplicationClass : Application() {
         super.onCreate()
         instance = this
 
-        //StackerAndroid.enable(this)
+        StackerAndroid.enable(this)
 
         Log.d("ApplicationClass", "Application started")
 

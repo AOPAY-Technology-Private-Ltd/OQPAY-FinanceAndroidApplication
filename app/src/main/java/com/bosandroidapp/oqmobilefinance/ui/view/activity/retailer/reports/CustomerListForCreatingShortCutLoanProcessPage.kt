@@ -1351,7 +1351,11 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
 
             if(selectedAuthType!!.contains(ConstantClass.UPIAUTOPAY)){
                 var request = UPIMandateRequest(
-                    registrationID = request.registrationID
+                    registrationID = request.registrationID,
+                    customerCode = CustomerCodeForEnach,
+                    loanCode = request.loanNo,
+                    emiAmount = request.collectionAmount,
+                    lastEMIDueDate = request.finalCollectionDate,
                 )
                 Log.d("UPIMandateReq", Gson().toJson(request))
                 dikshifinsureViewModel.getUpiMandateOnlineRequest(request).observe(this) { resources ->

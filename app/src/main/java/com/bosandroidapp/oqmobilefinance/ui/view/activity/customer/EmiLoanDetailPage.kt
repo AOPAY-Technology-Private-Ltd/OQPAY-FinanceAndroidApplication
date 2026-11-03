@@ -627,7 +627,7 @@ class EmiLoanDetailPage : BaseActivity() {
 
                     lifecycleScope.launch {
 
-                        selectedNoofEmi = binding.noOfEmi.selectedItem.toString().toInt()
+                        selectedNoofEmi = binding.noOfEmi.selectedItemPosition + 1
                         // val file = saveImageToCache(this@EmiLoanDetailPage,receiptUri,"ReceiptPhoto")
                         // ConstantClass.OpenPopUpForVeryfyOTP(this@EmiLoanDetailPage)
                         var ForServerlatefine:String ?= ""

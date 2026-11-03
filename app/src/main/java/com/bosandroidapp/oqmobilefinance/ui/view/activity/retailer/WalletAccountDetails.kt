@@ -163,7 +163,7 @@ class WalletAccountDetails : BaseActivity() {
         }
 
 
-   /*     binding.walletamounttxt.setOnClickListener{
+        /*     binding.walletamounttxt.setOnClickListener{
             binding.walletamountcard.setCardBackgroundColor(ContextCompat.getColor(this, R.color.purple))
             binding.holdamountcard.setCardBackgroundColor(ContextCompat.getColor(this, R.color.white))
             binding.walletamounttxt.setTextColor(resources.getColor(R.color.white))

@@ -228,10 +228,6 @@ class RetailerEMandateVerifyPage : BaseActivity() {
                 try {
                     val uri = Uri.parse(url)
 
-                    if (!merchandId.isNullOrEmpty() && !registrationId.isNullOrEmpty()) {
-                        doUpdateUpiAutoMandateStatus()
-                    }
-                    else {
                         // Get query parameter
                         val transactionId = uri.getQueryParameter("c")
 
@@ -241,7 +237,7 @@ class RetailerEMandateVerifyPage : BaseActivity() {
                             // Call verify API here
                             doUpdateEMandateStatus(transactionId)
                         }
-                    }
+
 
                 }
                 catch (e: Exception) {
@@ -269,7 +265,8 @@ class RetailerEMandateVerifyPage : BaseActivity() {
                         view?.context?.startActivity(intent)
                         return true
                     }
-                } catch (e: Exception) {
+                }
+                catch (e: Exception) {
                     Log.e("WEBVIEW_ERROR", "Error parsing URI: $url", e)
                     try {
                         val fallbackIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
@@ -315,13 +312,13 @@ class RetailerEMandateVerifyPage : BaseActivity() {
 
         binding.eMandatewebview.loadUrl(webUrl!!)
 
-
-/*        val uri = Uri.parse(webUrl)
+        /*        val uri = Uri.parse(webUrl)
 
         val customTabsIntent = CustomTabsIntent.Builder()
             .build()
 
         customTabsIntent.launchUrl(this, uri)*/
+
     }
 
 
@@ -339,6 +336,7 @@ class RetailerEMandateVerifyPage : BaseActivity() {
             WebStorage.getInstance().deleteAllData()
         }
     }
+
 
 
     fun injectJs(webView: WebView?) {
@@ -403,10 +401,9 @@ class RetailerEMandateVerifyPage : BaseActivity() {
     }
 
 
-
     // hit api for  online emandate auto pay
 
-    fun doUpdateUpiAutoMandateStatus() {
+ /*   fun doUpdateUpiAutoMandateStatus() {
         if (isStatusCheckInProgress) return
         isStatusCheckInProgress = true
         (this@RetailerEMandateVerifyPage).runOnUiThread {
@@ -522,7 +519,7 @@ class RetailerEMandateVerifyPage : BaseActivity() {
                 }
             }
         }
-    }
+    }*/
 
 
     fun doUpdateEMandateStatus(eMandateID : String){

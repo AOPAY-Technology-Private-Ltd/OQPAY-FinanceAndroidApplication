@@ -226,22 +226,19 @@ class QRCodePage : BaseActivity() {
 
 
     private fun fetchEmandateOptions() {
-        var loanmode = preference.getStringValue(ConstantClass.Loanmode,"")
+        val loanmode = preference.getStringValue(ConstantClass.Loanmode, "")
 
         val req = EmandateOptionSelectetionReq(
             mode = loanmode,
-            registrationID = if (loanmode == ConstantClass.online) {
+            registrationID = if (loanmode.equals(ConstantClass.online, ignoreCase = true)) {
                 ConstantClass.Enach_Option_Online_REGISTRATION_ID
-            }
-            else {
+            } else {
                 ConstantClass.Enach_Option_Offline_REGISTRATION_ID
             }
         )
 
         setupEmandateOptions(req)
-
     }
-
 
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -486,8 +483,9 @@ class QRCodePage : BaseActivity() {
     fun hitApiForBankList(check: Boolean, showPopup: Boolean = true) {
         bankList.clear()
 
-        var req = BankListReq(
-            registrationID = if (ConstantClass.CheckOnlineOrOffline == ConstantClass.online) {
+        val loanmode = preference.getStringValue(ConstantClass.Loanmode, "")
+        val req = BankListReq(
+            registrationID = if (loanmode.equals(ConstantClass.online, ignoreCase = true)) {
                 ConstantClass.PAN_VERIFICATION_REGISTRATION_ID
             } else {
                 ConstantClass.PAN_VERIFICATION_REGISTRATION_ID_OFFLINE
@@ -590,7 +588,7 @@ class QRCodePage : BaseActivity() {
                 LoanStartDate=""
                 LoanEndDate=""
                 loancreatedreq= null
-                hitApiForCustomerRegister()
+               // hitApiForCustomerRegister()
             }
             else {
                 loaneCode=""
@@ -951,11 +949,7 @@ class QRCodePage : BaseActivity() {
                                         val startDate = getCurrentStartDate()
                                         val endDate = calculateEmiEndDateFromNow(Tenure.toInt())
 
-                                        val currentMode = if (ConstantClass.CheckOnlineOrOffline.equals(ConstantClass.offline, ignoreCase = true) || LoanMode.equals(ConstantClass.offline, ignoreCase = true)) {
-                                            ConstantClass.offline
-                                        } else {
-                                            ConstantClass.online
-                                        }
+                                        val currentMode = preference.getStringValue(ConstantClass.Loanmode, ConstantClass.online).ifBlank { ConstantClass.online }
                                         LoanMode = currentMode
                                         ConstantClass.CheckOnlineOrOffline = currentMode
 
@@ -1023,7 +1017,7 @@ class QRCodePage : BaseActivity() {
 
         else {
 
-            if (ConstantClass.CheckOnlineOrOffline.equals(ConstantClass.offline)) {
+            if (preference.getStringValue(ConstantClass.Loanmode, "").equals(ConstantClass.offline, ignoreCase = true)) {
                 userScore = 0.0f
             }
             else {
@@ -1092,7 +1086,7 @@ class QRCodePage : BaseActivity() {
 
             Log.d("RequestRegis", requestMap.toString())
 
-            if (ConstantClass.CheckOnlineOrOffline.equals(ConstantClass.offline)) {
+            if (preference.getStringValue(ConstantClass.Loanmode, "").equals(ConstantClass.offline, ignoreCase = true)) {
                 lifecycleScope.launch {
                     try {
                         val response = api.getRegisterCustomerReq(
@@ -1249,11 +1243,7 @@ class QRCodePage : BaseActivity() {
                                         val startDate = getCurrentStartDate()
                                         val endDate = calculateEmiEndDateFromNow(Tenure.toInt())
 
-                                        val currentMode = if (ConstantClass.CheckOnlineOrOffline.equals(ConstantClass.offline, ignoreCase = true) || LoanMode.equals(ConstantClass.offline, ignoreCase = true)) {
-                                            ConstantClass.offline
-                                        } else {
-                                            ConstantClass.online
-                                        }
+                                        val currentMode = preference.getStringValue(ConstantClass.Loanmode, ConstantClass.online).ifBlank { ConstantClass.online }
                                         LoanMode = currentMode
                                         ConstantClass.CheckOnlineOrOffline = currentMode
 
@@ -1468,11 +1458,7 @@ class QRCodePage : BaseActivity() {
                                     val startDate = getCurrentStartDate()
                                     val endDate = calculateEmiEndDateFromNow(Tenure.toInt())
 
-                                    val currentMode = if (ConstantClass.CheckOnlineOrOffline.equals(ConstantClass.offline, ignoreCase = true) || LoanMode.equals(ConstantClass.offline, ignoreCase = true)) {
-                                        ConstantClass.offline
-                                    } else {
-                                        ConstantClass.online
-                                    }
+                                    val currentMode = preference.getStringValue(ConstantClass.Loanmode, ConstantClass.online).ifBlank { ConstantClass.online }
                                     LoanMode = currentMode
                                     ConstantClass.CheckOnlineOrOffline = currentMode
 
@@ -1783,7 +1769,8 @@ class QRCodePage : BaseActivity() {
                 }
             }
         }
-        
+
+
     }
 
 
@@ -1922,7 +1909,6 @@ class QRCodePage : BaseActivity() {
     }
 
 
-
     @SuppressLint("SetTextI18n")
     fun OpenPopUpForVAlert() {
         dialog = Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
@@ -1963,7 +1949,6 @@ class QRCodePage : BaseActivity() {
         dialog.show()
 
     }
-
 
 
     fun hitApiForLogin() {
@@ -2362,8 +2347,9 @@ class QRCodePage : BaseActivity() {
 
     fun hitApiForCheckLoanCharge(loancreatedreq: LoanCreatedReq){
 
+        val loanmode = preference.getStringValue(ConstantClass.Loanmode, "").ifBlank { loancreatedreq.loanMode }
         var request = LoanChargeReq(
-            registrationID =   if (loancreatedreq.loanMode == ConstantClass.online) {
+            registrationID = if (loanmode.equals(ConstantClass.online, ignoreCase = true)) {
                 ConstantClass.PENNYDROP_REGISTRATION_ID
             } else {
                 ConstantClass.PENNYDROP_REGISTRATION_ID_OFFLINE
@@ -2465,6 +2451,7 @@ class QRCodePage : BaseActivity() {
         }
 
     }
+
 
 
     /* fun hitApiForEMandateStatus(request: ENachStatusReq) {

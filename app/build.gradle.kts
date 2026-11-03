@@ -138,7 +138,7 @@ dependencies {
 
 
 
-   /* val stacker = "com.github.jatinsinghsatija.Stacker"
+    val stacker = "com.github.jatinsinghsatija.Stacker"
     val stackerVersion = "v0.2.0"
 
 
@@ -148,13 +148,13 @@ dependencies {
 
 
     releaseImplementation("$stacker:stacker_inspector_release:$stackerVersion")
-    releaseImplementation("$stacker:flutter_release:$stackerVersion")*/
+    releaseImplementation("$stacker:flutter_release:$stackerVersion")
 
 
 
     // for Provisioning dependency ......................................
 
-    implementation("com.github.jatinsinghsatija:Provisioner-Jatt-SDK:v1.2.3")
+    implementation("com.github.jatinsinghsatija:Provisioner-Jatt-SDK:v1.3.0")
 
 
 }

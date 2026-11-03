@@ -49,7 +49,8 @@ class DikshifinsureViewModel(private val repository: DikshifinsureRepository) : 
         }
     }
 
-    fun getUpiAutoMandateOrderStatusRequest(req: UpiAutoOrderStatusRequest) = liveData(Dispatchers.IO) {
+
+/*    fun getUpiAutoMandateOrderStatusRequest(req: UpiAutoOrderStatusRequest) = liveData(Dispatchers.IO) {
         emit(ApiResponse.loading(data = null))
         try {
             emit(ApiResponse.success(data = repository.getUpiAutoMandateOrderStatusRequest(req)))
@@ -67,7 +68,7 @@ class DikshifinsureViewModel(private val repository: DikshifinsureRepository) : 
         catch (exception: Exception) {
             emit(ApiResponse.error(data = null, message = exception.message?: "Error Occurred!"))
         }
-    }
+    }*/
 
 
 

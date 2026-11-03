@@ -782,19 +782,17 @@ interface ApiInterface {
     suspend fun geteMandateOnlineSatusRequest(@Body req: ENachStatusReq): Response<ENachStatusResp>?
 
 
-
-
     // for UPI Auto Mandate Api ....................................................................
     @POST("api/OQPay/Finance/V1/SetupSubscription/Pennydrop")
     suspend fun getUpiMandateOnlineRequest(@Body req: UPIMandateRequest): Response<UPIMandateResponse>?
 
 
-    @POST("api/OQPay/Finance/V1/SetupSubscription/Order/Status")
+/*    @POST("api/OQPay/Finance/V1/SetupSubscription/Order/Status")
     suspend fun getUpiAutoMandateOrderStatusRequest(@Body req: UpiAutoOrderStatusRequest): Response<UpiAutoOrderStatusResponse>?
 
 
     @POST("api/OQPay/Finance/V1/SetupSubscription/Transaction")
-    suspend fun getUpiAutoMandateTransactionRequest(@Body req: UpiAutoTransactionRequest): Response<UpiAutoTransactionResponse>?
+    suspend fun getUpiAutoMandateTransactionRequest(@Body req: UpiAutoTransactionRequest): Response<UpiAutoTransactionResponse>?*/
 
 
     //............................................................................................
@@ -810,7 +808,7 @@ interface ApiInterface {
     suspend fun uploadDeviceInfo(@Body req : UploadDeviceInfoReq): Response<UploadDeviceInfoResp>?
 
 
-    // customer device info
+    // update EmandateDetails .......................................................................
     @POST("api/V1/OQFinance/UpdateEmandateDetails")
     suspend fun UpdateEmandateDetails(@Body req : EnachDateUploadReq): Response<EnachDateUploadResp>?
 
