@@ -193,7 +193,7 @@ class LoginPage : BaseActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
-/*        binding.loginlayout.setOnClickListener {
+        /*        binding.loginlayout.setOnClickListener {
             var emailOfMobile = binding.emailormobilenumber.text.toString().trim()
             var password = binding.password.text.toString().trim()
 
@@ -222,21 +222,26 @@ class LoginPage : BaseActivity() {
         }
 
         binding.customerloginlayout.setOnClickListener {
-            var mobnumber = binding.mobilenumber.text.toString()
+            val mobnumber = binding.mobilenumber.text.toString().trim()
             if (ConstantClass.validateLoginInput(mobnumber, this)) {
                 if (isInternetAvailable(this@LoginPage)) {
-                    /*if (!isSimPresent()) {
-                        Toast.makeText(this, "No SIM detected. Insert SIM to continue.", Toast.LENGTH_LONG).show()
-                        return@setOnClickListener
-                    }*/
-                    hitApiForSendOTP(mobnumber, "Mobile")
+                    if (FireBaseToken.isBlank()) {
+                        FireBaseToken = preference.getStringValue(ConstantClass.FCMTOKEN, "")
+                    }
+                    if (FireBaseToken.isBlank()) {
+                        Log.d("FCM_TOKEN", "FireBaseToken is empty, auto-calling getFirebaseToken()...")
+                        getFirebaseToken { token ->
+                            Log.d("FCM_TOKEN", "Auto-retrieved FCM Token for Customer OTP: $token")
+                            hitApiForSendOTP(mobnumber, "Mobile")
+                        }
+                    } else {
+                        Log.d("FCM_TOKEN", "Customer Login using FCM Token: $FireBaseToken")
+                        hitApiForSendOTP(mobnumber, "Mobile")
+                    }
                 } else {
                     Toast.makeText(this, "Please check your internet connection!!", Toast.LENGTH_SHORT).show()
                 }
-            } else {
-
             }
-
         }
 
     }
@@ -253,7 +258,24 @@ class LoginPage : BaseActivity() {
     }
 
 
-    fun hitApiForCustomerLogin(emailOfMobile: String, password: String){
+    fun hitApiForCustomerLogin(emailOfMobile: String, password: String) {
+        if (FireBaseToken.isBlank()) {
+            FireBaseToken = preference.getStringValue(ConstantClass.FCMTOKEN, "")
+        }
+
+        if (FireBaseToken.isBlank()) {
+            Log.d("FCM_TOKEN", "FireBaseToken is empty, auto-calling getFirebaseToken()...")
+            getFirebaseToken { token ->
+                Log.d("FCM_TOKEN", "Auto-retrieved FCM Token for customer login: $token")
+                executeCustomerLogin(emailOfMobile, password)
+            }
+        } else {
+            Log.d("FCM_TOKEN", "Executing Customer Login with FCM Token: $FireBaseToken")
+            executeCustomerLogin(emailOfMobile, password)
+        }
+    }
+
+    private fun executeCustomerLogin(emailOfMobile: String, password: String) {
         val deviceId = Settings.Secure.getString(contentResolver, Settings.Secure.ANDROID_ID)
         preference.setStringValue("deviceid", deviceId)
 
@@ -424,7 +446,6 @@ class LoginPage : BaseActivity() {
 
         return true // Input is valid
     }
-
 
 
     // for customer login flow
@@ -995,18 +1016,19 @@ class LoginPage : BaseActivity() {
     }
 
 
-    fun getFirebaseToken() {
+    fun getFirebaseToken(onTokenRetrieved: ((String) -> Unit)? = null) {
         FirebaseMessaging.getInstance().token
             .addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
                     Log.e("FCM", "Fetching token failed", task.exception)
+                    onTokenRetrieved?.invoke("")
                     return@addOnCompleteListener
                 }
-                val fcmToken = task.result
+                val fcmToken = task.result.orEmpty()
                 FireBaseToken = fcmToken
                 preference.setStringValue(ConstantClass.FCMTOKEN, FireBaseToken)
-                //sendDataToEmail("FCM Token: $fcmToken") // for testing
-                Log.d("FCM_TOKEN", fcmToken)
+                Log.d("FCM_TOKEN", "Retrieved FCM Token: $fcmToken")
+                onTokenRetrieved?.invoke(fcmToken)
             }
     }
 
