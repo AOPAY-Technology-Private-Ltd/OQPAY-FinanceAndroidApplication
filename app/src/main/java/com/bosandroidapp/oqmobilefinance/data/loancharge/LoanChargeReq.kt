@@ -9,4 +9,6 @@ data class LoanChargeReq(
 
 	@field:SerializedName("RetailerCode")
 	val retailerCode: String? = null
+
 )
+
