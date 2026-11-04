@@ -102,6 +102,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.Aad
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.AadharVerificationResp
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.PanVerificationReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.verification.PanVerificationResponse
+import com.bosandroidapp.oqmobilefinance.data.model.updatecibilscore.CibilScoreResp
 import com.bosandroidapp.oqmobilefinance.data.notification.NotificationSendTokenRequest
 import com.bosandroidapp.oqmobilefinance.data.notification.NotificationSendTokenResponse
 import com.bosandroidapp.oqmobilefinance.data.notification.SendNotificationFeatureNameRequest
@@ -151,8 +152,9 @@ interface ApiInterface {
 
     // cibil api for getting cibil score...............
 
-    @POST("api/AOP/CreditAnalytics/Report")
-    suspend fun getcibilscore(@Body req : CibilScoreReq): Response<CibilScroeResp>?
+   /* @POST("api/AOP/CreditAnalytics/Report")*/
+    @POST("api/OQPay/Online/V2/Transunion/Score/Hybrid")
+    suspend fun getcibilscore(@Body req : CibilScoreReq): Response<CibilScoreResp>?
 
 
     // low cibil score customer report ....................
