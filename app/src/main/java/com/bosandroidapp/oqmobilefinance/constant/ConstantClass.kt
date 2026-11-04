@@ -101,7 +101,6 @@ import java.util.concurrent.TimeUnit
 
 object ConstantClass {
 
-
     // Environment Definition
     enum class AppEnvironment(
         val baseUrl: String,
