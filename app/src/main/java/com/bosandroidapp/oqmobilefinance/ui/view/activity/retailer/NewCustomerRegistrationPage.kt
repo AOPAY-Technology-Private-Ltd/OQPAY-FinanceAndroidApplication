@@ -27,6 +27,7 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -241,6 +242,19 @@ class NewCustomerRegistrationPage : BaseActivity() {
         binding = ActivityNewCustomerRegistrationPageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                PanNumber = ""
+                PanFrontImageUri = null
+                ConstantClass.AadharVerified = ""
+                CheckOnlineOrOffline = ""
+                AadharTransactionIdNo = ""
+                iisAggrementVerified = false
+                isAggrementVerified = ""
+                finish()
+            }
+        })
+
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { view, insets ->
             val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             view.setPadding(systemBarsInsets.left, 0, systemBarsInsets.right, systemBarsInsets.bottom)
@@ -421,6 +435,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
         })
 
+
         binding.areasector.addTextChangedListener(object :TextWatcher{
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
 
@@ -444,6 +459,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
         })
 
+
         binding.currentaddress.addTextChangedListener(object :TextWatcher{
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
 
@@ -466,6 +482,8 @@ class NewCustomerRegistrationPage : BaseActivity() {
             }
 
         })
+
+
 
         binding.statename.addTextChangedListener(object :TextWatcher{
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -1657,19 +1675,6 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
 
 
-    override fun onBackPressed() {
-        PanNumber=""
-        PanFrontImageUri= null
-        ConstantClass.AadharVerified=""
-        CheckOnlineOrOffline =""
-        AadharTransactionIdNo =""
-        iisAggrementVerified = false
-        isAggrementVerified = ""
-        super.onBackPressed()
-    }
-
-
-
     @SuppressLint("SetTextI18n")
     fun OpenPopUpForVAlert() {
         dialog = Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
@@ -2134,14 +2139,10 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
                                 Log.d("cibilresp", Gson().toJson(response))
 
+                                val isStatusTrue = response.status.toLowerCase().equals("true", ignoreCase = true)
+                                val isHttpSuccess = response.httpResponseCode == "200"
 
-                                if(response.status.toLowerCase().equals("false")&& !response.resultCode.equals("101")){
-                                    PopOpForCibileScoreRequestToAdmin(response.message.toString(), "Record Message",false)
-                                    binding.createaccount.isEnabled = true
-                                }
-
-
-                                if (!response.httpResponseCode.isNullOrBlank() && response.httpResponseCode.equals("200")) {
+                                if (isStatusTrue && isHttpSuccess) {
                                     Toast.makeText(this@NewCustomerRegistrationPage, response.message.toString(), Toast.LENGTH_SHORT).show()
 
                                     if (response.result != null && response.result.resultJson != null) {
@@ -2286,9 +2287,11 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                         PopOpForCibileScoreRequestToAdmin(response.message.toString(), "Record Message", false)
                                         binding.createaccount.isEnabled = true
                                     }
-                                } else {
-                                    Toast.makeText(this@NewCustomerRegistrationPage, response.message, Toast.LENGTH_LONG).show()
+                                }
+                                else {
                                     binding.createaccount.isEnabled = true
+                                    val errorMsg = if (!response.message.isNullOrBlank()) response.message else "Authentication failed. Please contact administrator."
+                                    PopOpForCibileScoreRequestToAdmin(errorMsg, "Authentication Error", false)
                                 }
 
                             }

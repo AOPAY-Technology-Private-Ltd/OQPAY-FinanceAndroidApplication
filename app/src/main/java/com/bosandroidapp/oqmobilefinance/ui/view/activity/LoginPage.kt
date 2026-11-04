@@ -117,41 +117,51 @@ class LoginPage : BaseActivity() {
             binding.retailerLogin.visibility = View.VISIBLE
             binding.customerLogin.visibility = View.GONE
             binding.emailormobilenumber.requestFocus()
-
-            binding.emailormobilenumber.postDelayed({
-                binding.emailormobilenumber.requestFocus()
-                val imm = getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.showSoftInput(binding.emailormobilenumber, InputMethodManager.SHOW_FORCED)
-
-                binding.main.viewTreeObserver.addOnGlobalLayoutListener {
-                    val rect = Rect()
-                    binding.main.getWindowVisibleDisplayFrame(rect)
-
-                    val screenHeight = binding.main.rootView.height
-                    val keypadHeight = screenHeight - rect.bottom
-
-                    Log.d(
-                        "KeyboardCheck",
-                        "screenHeight=$screenHeight, rect.bottom=${rect.bottom}, keypadHeight=$keypadHeight"
-                    )
-
-                    if (keypadHeight > screenHeight * 0.20) {
-                        //  Keyboard is open
-
-                        binding.scrollview.post {
-                            binding.scrollview.smoothScrollTo(0, binding.scrollview.bottom)
-                        }
-
-                    }
-                }
-
-            }, 300)
-
-        }
-        else {
+        } else {
             binding.retailerLogin.visibility = View.GONE
             binding.customerLogin.visibility = View.VISIBLE
             binding.customerLoginLayout.visibility = View.VISIBLE
+            binding.mobilenumber.requestFocus()
+        }
+        setupAutoScrollForKeyboard()
+    }
+
+    private fun setupAutoScrollForKeyboard() {
+        val focusChangeListener = View.OnFocusChangeListener { view, hasFocus ->
+            if (hasFocus) {
+                binding.scrollview.postDelayed({
+                    val rect = Rect()
+                    view.getDrawingRect(rect)
+                    binding.scrollview.offsetDescendantRectToMyCoords(view, rect)
+                    val scrollToY = (rect.top - 120).coerceAtLeast(0)
+                    binding.scrollview.smoothScrollTo(0, scrollToY)
+                }, 200)
+            }
+        }
+
+        binding.emailormobilenumber.onFocusChangeListener = focusChangeListener
+        binding.password.onFocusChangeListener = focusChangeListener
+        binding.mobilenumber.onFocusChangeListener = focusChangeListener
+
+        binding.main.viewTreeObserver.addOnGlobalLayoutListener {
+            val rect = Rect()
+            binding.main.getWindowVisibleDisplayFrame(rect)
+
+            val screenHeight = binding.main.rootView.height
+            val keypadHeight = screenHeight - rect.bottom
+
+            if (keypadHeight > screenHeight * 0.15) {
+                val currentFocusedView = currentFocus
+                if (currentFocusedView != null) {
+                    binding.scrollview.post {
+                        val focusedRect = Rect()
+                        currentFocusedView.getDrawingRect(focusedRect)
+                        binding.scrollview.offsetDescendantRectToMyCoords(currentFocusedView, focusedRect)
+                        val scrollToY = (focusedRect.top - 120).coerceAtLeast(0)
+                        binding.scrollview.smoothScrollTo(0, scrollToY)
+                    }
+                }
+            }
         }
     }
 

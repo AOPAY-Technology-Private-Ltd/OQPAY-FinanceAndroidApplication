@@ -1658,6 +1658,7 @@ class QRCodePage : BaseActivity() {
                                             else{
                                                 CustomerCodeForEnach = response.data!!.customerCode!!
                                             }
+                                            preference.setStringValue(ConstantClass.CustomerCode,response.data!!.customerCode!!)
 
                                             LoanCodeForEnach = response.data!!.loanCode!!
                                             RetailerCodeForEnach = response.data!!.retailerCode!!
@@ -2159,7 +2160,7 @@ class QRCodePage : BaseActivity() {
             if(selectedAuthType!!.contains(ConstantClass.UPIAUTOPAY)){
                 var request = UPIMandateRequest(
                     registrationID = request.registrationID,
-                    customerCode = CustomerCodeForEnach,
+                    customerCode = preference.getStringValue(ConstantClass.CustomerCode,""),
                     loanCode = request.loanNo,
                     emiAmount = request.collectionAmount,
                     lastEMIDueDate = request.finalCollectionDate,
