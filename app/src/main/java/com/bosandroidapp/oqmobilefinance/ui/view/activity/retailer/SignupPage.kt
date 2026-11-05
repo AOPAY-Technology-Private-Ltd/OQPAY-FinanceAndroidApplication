@@ -1260,8 +1260,6 @@ class SignupPage : BaseActivity() {
             binding.firstName.error = null
         }*/
 
-        ///................................as per Guru testing flow....................................................................................
-
 
         /*if (gstNumber.isBlank() || !ConstantClass.isValidGST(gstNumber)) {
             binding.gstEditText.error= "Enter a valid GST number (e.g., 07ABCDE1234F1Z5)"
@@ -1282,6 +1280,8 @@ class SignupPage : BaseActivity() {
         else{
             binding.gstEditText.error = null
         }*/
+
+        ///....................................................................................................................
 
 
         if (storeName.isNullOrBlank() ) {
