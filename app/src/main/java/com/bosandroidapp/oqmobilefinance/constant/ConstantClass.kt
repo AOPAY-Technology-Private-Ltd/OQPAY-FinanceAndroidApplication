@@ -109,8 +109,7 @@ object ConstantClass {
         val panRegId: String,
         val pennyDropRegId: String,
         val panRegIdOffline: String,
-        val pennyDropRegIdOffline: String
-    ) {
+        val pennyDropRegIdOffline: String) {
         RELEASE_UAT(
             baseUrl = "https://uat.api.oqpay.in/",
             baseUrlImage = "https://uat.api.oqpay.in",
@@ -214,8 +213,10 @@ object ConstantClass {
 
 
     const val SMS_BASE_URL = "http://web.adcruxmedia.in/"
+
    // const val PAN_BASE_URL = "https://api.aopay.in/"
     const val PAN_BASE_URL = "https://uat.api.aopay.in/"
+
    //  const val ONLINE_PG = "https://api.dikshifinsure.com/"
     const val ONLINE_PG = "https://uat.api.dikshifinsure.com/"
 

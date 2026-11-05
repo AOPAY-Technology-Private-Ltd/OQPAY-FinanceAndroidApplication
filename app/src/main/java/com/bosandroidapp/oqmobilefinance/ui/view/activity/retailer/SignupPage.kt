@@ -1198,7 +1198,7 @@ class SignupPage : BaseActivity() {
             binding.address.error = null
         }
 
-        // .............................................................for testing purpose............................................
+        // .............................................................for not use............................................
 
         val aadhaarRegex = Regex("^[2-9][0-9]{11}$")
         val maskedAadhaarRegex = Regex("^[xX]{8}[0-9]{4}$")
@@ -1260,7 +1260,7 @@ class SignupPage : BaseActivity() {
             binding.firstName.error = null
         }*/
 
-        ///................................as per Guru teting flow....................................................................................
+        ///................................as per Guru testing flow....................................................................................
 
 
         /*if (gstNumber.isBlank() || !ConstantClass.isValidGST(gstNumber)) {
