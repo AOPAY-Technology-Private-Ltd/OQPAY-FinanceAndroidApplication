@@ -1270,6 +1270,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
     }
 
 
+
     private fun createImageFile(): File {
         val fileName = "IMG_${System.currentTimeMillis()}"
         val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)

@@ -84,7 +84,7 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
 
             when {
                 // Payment Success
-                status == "SUCCESS" || uri.path?.contains("/success", ignoreCase = true) == true -> {
+                status == "SUCCESS"  == true -> {
                     isPaymentProcessed = true
                     Log.d("PAYU", "Payment Success: $url")
 
@@ -110,7 +110,7 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
                 }
 
                 // Payment Failed
-                status == "FAILED" || uri.path?.contains("/failure", ignoreCase = true) == true -> {
+                status == "FAILED"  == true -> {
                     isPaymentProcessed = true
                     Log.d("PAYU", "Payment Failed: $url")
 
@@ -122,7 +122,7 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
                 }
 
                 // Payment Cancelled
-                status == "CANCEL" || status == "CANCELLED" || uri.path?.contains("/cancel", ignoreCase = true) == true || uri.getQueryParameter("action")?.equals("userCancel", ignoreCase = true) == true -> {
+                status == "CANCEL"   == true -> {
                     isPaymentProcessed = true
                     Log.d("PAYU", "Payment Cancelled: $url")
 

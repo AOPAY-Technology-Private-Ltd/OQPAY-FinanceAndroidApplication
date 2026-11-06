@@ -26,6 +26,7 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -223,8 +224,14 @@ class PaymentInformation : BaseActivity() {
         }
 
 
+       /* onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                OpenPopUpForVAlert()
+            }
+        })*/
+
         setView()
-        hitApiForBankList()
+       
         setDataInSpinner()
         setOnClickListner()
 
@@ -241,7 +248,7 @@ class PaymentInformation : BaseActivity() {
         super.onResume()
 
         hitApiForLogin()
-
+        hitApiForBankList()
         if(ConstantClass.CheckOnlineOrOffline.equals(ConstantClass.online)){
 
             if (checkKYC) {
@@ -294,6 +301,7 @@ class PaymentInformation : BaseActivity() {
 
     fun hitApiForBankList() {
         bankList.clear()
+        bankName.clear()
 
         var req = BankListReq(
             registrationID = if (ConstantClass.CheckOnlineOrOffline == ConstantClass.online) {
@@ -308,6 +316,7 @@ class PaymentInformation : BaseActivity() {
           resources.let {
               when (it.apiStatus) {
                   ApiStatus.SUCCESS -> {
+                      binding.swiperefresh.isRefreshing = false
                       it.data.let { users ->
                           users!!.body().let { response ->
                               ConstantClass.dialog.dismiss()
@@ -341,12 +350,15 @@ class PaymentInformation : BaseActivity() {
                   }
 
                   ApiStatus.ERROR -> {
+                      binding.swiperefresh.isRefreshing = false
                       ConstantClass.dialog.dismiss()
                       Toast.makeText(this@PaymentInformation, resources.message ?: "Error occurred", Toast.LENGTH_SHORT).show()
                   }
 
                   ApiStatus.LOADING -> {
-                       ConstantClass.OpenPopUpForVeryfyOTP(this)
+                       if (!binding.swiperefresh.isRefreshing) {
+                           ConstantClass.OpenPopUpForVeryfyOTP(this)
+                       }
                   }
 
               }
@@ -495,17 +507,24 @@ class PaymentInformation : BaseActivity() {
     }
 
 
-    override fun onBackPressed() {
 
-    }
 
     fun setOnClickListner(){
+
+        binding.swiperefresh.setOnRefreshListener {
+            if (isInternetAvailable(this@PaymentInformation)) {
+                hitApiForBankList()
+            } else {
+                binding.swiperefresh.isRefreshing = false
+                Toast.makeText(this, "Please check your internet connection!!", Toast.LENGTH_SHORT).show()
+            }
+        }
 
         binding.home.setOnClickListener {
             val intent = Intent(this, DashBoard::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
-            onBackPressed()
+            finish()
         }
 
         binding.refmobno.addTextChangedListener(object : TextWatcher {
@@ -661,7 +680,6 @@ class PaymentInformation : BaseActivity() {
 
                         Log.d("PaymentInformationreq", Gson().toJson(req))
                         hitApiForUploadCustomerBankDataData(req)*/
-
                         hitApiForRequestPennyDrop()
 
                     }

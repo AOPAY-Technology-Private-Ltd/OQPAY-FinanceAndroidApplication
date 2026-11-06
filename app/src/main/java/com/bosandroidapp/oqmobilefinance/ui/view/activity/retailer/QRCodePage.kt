@@ -1645,6 +1645,7 @@ class QRCodePage : BaseActivity() {
 
                                         if (response.status?.toLowerCase().equals(ConstantClass.LoanSuccessStatus)) {
                                             binding.LoanCreatelayout.isEnabled = false
+                                            binding.LoanCreatelayout.visibility = View.GONE
                                             loaneCode = response.data!!.loanCode!!
                                             ConstantClass.LoanRID = response.data!!.rid!!
                                             FirstName = CustFirstName
@@ -1692,6 +1693,8 @@ class QRCodePage : BaseActivity() {
                                             if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
                                                 ConstantClass.dialog.dismiss()
                                             }
+                                            binding.LoanCreatelayout.visibility = View.VISIBLE
+                                            binding.LoanCreatelayout.isEnabled= true
                                         }
 
                                     }
@@ -1699,6 +1702,10 @@ class QRCodePage : BaseActivity() {
                                     Toast.makeText(this, error, Toast.LENGTH_LONG).show()
                             }
                             else{
+
+                                binding.LoanCreatelayout.visibility = View.VISIBLE
+                                binding.LoanCreatelayout.isEnabled= true
+
                                 val errorBody = users.errorBody()?.string()
 
                                 Log.e("API_RESPONSE_ERROR", errorBody ?: "Unknown error")
@@ -1745,16 +1752,15 @@ class QRCodePage : BaseActivity() {
                             ConstantClass.dialog.dismiss()
                         }
 
+                        binding.LoanCreatelayout.visibility = View.VISIBLE
+                        binding.LoanCreatelayout.isEnabled= true
+
                         // ✅ Print the full error details
                         Log.e("API_ERROR", "Status: ERROR")
                         Log.e("API_ERROR_CODE", resources.data?.code().toString())
                         Log.e("API_ERROR_MSG", resources.message ?: "Unknown Error")
 
-                        Toast.makeText(
-                            this,
-                            "Server error occurred (Code: ${resources.data?.code() ?: "Unknown"})",
-                            Toast.LENGTH_LONG
-                        ).show()
+                        Toast.makeText(this, "Server error occurred (Code: ${resources.data?.code() ?: "Unknown"})", Toast.LENGTH_LONG).show()
 
                         // Optional: Handle specific 500 error
                         if (resources.data?.code() == 500) {
@@ -2070,7 +2076,6 @@ class QRCodePage : BaseActivity() {
     fun hitApiForEnach(request: EMandateRequest, mode: String, check: Boolean) {
         Log.d("eManadateReq", Gson().toJson(request))
 
-
         if(mode.equals(ConstantClass.offline)) {
             panViewModel.getEMandateRequestReq(request).observe(this) { resources ->
                 resources.let {
@@ -2158,6 +2163,7 @@ class QRCodePage : BaseActivity() {
 
             }
         }
+
         else{
 
             if(selectedAuthType!!.contains(ConstantClass.UPIAUTOPAY)){
@@ -2412,6 +2418,7 @@ class QRCodePage : BaseActivity() {
                 }
             }
         }
+
     }
 
 
