@@ -151,7 +151,6 @@ object ConstantClass {
     }
 
 
-
     // Change current environment here: RELEASE_UAT | STAGING | DEV | PRODUCTION
     val CURRENT_ENVIRONMENT = AppEnvironment.RELEASE_UAT
     val BASE_URL = CURRENT_ENVIRONMENT.baseUrl

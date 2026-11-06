@@ -38,22 +38,22 @@ data class CustomerReportDataItem(
 	val productDetails: String? = null,
 
 	@field:SerializedName("settlementOrForeclosureCharg")
-	val settlementOrForeclosureCharg: Any? = null,
+	val settlementOrForeclosureCharg: Double? = null,
 
 	@field:SerializedName("settlementOrForeclosureStatus")
-	val settlementOrForeclosureStatus: Any? = null,
+	val settlementOrForeclosureStatus: String? = null,
 
 	@field:SerializedName("totalOtherCharge")
-	val totalOtherCharge: Int? = null,
+	val totalOtherCharge: Double? = null,
 
 	@field:SerializedName("emiAmount")
-	val emiAmount: Any? = null,
+	val emiAmount: Double? = null,
 
 	@field:SerializedName("totalLateFine")
-	val totalLateFine: Int? = null,
+	val totalLateFine: Double? = null,
 
 	@field:SerializedName("downPayment")
-	val downPayment: Any? = null,
+	val downPayment: Double? = null,
 
 	@field:SerializedName("duesEMI")
 	val duesEMI: Int? = null,
@@ -65,7 +65,7 @@ data class CustomerReportDataItem(
 	val paidEMICount: Int? = null,
 
 	@field:SerializedName("finalPaidAmount")
-	val finalPaidAmount: Any? = null,
+	val finalPaidAmount: Double? = null,
 
 	@field:SerializedName("tenure")
 	val tenure: Int? = null,
@@ -116,10 +116,10 @@ data class CustomerReportDataItem(
 	val bankName: String? = null,
 
 	@field:SerializedName("txnNo")
-	val txnNo: Any? = null,
+	val txnNo: String? = null,
 
 	@field:SerializedName("settlementOrForeclosuredate")
-	val settlementOrForeclosuredate: Any? = null,
+	val settlementOrForeclosuredate: String? = null,
 
 	@field:SerializedName("retailerName")
 	val retailerName: String? = null,
@@ -128,7 +128,7 @@ data class CustomerReportDataItem(
 	val emAccountNumber: String? = null,
 
 	@field:SerializedName("lastPaymentDate")
-	val lastPaymentDate: Any? = null,
+	val lastPaymentDate: String? = null,
 
 	@field:SerializedName("emIfscCode")
 	val emIfscCode: String? = null,
@@ -140,7 +140,7 @@ data class CustomerReportDataItem(
 	val isSuccess: Boolean? = null,
 
 	@field:SerializedName("interestRate")
-	val interestRate: Int? = null,
+	val interestRate: Double? = null,
 
 	@field:SerializedName("emAccountType")
 	val emAccountType: String? = null,
@@ -152,10 +152,10 @@ data class CustomerReportDataItem(
 	val paidEMI: Int? = null,
 
 	@field:SerializedName("paymentMode")
-	val paymentMode: Any? = null,
+	val paymentMode: String? = null,
 
 	@field:SerializedName("totalWaiveOffAmount")
-	val totalWaiveOffAmount: Int? = null,
+	val totalWaiveOffAmount: Double? = null,
 
 	@field:SerializedName("branchName")
 	val branchName: String? = null,
@@ -167,16 +167,16 @@ data class CustomerReportDataItem(
 	val accountNumber: String? = null,
 
 	@field:SerializedName("loanAmount")
-	val loanAmount: Any? = null,
+	val loanAmount: Double? = null,
 
 	@field:SerializedName("recordStatus")
 	val recordStatus: String? = null,
 
 	@field:SerializedName("totalBouncingCharge")
-	val totalBouncingCharge: Int? = null,
+	val totalBouncingCharge: Double? = null,
 
 	@field:SerializedName("totalPendingAmount")
-	val totalPendingAmount: Any? = null,
+	val totalPendingAmount: Double? = null,
 
 	@field:SerializedName("pendingEMICount")
 	val pendingEMICount: Int? = null,
@@ -185,5 +185,5 @@ data class CustomerReportDataItem(
 	val loanCode: String? = null,
 
 	@field:SerializedName("txnDate")
-	val txnDate: Any? = null
+	val txnDate: String? = null
 )
