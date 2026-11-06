@@ -37,6 +37,8 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AadharFrontImage
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AadharNumber
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.AadharTransactionIdNo
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CheckOnlineOrOffline
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustPrimaryMobileNumber
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.CustPrimaryMobileVerified
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.ENTEREDCUSTOMERDOB
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.LoginMobileorMailid
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.Loginpassword
@@ -151,6 +153,8 @@ class IDVerificationPage : BaseActivity() {
                         RefAadharTransactionIdNo = ""
                         ReferenceAadharVerified=""
                         ReferenceAadharNumber=""
+                        CustPrimaryMobileNumber = ""
+                        CustPrimaryMobileVerified = "no"
                         preference.setStringValue(ConstantClass.Loanmode,ConstantClass.online)
                         onResume()
                     }
@@ -166,6 +170,8 @@ class IDVerificationPage : BaseActivity() {
                         RefAadharTransactionIdNo = ""
                         ReferenceAadharVerified=""
                         ReferenceAadharNumber=""
+                        CustPrimaryMobileNumber = ""
+                        CustPrimaryMobileVerified = "no"
                         preference.setStringValue(ConstantClass.Loanmode,ConstantClass.offline)
                         onResume()
                     }

@@ -110,7 +110,7 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
                 }
 
                 // Payment Failed
-                status == "FAILURE" || uri.path?.contains("/failure", ignoreCase = true) == true -> {
+                status == "FAILED" || uri.path?.contains("/failure", ignoreCase = true) == true -> {
                     isPaymentProcessed = true
                     Log.d("PAYU", "Payment Failed: $url")
 
@@ -232,27 +232,7 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
     }
 
 
-     /*    fun injectJs(webView: WebView?) {
-        webView?.evaluateJavascript("""
-        (function() {
-            function notify() {
-                Android.onUrlChange(window.location.href);
-            }
-            var pushState = history.pushState;
-            history.pushState = function() {
-                pushState.apply(history, arguments);
-                notify();
-            };
-            var replaceState = history.replaceState;
-            history.replaceState = function() {
-                replaceState.apply(history, arguments);
-                notify();
-            };
-            window.addEventListener('popstate', notify);
-            notify(); 
-        })();
-    """.trimIndent(), null)
-    }*/
+
 
 
     fun injectJs(webView: WebView?) {
@@ -317,145 +297,6 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
     }
 
 
-
- /*   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        if (requestCode == 2001) {
-            Log.d("AUTOUPI", "Returned from UPI app")
-            doUpdateUpiAutoMandateStatus()
-        }
-
-    }*/
-
-
-  /*  fun doUpdateUpiAutoMandateStatus() {
-        if (isStatusCheckInProgress) return
-        isStatusCheckInProgress = true
-        runOnUiThread {
-            hitApiForUpiAutoMandateOrderStatus(registrationId, merchandId)
-        }
-    }*/
-
-
-    /*fun hitApiForUpiAutoMandateOrderStatus(registrationId: String, merchandId: String) {
-        val request = UpiAutoOrderStatusRequest(
-            registrationID = registrationId,
-            merchantOrderId = merchandId
-        )
-        Log.d("UpiAutoStatusReq", Gson().toJson(request))
-
-        dikshifinsureViewModel.getUpiAutoMandateOrderStatusRequest(request).observe(this) { resources ->
-
-            when (resources.apiStatus) {
-                ApiStatus.SUCCESS -> {
-                    isStatusCheckInProgress = false
-
-                    if (ConstantClass.dialog?.isShowing == true) {
-                        ConstantClass.dialog!!.dismiss()
-                    }
-
-                    val response = resources.data?.body()
-                    Log.d("UpiAutoStatusRes", Gson().toJson(response))
-
-
-                    if (response?.state?.lowercase().equals("failed", ignoreCase = true)) {
-                        isEmandateVerified= "No"
-                        showingRejectioneMandatePopUp(response!!.paymentDetails?.filterNotNull()?.firstOrNull()?.rail?.umn ?: "")
-                        return@observe
-                    }
-
-                    if (response?.state?.lowercase().equals("completed", ignoreCase = true) == true) {
-                        if (response?.paymentDetails.isNullOrEmpty()) {
-                            hitApiForUpiAutoMandateTransaction(registrationId)
-                        }
-                        else {
-                            val umn = response?.paymentDetails?.filterNotNull()?.firstOrNull()?.rail?.umn ?: ""
-                            isEmandateVerified = isMandate
-                            val uploadReq = EnachDateUploadReq(
-                                isEmandateVerified = isEmandateVerified,
-                                emAccountType = AccountType,
-                                isPannydropVerified = isPannydropVerified,
-                                emAccountNumber = AccountNumber,
-                                customerCode = CustomerCodeForEnach,
-                                retailerCode = RetailerCodeForEnach,
-                                loanCode = loaneCode,
-                                emBankName = BankName,
-                                emIfscCode = BankIFSCCode,
-                                emumrn = umn
-                            )
-                            hitApiForUploadEnachMandateDataResponse(uploadReq, isEmandateVerified)
-                        }
-                    }
-
-                }
-
-                ApiStatus.ERROR -> {
-                    isStatusCheckInProgress = false
-                    if (ConstantClass.dialog?.isShowing == true) {
-                        ConstantClass.dialog!!.dismiss()
-                    }
-                    Toast.makeText(this, resources.message ?: "Status Check Failed", Toast.LENGTH_SHORT).show()
-                }
-
-                ApiStatus.LOADING -> {
-                    if (ConstantClass.dialog?.isShowing != true) {
-                        ConstantClass.OpenPopUpForVeryfyOTP(this)
-                    }
-                }
-
-            }
-        }
-    }*/
-
-
-   /* fun hitApiForUpiAutoMandateTransaction(registrationId: String) {
-        val emiNumbers = "1"
-        val amount = EmiAmount.toDouble().roundToInt()
-
-        val request = UpiAutoTransactionRequest(
-            registrationID = registrationId,
-            amount = amount,
-            eMINumbers = emiNumbers,
-            customerCode = CustomerCodeForEnach,
-            loanCode = loaneCode
-        )
-        Log.d("UpiAutoTransReq", Gson().toJson(request))
-
-        dikshifinsureViewModel.getUpiAutoMandateTransactionRequest(request).observe(this) { resources ->
-            when (resources.apiStatus) {
-                ApiStatus.SUCCESS -> {
-                    isStatusCheckInProgress = false
-                    if (ConstantClass.dialog?.isShowing == true) {
-                        ConstantClass.dialog!!.dismiss()
-                    }
-                    val response = resources.data?.body()
-                    Log.d("UpiAutoTransRes", Gson().toJson(response))
-
-                    if (!response?.intentUrl.isNullOrEmpty()) {
-                        merchandId = response?.marchentOrderID ?: ""
-                        binding.webview.loadUrl(response?.intentUrl!!)
-                    } else {
-                        Toast.makeText(this, response?.errorMessage ?: "Transaction trigger failed", Toast.LENGTH_SHORT).show()
-                    }
-                }
-                ApiStatus.ERROR -> {
-                    isStatusCheckInProgress = false
-                    if (ConstantClass.dialog?.isShowing == true) {
-                        ConstantClass.dialog!!.dismiss()
-                    }
-                    Toast.makeText(this, resources.message ?: "Transaction Failed", Toast.LENGTH_SHORT).show()
-                }
-                ApiStatus.LOADING -> {
-                    if (ConstantClass.dialog?.isShowing != true) {
-                        ConstantClass.OpenPopUpForVeryfyOTP(this)
-                    }
-                }
-            }
-        }
-    }*/
-
-
     fun hitApiForUploadEnachMandateDataResponse(request: EnachDateUploadReq, isMandate: String) {
 
         Log.d("UpiAutoTransReq", Gson().toJson(request))
@@ -510,6 +351,7 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
     }
 
 
+
     class MerchantWebViewClient(private val activity: OnlineAutoUpiEmandateActivity) : WebViewClient() {
 
         override fun onPageFinished(view: WebView?, url: String?) {
@@ -539,7 +381,7 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
             val status = (uri.getQueryParameter("Status") ?: uri.getQueryParameter("status"))?.uppercase()
 
             if (status == "SUCCESS" || uri.path?.contains("/success", ignoreCase = true) == true ||
-                status == "FAILURE" || uri.path?.contains("/failure", ignoreCase = true) == true ||
+                status == "FAILED" || uri.path?.contains("/failure", ignoreCase = true) == true ||
                 status == "CANCEL" || status == "CANCELLED" || uri.path?.contains("/cancel", ignoreCase = true) == true) {
                 view.stopLoading()
                 activity.handleUrlChange(url)

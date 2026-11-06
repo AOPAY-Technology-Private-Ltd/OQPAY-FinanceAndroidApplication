@@ -187,7 +187,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
 
         dikshifinsureViewModel = ViewModelProvider(this, DikshifinsureOnlinePGModelFactory(DikshifinsureRepository(RetrofitClient.apiInterfaceOnlinePG)))[DikshifinsureViewModel::class.java]
 
-
+        preference.setStringValue(ConstantClass.Loanmode,"")
         setonclickListner()
         setupRecyclerView()
         setview()
@@ -526,7 +526,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
             else {
                 ConstantClass.offline
             }
-
+            preference.setStringValue(ConstantClass.Loanmode,ConstantClass.CheckOnlineOrOffline)
             dialog.dismiss()
 
             navigateToNextStep(item,step)

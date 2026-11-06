@@ -346,39 +346,7 @@ class QRCodePage : BaseActivity() {
         val safeLastName = if (!lastName.isNullOrBlank() && lastName != "null") lastName else ""
         val createdBy = firstName.plus(" ").plus(safeLastName)
 
-        if (loanmode.equals(ConstantClass.offline) || LoanMode.equals(ConstantClass.offline, ignoreCase = true)) {
-            loancreatedreq = LoanCreatedReq(
-                modetype = "INSERT",
-                rid = 0,
-                customerCode = preference.getStringValue(ConstantClass.CustomerCode, ""),
-                loanAmount = ConstantClass.LoanAmount ?: 0.0,
-                downPayment = DownPayment?.toDoubleOrNull() ?: 0.0,
-                emiAmount = EmiAmount?.toDoubleOrNull() ?: 0.0,
-                tenure = Tenure?.toInt() ?: 0,
-                interestRate = InterestRate?.toDoubleOrNull() ?: 0.0,
-                startDate = startDate,
-                endDate = endDate,
-                imeiNumber = ImeiNumber1,
-                createdBy = createdBy,
-                brandname = BrandName,
-                modelname = ModelName,
-                variantname = ModelVarient,
-                avlcolor = ModelColor,
-                retailerCode = preference.getStringValue(ConstantClass.RetailerCode, ""),
-                processingFees = ProcessingFees,
-                interestAmt = InterestAmt,
-                remarks = "",
-                recordStatus = LoanStatus,
-                creditScore = userScore.toString(),
-                validateKey = "",
-                defaultEmidebit = DefaulterEmiDebitPending,
-                sellingPrice = ConstantClass.SellingPrice?.toDoubleOrNull() ?: 0.0,
-                loanMode = ConstantClass.offline
-            )
-            LoanMode = ConstantClass.offline
-            ConstantClass.CheckOnlineOrOffline = ConstantClass.offline
-        }
-        else {
+        if (loanmode.equals(ConstantClass.online) ) {
             loancreatedreq = LoanCreatedReq(
                 modetype = "INSERT",
                 rid = 0,
@@ -409,6 +377,38 @@ class QRCodePage : BaseActivity() {
             )
             LoanMode = ConstantClass.online
             ConstantClass.CheckOnlineOrOffline = ConstantClass.online
+        }
+        else {
+            loancreatedreq = LoanCreatedReq(
+                modetype = "INSERT",
+                rid = 0,
+                customerCode = preference.getStringValue(ConstantClass.CustomerCode, ""),
+                loanAmount = ConstantClass.LoanAmount ?: 0.0,
+                downPayment = DownPayment?.toDoubleOrNull() ?: 0.0,
+                emiAmount = EmiAmount?.toDoubleOrNull() ?: 0.0,
+                tenure = Tenure?.toInt() ?: 0,
+                interestRate = InterestRate?.toDoubleOrNull() ?: 0.0,
+                startDate = startDate,
+                endDate = endDate,
+                imeiNumber = ImeiNumber1,
+                createdBy = createdBy,
+                brandname = BrandName,
+                modelname = ModelName,
+                variantname = ModelVarient,
+                avlcolor = ModelColor,
+                retailerCode = preference.getStringValue(ConstantClass.RetailerCode, ""),
+                processingFees = ProcessingFees,
+                interestAmt = InterestAmt,
+                remarks = "",
+                recordStatus = LoanStatus,
+                creditScore = userScore.toString(),
+                validateKey = "",
+                defaultEmidebit = DefaulterEmiDebitPending,
+                sellingPrice = ConstantClass.SellingPrice?.toDoubleOrNull() ?: 0.0,
+                loanMode = ConstantClass.offline
+            )
+            LoanMode = ConstantClass.offline
+            ConstantClass.CheckOnlineOrOffline = ConstantClass.offline
         }
 
         when (BankID) {
@@ -665,7 +665,7 @@ class QRCodePage : BaseActivity() {
 
 
 
-    @RequiresApi(Build.VERSION_CODES.O)
+  /*  @RequiresApi(Build.VERSION_CODES.O)
     fun hitApiForCustomerRegister() {
 
         val custPhotoPart = createMultipartFromUri(this, CustPhotoPath, "CustPhoto_File", "CustomerPhoto")
@@ -953,7 +953,7 @@ class QRCodePage : BaseActivity() {
                                         LoanMode = currentMode
                                         ConstantClass.CheckOnlineOrOffline = currentMode
 
-                                        loancreatedreq = LoanCreatedReq(
+                                      *//*  loancreatedreq = LoanCreatedReq(
                                             modetype = "INSERT",
                                             rid = 0,
                                             customerCode = safecustomerCode,
@@ -980,7 +980,7 @@ class QRCodePage : BaseActivity() {
                                             defaultEmidebit = DefaulterEmiDebitPending,
                                             sellingPrice = ConstantClass.SellingPrice.toDouble(),
                                             loanMode = currentMode
-                                        )
+                                        )*//*
 
                                         Log.d("LoanCreateReq", Gson().toJson(loancreatedreq))
 
@@ -1044,9 +1044,9 @@ class QRCodePage : BaseActivity() {
                 "CityName" to CustCityName.toRequestBody(),
                 "Country" to CustCountry!!.toRequestBody(),
                 "AadharNumber" to AadharNumber.toRequestBody(),
-                "AadharNumberVerified" to ConstantClass.AadharVerified.toRequestBody(),/*"".toRequestBody()*/
+                "AadharNumberVerified" to ConstantClass.AadharVerified.toRequestBody(),*//*"".toRequestBody()*//*
                 "PANNumber" to PanNumber.toRequestBody(),
-                "PANNumberVerified" to PanNumberVerified.toRequestBody(), /*"".toRequestBody()*/
+                "PANNumberVerified" to PanNumberVerified.toRequestBody(), *//*"".toRequestBody()*//*
                 "BrandName" to BrandName.toRequestBody(),
                 "ModelName" to ConstantClass.ModelName.toRequestBody(),
                 "ModelVariant" to ConstantClass.ModelVarient.toRequestBody(),
@@ -1247,7 +1247,7 @@ class QRCodePage : BaseActivity() {
                                         LoanMode = currentMode
                                         ConstantClass.CheckOnlineOrOffline = currentMode
 
-                                        loancreatedreq = LoanCreatedReq(
+                                       *//* loancreatedreq = LoanCreatedReq(
                                             modetype = "INSERT",
                                             rid = 0,
                                             customerCode = safecustomerCode,
@@ -1274,7 +1274,7 @@ class QRCodePage : BaseActivity() {
                                             defaultEmidebit = DefaulterEmiDebitPending,
                                             sellingPrice = ConstantClass.SellingPrice.toDouble(),
                                             loanMode = currentMode
-                                        )
+                                        )*//*
 
                                         Log.d("LoanCreateReq", Gson().toJson(loancreatedreq))
 
@@ -1391,8 +1391,8 @@ class QRCodePage : BaseActivity() {
                         if (response.isSuccessful) {
                             // Handle success
                             val body = response.body()
-                            /* ConstantClass.dialog.dismiss()
-                             startActivity(Intent(this@QRCodePage,CongratulationPage::class.java))*/
+                            *//* ConstantClass.dialog.dismiss()
+                             startActivity(Intent(this@QRCodePage,CongratulationPage::class.java))*//*
                             var message = body?.message ?: "Success"
 
                             Log.d("createcustresp", Gson().toJson(body))
@@ -1462,7 +1462,7 @@ class QRCodePage : BaseActivity() {
                                     LoanMode = currentMode
                                     ConstantClass.CheckOnlineOrOffline = currentMode
 
-                                    loancreatedreq = LoanCreatedReq(
+                                   *//* loancreatedreq = LoanCreatedReq(
                                         modetype = "INSERT",
                                         rid = 0,
                                         customerCode = safecustomerCode,
@@ -1489,7 +1489,7 @@ class QRCodePage : BaseActivity() {
                                         defaultEmidebit = DefaulterEmiDebitAutoApproved,
                                         sellingPrice = ConstantClass.SellingPrice.toDouble(),
                                         loanMode = currentMode
-                                    )
+                                    )*//*
 
                                     Log.d("LoanCreateReq", Gson().toJson(loancreatedreq))
 
@@ -1543,7 +1543,7 @@ class QRCodePage : BaseActivity() {
             }
         }
 
-    }
+    }*/
 
 
 
@@ -1910,6 +1910,7 @@ class QRCodePage : BaseActivity() {
     }
 
 
+
     @SuppressLint("SetTextI18n")
     fun OpenPopUpForVAlert() {
         dialog = Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen)
@@ -1950,6 +1951,7 @@ class QRCodePage : BaseActivity() {
         dialog.show()
 
     }
+
 
 
     fun hitApiForLogin() {
@@ -2023,6 +2025,7 @@ class QRCodePage : BaseActivity() {
         }
 
     }
+
 
 
     fun hitApiForRetailerLogout() {
@@ -2217,11 +2220,9 @@ class QRCodePage : BaseActivity() {
                                             }
 
                                         }
-
-                                        Toast.makeText(this, "Upi AutoPay not working", Toast.LENGTH_LONG).show()
                                     }
                                     else {
-                                        Toast.makeText(this, resources.message ?: "Server error occurred", Toast.LENGTH_LONG).show()
+                                        Toast.makeText(this, resources.message ?: "Upi AutoPay not working", Toast.LENGTH_LONG).show()
                                     }
 
                                 }
@@ -2257,9 +2258,7 @@ class QRCodePage : BaseActivity() {
 
                 }
             }
-
             else{
-
                 panViewModel.getEMandateOnlineRequest(request).observe(this) { resources ->
                     resources.let {
                         when (it.apiStatus) {
@@ -2352,7 +2351,8 @@ class QRCodePage : BaseActivity() {
 
     fun hitApiForCheckLoanCharge(loancreatedreq: LoanCreatedReq){
 
-        val loanmode = preference.getStringValue(ConstantClass.Loanmode, "").ifBlank { loancreatedreq.loanMode }
+        val loanmode = preference.getStringValue(ConstantClass.Loanmode, "")
+
         var request = LoanChargeReq(
             registrationID = if (loanmode.equals(ConstantClass.online, ignoreCase = true)) {
                 ConstantClass.PENNYDROP_REGISTRATION_ID

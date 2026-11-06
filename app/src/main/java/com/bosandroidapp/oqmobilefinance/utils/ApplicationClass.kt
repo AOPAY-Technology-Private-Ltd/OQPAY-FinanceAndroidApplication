@@ -27,8 +27,8 @@ import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
 import com.bosandroidapp.oqmobilefinance.ui.viewmodel.AuthenticationViewModel
 import com.google.gson.Gson
-import com.stacker.stacker.StackerAndroid
 /*import com.stacker.stacker.StackerAndroid*/
+import com.stacker.stacker.StackerAndroid
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,6 +48,7 @@ class ApplicationClass : Application() {
         lateinit var instance: ApplicationClass
             private set
     }
+
 
     override fun onCreate() {
         super.onCreate()
@@ -94,6 +95,7 @@ class ApplicationClass : Application() {
                 showProvisionerDialog = true, // default; pass false to skip
             ),
         )
+
 
     }
 

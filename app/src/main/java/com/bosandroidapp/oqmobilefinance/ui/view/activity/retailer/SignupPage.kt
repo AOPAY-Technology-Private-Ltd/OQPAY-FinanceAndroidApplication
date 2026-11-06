@@ -413,7 +413,7 @@ class SignupPage : BaseActivity() {
             Log.d("ReferenceName"," ${ConstantClass.ReferenceAadharNumber}" )
         }
         else{
-            binding.aadharnumber.text?.clear()
+            //binding.aadharnumber.text?.clear()
             binding.aadharnumber.isEnabled = ConstantClass.ReferenceAadhaarName.isEmpty()
             binding.verifyaadharnumber.visibility= View.GONE
         }
@@ -1198,7 +1198,7 @@ class SignupPage : BaseActivity() {
             binding.address.error = null
         }
 
-        // .............................................................for not use............................................
+        // ............................................................. not for use............................................
 
         val aadhaarRegex = Regex("^[2-9][0-9]{11}$")
         val maskedAadhaarRegex = Regex("^[xX]{8}[0-9]{4}$")

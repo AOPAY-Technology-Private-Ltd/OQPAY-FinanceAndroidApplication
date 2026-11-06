@@ -253,6 +253,9 @@ class NewCustomerRegistrationPage : BaseActivity() {
                 AadharTransactionIdNo = ""
                 iisAggrementVerified = false
                 isAggrementVerified = ""
+                CustPrimaryMobileNumber = ""
+                CustPrimaryMobileVerified = "no"
+                mobileveryfied = false
                 finish()
             }
         })
@@ -334,7 +337,8 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
         if (CheckOnlineOrOffline.equals(ConstantClass.online)) {
             setDataIfGeetingPanVerification()
-        } else {
+        }
+        else {
             if (AlreadyCustomerCodeHaveEligiblity.isNotEmpty()) {
                 setDataIfCustomerAlreadyExist()
             }
@@ -649,6 +653,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
             }
         })
 
+
         binding.alternatemobileNumber.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -806,6 +811,9 @@ class NewCustomerRegistrationPage : BaseActivity() {
     fun setOnClickListner() {
 
         binding.home.setOnClickListener {
+            CustPrimaryMobileNumber = ""
+            CustPrimaryMobileVerified = "no"
+            mobileveryfied = false
             val intent = Intent(this, DashBoard::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
@@ -1855,7 +1863,6 @@ class NewCustomerRegistrationPage : BaseActivity() {
             binding.firstName.setText(AadhaarName)
         }
 
-
         binding.middleName.setText(PanMiddleName)
         binding.lastName.setText(PanLastName)
 
@@ -2097,8 +2104,6 @@ class NewCustomerRegistrationPage : BaseActivity() {
     }
 
 
-
-
     fun hitApiForRetailerLogout() {
         var loginRequest = LogoutReq(
             retailerCode = preference.getStringValue(ConstantClass.RetailerCode, ""),
@@ -2243,12 +2248,12 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                     ConstantClass.dialog.dismiss()
                                     var otp = response.value
 
-                                    val isHttpSuccess = response.code == 200
+                                   // val isHttpSuccess = response.code == 200
                                     var userScore = response.creditScore!!
                                     CibilResponse = Gson().toJson(response)
                                     Log.d("cibilresp", Gson().toJson(CibilResponse))
 
-                                    if ( isHttpSuccess) {
+                                    if ( /*isHttpSuccess*/ response.code == 200) {
 
                                         if (userScore>0) {
                                             if (userScore >= 500) {

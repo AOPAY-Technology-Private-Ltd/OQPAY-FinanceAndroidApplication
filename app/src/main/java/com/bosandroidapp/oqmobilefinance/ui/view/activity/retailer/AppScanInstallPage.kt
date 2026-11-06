@@ -664,7 +664,7 @@ class AppScanInstallPage : BaseActivity() {
                                         validateKey = binding.accesstoken.text.toString(),
                                         defaultEmidebit = DefaulterEmiDebitPending,
                                         sellingPrice = ConstantClass.SellingPrice.toDouble(),
-                                        loanMode = currentMode
+                                        loanMode =  preference.getStringValue(ConstantClass.Loanmode,"")
                                     )
                                     hitApiForRetailerCreatedLoan(loancreatedreq!!)
                                 }
@@ -697,13 +697,6 @@ class AppScanInstallPage : BaseActivity() {
 
 
     fun hitApiForRetailerCreatedLoan(requset: LoanCreatedReq) {
-
-        if (requset.loanMode.isBlank()) {
-            val fallbackMode = if (LoanMode.isNotBlank()) LoanMode else if (ConstantClass.CheckOnlineOrOffline.isNotBlank()) ConstantClass.CheckOnlineOrOffline else ConstantClass.online
-            requset.loanMode = fallbackMode
-            LoanMode = fallbackMode
-            ConstantClass.CheckOnlineOrOffline = fallbackMode
-        }
 
         Log.d("customerReq", Gson().toJson(requset))
         viewModel.getRetailerLoanCreatedReq(requset).observe(this) { resources ->
@@ -807,6 +800,7 @@ class AppScanInstallPage : BaseActivity() {
                             Log.d("VerifiedReq", Gson().toJson(responseBody))
 
                             if(status == true ){
+                                 preference.setStringValue(ConstantClass.Loanmode,"")
                                  startActivity(Intent(this@AppScanInstallPage, CongratulationPage::class.java))
                                  clearData()
                                  finish()

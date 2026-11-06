@@ -507,6 +507,7 @@ class DashBoard : BaseActivity() {
             ConstantClass.ClickOnCardDashboard = "Customer"
             ConstantClass.CheckOnlineOrOffline=""
             PanNumber=""
+            preference.setStringValue(ConstantClass.Loanmode,"")
             startActivity(Intent(this@DashBoard, IDVerificationPage::class.java))
         }
 
