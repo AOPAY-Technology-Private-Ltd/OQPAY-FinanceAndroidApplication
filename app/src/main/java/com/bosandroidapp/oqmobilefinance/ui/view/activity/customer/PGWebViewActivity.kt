@@ -366,12 +366,23 @@ class PGWebViewActivity : BaseActivity() {
 
 
         Ok.setOnClickListener {
-            if (emiList.size > 0) {
+            if (emiList.isNotEmpty()) {
+                emiList.clear()
+            }
+            EMIamountPG = ""
+            LoanCodePG = ""
+            Toast.makeText(this@PGWebViewActivity,  "Payment processed successfully", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this@PGWebViewActivity, DashBoard::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
+
+           /* if (emiList.size > 0) {
                 val totalCount = emiList.size
                 for (i in 0 until totalCount) {
                     HitApiForPayEmiAmount(totalEmiCount = totalCount, currentIndex = i + 1, emiamount = emiList[i].emiAmount, fine = emiList[i].lateFine, loanCode = emiList[i].loancode, utrNumber = utrNumber)
                 }
-            }
+            }*/
         }
 
         dialog.setCanceledOnTouchOutside(false)

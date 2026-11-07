@@ -15,8 +15,8 @@ android {
         applicationId = "com.bosandroidapp.oqmobilefinance"
         minSdk = 27
         targetSdk = 36
-        versionCode = 15
-        versionName = "2.0.7" // pro 1.0.7 //  2.0.4 , 12 uat current old   for update 2.0.5  13
+        versionCode = 16
+        versionName = "2.0.8" // pro 1.0.7 //  2.0.4 , 12 uat current old   for update 2.0.5  13
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
