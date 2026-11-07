@@ -14,8 +14,8 @@ android {
         applicationId = "com.bosandroidapp.oqmobilefinance"
         minSdk = 27
         targetSdk = 36
-        versionCode = 17
-        versionName = "2.0.7" // pro 1.0.7   // 2.0.3 uat
+        versionCode = 18
+        versionName = "2.0.8" // pro 1.0.7   // 2.0.7 uat
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -138,7 +138,7 @@ dependencies {
 
 
 
-    val stacker = "com.github.jatinsinghsatija.Stacker"
+   /* val stacker = "com.github.jatinsinghsatija.Stacker"
     val stackerVersion = "v0.2.0"
 
 
@@ -148,7 +148,7 @@ dependencies {
 
 
     releaseImplementation("$stacker:stacker_inspector_release:$stackerVersion")
-    releaseImplementation("$stacker:flutter_release:$stackerVersion")
+    releaseImplementation("$stacker:flutter_release:$stackerVersion")*/
 
 
 

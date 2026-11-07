@@ -2249,7 +2249,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                     ConstantClass.dialog.dismiss()
                                     var otp = response.value
 
-                                   // val isHttpSuccess = response.code == 200
+                                    val isHttpSuccess = response.code == 200
                                     var userScore = response.creditScore!!
                                     CibilResponse = Gson().toJson(response)
                                     Log.d("cibilresp", Gson().toJson(CibilResponse))

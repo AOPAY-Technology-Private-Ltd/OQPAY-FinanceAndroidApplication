@@ -144,6 +144,7 @@ class IDVerificationPage : BaseActivity() {
 
                     R.id.radioButton1 -> {
                         CheckOnlineOrOffline = ConstantClass.online
+                        com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.AppScanInstallPage.LoanMode = ConstantClass.online
                         PanNumber = ""
                         PanFrontImageUri = null
                         ConstantClass.AadharVerified = ""
@@ -155,12 +156,13 @@ class IDVerificationPage : BaseActivity() {
                         ReferenceAadharNumber=""
                         CustPrimaryMobileNumber = ""
                         CustPrimaryMobileVerified = "no"
-                        preference.setStringValue(ConstantClass.Loanmode,ConstantClass.online)
+                        preference.setStringValue(ConstantClass.Loanmode, ConstantClass.online)
                         onResume()
                     }
 
                     R.id.radioButton2 -> {
                         CheckOnlineOrOffline = ConstantClass.offline
+                        com.bosandroidapp.oqmobilefinance.ui.view.activity.retailer.AppScanInstallPage.LoanMode = ConstantClass.offline
                         PanNumber = ""
                         PanFrontImageUri = null
                         ConstantClass.AadharVerified = ""
@@ -172,7 +174,7 @@ class IDVerificationPage : BaseActivity() {
                         ReferenceAadharNumber=""
                         CustPrimaryMobileNumber = ""
                         CustPrimaryMobileVerified = "no"
-                        preference.setStringValue(ConstantClass.Loanmode,ConstantClass.offline)
+                        preference.setStringValue(ConstantClass.Loanmode, ConstantClass.offline)
                         onResume()
                     }
 

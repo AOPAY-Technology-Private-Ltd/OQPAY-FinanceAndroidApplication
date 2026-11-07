@@ -232,7 +232,8 @@ class QRCodePage : BaseActivity() {
             mode = loanmode,
             registrationID = if (loanmode.equals(ConstantClass.online, ignoreCase = true)) {
                 ConstantClass.Enach_Option_Online_REGISTRATION_ID
-            } else {
+            } 
+            else {
                 ConstantClass.Enach_Option_Offline_REGISTRATION_ID
             }
         )
@@ -346,7 +347,7 @@ class QRCodePage : BaseActivity() {
         val safeLastName = if (!lastName.isNullOrBlank() && lastName != "null") lastName else ""
         val createdBy = firstName.plus(" ").plus(safeLastName)
 
-        if (loanmode.equals(ConstantClass.online) ) {
+        if (loanmode.equals(ConstantClass.online)) {
             loancreatedreq = LoanCreatedReq(
                 modetype = "INSERT",
                 rid = 0,

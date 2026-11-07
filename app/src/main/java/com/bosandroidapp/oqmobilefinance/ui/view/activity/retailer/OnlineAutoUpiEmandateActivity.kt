@@ -122,7 +122,7 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
                 }
 
                 // Payment Cancelled
-                status == "CANCEL"   == true -> {
+                status == "TIMEOUT"   == true -> {
                     isPaymentProcessed = true
                     Log.d("PAYU", "Payment Cancelled: $url")
 

@@ -187,7 +187,6 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
 
         dikshifinsureViewModel = ViewModelProvider(this, DikshifinsureOnlinePGModelFactory(DikshifinsureRepository(RetrofitClient.apiInterfaceOnlinePG)))[DikshifinsureViewModel::class.java]
 
-        preference.setStringValue(ConstantClass.Loanmode,"")
         setonclickListner()
         setupRecyclerView()
         setview()
@@ -449,13 +448,26 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
                 IsRetailerAggrementVerified = imeiDetails.isRetailerAggrementVerified!!
             }
 
-            if (createLoanDetails != null && createLoanDetails.loanCode!!.isNotEmpty()) {
-                LoanMode = createLoanDetails.loanMode!!
-                preference.setStringValue(ConstantClass.Loanmode,createLoanDetails.loanMode!! )
-                LoanStatus = createLoanDetails.loanStatus!!
+            if (createLoanDetails != null && !createLoanDetails.loanCode.isNullOrBlank()) {
+                val serverLoanMode = createLoanDetails.loanMode.orEmpty().trim()
+                if (serverLoanMode.isNotBlank()) {
+                    LoanMode = serverLoanMode
+                    preference.setStringValue(ConstantClass.Loanmode, serverLoanMode)
+                    ConstantClass.CheckOnlineOrOffline = serverLoanMode
+                } else {
+                    val savedMode = preference.getStringValue(ConstantClass.Loanmode, "").ifBlank {
+                        ConstantClass.CheckOnlineOrOffline.ifBlank { LoanMode }
+                    }
+                    if (savedMode.isNotBlank()) {
+                        LoanMode = savedMode
+                        preference.setStringValue(ConstantClass.Loanmode, savedMode)
+                        ConstantClass.CheckOnlineOrOffline = savedMode
+                    }
+                }
+                LoanStatus = createLoanDetails.loanStatus.orEmpty()
                 LoanRID = createLoanDetails.loanRID?.takeIf { it.isNotBlank() }?.toIntOrNull() ?: 0
                 loaneCode = createLoanDetails.loanCode!!
-                ConstantClass.DefaultEmidebit = createLoanDetails.defaulterEmiDebit!!
+                ConstantClass.DefaultEmidebit = createLoanDetails.defaulterEmiDebit.orEmpty()
                 if (createLoanDetails.loanStartDate != null && createLoanDetails.loanEndDate != null) {
                     LoanStartDate = createLoanDetails.loanStartDate!!
                     LoanEndDate = createLoanDetails.loanEndDate!!
@@ -464,8 +476,7 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
                     LoanStartDate = ""
                     LoanEndDate = ""
                 }
-                isEmandateVerified = createLoanDetails.isEmandateVerified!!
-                ConstantClass.CheckOnlineOrOffline = createLoanDetails.loanMode ?: ConstantClass.online
+                isEmandateVerified = createLoanDetails.isEmandateVerified.orEmpty()
             }
 
             if (invoiceAndAppVerification != null) {
@@ -520,13 +531,15 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            ConstantClass.CheckOnlineOrOffline = if (selectedId == R.id.rbOnline) {
+            val selectedMode = if (selectedId == R.id.rbOnline) {
                 ConstantClass.online
             }
             else {
                 ConstantClass.offline
             }
-            preference.setStringValue(ConstantClass.Loanmode,ConstantClass.CheckOnlineOrOffline)
+            LoanMode = selectedMode
+            ConstantClass.CheckOnlineOrOffline = selectedMode
+            preference.setStringValue(ConstantClass.Loanmode, selectedMode)
             dialog.dismiss()
 
             navigateToNextStep(item,step)

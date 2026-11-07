@@ -634,9 +634,12 @@ class AppScanInstallPage : BaseActivity() {
                                     val startDate = getCurrentStartDate()
                                     val endDate = calculateEmiEndDateFromNow(Tenure.toInt())
 
-                                    val currentMode = if (LoanMode.isNotBlank()) LoanMode else if (ConstantClass.CheckOnlineOrOffline.isNotBlank()) ConstantClass.CheckOnlineOrOffline else ConstantClass.online
+                                    val currentMode = preference.getStringValue(ConstantClass.Loanmode, "").ifBlank {
+                                        LoanMode.ifBlank { ConstantClass.CheckOnlineOrOffline.ifBlank { ConstantClass.online } }
+                                    }
                                     LoanMode = currentMode
                                     ConstantClass.CheckOnlineOrOffline = currentMode
+                                    preference.setStringValue(ConstantClass.Loanmode, currentMode)
 
                                     var loancreatedreq = LoanCreatedReq(
                                         modetype = "UPDATE",
@@ -664,7 +667,7 @@ class AppScanInstallPage : BaseActivity() {
                                         validateKey = binding.accesstoken.text.toString(),
                                         defaultEmidebit = DefaulterEmiDebitPending,
                                         sellingPrice = ConstantClass.SellingPrice.toDouble(),
-                                        loanMode =  preference.getStringValue(ConstantClass.Loanmode,"")
+                                        loanMode = currentMode
                                     )
                                     hitApiForRetailerCreatedLoan(loancreatedreq!!)
                                 }
@@ -715,6 +718,15 @@ class AppScanInstallPage : BaseActivity() {
                                     CustomerCodeForEnach = response.data!!.customerCode!!
                                     LoanCodeForEnach = response.data!!.loanCode!!
                                     RetailerCodeForEnach = response.data!!.retailerCode!!
+
+                                    val currentLoanMode = preference.getStringValue(ConstantClass.Loanmode, "").ifBlank {
+                                        LoanMode.ifBlank { ConstantClass.CheckOnlineOrOffline }
+                                    }
+                                    if (currentLoanMode.isNotBlank()) {
+                                        LoanMode = currentLoanMode
+                                        ConstantClass.CheckOnlineOrOffline = currentLoanMode
+                                        preference.setStringValue(ConstantClass.Loanmode, currentLoanMode)
+                                    }
 
                                     LoanStartDate = response.data.startDate!!
                                     LoanEndDate = response.data.endDate!!
