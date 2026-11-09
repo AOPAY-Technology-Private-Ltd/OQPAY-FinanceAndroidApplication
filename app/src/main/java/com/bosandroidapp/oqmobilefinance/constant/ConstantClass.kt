@@ -520,7 +520,6 @@ object ConstantClass {
     }
 
 
-
     fun isInternetAvailable(context: Context): Boolean {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
@@ -907,7 +906,6 @@ object ConstantClass {
             null
         }
     }
-
 
 
     fun createMultipartFromUri(context: Context, uri: Uri?, partName: String, filename:String): MultipartBody.Part? {
