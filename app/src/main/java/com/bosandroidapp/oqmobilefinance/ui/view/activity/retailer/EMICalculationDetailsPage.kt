@@ -627,8 +627,8 @@ class EMICalculationDetailsPage : BaseActivity() {
 
      }*/
 
-    // as discuss by Naim Sir 03/06/2026
 
+    // as discuss by Naim Sir 03/06/2026
 
     fun UpdateEmiCalculationOnSellingPrice(EmiDataList: List<DataItems>, SellingPrice: String) {
 

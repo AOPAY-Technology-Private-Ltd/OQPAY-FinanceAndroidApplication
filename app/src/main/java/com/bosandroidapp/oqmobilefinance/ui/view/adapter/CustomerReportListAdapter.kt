@@ -53,6 +53,7 @@ class CustomerReportListAdapter(private val ReportsDataList: MutableList<Reports
         var reportstatus = binding.reportstatus
         var duedatelayout = binding.duedatelayout
         var viewNOC = binding.viewNOC
+
     }
 
 

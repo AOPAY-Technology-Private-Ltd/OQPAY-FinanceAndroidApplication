@@ -251,6 +251,7 @@ interface ApiInterface {
     suspend fun getLoanCreatedByRetailer(@Body req : LoanCreatedReq): Response<LoanCreatedResp>?
 
 
+
     @Multipart
     @POST("api/V1/OQFinance/ManageCustByCredit")
     suspend fun getCustomerCibilApprovedReq(

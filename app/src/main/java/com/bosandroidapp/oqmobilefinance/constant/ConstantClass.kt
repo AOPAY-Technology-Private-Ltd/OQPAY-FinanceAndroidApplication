@@ -150,7 +150,7 @@ object ConstantClass {
 
 
     // Change current environment here: RELEASE_UAT | STAGING | DEV | PRODUCTION
-    val CURRENT_ENVIRONMENT = AppEnvironment.RELEASE_UAT
+    val CURRENT_ENVIRONMENT = AppEnvironment.DEV
     val BASE_URL = CURRENT_ENVIRONMENT.baseUrl
     val BASE_URL_IMAGE = CURRENT_ENVIRONMENT.baseUrlImage
     val CUSTOMERPPURLLINK= BASE_URL +"api/V1/OQFinance/download"
