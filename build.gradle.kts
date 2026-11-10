@@ -3,7 +3,5 @@ plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.google.gms.google.services) apply false
-    // Add the Crashlytics Gradle plugin
-    id("com.google.firebase.crashlytics") version "3.0.8" apply false
-
+    alias(libs.plugins.google.firebase.crashlytics) apply false
 }

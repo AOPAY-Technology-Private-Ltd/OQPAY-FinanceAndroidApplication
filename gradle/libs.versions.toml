@@ -31,6 +31,7 @@ navigationFragmentKtx = "2.8.5"
 webkit = "1.14.0"
 workRuntimeKtx = "2.9.1"
 googleGmsGoogleServices = "4.4.2"
+firebaseCrashlytics = "3.0.8"
 googleid = "1.1.1"
 playServicesLocation = "21.0.1"
 firebaseBom = "33.7.0"
@@ -91,4 +92,5 @@ androidx-activity-ktx = { group = "androidx.activity", name = "activity-ktx", ve
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
+google-firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlytics" }
 

@@ -152,7 +152,7 @@ object ConstantClass {
 
 
     // Change current environment here: RELEASE_UAT | STAGING | DEV | PRODUCTION
-    val CURRENT_ENVIRONMENT = AppEnvironment.DEV
+    val CURRENT_ENVIRONMENT = AppEnvironment.RELEASE_UAT
     val BASE_URL = CURRENT_ENVIRONMENT.baseUrl
     val BASE_URL_IMAGE = CURRENT_ENVIRONMENT.baseUrlImage
     val CUSTOMERPPURLLINK = BASE_URL +"api/V1/OQFinance/download"
@@ -215,7 +215,7 @@ object ConstantClass {
      //const val PAN_BASE_URL = "https://api.aopay.in/"
      const val PAN_BASE_URL = "https://uat.api.aopay.in/"
     // const val ONLINE_PG = "https://api.dikshifinsure.com/"
-    const val ONLINE_PG = "https://uat.api.dikshifinsure.com/"
+     const val ONLINE_PG = "https://uat.api.dikshifinsure.com/"
      const val SMS_API_KEY = "KBSxc26XqjoiR7SA"
      const val SMS_SENDER_ID = "BOSCNT"
      const val SMS_TEMPLATE_ID = "1207175396979758678"
