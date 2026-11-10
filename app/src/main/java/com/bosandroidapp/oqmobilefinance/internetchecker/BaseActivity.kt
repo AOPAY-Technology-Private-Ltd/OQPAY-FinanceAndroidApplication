@@ -17,6 +17,22 @@ open class BaseActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        try {
+            val activityName = this::class.java.simpleName
+            com.bosandroidapp.oqmobilefinance.utils.CrashlyticsUtils.setCustomKey("last_opened_activity", activityName)
+            com.bosandroidapp.oqmobilefinance.utils.CrashlyticsUtils.log("Activity Created: $activityName")
+
+            val pref = com.bosandroidapp.oqmobilefinance.localdb.SharedPreference(this)
+            val customerCode = pref.getStringValue(ConstantClass.CustomerCode, "")
+            val retailerCode = pref.getStringValue(ConstantClass.RetailerCode, "")
+            val userId = customerCode
+            if (userId.isNotBlank()) {
+                com.bosandroidapp.oqmobilefinance.utils.CrashlyticsUtils.setUserId(userId)
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("BaseActivity", "Error setting Crashlytics keys", e)
+        }
+
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 ApplicationClass.isNetworkAvailable.collect { connected ->

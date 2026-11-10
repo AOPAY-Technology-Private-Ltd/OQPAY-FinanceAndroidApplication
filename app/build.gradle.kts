@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.gms.google.services)
+    id("com.google.firebase.crashlytics")
 }
 
 
@@ -119,6 +120,12 @@ dependencies {
     implementation(libs.firebase.firestore.ktx)
     // (optional)
     implementation(libs.firebase.storage)
+
+    // Add the dependencies for the Crashlytics and Analytics libraries
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.analytics)
+
     implementation(libs.androidx.swiperefreshlayout)
 
     implementation(libs.googleid)

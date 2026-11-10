@@ -49,9 +49,23 @@ class ApplicationClass : Application() {
         super.onCreate()
         instance = this
 
-       /* StackerAndroid.enable(this)*/
-
         Log.d("ApplicationClass", "Application started")
+
+        try {
+            com.google.firebase.FirebaseApp.initializeApp(this)
+            com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true)
+
+            preference = SharedPreference(this)
+            val customerCode = preference.getStringValue(ConstantClass.CustomerCode, "")
+            val retailerCode = preference.getStringValue(ConstantClass.RetailerCode, "")
+            val userId = customerCode
+            if (userId.isNotBlank()) {
+                CrashlyticsUtils.setUserId(userId)
+            }
+        } catch (e: Exception) {
+            Log.e("ApplicationClass", "Error initializing Firebase/Crashlytics", e)
+            CrashlyticsUtils.logException(e)
+        }
 
         // Create default notification channel once
         createNotificationChannel()
