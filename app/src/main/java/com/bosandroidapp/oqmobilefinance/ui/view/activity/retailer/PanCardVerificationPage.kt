@@ -451,7 +451,7 @@ class PanCardVerificationPage : BaseActivity() {
                                 }
                                 else{
                                     ConstantClass.dialog.dismiss()
-                                    OpenPopUpForVAlert()
+                                    OpenPopUpForVAlert(response.message!!)
                                 }
 
                             }
@@ -476,11 +476,10 @@ class PanCardVerificationPage : BaseActivity() {
 
 
     @SuppressLint("SetTextI18n")
-    fun OpenPopUpForVAlert(){
+    fun OpenPopUpForVAlert(msg: String){
         dialog = Dialog(this,android.R.style.Theme_Black_NoTitleBar_Fullscreen)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setContentView(R.layout.signoutalert)
-
 
         dialog.window?.apply {
             setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
@@ -498,7 +497,11 @@ class PanCardVerificationPage : BaseActivity() {
         image.visibility=View.VISIBLE
         done.visibility= View.GONE
 
-        txt.text="Your loan application was created, but you must validate your PAN  again since 90 days have passed"
+        txt.text = if (msg.isNullOrBlank()) {
+            "Your loan application was created, but you must validate your PAN again since 90 days have passed."
+        } else {
+            msg
+        }
 
         cancel.setOnClickListener {
             finish()
