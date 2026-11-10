@@ -85,6 +85,7 @@ import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.DataItem
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.DataItems
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.EmiSplitRes
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.GetEMISplitDetlailsReq
+import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.GetIsEligibleLoanReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LoginReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.LogoutReq
 import com.bosandroidapp.oqmobilefinance.data.model.loginsignup.ManageCustomerStepWiseReq
@@ -119,6 +120,7 @@ class EMICalculationDetailsPage : BaseActivity() {
 
     var isclick = true
     var lastSellingPrice: String = ""
+    var membershipAmt: String = ""
 
 
     companion object {
@@ -185,6 +187,7 @@ class EMICalculationDetailsPage : BaseActivity() {
     override fun onResume() {
         super.onResume()
         hitApiForLogin()
+        hitApiForMemberShipFee()
     }
 
 
@@ -904,6 +907,58 @@ class EMICalculationDetailsPage : BaseActivity() {
 
             }
 
+        }
+
+    }
+
+
+    fun hitApiForMemberShipFee() {
+        val startTime = System.currentTimeMillis()
+        var req = GetIsEligibleLoanReq(
+            panNumber = PanNumber,
+            aadharNumber = ""
+        )
+
+        Log.d("checkMemberShipReq", Gson().toJson(req))
+
+        viewModel.getgetMemberShipReqeReq(req).observe(this) { resources ->
+            resources.let {
+                when (it.apiStatus) {
+                    ApiStatus.SUCCESS -> {
+                        it.data.let { users ->
+                            users!!.body().let { response ->
+                                Log.d("API_TIME", "Response Time: ${System.currentTimeMillis() - startTime} ms")
+                                val response = users?.body()
+                                if (response != null) {
+                                    Log.d("PanVerificationResp", Gson().toJson(response))
+                                    if (response!!.statuss.equals("True")) {
+                                        val membership = response.membershipFee?.toDouble() ?: 0.0
+                                        membershipAmt = "$membership"
+                                    } else {
+                                    }
+                                }
+                                else {
+
+                                    hitApiForMemberShipFee()
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                    ApiStatus.ERROR -> {
+                        ConstantClass.dialog.dismiss()
+                        Toast.makeText(this@EMICalculationDetailsPage, resources.message ?: "Error getting membership fee", Toast.LENGTH_SHORT).show()
+                        Log.d("API_TIME", "Failed after: ${System.currentTimeMillis() - startTime} ms")
+                    }
+
+                    ApiStatus.LOADING -> {
+
+                    }
+                }
+            }
         }
 
     }

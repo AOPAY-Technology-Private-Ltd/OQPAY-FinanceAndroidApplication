@@ -2245,16 +2245,15 @@ class NewCustomerRegistrationPage : BaseActivity() {
                     ApiStatus.SUCCESS -> {
                         it.data?.let { users ->
                             if(users.isSuccessful){
-                                users.body()?.let { response ->
+                                users.body()?.let { data ->
                                     ConstantClass.dialog.dismiss()
-                                    var otp = response.value
+                                    var otp = data.value
 
-                                    val isHttpSuccess = response.code == 200
-                                    var userScore = response.creditScore!!
-                                    CibilResponse = Gson().toJson(response)
+                                    var userScore = data.creditScore!!
+                                    CibilResponse = Gson().toJson(data)
                                     Log.d("cibilresp", Gson().toJson(CibilResponse))
 
-                                    if ( /*isHttpSuccess*/ response.code == 200) {
+                                    if ( /*isHttpSuccess*/ data.code == 200) {
 
                                         if (userScore>0) {
                                             if (userScore >= 500) {
@@ -2386,21 +2385,21 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                         }
 
                                         else {
-                                            PopOpForCibileScoreRequestToAdmin(response.message.toString(), "Record Message", false)
+                                            PopOpForCibileScoreRequestToAdmin(data.message.toString(), "Record Message", false)
                                             binding.createaccount.isEnabled = true
                                         }
                                     }
                                     else {
-                                        if (response.code == 102) {
+                                        if (data.code == 102) {
                                             userScore = 0
-                                            CibilResponse = Gson().toJson(response)
+                                            CibilResponse = Gson().toJson(data)
                                             GlobalScope.launch(Dispatchers.Main) {
                                                 hitApiForCustomerRegister(userScore,"Your CIBIL score is low or No Record Available. Please contact your Admin for approval before applying for a loan.", "Low CIBIL Score")
                                             }
                                         }
                                         else{
                                             binding.createaccount.isEnabled = true
-                                            val errorMsg = if (!response.message.isNullOrBlank()) response.message else "Authentication failed. Please contact administrator."
+                                            val errorMsg = if (!data.message.isNullOrBlank()) data.message else "Authentication failed. Please contact administrator."
                                             PopOpForCibileScoreRequestToAdmin(errorMsg, "Authentication Error", false)
                                         }
 

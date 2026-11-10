@@ -61,7 +61,6 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
     private lateinit var binding: ActivityOnlineAutoUpiEmandateBinding
     private lateinit var viewModel: AuthenticationViewModel
     private lateinit var dikshifinsureViewModel: DikshifinsureViewModel
-    
     private var merchandId: String = ""
     private var registrationId: String = ""
     private var isStatusCheckInProgress = false
@@ -71,6 +70,7 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
 
     private var isPaymentProcessed = false
 
+
     fun handleUrlChange(url: String) {
         if (isPaymentProcessed) return
 
@@ -79,62 +79,48 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
             val status = (uri.getQueryParameter("Status") ?: uri.getQueryParameter("status"))?.uppercase()
             val merchantOrderId = uri.getQueryParameter("MerchantOrderId")
 
-            Log.d("AUTOUPI_STATUS", "Payment Status: $status")
-            Log.d("AUTOUPI_UTR", "Merchant Order ID: $merchantOrderId")
+            Log.d("AUTOUPI_STATUS", "Payment Status: $status, URL: $url")
 
-            when {
-                // Payment Success
-                status == "SUCCESS"  == true -> {
-                    isPaymentProcessed = true
+            val isSuccess = status == "SUCCESS" || uri.path?.contains("/success", ignoreCase = true) == true
+            val isFailed = status == "FAILED" || uri.path?.contains("/failure", ignoreCase = true) == true
+            val isCancelled = status == "TIMEOUT" || status == "CANCEL" || status == "CANCELLED" || uri.path?.contains("/cancel", ignoreCase = true) == true
+
+            if (!isSuccess && !isFailed && !isCancelled) {
+                return
+            }
+
+            isPaymentProcessed = true
+
+            runOnUiThread {
+                try {
+                    binding.webview.stopLoading()
+                    binding.webview.loadUrl("about:blank")
+                } catch (e: Exception) {
+                    Log.e("AUTOUPI", "Error stopping webview", e)
+                }
+
+                if (isSuccess) {
                     Log.d("PAYU", "Payment Success: $url")
+                    isEmandateVerified = isMandate
 
-                    runOnUiThread {
-                        binding.webview.stopLoading()
-                        isEmandateVerified = isMandate
+                    val uploadReq = EnachDateUploadReq(
+                        isEmandateVerified = isEmandateVerified,
+                        emAccountType = AccountType,
+                        isPannydropVerified = isPannydropVerified,
+                        emAccountNumber = AccountNumber,
+                        customerCode = CustomerCodeForEnach,
+                        retailerCode = RetailerCodeForEnach,
+                        loanCode = loaneCode,
+                        emBankName = BankName,
+                        emIfscCode = BankIFSCCode,
+                        emumrn = merchantOrderId
+                    )
 
-                        val uploadReq = EnachDateUploadReq(
-                            isEmandateVerified = isEmandateVerified,
-                            emAccountType = AccountType,
-                            isPannydropVerified = isPannydropVerified,
-                            emAccountNumber = AccountNumber,
-                            customerCode = CustomerCodeForEnach,
-                            retailerCode = RetailerCodeForEnach,
-                            loanCode = loaneCode,
-                            emBankName = BankName,
-                            emIfscCode = BankIFSCCode,
-                            emumrn = merchantOrderId
-                        )
-
-                        hitApiForUploadEnachMandateDataResponse(uploadReq, isEmandateVerified)
-                    }
-                }
-
-                // Payment Failed
-                status == "FAILED"  == true -> {
-                    isPaymentProcessed = true
-                    Log.d("PAYU", "Payment Failed: $url")
-
-                    runOnUiThread {
-                        binding.webview.stopLoading()
-                        isEmandateVerified = "No"
-                        showingRejectioneMandatePopUp("",isEmandateVerified)
-                    }
-                }
-
-                // Payment Cancelled
-                status == "TIMEOUT"   == true -> {
-                    isPaymentProcessed = true
-                    Log.d("PAYU", "Payment Cancelled: $url")
-
-                    runOnUiThread {
-                        binding.webview.stopLoading()
-                        isEmandateVerified = "No"
-                        showingRejectioneMandatePopUp("",isEmandateVerified)
-                    }
-                }
-
-                else -> {
-                    Log.d("PAYU", "Other URL: $url")
+                    hitApiForUploadEnachMandateDataResponse(uploadReq, isEmandateVerified)
+                } else {
+                    Log.d("PAYU", "Payment Failed/Cancelled: $url")
+                    isEmandateVerified = "No"
+                    showingRejectioneMandatePopUp(merchantOrderId ?: "", isEmandateVerified)
                 }
             }
 
@@ -158,8 +144,8 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
 
         viewModel = ViewModelProvider(this, CommonViewModelFactory(AuthRepository(RetrofitClient.apiInterface))
         )[AuthenticationViewModel::class.java]
-        dikshifinsureViewModel = ViewModelProvider(this,
-            DikshifinsureOnlinePGModelFactory(DikshifinsureRepository(RetrofitClient.apiInterfaceOnlinePG))
+
+        dikshifinsureViewModel = ViewModelProvider(this, DikshifinsureOnlinePGModelFactory(DikshifinsureRepository(RetrofitClient.apiInterfaceOnlinePG))
         )[DikshifinsureViewModel::class.java]
 
         if (intent.hasExtra(ConstantClass.MarchentOrderID_UPIAUTOPAY) && intent.hasExtra(ConstantClass.RegistrationID_UPIAUTOPAY)) {
@@ -230,8 +216,6 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
             WebStorage.getInstance().deleteAllData()
         }
     }
-
-
 
 
 
@@ -311,11 +295,13 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
                         dialog.dismiss()
                     }
                     val response = resources.data?.body()
+                    val msg = response?.message ?: "Upload failed"
 
                     Log.d("UpiAutoTransRes", Gson().toJson(response))
 
                     if (response?.success!!.toLowerCase().equals("true", ignoreCase = true)|| response.code==200) {
                         if (isMandate == ConstantClass.isMandate) {
+                            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
                             startActivity(Intent(this, AppScanInstallPage::class.java))
                             finish()
                         } else {
@@ -354,6 +340,19 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
 
     class MerchantWebViewClient(private val activity: OnlineAutoUpiEmandateActivity) : WebViewClient() {
 
+        override fun onPageStarted(view: WebView?, url: String?, favicon: android.graphics.Bitmap?) {
+            super.onPageStarted(view, url, favicon)
+          /*  if (!url.isNullOrBlank()) {
+                val uri = Uri.parse(url)
+                val status = (uri.getQueryParameter("Status") ?: uri.getQueryParameter("status"))?.uppercase()
+                if (status == "SUCCESS" || status == "FAILED" || status == "TIMEOUT" || status == "CANCEL" || status == "CANCELLED") {
+                    view?.stopLoading()
+                    view?.loadUrl("about:blank")
+                    activity.handleUrlChange(url)
+                }
+            }*/
+        }
+
         override fun onPageFinished(view: WebView?, url: String?) {
             super.onPageFinished(view, url)
             Log.d("AUTOUPI_WEBVIEW", "Page Finished: $url")
@@ -382,8 +381,9 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
 
             if (status == "SUCCESS" || uri.path?.contains("/success", ignoreCase = true) == true ||
                 status == "FAILED" || uri.path?.contains("/failure", ignoreCase = true) == true ||
-                status == "CANCEL" || status == "CANCELLED" || uri.path?.contains("/cancel", ignoreCase = true) == true) {
+                status == "TIMEOUT" || status == "CANCEL" || status == "CANCELLED" || uri.path?.contains("/cancel", ignoreCase = true) == true) {
                 view.stopLoading()
+                view.loadUrl("about:blank")
                 activity.handleUrlChange(url)
                 return true
             }
@@ -406,51 +406,64 @@ class OnlineAutoUpiEmandateActivity : BaseActivity() {
     }
 
 
-    fun showingRejectioneMandatePopUp(emumrn: String,isEmandateVerified: String){
-        dialog = Dialog(this, R.style.Theme_Black_NoTitleBar_Fullscreen)
-        dialog!!.requestWindowFeature(Window.FEATURE_NO_TITLE)
-        dialog!!.setContentView(com.bosandroidapp.oqmobilefinance.R.layout.enach_reject_alert)
+    fun showingRejectioneMandatePopUp(emumrn: String, isEmandateVerified: String) {
 
-        dialog!!.window?.apply {
-            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
-            addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
+        try {
+            dialog = Dialog(this, R.style.Theme_Black_NoTitleBar_Fullscreen)
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            dialog.setContentView(com.bosandroidapp.oqmobilefinance.R.layout.enach_reject_alert)
 
-            statusBarColor = Color.TRANSPARENT
-            navigationBarColor = Color.TRANSPARENT
-        }
+            dialog.window?.apply {
+                setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+                addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS)
 
-        var Ok = dialog!!.findViewById<Button>(com.bosandroidapp.oqmobilefinance.R.id.btnOk)
+                statusBarColor = Color.TRANSPARENT
+                navigationBarColor = Color.TRANSPARENT
+            }
 
+            val okBtn = dialog.findViewById<Button>(com.bosandroidapp.oqmobilefinance.R.id.btnOk)
+            val title = dialog.findViewById<TextView>(com.bosandroidapp.oqmobilefinance.R.id.title)
+            val message = dialog.findViewById<TextView>(com.bosandroidapp.oqmobilefinance.R.id.message)
+            title.text = "UPI Mendate Rejected"
+            message.text = "Your UPI Mendate request has been rejected. Please try again or contact support."
 
-        Ok.setOnClickListener {
+            okBtn?.setOnClickListener {
+                if (!isEmandateVerified.isNullOrBlank()) {
+                    val request = EnachDateUploadReq(
+                        isEmandateVerified = isEmandateVerified,
+                        emAccountType = AccountType,
+                        isPannydropVerified = isPannydropVerified,
+                        emAccountNumber = AccountNumber,
+                        customerCode = CustomerCodeForEnach,
+                        retailerCode = RetailerCodeForEnach,
+                        loanCode = loaneCode,
+                        emBankName = BankName,
+                        emIfscCode = BankIFSCCode,
+                        emumrn = emumrn
+                    )
+                    hitApiForUploadEnachMandateDataResponse(request, isEmandateVerified)
+                } else {
+                    if (::dialog.isInitialized && dialog.isShowing) {
+                        dialog.dismiss()
+                    }
+                    QRCodePage.isEnachCancelled = true
+                    finish()
+                }
+            }
 
-            if(!isEmandateVerified.isNullOrBlank()){
+            dialog.setCanceledOnTouchOutside(false)
 
-                var request = EnachDateUploadReq(
-                    isEmandateVerified = isEmandateVerified,
-                    emAccountType = AccountType,
-                    isPannydropVerified = isPannydropVerified,
-                    emAccountNumber = AccountNumber,
-                    customerCode = CustomerCodeForEnach,
-                    retailerCode= RetailerCodeForEnach,
-                    loanCode= loaneCode,
-                    emBankName=BankName,
-                    emIfscCode =BankIFSCCode,
-                    emumrn = emumrn
-                )
-
-                hitApiForUploadEnachMandateDataResponse(request,isEmandateVerified)
+            if (!isFinishing && !isDestroyed) {
+                dialog.show()
             }
 
         }
-
-        dialog!!.setCanceledOnTouchOutside(false)
-
-        dialog!!.show()
-
+        catch (e: Exception) {
+            Log.e("AUTOUPI", "Error showing rejection popup", e)
+            QRCodePage.isEnachCancelled = true
+        }
     }
-
 
 
 
