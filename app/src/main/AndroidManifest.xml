@@ -145,6 +145,7 @@
             android:name=".ui.view.activity.retailer.reports.SettlementLoanReport"
             android:exported="false"
             android:screenOrientation="portrait" />
+
         <activity
             android:name=".ui.view.activity.retailer.MapActivity"
             android:exported="false"
