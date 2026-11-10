@@ -882,8 +882,10 @@ interface ApiInterface {
     //............................................................................................
     // device lock check api
 
+
     @POST("api/V1/OQFinance/DeviceActionLog")
     suspend fun uploadDeviceLockStatusReq(@Body req: CustomerDeviceLockStatusReq): Response<CustomerDeviceLockStatusResp>?
+
 
     // for customer Reports
 
