@@ -1448,6 +1448,23 @@ object ConstantClass {
         }
     }
 
+    fun formatTwoDecimalAmount(amount: Any?): String {
+        if (amount == null) return "₹0.00"
+        val number = when (amount) {
+            is Number -> amount.toDouble()
+            is String -> amount.toDoubleOrNull() ?: 0.0
+            else -> 0.0
+        }
+        return try {
+            val formatter = NumberFormat.getNumberInstance(Locale("en", "IN"))
+            formatter.maximumFractionDigits = 2
+            formatter.minimumFractionDigits = 2
+            "₹${formatter.format(number)}"
+        } catch (e: Exception) {
+            String.format(Locale.ENGLISH, "₹%.2f", number)
+        }
+    }
+
     fun formatIndianAmount(amount: String): String {
         return try {
             val number = amount.toDouble()
