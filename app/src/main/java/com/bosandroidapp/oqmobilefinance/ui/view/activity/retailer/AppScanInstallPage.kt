@@ -634,9 +634,7 @@ class AppScanInstallPage : BaseActivity() {
                                     val startDate = getCurrentStartDate()
                                     val endDate = calculateEmiEndDateFromNow(Tenure.toInt())
 
-                                    val currentMode = preference.getStringValue(ConstantClass.Loanmode, "").ifBlank {
-                                        LoanMode.ifBlank { ConstantClass.CheckOnlineOrOffline.ifBlank { ConstantClass.online } }
-                                    }
+                                    val currentMode = preference.getStringValue(ConstantClass.Loanmode, "")
                                     LoanMode = currentMode
                                     ConstantClass.CheckOnlineOrOffline = currentMode
                                     preference.setStringValue(ConstantClass.Loanmode, currentMode)

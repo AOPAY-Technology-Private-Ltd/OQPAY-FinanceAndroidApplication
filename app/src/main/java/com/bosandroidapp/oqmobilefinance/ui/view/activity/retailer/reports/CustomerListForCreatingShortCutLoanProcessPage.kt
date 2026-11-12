@@ -1499,9 +1499,9 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
                                         hitApiForUploadEnachMandateDataResponse(uploadReq)
                                     }
 
-                                    val error = users.body()?.statusDesc ?: users.message() ?: "Something went wrong"
+                                   /* val error = users.body()?.statusDesc ?: users.message() ?: "Something went wrong"
 
-                                    Toast.makeText(this, error, Toast.LENGTH_LONG).show()
+                                    Toast.makeText(this, error, Toast.LENGTH_LONG).show()*/
                                 }
                                 else {
                                     var error = resources.data.toString()

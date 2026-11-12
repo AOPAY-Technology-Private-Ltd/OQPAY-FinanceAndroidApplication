@@ -345,9 +345,9 @@ class NewCustomerRegistrationPage : BaseActivity() {
         }
 
         validateAndSyncMobileVerificationState()
-
         hitApiForLogin()
     }
+
 
     fun validateAndSyncMobileVerificationState() {
         val primaryMobileText = binding.mobileNumber.text.toString().trim()
@@ -697,7 +697,6 @@ class NewCustomerRegistrationPage : BaseActivity() {
         })
 
 
-
         binding.emailId.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
 
@@ -769,7 +768,6 @@ class NewCustomerRegistrationPage : BaseActivity() {
             }
 
         })
-
 
 
         binding.pincode.addTextChangedListener(object : TextWatcher {
@@ -1014,7 +1012,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                 cibilApiResponse = CibilResponse,
                                 cibilScore = userScore.toInt().toString(),
                                 retailerCode = preference.getStringValue(ConstantClass.RetailerCode, ""),
-                                activeStatus = "Pending",
+                                activeStatus = "Approved",
                                 custPhoto_path = "",
                                 custPhoto_File = customerImageFile
                             )
@@ -1076,7 +1074,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                 membershipfees=membershipAmt,
                                 retailercode=preference.getStringValue(ConstantClass.RetailerCode,""),
                                 cibilScore=userScore.toString(),
-                                activeStatus = "Pending",
+                                activeStatus = "Approved",
                                 cibilApiResponse = CibilResponse,
                                 aadhaarApiResponse = AadhaarResponse,
                                 panApiResponse = PanResponse,
@@ -2296,7 +2294,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                                         cibilApiResponse = CibilResponse,
                                                         cibilScore = userScore.toInt().toString(),
                                                         retailerCode = preference.getStringValue(ConstantClass.RetailerCode, ""),
-                                                        activeStatus = "activeStatus",
+                                                        activeStatus = "Approved",
                                                         custPhoto_path = "",
                                                         custPhoto_File = customerImageFile
                                                     )
@@ -2357,7 +2355,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                                                         retailercode = preference.getStringValue(ConstantClass.RetailerCode, ""),
                                                         customerCode = "",
                                                         cibilScore = userScore.toString(),
-                                                        activeStatus = "activeStatus",
+                                                        activeStatus = "Approved",
                                                         cibilApiResponse = CibilResponse,
                                                         aadhaarApiResponse = AadhaarResponse,
                                                         panApiResponse = PanResponse,
@@ -2476,7 +2474,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                 cibilApiResponse = CibilResponse,
                 cibilScore = cibilScore.toString(),
                 retailerCode = preference.getStringValue(ConstantClass.RetailerCode, ""),
-                activeStatus = "Pending",
+                activeStatus = "Approved",
                 custPhoto_path = "",
                 custPhoto_File = customerImageFile
             )
