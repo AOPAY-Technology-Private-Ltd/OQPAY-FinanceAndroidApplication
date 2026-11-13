@@ -1660,6 +1660,7 @@ class QRCodePage : BaseActivity() {
                                             else{
                                                 CustomerCodeForEnach = response.data!!.customerCode!!
                                             }
+
                                             preference.setStringValue(ConstantClass.CustomerCode,response.data!!.customerCode!!)
 
                                             LoanCodeForEnach = response.data!!.loanCode!!
@@ -2074,7 +2075,32 @@ class QRCodePage : BaseActivity() {
     }
 
 
-    fun hitApiForEnach(request: EMandateRequest, mode: String, check: Boolean) {
+    private fun parseErrorMessage(errorJson: String?, defaultMsg: String): String {
+        if (errorJson.isNullOrBlank()) return defaultMsg
+        try {
+            val jsonObject = org.json.JSONObject(errorJson)
+            if (jsonObject.has("Message")) {
+                val msg = jsonObject.getString("Message")
+                if (msg.isNotBlank()) return msg
+            }
+            if (jsonObject.has("message")) {
+                val msg = jsonObject.getString("message")
+                if (msg.isNotBlank()) return msg
+            }
+            if (jsonObject.has("errorMessage")) {
+                val msg = jsonObject.getString("errorMessage")
+                if (msg.isNotBlank()) return msg
+            }
+            if (jsonObject.has("error")) {
+                val msg = jsonObject.getString("error")
+                if (msg.isNotBlank()) return msg
+            }
+        } catch (e: Exception) {
+            Log.e("ParseError", "Failed to parse error JSON: $errorJson", e)
+        }
+        return defaultMsg
+    }
+     fun hitApiForEnach(request: EMandateRequest, mode: String, check: Boolean) {
         Log.d("eManadateReq", Gson().toJson(request))
 
         if(mode.equals(ConstantClass.offline)) {
@@ -2123,13 +2149,14 @@ class QRCodePage : BaseActivity() {
 
                                     }
 
-                                    val error = users.body()?.statusDesc ?: users.message() ?: "Something went wrong"
+                                    val error = users.body()?.statusDesc ?: users.message()
                                     Toast.makeText(this, error, Toast.LENGTH_LONG).show()
 
                                 }
                                 else {
-                                    var error = resources.data.toString()
-                                    Toast.makeText(this@QRCodePage,error, Toast.LENGTH_SHORT).show()
+                                    val rawErrorBody = users.errorBody()?.string()
+                                    val parsedMessage = parseErrorMessage(rawErrorBody, users.message() ?: "Error occurred")
+                                    Toast.makeText(this@QRCodePage, parsedMessage, Toast.LENGTH_SHORT).show()
 
                                 }
 
@@ -2144,7 +2171,9 @@ class QRCodePage : BaseActivity() {
                             Log.e("API_ERROR_CODE", resources.data?.code().toString())
                             Log.e("API_ERROR_MSG", resources.message ?: "Unknown Error")
 
-                            Toast.makeText(this@QRCodePage, resources.message ?: "Server error occurred", Toast.LENGTH_LONG).show()
+                            val rawErrorBody = resources.data?.errorBody()?.string()
+                            val parsedMessage = parseErrorMessage(rawErrorBody, resources.message ?: "Server error occurred")
+                            Toast.makeText(this@QRCodePage, parsedMessage, Toast.LENGTH_LONG).show()
 
                             // Optional: Handle specific 500 error
                             if (resources.data?.code() == 500) {
@@ -2168,45 +2197,50 @@ class QRCodePage : BaseActivity() {
         else{
 
             if(selectedAuthType!!.contains(ConstantClass.UPIAUTOPAY)){
-                var request = UPIMandateRequest(
+                val rawAmount = request.collectionAmount ?: 0.0
+                val formattedAmount = String.format(java.util.Locale.US, "%.2f", rawAmount).toDoubleOrNull() ?: rawAmount
+
+                val upiReq = UPIMandateRequest(
                     registrationID = request.registrationID,
                     customerCode = preference.getStringValue(ConstantClass.CustomerCode,""),
                     loanCode = request.loanNo,
-                    emiAmount = request.collectionAmount,
+                    emiAmount = formattedAmount,
                     lastEMIDueDate = request.finalCollectionDate,
                 )
-                Log.d("UPIMandateReq", Gson().toJson(request))
-                dikshifinsureOnlinePGModel.getUpiMandateOnlineRequest(request).observe(this) { resources ->
+                Log.d("UPIMandateReq", Gson().toJson(upiReq))
+
+                dikshifinsureOnlinePGModel.getUpiMandateOnlineRequest(upiReq).observe(this) { resources ->
                     resources.let {
                         when (it.apiStatus) {
 
                             ApiStatus.SUCCESS -> {
 
-                                it.data.let { users ->
+                                it.data?.let { users ->
 
-                                    if(users!!.isSuccessful){
-                                        users!!.body().let { response ->
+                                    if(users.isSuccessful){
+                                        users.body()?.let { response ->
                                             Log.d("eMandateUpiOnlineRes", Gson().toJson(response))
 
                                             if (ConstantClass.dialog != null && ConstantClass.dialog.isShowing) {
                                                 ConstantClass.dialog.dismiss()
                                             }
 
-                                            /*binding.LoanCreatelayout.isEnabled= true*/
-
-                                            if (response!!.code=="200" ) {
-                                                webUrl = response!!.intentUrl
-                                                var MarchentOrderID = response.marchentOrderID
-                                                var intent = Intent(this@QRCodePage, OnlineAutoUpiEmandateActivity::class.java)
-                                                intent.putExtra(ConstantClass.MarchentOrderID_UPIAUTOPAY,MarchentOrderID)
-                                                intent.putExtra(ConstantClass.RegistrationID_UPIAUTOPAY,request.registrationID)
+                                            if (response.code == "200") {
+                                                webUrl = response.intentUrl
+                                                val marchentOrderID = response.marchentOrderID
+                                                val intent = Intent(this@QRCodePage, OnlineAutoUpiEmandateActivity::class.java)
+                                                intent.putExtra(ConstantClass.MarchentOrderID_UPIAUTOPAY, marchentOrderID)
+                                                intent.putExtra(ConstantClass.RegistrationID_UPIAUTOPAY, request.registrationID)
                                                 startActivity(intent)
                                             }
                                             else {
-                                                ConstantClass.dialog.dismiss()
-                                                isEmandateVerified= "No"
+                                                if (ConstantClass.dialog?.isShowing == true) {
+                                                    ConstantClass.dialog!!.dismiss()
+                                                }
+                                                isEmandateVerified = "No"
                                                 isEnachCancelled = true
-                                                Toast.makeText(this, response.errorMessage.toString(), Toast.LENGTH_SHORT).show()
+                                                val errMsg = response.errorMessage?.toString()?.takeIf { it.isNotBlank() && it != "null" } ?: "UPI AutoPay failed"
+                                                Toast.makeText(this@QRCodePage, errMsg, Toast.LENGTH_SHORT).show()
                                             }
 
                                             if(!isEmandateVerified.isNullOrBlank()){
@@ -2229,7 +2263,12 @@ class QRCodePage : BaseActivity() {
                                         }
                                     }
                                     else {
-                                        Toast.makeText(this, resources.message ?: "Upi AutoPay not working", Toast.LENGTH_LONG).show()
+                                        if (ConstantClass.dialog?.isShowing == true) {
+                                            ConstantClass.dialog!!.dismiss()
+                                        }
+                                        val rawErrorBody = users.errorBody()?.string()
+                                        val parsedMsg = parseErrorMessage(rawErrorBody, users.message() ?: "UPI AutoPay failed")
+                                        Toast.makeText(this@QRCodePage, parsedMsg, Toast.LENGTH_LONG).show()
                                     }
 
                                 }
@@ -2237,19 +2276,13 @@ class QRCodePage : BaseActivity() {
                             }
 
                             ApiStatus.ERROR -> {
-                                ConstantClass.dialog.dismiss()
-                                // ✅ Print the full error details
-                                Log.e("API_ERROR", "Status: ERROR")
-                                Log.e("API_ERROR_CODE", resources.data?.code().toString())
-                                Log.e("API_ERROR_MSG", resources.message ?: "Unknown Error")
-
-                                Toast.makeText(this, "Server error occurred (Code: ${resources.data?.code() ?: "Unknown"})", Toast.LENGTH_LONG).show()
-
-                                // Optional: Handle specific 500 error
-                                if (resources.data?.code() == 500) {
-                                    Log.e("API_ERROR", "Internal Server Error from backend.")
+                                if (ConstantClass.dialog?.isShowing == true) {
+                                    ConstantClass.dialog!!.dismiss()
                                 }
-
+                                val rawErrorBody = resources.data?.errorBody()?.string()
+                                val parsedMsg = parseErrorMessage(rawErrorBody, resources.message ?: "Server error occurred")
+                                Log.e("API_ERROR", "Status: ERROR | Code: ${resources.data?.code()} | Msg: $parsedMsg")
+                                Toast.makeText(this@QRCodePage, parsedMsg, Toast.LENGTH_LONG).show()
                             }
 
                             ApiStatus.LOADING -> {
@@ -2262,7 +2295,6 @@ class QRCodePage : BaseActivity() {
                         }
 
                     }
-
                 }
             }
             else{
@@ -2310,7 +2342,7 @@ class QRCodePage : BaseActivity() {
 
                                         }
 
-                                        val error = users.body()?.statusDesc ?: users.message() ?: "Something went wrong"
+                                        val error = users.body()?.statusDesc ?: users.message()
                                         Toast.makeText(this, error, Toast.LENGTH_LONG).show()
                                     }
                                     else {

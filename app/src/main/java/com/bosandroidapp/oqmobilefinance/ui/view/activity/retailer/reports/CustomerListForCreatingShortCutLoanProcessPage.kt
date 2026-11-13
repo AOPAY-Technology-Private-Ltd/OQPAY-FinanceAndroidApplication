@@ -978,7 +978,8 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
                                                                                             nextLayout.isEnabled = true
                                                                                             Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage, body?.message ?: "Failed to update bank details", Toast.LENGTH_LONG).show()
                                                                                         }
-                                                                                    } else {
+                                                                                    }
+                                                                                    else {
                                                                                         ConstantClass.dialog?.dismiss()
                                                                                         nextLayout.isEnabled = true
                                                                                         val errorStr = response.message()
@@ -1159,7 +1160,8 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
         if (!isEmandateVerifiedStatus) {
             // Step 7: E-Mandate Process (After Loan Created)
             showEmandateSelectionDialog(item)
-        } else
+        }
+        else
             if (!isAccessKeyVerifiedStatus ) {
             // Step 8: App Install
             startActivity(Intent(this, AppScanInstallPage::class.java))
@@ -1322,7 +1324,6 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
                                 }
 
                                 val error = users.body()?.statusDesc ?: users.message()
-                                ?: "Something went wrong"
 
                                 Toast.makeText(this, error, Toast.LENGTH_LONG).show()
                             } else {
@@ -1363,11 +1364,13 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
         else {
 
             if(selectedAuthType!!.contains(ConstantClass.UPIAUTOPAY)){
+                val rawAmount = request.collectionAmount ?: 0.0
+                val formattedAmount = String.format(java.util.Locale.US, "%.2f", rawAmount).toDoubleOrNull() ?: rawAmount
                 var request = UPIMandateRequest(
                     registrationID = request.registrationID,
                     customerCode = CustomerCodeForEnach,
                     loanCode = request.loanNo,
-                    emiAmount = request.collectionAmount,
+                    emiAmount = formattedAmount,
                     lastEMIDueDate = request.finalCollectionDate,
                 )
                 Log.d("UPIMandateReq", Gson().toJson(request))
@@ -1422,7 +1425,12 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
 
                                     }
                                     else {
-                                        Toast.makeText(this, resources.message ?: "Server error occurred", Toast.LENGTH_LONG).show()
+                                        if (ConstantClass.dialog?.isShowing == true) {
+                                            ConstantClass.dialog!!.dismiss()
+                                        }
+                                        val rawErrorBody = users.errorBody()?.string()
+                                        val parsedMsg = parseErrorMessage(rawErrorBody, users.message() ?: "UPI AutoPay failed")
+                                        Toast.makeText(this@CustomerListForCreatingShortCutLoanProcessPage, parsedMsg, Toast.LENGTH_LONG).show()
                                     }
 
                                 }
@@ -1499,9 +1507,9 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
                                         hitApiForUploadEnachMandateDataResponse(uploadReq)
                                     }
 
-                                   /* val error = users.body()?.statusDesc ?: users.message() ?: "Something went wrong"
+                                    val error = users.body()?.statusDesc ?: users.message()
 
-                                    Toast.makeText(this, error, Toast.LENGTH_LONG).show()*/
+                                    Toast.makeText(this, error, Toast.LENGTH_LONG).show()
                                 }
                                 else {
                                     var error = resources.data.toString()
@@ -1550,6 +1558,33 @@ class CustomerListForCreatingShortCutLoanProcessPage : AppCompatActivity() {
                 ApiStatus.LOADING -> {}
             }
         }
+    }
+
+
+    private fun parseErrorMessage(errorJson: String?, defaultMsg: String): String {
+        if (errorJson.isNullOrBlank()) return defaultMsg
+        try {
+            val jsonObject = org.json.JSONObject(errorJson)
+            if (jsonObject.has("Message")) {
+                val msg = jsonObject.getString("Message")
+                if (msg.isNotBlank()) return msg
+            }
+            if (jsonObject.has("message")) {
+                val msg = jsonObject.getString("message")
+                if (msg.isNotBlank()) return msg
+            }
+            if (jsonObject.has("errorMessage")) {
+                val msg = jsonObject.getString("errorMessage")
+                if (msg.isNotBlank()) return msg
+            }
+            if (jsonObject.has("error")) {
+                val msg = jsonObject.getString("error")
+                if (msg.isNotBlank()) return msg
+            }
+        } catch (e: Exception) {
+            Log.e("ParseError", "Failed to parse error JSON: $errorJson", e)
+        }
+        return defaultMsg
     }
 
 
