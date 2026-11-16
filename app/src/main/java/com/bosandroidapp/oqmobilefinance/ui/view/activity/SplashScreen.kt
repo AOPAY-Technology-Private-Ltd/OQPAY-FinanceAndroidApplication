@@ -27,6 +27,8 @@ import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isDevModeEnabled
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.isInternetAvailable
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.showDevModeSnackbar
 import com.bosandroidapp.oqmobilefinance.internetchecker.BaseActivity
+import com.bosandroidapp.oqmobilefinance.kioskmode.KioskActivity
+import com.bosandroidapp.oqmobilefinance.kioskmode.isLocked
 import com.bosandroidapp.oqmobilefinance.localdb.SharedPreference
 import com.bosandroidapp.oqmobilefinance.ui.view.activity.ChooseYourRolePage
 import com.bosandroidapp.oqmobilefinance.ui.slideshow.activity.DashBoard
@@ -81,7 +83,14 @@ class SplashScreen : AppCompatActivity() {
 
 
         Handler(Looper.getMainLooper()).postDelayed({
-            if (!isInternetAvailable(this)) {
+            if (isLocked()) {
+                val kioskIntent = Intent(this@SplashScreen, KioskActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                }
+                startActivity(kioskIntent)
+                finish()
+            }
+            else if (!isInternetAvailable(this)) {
                 Snackbar.make(findViewById(android.R.id.content),
                     "No internet connection. Please check your network.",
                     Snackbar.LENGTH_INDEFINITE
@@ -92,7 +101,6 @@ class SplashScreen : AppCompatActivity() {
                 }.show()
             }
             else{
-                // Code to run after delay
                 if (preference.getBoolanValue(ConstantClass.LoggedIn, false)) {
                     val mainIntent = Intent(this@SplashScreen, DashBoard::class.java)
                     startActivity(mainIntent)

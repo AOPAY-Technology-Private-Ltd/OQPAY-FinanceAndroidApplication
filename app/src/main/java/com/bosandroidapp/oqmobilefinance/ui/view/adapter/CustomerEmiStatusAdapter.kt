@@ -71,6 +71,7 @@ class CustomerEmiStatusAdapter(var context: Context, var ledgerReportList: List<
         binding.tvRecordStatus.text = item.recordStatus
         binding.tvPaymentDate.text = item.paymentDate
         binding.tvDueDate.text = "Due Date: ${item.emIDueDate}"
+
     }
 
 

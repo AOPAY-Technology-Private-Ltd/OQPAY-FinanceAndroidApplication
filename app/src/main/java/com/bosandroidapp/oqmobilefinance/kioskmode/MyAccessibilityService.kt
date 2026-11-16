@@ -56,6 +56,7 @@ class MyAccessibilityService : AccessibilityService() {
     }
 
 
+
     override fun onCreate() {
         super.onCreate()
         instance = this
@@ -69,6 +70,8 @@ class MyAccessibilityService : AccessibilityService() {
         val currentPkg = event?.packageName?.toString() ?: ""
 
         val preference = SharedPreference(this)
+
+
         if (preference.getBoolanValue(ConstantClass.LoggedIn, false) && 
             preference.getStringValue(ConstantClass.CustomerCode, "").isNotEmpty()) {
             CoroutineScope(Dispatchers.IO).launch {
@@ -80,7 +83,7 @@ class MyAccessibilityService : AccessibilityService() {
 
         
 
-      /*  if (currentPkg.equals(packageName)&&isMyAppInfoPage() && !isEMIsCompleted()) {
+        if (currentPkg.equals(packageName)&&isMyAppInfoPage() && !isEMIsCompleted()) {
             // Logger.d(ACCESSIBILITYTAG, "On App Info Page: Global Back")
             performGlobalAction(GLOBAL_ACTION_BACK)
         }
@@ -90,7 +93,7 @@ class MyAccessibilityService : AccessibilityService() {
             // Logger.d(ACCESSIBILITYTAG, "On Factory Reset Page: Global Back")
             performGlobalAction(GLOBAL_ACTION_BACK)
             this.showToast("You are not allowed to Factory reset your device when your EMIs are pending.")
-        }*/
+        }
 
 
         if (!isGpsEnabled(this) && !isEMIsCompleted()) {
@@ -113,6 +116,7 @@ class MyAccessibilityService : AccessibilityService() {
         if (gpsSettingsOpened) {
             gpsSettingsOpened = false
         }
+
 
         /*if (isGoogleLogin(event) && !isEMIsCompleted()) {
             // Logger.d(ACCESSIBILITYTAG, "On Google Login Page: Global Back")

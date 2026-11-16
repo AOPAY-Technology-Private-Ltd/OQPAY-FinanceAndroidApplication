@@ -7,6 +7,8 @@ import android.content.pm.PackageInstaller
 import android.util.Log
 import android.widget.Toast
 
+import com.bosandroidapp.oqmobilefinance.kioskmode.KioskActivity
+import com.bosandroidapp.oqmobilefinance.kioskmode.isLocked
 import com.bosandroidapp.oqmobilefinance.utils.AppUpdateManager
 
 class ApkInstallReceiver : BroadcastReceiver() {
@@ -25,6 +27,13 @@ class ApkInstallReceiver : BroadcastReceiver() {
                 Log.d("ApkInstallReceiver", "App updated successfully!")
                 Toast.makeText(context, "App updated successfully!", Toast.LENGTH_SHORT).show()
                 AppUpdateManager.hitApiForDeviceLockStatus(context, true, "APP_UPDATED")
+
+                if (context.isLocked()) {
+                    val kioskIntent = Intent(context, KioskActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    }
+                    context.startActivity(kioskIntent)
+                }
             }
             PackageInstaller.STATUS_PENDING_USER_ACTION -> {
                 val confirmIntent = intent.getParcelableExtra<Intent>(Intent.EXTRA_INTENT)

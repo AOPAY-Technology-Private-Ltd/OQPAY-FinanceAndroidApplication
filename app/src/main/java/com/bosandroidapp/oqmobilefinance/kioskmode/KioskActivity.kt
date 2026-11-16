@@ -192,6 +192,7 @@ class KioskActivity : BaseActivity() {
 
         HitApiForEmiList()
         setOnClickListner()
+        checkAndReengageKioskMode()
 
     }
 
@@ -332,7 +333,6 @@ class KioskActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
 
-        // instant unlock activity .................
         if (!isLocked()) {
             try {
                 stopLockIfRunning()
@@ -341,8 +341,7 @@ class KioskActivity : BaseActivity() {
             return
         }
 
-       // enterImmersiveMode()
-       // startLockIfPermitted()
+        checkAndReengageKioskMode()
 
         if (!previousLoanData.isNullOrEmpty()) {
             setData(previousLoanData, previousCurrentDate)
@@ -352,38 +351,55 @@ class KioskActivity : BaseActivity() {
         }
 
         hitapiforGetUpdateProfile()
+        isPgClosing = false
+    }
 
-        // for testing transferOwnerShip.....................................................
+    private fun checkAndReengageKioskMode() {
+        if (!isLocked()) return
+
+        enterImmersiveMode()
+
         try {
-            val dpm = getSystemService(DevicePolicyManager::class.java)
+            val dpm = getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
             val admin = ComponentName(this, KioskDeviceAdminReceiver::class.java)
             val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
 
             if (dpm.isDeviceOwnerApp(packageName)) {
-
-                // Whitelist the app for Lock Task Mode (typically done once during provisioning)
                 dpm.setLockTaskPackages(admin, arrayOf(packageName))
 
-              /*  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                     try {
                         dpm.setLockTaskFeatures(admin, 0)
                         dpm.setStatusBarDisabled(admin, true)
-                    } catch (_: Exception) {}
-                }*/
+                    } catch (e: Exception) {
+                        Log.e("KioskActivity", "Error setting lock task features", e)
+                    }
+                }
 
-                // Start Lock Task only if not already active
-                if (!isLockTaskStarted && activityManager.lockTaskModeState == ActivityManager.LOCK_TASK_MODE_NONE) {
+                val lockState = activityManager.lockTaskModeState
+                Log.d("KioskActivity", "LockTaskModeState: $lockState, isLockTaskStarted: $isLockTaskStarted")
+
+                if (lockState == ActivityManager.LOCK_TASK_MODE_NONE) {
+                    Log.d("KioskActivity", "Re-activating startLockTask() mode post update/resume...")
                     startLockTask()
                     isLockTaskStarted = true
                     hitApiForDeviceLockStatus(true)
+                } else {
+                    isLockTaskStarted = true
+                }
+            } else {
+                if (activityManager.lockTaskModeState == ActivityManager.LOCK_TASK_MODE_NONE) {
+                    try {
+                        startLockTask()
+                        isLockTaskStarted = true
+                    } catch (e: Exception) {
+                        Log.e("KioskActivity", "Fallback startLockTask failed: ${e.message}")
+                    }
                 }
             }
         } catch (e: Exception) {
-            Log.e("KioskActivity", "Error in onResume DPM check: ${e.message}")
+            Log.e("KioskActivity", "Error in checkAndReengageKioskMode: ${e.message}", e)
         }
-
-        isPgClosing = false
-
     }
 
 
@@ -491,7 +507,8 @@ class KioskActivity : BaseActivity() {
                                     MobileNumber= response.mobileNo.toString()
                                     FName= response.firstName.toString()
                                     LName= response.lastName.toString()
-                                    binding.infomasg.text = "This device is locked due to a pending payment. " + "To unlock, please contact your retailer ${FName} ${LName} at $MobileNumber or email at $EmailId"
+                                    binding.infomasg.text = "This device has been locked due to a pending payment for Loan Code ${loanCode}. To unlock your device, please contact your retailer, ${FName} ${LName}, at 9558444159 or via email at $EmailId."
+                               
                                 }
                                 else {
 

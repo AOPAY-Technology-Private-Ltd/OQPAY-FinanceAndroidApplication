@@ -59,6 +59,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
 
+
     fun passNotificationCode(notificationCode: String){
         val dpm = applicationContext.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
         val admin = ComponentName(applicationContext, KioskDeviceAdminReceiver::class.java)
@@ -136,8 +137,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         }
 
     }
-
-
 
 
     fun hitApiForDeviceLockStatus(status: Boolean, actionName: String) {
