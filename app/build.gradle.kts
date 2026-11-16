@@ -26,6 +26,7 @@ android {
     }
 
 
+
     buildTypes {
         release {
             isDebuggable = true
@@ -35,6 +36,8 @@ android {
                 "proguard-rules.pro"
             )
         }
+
+
     }
 
 
