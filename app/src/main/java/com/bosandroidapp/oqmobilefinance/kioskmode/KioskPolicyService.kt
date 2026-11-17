@@ -36,6 +36,7 @@ class KioskPolicyService : Service() {
     private lateinit var fusedClient: FusedLocationProviderClient
 
 
+
     @RequiresApi(Build.VERSION_CODES.R)
     @RequiresPermission(Manifest.permission.READ_PHONE_STATE)
     @SuppressLint("ForegroundServiceType")

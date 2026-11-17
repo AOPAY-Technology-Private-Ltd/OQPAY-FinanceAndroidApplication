@@ -22,6 +22,7 @@ class KioskDeviceAdminReceiver : DeviceAdminReceiver(){
         // Called when admin is enabled
         // Called when admin is enabled
         val dpm = context.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
+
         if (dpm.isDeviceOwnerApp(context.packageName))  {
             performDpcProvision(context)
 
@@ -49,7 +50,7 @@ class KioskDeviceAdminReceiver : DeviceAdminReceiver(){
             )
             dpm.addUserRestriction(admin, UserManager.DISALLOW_FACTORY_RESET)
             dpm.setOrganizationName(admin, ConstantClass.OrganizationName)
-            dpm.addUserRestriction(admin, UserManager.DISALLOW_DEBUGGING_FEATURES)
+           // dpm.addUserRestriction(admin, UserManager.DISALLOW_DEBUGGING_FEATURES)
             dpm.setPermittedAccessibilityServices(admin, Arrays.asList(context.packageName))
             dpm.setPermissionGrantState(admin, context.packageName, "android.permission.ACCESS_FINE_LOCATION", DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED)
             dpm.setPermissionGrantState(admin, context.packageName, "android.permission.ACCESS_BACKGROUND_LOCATION", DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED)
@@ -85,7 +86,7 @@ class KioskDeviceAdminReceiver : DeviceAdminReceiver(){
             )
             dpm.addUserRestriction(admin, UserManager.DISALLOW_FACTORY_RESET)
             dpm.setOrganizationName(admin, ConstantClass.OrganizationName)
-            dpm.addUserRestriction(admin, UserManager.DISALLOW_DEBUGGING_FEATURES)
+            //dpm.addUserRestriction(admin, UserManager.DISALLOW_DEBUGGING_FEATURES)
             dpm.setPermittedAccessibilityServices(admin, Arrays.asList(context.packageName))
             dpm.setPermissionGrantState(admin, context.packageName, "android.permission.ACCESS_FINE_LOCATION", DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED)
             dpm.setPermissionGrantState(admin, context.packageName, "android.permission.ACCESS_BACKGROUND_LOCATION", DevicePolicyManager.PERMISSION_GRANT_STATE_GRANTED)

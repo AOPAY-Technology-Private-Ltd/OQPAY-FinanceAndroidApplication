@@ -507,7 +507,7 @@ class KioskActivity : BaseActivity() {
                                     MobileNumber= response.mobileNo.toString()
                                     FName= response.firstName.toString()
                                     LName= response.lastName.toString()
-                                    binding.infomasg.text = "This device has been locked due to a pending payment for Loan Code ${loanCode}. To unlock your device, please contact your retailer, ${FName} ${LName}, at 9558444159 or via email at $EmailId."
+                                    binding.infomasg.text = "This device has been locked due to a pending payment for Loan Code ${preference.getStringValue(ConstantClass.LoanCode, "")}. To unlock your device, please contact your retailer, ${FName} ${LName}, at 9558444159 or via email at $EmailId."
                                
                                 }
                                 else {
@@ -614,6 +614,7 @@ class KioskActivity : BaseActivity() {
 
 
         loanCode = LoanEmiList!![0]!!.loanCode.toString()
+        preference.setStringValue(ConstantClass.LoanCode,LoanEmiList!![0]!!.loanCode.toString())
         emiAmount = LoanEmiList!![0]!!.emiAmount.toString()
         loanmode = LoanEmiList[0]!!.loanmode
 
