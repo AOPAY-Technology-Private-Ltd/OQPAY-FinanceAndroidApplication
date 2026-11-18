@@ -113,21 +113,31 @@ class AadharCardVerificationPage : BaseActivity() {
     private val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         if (success) {
             if(front){
-                // Handle the photoUri, e.g., show image in ImageView
+                // Handle the photoUri with saveImageToCache to fix rotation and handle large images
                 binding.frontcardimage.visibility= View.VISIBLE
                 binding.frontcardicon.visibility= View.GONE
-                binding.frontcardimage.setImageURI(photoFrontUri)
                 binding.uploadtextfront.text= "Re- Upload"
-                // binding.frontcardimage.setImageURI(Uri.fromFile(saveImageToCache(this@AadharCardVerificationPage,photoFrontUri!!,"AadharFrontImage")))
-                Log.d("ImageCache", "File saved at: ${saveImageToCache(this@AadharCardVerificationPage,photoFrontUri!!,"AadharFrontImage")!!.absolutePath}, size: ${saveImageToCache(this@AadharCardVerificationPage,photoFrontUri!!,"AadharFrontImage")!!.length()} bytes")
+                val cachedFile = saveImageToCache(this@AadharCardVerificationPage, photoFrontUri!!, "AadharFrontImage")
+                if (cachedFile != null) {
+                    photoFrontUri = Uri.fromFile(cachedFile)
+                    binding.frontcardimage.setImageURI(photoFrontUri)
+                } else {
+                    binding.frontcardimage.setImageURI(photoFrontUri)
+                }
 
             }
             else{
-                // Handle the photoUri, e.g., show image in ImageView
+                // Handle the photoUri with saveImageToCache to fix rotation and handle large images
                 binding.backcardimage.visibility= View.VISIBLE
                 binding.camerabackicon.visibility= View.GONE
-                binding.backcardimage.setImageURI(photoBackUri)
                 binding.uploadtextback.text= "Re- Upload"
+                val cachedFile = saveImageToCache(this@AadharCardVerificationPage, photoBackUri!!, "AadharBackImage")
+                if (cachedFile != null) {
+                    photoBackUri = Uri.fromFile(cachedFile)
+                    binding.backcardimage.setImageURI(photoBackUri)
+                } else {
+                    binding.backcardimage.setImageURI(photoBackUri)
+                }
             }
 
         }else{

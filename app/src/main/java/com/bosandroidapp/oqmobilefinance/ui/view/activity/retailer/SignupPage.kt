@@ -334,22 +334,8 @@ class SignupPage : BaseActivity() {
 
 
     private fun compressImageAndGetPath(uri: Uri): String {
-        val bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            ImageDecoder.decodeBitmap(ImageDecoder.createSource(contentResolver, uri))
-        } else {
-            MediaStore.Images.Media.getBitmap(contentResolver, uri)
-        }
-
-        // Define destination for compressed file
-        val compressedFile = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "compressed_${System.currentTimeMillis()}.jpg")
-        val out = FileOutputStream(compressedFile)
-
-        // 80 is a good balance between file size and readability for documents
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 80, out)
-        out.flush()
-        out.close()
-
-        return compressedFile.absolutePath
+        val cachedFile = saveImageToCache(this, uri, "SignupPhoto_$currentCaptureMode")
+        return cachedFile?.absolutePath ?: ""
     }
 
 

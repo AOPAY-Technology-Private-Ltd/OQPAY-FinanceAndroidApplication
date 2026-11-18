@@ -116,28 +116,18 @@ class PanCardVerificationPage : BaseActivity() {
 
     private val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success) {
-                // Handle the photoUri, e.g., show image in ImageView
+                // Handle the photoUri with saveImageToCache to fix rotation and handle large images
                 binding.frontcardimage.visibility = View.VISIBLE
                 binding.frontcardicon.visibility = View.GONE
-                binding.frontcardimage.setImageURI(photoFrontUri)
                 binding.uploadtextfront.text = "Re- Upload"
-                // binding.frontcardimage.setImageURI(Uri.fromFile(saveImageToCache(this@AadharCardVerificationPage,photoFrontUri!!,"AadharFrontImage")))
-                Log.d(
-                    "ImageCache",
-                    "File saved at: ${
-                        saveImageToCache(
-                            this@PanCardVerificationPage,
-                            photoFrontUri!!,
-                            "PanFrontImage"
-                        )!!.absolutePath
-                    }, size: ${
-                        saveImageToCache(
-                            this@PanCardVerificationPage,
-                            photoFrontUri!!,
-                            "PanFrontImage"
-                        )!!.length()
-                    } bytes"
-                )
+                val cachedFile = saveImageToCache(this@PanCardVerificationPage, photoFrontUri!!, "PanFrontImage")
+                if (cachedFile != null) {
+                    photoFrontUri = Uri.fromFile(cachedFile)
+                    binding.frontcardimage.setImageURI(photoFrontUri)
+                }
+                else {
+                    binding.frontcardimage.setImageURI(photoFrontUri)
+                }
 
             }
             else{

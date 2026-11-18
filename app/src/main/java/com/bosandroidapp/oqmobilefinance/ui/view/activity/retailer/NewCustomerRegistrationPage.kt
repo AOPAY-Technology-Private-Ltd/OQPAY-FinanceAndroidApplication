@@ -210,20 +210,32 @@ class NewCustomerRegistrationPage : BaseActivity() {
     var membershipAmt: String = ""
 
     private var verifyCustomerRetryCount = 0
+
     private val MAX_RETRY_COUNT = 3
+
 
     private val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success) {
-                // Handle the photoUri, e.g., show image in ImageView
+                // Handle the photoUri with saveImageToCache to fix rotation (EXIF orientation) and handle large / high-resolution images
                 AadharImage=""
                 binding.userimage.visibility = View.VISIBLE
                 binding.lockimage.visibility = View.GONE
-                binding.userimage.setImageURI(photoUri)
 
-                val imageFile = uriToFile(photoUri!!, this)
-                customerImagePath = imageFile!!.absolutePath
+                val cachedFile = saveImageToCache(this, photoUri!!, "CustomerPhoto")
+                if (cachedFile != null) {
+                    photoUri = Uri.fromFile(cachedFile)
+                    customerImagePath = cachedFile.absolutePath
+                    CustPhotoPath = photoUri
+                    binding.userimage.setImageURI(photoUri)
+                }
+                else {
+                    binding.userimage.setImageURI(photoUri)
+                    val imageFile = uriToFile(photoUri!!, this)
+                    customerImagePath = imageFile?.absolutePath ?: ""
+                    CustPhotoPath = photoUri
+                }
+
                 binding.imagenotuploaded.visibility = View.GONE
-
             }
             else{
                 photoUri = null
@@ -232,7 +244,6 @@ class NewCustomerRegistrationPage : BaseActivity() {
                 binding.userimage.visibility = View.GONE
                 binding.lockimage.visibility = View.VISIBLE
             }
-
         }
 
 
@@ -280,7 +291,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
     }
 
 
-  fun hitApiForMemberShipFee() {
+    fun hitApiForMemberShipFee() {
         val startTime = System.currentTimeMillis()
         var req = GetIsEligibleLoanReq(
             panNumber = PanNumber,
@@ -446,6 +457,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
         })
 
+
         binding.middleName.addTextChangedListener(object :TextWatcher{
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -468,6 +480,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
         })
 
+
         binding.lastName.addTextChangedListener(object :TextWatcher{
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -489,6 +502,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
             }
 
         })
+
 
         binding.flathouseno.addTextChangedListener(object :TextWatcher{
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
@@ -819,7 +833,6 @@ class NewCustomerRegistrationPage : BaseActivity() {
         }
 
 
-
         binding.acceptTermConditionCheck.setOnClickListener {
             OpenPopUpForTermCondition()
 
@@ -1112,9 +1125,11 @@ class NewCustomerRegistrationPage : BaseActivity() {
 
 
     }
-    
+
+
 
      fun hitApiForVerifyCustomer(){
+
         var sendOtpReq = VerifyCustomerReq(
             primaryMobileNumber = binding.mobileNumber.text.toString().trim()
         )
@@ -1155,7 +1170,9 @@ class NewCustomerRegistrationPage : BaseActivity() {
                 }
             }
         }
+
     }
+
 
 
     fun OpenPopUpForVeryfyOTP(EmailID: String, otp: String) {
@@ -1268,7 +1285,6 @@ class NewCustomerRegistrationPage : BaseActivity() {
     }
 
 
-
     private fun createImageFile(): File {
         val fileName = "IMG_${System.currentTimeMillis()}"
         val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
@@ -1286,12 +1302,9 @@ class NewCustomerRegistrationPage : BaseActivity() {
     private fun checkCameraPermissionAndOpenCamera() {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
             clickCameraForUploadDocument()
-        } else {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(android.Manifest.permission.CAMERA),
-                CAMERA_REQUEST_CODE_FRONT
-            )
+        }
+        else {
+            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.CAMERA), CAMERA_REQUEST_CODE_FRONT)
         }
     }
 
@@ -1345,7 +1358,6 @@ class NewCustomerRegistrationPage : BaseActivity() {
             }
         }
     }
-
 
 
     fun hitApiForSendOTP(mailidormobile: String, type: String) {
@@ -1402,7 +1414,6 @@ class NewCustomerRegistrationPage : BaseActivity() {
             }
         }
     }
-
 
 
     fun hitApiForOTPVerify(mobileOrEmailID: String, otp: String, message: String) {
@@ -1477,7 +1488,6 @@ class NewCustomerRegistrationPage : BaseActivity() {
         }
 
     }
-
 
 
     fun isValidForm(

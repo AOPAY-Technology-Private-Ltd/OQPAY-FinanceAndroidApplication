@@ -137,55 +137,60 @@ class IMEIDetailsPage : BaseActivity() {
     private val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         if (success) {
             if(imei1photo){
-                // Handle the photoUri, e.g., show image in ImageView
+                // Handle the photoUri with saveImageToCache to fix rotation and handle large images
                 binding.imei1photo.visibility= View.VISIBLE
                 binding.imei1photoicon.visibility= View.GONE
-               // binding.imei1photo.setImageURI(imei1photoUri)
+                binding.clicktosealphoto1.text= "Re- Upload"
+                val cachedFile = saveImageToCache(this, imei1photoUri!!, "IMEINumber1Image")
+                if (cachedFile != null) {
+                    imei1photoUri = Uri.fromFile(cachedFile)
+                    ImeiNumber1SealPhotoPath = imei1photoUri
+                } else {
+                    ImeiNumber1SealPhotoPath = imei1photoUri
+                }
                 Glide.with(this)
                     .load(imei1photoUri)
                     .centerCrop()
                     .into(binding.imei1photo)
-                binding.clicktosealphoto1.text= "Re- Upload"
                 resetFlag()
             }
            else if(imei2photo){
-                // Handle the photoUri, e.g., show image in ImageView
+                // Handle the photoUri with saveImageToCache to fix rotation and handle large images
                 binding.imei2photo.visibility= View.VISIBLE
                 binding.imei2photoicon.visibility= View.GONE
-                //binding.imei2photo.setImageURI(imei2photoUri)
+                binding.clicktosealphoto2.text= "Re- Upload"
+                val cachedFile = saveImageToCache(this, imei2photoUri!!, "IMEINumber2Image")
+                if (cachedFile != null) {
+                    imei2photoUri = Uri.fromFile(cachedFile)
+                    ImeiNumber2SealPhotoPath = imei2photoUri
+                } else {
+                    ImeiNumber2SealPhotoPath = imei2photoUri
+                }
                 Glide.with(this)
                     .load(imei2photoUri)
                     .centerCrop()
                     .into(binding.imei2photo)
-                binding.clicktosealphoto2.text= "Re- Upload"
                 resetFlag()
             }
 
            else if(ImeiPhoto){
-                // Handle the photoUri, e.g., show image in ImageView
+                // Handle the photoUri with saveImageToCache to fix rotation and handle large images
                 binding.ImeiPhoto.visibility= View.VISIBLE
                 binding.imeiicon.visibility= View.GONE
-               // binding.ImeiPhoto.setImageURI(ImeiPhotoUri)
+                binding.clicktoimeiphoto.text= "Re- Upload"
+                val cachedFile = saveImageToCache(this, ImeiPhotoUri!!, "IMEINumberImage")
+                if (cachedFile != null) {
+                    ImeiPhotoUri = Uri.fromFile(cachedFile)
+                    ImeiNumberPhotoPath = ImeiPhotoUri
+                } else {
+                    ImeiNumberPhotoPath = ImeiPhotoUri
+                }
                 Glide.with(this)
                     .load(ImeiPhotoUri)
                     .centerCrop()
                     .into(binding.ImeiPhoto)
-                binding.clicktoimeiphoto.text= "Re- Upload"
                 resetFlag()
             }
-
-          /* else if(invoicePhoto){
-                // Handle the photoUri, e.g., show image in ImageView
-                binding.invoicePhoto.visibility= View.VISIBLE
-                binding.invoiceicon.visibility= View.GONE
-               // binding.invoicePhoto.setImageURI(invoicePhotoUri)
-                Glide.with(this)
-                    .load(invoicePhotoUri)
-                    .centerCrop()
-                    .into(binding.invoicePhoto)
-                binding.clicktoinvoice.text= "Re- Upload"
-                resetFlag()
-            }*/
         }
         else{
             if(imei1photo){

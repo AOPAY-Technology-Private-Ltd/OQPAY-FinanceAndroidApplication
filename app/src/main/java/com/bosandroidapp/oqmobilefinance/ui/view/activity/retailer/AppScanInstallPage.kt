@@ -42,6 +42,7 @@ import com.beastblocks.provisionerjattsdk.ProvisionerJattListener
 import com.beastblocks.provisionerjattsdk.ProvisioningStatus
 import okhttp3.RequestBody.Companion.toRequestBody
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.createMultipartFromUri
+import com.bosandroidapp.oqmobilefinance.constant.ConstantClass.saveImageToCache
 import com.bosandroidapp.bosmobilefinance.ui.slideshow.ui.view.activity.retailer.cibilreportsfragment.BureauScore.Companion.userScore
 import com.bosandroidapp.oqmobilefinance.R
 import com.bosandroidapp.oqmobilefinance.constant.ConstantClass
@@ -168,14 +169,20 @@ class AppScanInstallPage : BaseActivity() {
 
     private val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         if (success) {
-                // Handle the photoUri, e.g., show image in ImageView
+                // Handle the photoUri with saveImageToCache to fix rotation and handle large images
                 binding.invoiceImage.visibility= View.VISIBLE
+                binding.tvUploadText.text= "Re-Upload"
+                val cachedFile = saveImageToCache(this, invoicePhotoUri!!, "InvoiceImage")
+                if (cachedFile != null) {
+                    invoicePhotoUri = Uri.fromFile(cachedFile)
+                    Invoive_Path = invoicePhotoUri
+                } else {
+                    Invoive_Path = invoicePhotoUri
+                }
                 Glide.with(this)
                     .load(invoicePhotoUri)
                     .centerCrop()
                     .into(binding.invoiceImage)
-                binding.tvUploadText.text= "Re-Upload"
-                Invoive_Path = invoicePhotoUri
                 binding.btnUploadToServer.visibility = View.VISIBLE
         }
         else{

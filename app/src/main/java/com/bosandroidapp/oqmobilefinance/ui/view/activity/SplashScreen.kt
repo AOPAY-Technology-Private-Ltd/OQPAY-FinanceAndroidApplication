@@ -40,6 +40,8 @@ class SplashScreen : AppCompatActivity() {
     lateinit var preference: SharedPreference
 
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         actionBar?.hide()

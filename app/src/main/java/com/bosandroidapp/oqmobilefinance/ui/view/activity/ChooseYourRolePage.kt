@@ -58,7 +58,6 @@ class ChooseYourRolePage : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
         binding = ActivityChooseYourRolePageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -125,6 +124,7 @@ class ChooseYourRolePage : BaseActivity() {
 
 
     }
+
 
 
     private fun checkPermissionsrRetailer(): Boolean {
