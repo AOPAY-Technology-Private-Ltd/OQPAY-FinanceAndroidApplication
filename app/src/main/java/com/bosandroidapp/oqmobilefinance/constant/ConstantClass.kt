@@ -110,8 +110,7 @@ object ConstantClass {
         val panRegId: String,
         val pennyDropRegId: String,
         val panRegIdOffline: String,
-        val pennyDropRegIdOffline: String
-    ) {
+        val pennyDropRegIdOffline: String) {
         RELEASE_UAT(
             baseUrl = "https://uat.api.oqpay.in/",
             baseUrlImage = "https://uat.api.oqpay.in",
