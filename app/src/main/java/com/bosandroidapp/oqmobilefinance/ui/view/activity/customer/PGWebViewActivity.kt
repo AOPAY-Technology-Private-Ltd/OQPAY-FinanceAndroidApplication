@@ -117,12 +117,13 @@ class PGWebViewActivity : BaseActivity() {
 
     fun launchPGOnWebView(){
         val pgUrl = intent.getStringExtra("pgurl")
+
         if(intent.hasExtra("mode")&& intent.hasExtra("merchantid")){
             mode = intent.getStringExtra("mode").toString()
             merchantid = intent.getStringExtra("merchantid").toString()
         }
 
-        val finalHtml = """
+/*        val finalHtml = """
        <html>
        <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -131,12 +132,53 @@ class PGWebViewActivity : BaseActivity() {
         $pgUrl
         </body>
         </html> 
-        """.trimIndent()
+        """.trimIndent()*/
 
-        binding.pgwebview.settings.javaScriptEnabled = true
-        binding.pgwebview.settings.domStorageEnabled = true
+
+        val finalHtml = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta name="viewport" 
+              content="width=device-width, initial-scale=1.0"/>
+        <style>
+            html, body {
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                font-size: 16px;
+            }
+        </style>
+    </head>
+    <body>
+        $pgUrl
+    </body>
+    </html>
+""".trimIndent()
+
+        binding.pgwebview.settings.apply {
+
+            // Enable JavaScript
+            javaScriptEnabled = true
+
+            // Enable DOM Storage
+            domStorageEnabled = true
+
+            // Responsive screen support
+            useWideViewPort = true
+            loadWithOverviewMode = true
+
+            builtInZoomControls = false
+            displayZoomControls = false
+
+            // Load images automatically
+            loadsImagesAutomatically = true
+
+            // Enable normal scrolling
+            javaScriptCanOpenWindowsAutomatically = true
+        }
+
         binding.pgwebview.webViewClient = object : WebViewClient() {
-
             override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
 
                 if(mode.equals(ConstantClass.online) && !merchantid.isNullOrEmpty()){
@@ -210,8 +252,15 @@ class PGWebViewActivity : BaseActivity() {
             }
         }
 
-        binding.pgwebview.loadDataWithBaseURL("https://secure.payu.in/", finalHtml, "text/html", "UTF-8", null)
-        binding.pgwebview.loadUrl(pgUrl!!)
+        //binding.pgwebview.loadDataWithBaseURL("https://secure.payu.in/", finalHtml, "text/html", "UTF-8", null)
+        // Load HTML form and automatically submit it to PayU
+        if(mode.equals(ConstantClass.online) && !merchantid.isNullOrEmpty()){
+            binding.pgwebview.loadUrl(pgUrl!!)
+        }
+        else{
+            binding.pgwebview.loadDataWithBaseURL("https://secure.payu.in/", finalHtml, "text/html", "UTF-8", null)
+        }
+
 
     }
 

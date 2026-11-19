@@ -39,7 +39,7 @@ class AuthInterceptor : Interceptor {
         if (response.code == 403) {
             Log.e("AuthInterceptor", "403 Forbidden - Redirecting to login $path")
             
-/*            val preference = SharedPreference(ApplicationClass.instance)
+/*          val preference = SharedPreference(ApplicationClass.instance)
             preference.setBooleanValue(ConstantClass.LoggedIn, false)
             preference.setStringValue(ConstantClass.AccessToken, "")
             preference.setStringValue(ConstantClass.RefreshToken, "")
