@@ -1019,6 +1019,7 @@ class SignupPage : BaseActivity() {
 
     fun hitApiForRegistration(firstName:String,lastName:String,mobNumber:String,emailId:String,password:String,confrmPassword:String,panNumber:String,aadharNumber:String,gstNumber:String,address:String,storename:String,legalName:String,tradeName:String,constitutionOfBusiness:String,storeaddress:String){
         binding.createaccount.isEnabled=false
+
         val profilePhoto = saveImageToCache(this, profilePhotoUri!!, "profile.jpg")
         val aadhaarfront = saveImageToCache(this, aadhaarFronthotoUri!!, "aadhaarfront.jpg")
         val aadhaarback = saveImageToCache(this,aadhaarBackhotoUri!!, "aadhaarback.jpg")

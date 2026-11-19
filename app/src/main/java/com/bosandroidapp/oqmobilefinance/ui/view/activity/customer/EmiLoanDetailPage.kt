@@ -494,6 +494,7 @@ class EmiLoanDetailPage : BaseActivity() {
         }
 
 
+
       /*  val emiOptions = ConstantClass.generateEMIOptions(tenure)
         val noOfEmiAdapter = ArrayAdapter(this, R.layout.mobilenamelayout, emiOptions )
         noOfEmiAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)

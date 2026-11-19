@@ -189,6 +189,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
     lateinit var preference: SharedPreference
     var clickmobile: Boolean = false
     var clickalternatemobile: Boolean = false
+    private var isAlreadyCustomerDataLoaded = false
     var clickemailId: Boolean = false
     var EmailId: String = ""
     var customerImagePath: String? = ""
@@ -1881,7 +1882,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
         binding.statename.setText(AlreadyCustomerStateName)
         binding.cityname.setText(AlreadyCustomerCityName)
 
-        if(!AlreadyCustomerImage.isNullOrBlank()){
+        if(!AlreadyCustomerImage.isNullOrBlank() && !isAlreadyCustomerDataLoaded){
                 var CustomerImage = ConstantClass.BASE_URL_IMAGE + AlreadyCustomerImage
                 binding.lockimage.visibility = View.GONE
                 binding.userimage.visibility = View.VISIBLE
@@ -1889,6 +1890,7 @@ class NewCustomerRegistrationPage : BaseActivity() {
                 CustPhotoPath = Uri.parse(CustomerImage)
 
                 Glide.with(this).load(CustomerImage).into( binding.userimage)
+                isAlreadyCustomerDataLoaded = true
 
             lifecycleScope.launch(Dispatchers.IO) {
                 val imageFile = downloadImageToTemp(this@NewCustomerRegistrationPage, CustomerImage)
